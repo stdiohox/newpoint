@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "source_url": "https://www.newpointnp.com/",
+    "crawl_date": "2026-08-27",
+    "crawl_method": "Live browser render (Claude in Chrome) + robots.txt/sitemap.xml fetch; site is not exposed via any public API or CMS export",
+    "notes": "This JSON consolidates the structured/business data captured across the full crawl. See the accompanying markdown files in /research for verbatim content and full narrative context."
+  },
+  "business": {
+    "name_variants": {
+      "logo_wordmark": "NEWPOINT HEALTHCARE SERVICES, LLC",
+      "body_copy": "New Point Healthcare Services LLC",
+      "services_page_title": "New Point Healthcare LLC",
+      "schema_org_ldjson": "New Point healthcare Services LLC",
+      "canonical_recommendation": "UNRESOLVED - confirm exact registered legal name with client before rebuild/GBP setup"
+    },
+    "tagline": "Your Health is our Priority",
+    "domain": "newpointnp.com",
+    "phones": [
+      { "number": "(609) 527-9438", "e164": "+16095279438", "role": "primary / header Call Us button" },
+      { "number": "(215) 526-4153", "e164": "+12155264153", "role": "secondary" },
+      { "number": "(215) 987-2847", "e164": "+12159872847", "role": "secondary" }
+    ],
+    "fax": { "number": "(609) 527-9437", "e164": "+16095279437" },
+    "emails": [
+      { "address": "fwhitaker@newpointnp.com", "owner": "Funmilayo Whitaker" },
+      { "address": "aofoegbu@newpointnp.com", "owner": "Anastasia Ofoegbu" }
+    ],
+    "address": {
+      "street": null,
+      "city_stated_variants": ["Lawrence Township, NJ", "Lawrenceville, NJ"],
+      "state": "NJ",
+      "zip": null,
+      "note": "No street address published anywhere on the site. Must be obtained from client before GBP/citation work."
+    },
+    "service_area": {
+      "states": ["New Jersey", "Pennsylvania"],
+      "counties_towns": [],
+      "note": "Only state-level service area is published; no county/town breakdown exists on the site."
+    },
+    "hours": null,
+    "license_numbers": [],
+    "accreditations": [],
+    "insurance_accepted": [
+      "Aetna",
+      "Optum",
+      "Cigna Evernorth",
+      "United Healthcare",
+      "Medicare",
+      "NJ Medicaid",
+      "Blue Cross Blue Shield Horizon NJ"
+    ],
+    "finances": {
+      "session_fee": true,
+      "sliding_scale": true,
+      "payment_methods": ["Visa/Mastercard/major credit cards", "Debit cards", "Cash"]
+    },
+    "intake_process_notes": "No formal documented intake process. Stated first step is a comprehensive psychiatric evaluation at the initial visit; contact is via phone, email, or the site contact form."
+  },
+  "team": [
+    {
+      "name": "Funmilayo Whitaker",
+      "credentials": "DNP, FNP-BC, PMHNP-BC",
+      "certifications": [
+        "Psychiatric Mental Health Nurse Practitioner (DNP-PMHNP), board-certified",
+        "Family Nurse Practitioner (FNP), board-certified"
+      ],
+      "years_experience": "10+ (direct patient care)",
+      "licensed_states": ["New Jersey", "Pennsylvania"],
+      "email": "fwhitaker@newpointnp.com",
+      "photo_available": false,
+      "bio_conditions_treated": ["depression", "anxiety", "bipolar disorder", "panic attacks", "OCD", "PTSD", "schizophrenia"]
+    },
+    {
+      "name": "Anastasia O. Ofoegbu",
+      "credentials": "DNP, FNP-BC, PMHNP-BC",
+      "certifications": [
+        "Psychiatric Mental Health Nurse Practitioner (DNP-PMHNP), board-certified",
+        "Family Nurse Practitioner (FNP), board-certified"
+      ],
+      "years_experience": "14 (nursing overall); 11 (mental health/addiction focus)",
+      "licensed_states": ["New Jersey", "Pennsylvania"],
+      "email": "aofoegbu@newpointnp.com",
+      "photo_available": false,
+      "bio_conditions_treated": ["depression", "anxiety/panic attacks", "bipolar disorder", "other psychotic/mood disorders"]
+    }
+  ],
+  "services": {
+    "named_services": [
+      {
+        "name": "Comprehensive Psychiatric Evaluation and Treatment Planning",
+        "description": "Initial comprehensive psychiatric evaluation identifying risk factors; diagnosis via assessment; treatment plan combining psychotherapy modalities and psychopharmacology; collaboration with other professionals; ongoing progress evaluation, support, and education."
+      }
+    ],
+    "conditions_treated": [
+      "depression", "anxiety", "bipolar disorder", "panic attacks", "OCD", "PTSD",
+      "schizophrenia", "mood disorders", "irritability", "anger issues", "psychosis",
+      "stress", "burnout"
+    ],
+    "tagged_specialties": ["Depression", "Anxiety", "Mood Disorders"],
+    "treatment_methods_tools": [
+      "Telehealth (expanded schedule: weekends, evenings, holidays by request)",
+      "Comprehensive psychiatric evaluation questionnaire",
+      "Standardized clinical rating scales",
+      "Screening tests"
+    ],
+    "treatment_options": [
+      "Psychiatric consultation",
+      "Medication treatment",
+      "Individual counseling",
+      "Skill building groups",
+      "Support groups",
+      "Referral to follow-up services"
+    ],
+    "gaps_vs_standard_menu": [
+      "No named therapy modalities (e.g., CBT/DBT/EMDR)",
+      "No stated age range / population served as official policy",
+      "No substance use / addiction treatment service listed despite provider experience",
+      "No crisis/emergency protocol or 988/911 guidance",
+      "No online scheduling/booking",
+      "No new-patient info page",
+      "No description of group offerings",
+      "No published pricing/self-pay rate",
+      "No FAQ section",
+      "Testimonials section is a placeholder ('Coming soon')"
+    ]
+  },
+  "site_structure": {
+    "pages": [
+      { "url": "https://www.newpointnp.com/", "slug": "home", "title": "Mental Health Care Providers | Lawrence Township, NJ | New Point Healthcare Services LLC", "in_nav": true },
+      { "url": "https://www.newpointnp.com/services", "slug": "services", "title": "Psychiatric Evaluation and Treatment Planning | New Jersey | New Point Healthcare LLC", "in_nav": true },
+      { "url": "https://www.newpointnp.com/contact", "slug": "contact", "title": "Mental Health Care Providers | Lawrence Township, NJ", "in_nav": true },
+      { "url": "https://www.newpointnp.com/my-first-blog-postf4fcb77a", "slug": "my-first-blog-post", "title": "My First Blog Post", "in_nav": false, "orphan": true, "note": "Unedited Duda/IONOS template placeholder, dated 2017" },
+      { "url": "https://www.newpointnp.com/10-reasons-you-should-love-blogging6e3459e9", "slug": "10-reasons-you-should-love-blogging", "title": "10 Reasons You Should Love Blogging", "in_nav": false, "orphan": true, "note": "Unedited Duda/IONOS template placeholder" }
+    ],
+    "nav_links": ["Home -> /", "Services -> /services", "Contact -> /contact", "Call Us -> tel:+16095279438"],
+    "footer_or_bottom_block": {
+      "present_on_all_pages": true,
+      "is_semantic_footer_tag": false,
+      "content": ["Call Us heading", "3 phone numbers", "1 fax number", "2 email addresses", "IONOS Website Builder attribution badge"]
+    },
+    "robots_txt": "User-agent: *\n(no Disallow rules)\nSitemap: https://www.newpointnp.com/sitemap.xml",
+    "sitemap_xml_url_count": 5
+  },
+  "seo_technical": {
+    "cms_platform": "IONOS Website Builder (white-labeled Duda)",
+    "pages_metadata": [
+      {
+        "slug": "home",
+        "title": "Mental Health Care Providers | Lawrence Township, NJ | New Point Healthcare Services LLC",
+        "title_char_count": 88,
+        "meta_description": "At New Point Healthcare Services LLC, our mental health care providers specialize in psychiatric evaluations in New Jersey and Pennsylvania. Learn more.",
+        "canonical": "https://www.newpointnp.com/",
+        "h1": "Mental Health Support for Managing Stress, Anxiety, and Burnout",
+        "og_type": "website",
+        "twitter_card": "summary",
+        "structured_data_types": ["WebSite"]
+      },
+      {
+        "slug": "services",
+        "title": "Psychiatric Evaluation and Treatment Planning | New Jersey | New Point Healthcare LLC",
+        "title_char_count": 86,
+        "meta_description": "At New Point Healthcare Services LLC, we provide you with comprehensive psychiatric evaluation and treatment planning in Pennsylvania. Learn more here.",
+        "canonical": "https://www.newpointnp.com/services",
+        "h1": "Comprehensive Psychiatric Evaluation and Treatment Planning",
+        "og_type": "website",
+        "twitter_card": "summary",
+        "structured_data_types": []
+      },
+      {
+        "slug": "contact",
+        "title": "Mental Health Care Providers | Lawrence Township, NJ",
+        "title_char_count": 52,
+        "meta_description": "New Point Healthcare Services LLC offers mental health support to manage stress, anxiety, and burnout in New Jersey and Pennsylvania. Learn more here.",
+        "canonical": "https://www.newpointnp.com/contact",
+        "h1": "Mental Health Care Providers in Lawrenceville, NJ",
+        "og_type": "website",
+        "twitter_card": "summary",
+        "structured_data_types": []
+      }
+    ],
+    "issues": [
+      "Home and Services titles exceed ~60 chars (88 and 86) and are likely truncated in search results",
+      "Home and Contact titles are near-duplicates",
+      "Services page title says 'New Jersey' while its own meta description says 'Pennsylvania' - contradictory on-page targeting",
+      "Only one schema.org block site-wide (WebSite, homepage only), containing a typo in the business name; no LocalBusiness/MedicalBusiness/Physician schema anywhere",
+      "Same logo image reused as og:image/twitter:image on every page; twitter:card is 'summary' not 'summary_large_image'",
+      "3 of 4 img elements missing alt text; all 5 CSS background images have no text alternative",
+      "2 of 4 img elements missing explicit width/height",
+      "2 orphan pages are indexable and in sitemap.xml despite being unlinked from navigation"
+    ],
+    "performance_snapshot": {
+      "homepage_resource_count": 66,
+      "homepage_script_count": 23,
+      "homepage_image_requests": 20,
+      "dom_content_loaded_ms_observed": 446,
+      "load_event_ms_observed": 584,
+      "caveat": "Observed in this crawl session only; not a substitute for real PageSpeed Insights / Core Web Vitals field data"
+    },
+    "inferred_target_keywords": [
+      "mental health care providers", "psychiatric evaluation", "psychiatric evaluation and treatment planning",
+      "medication management", "Lawrence Township NJ", "Lawrenceville NJ", "New Jersey and Pennsylvania",
+      "anxiety", "depression", "stress", "burnout", "PTSD", "bipolar disorder", "telehealth", "mood disorders"
+    ]
+  },
+  "brand": {
+    "colors": {
+      "primary_blue": "#234598",
+      "accent_hover_blue": "#1F9DD6",
+      "white": "#FFFFFF",
+      "near_black_text": "#111111",
+      "body_background": "#EEEEEE",
+      "body_text": "#000000"
+    },
+    "fonts": {
+      "body": "Source Sans Pro",
+      "headings": "Inter",
+      "buttons": "Lato"
+    },
+    "logo": {
+      "original_file_downloaded": false,
+      "reason": "Signed/expiring CloudFront CDN URLs blocked both server-side fetch (CORS) and canvas re-export (tainted canvas, no CORS headers on the image response); no reference screenshot file could be saved into this repo either",
+      "reference_capture": null,
+      "description": "Blue medical-cross icon containing a stylized white human figure (blue gradient), wordmark 'NEWPOINT HEALTHCARE SERVICES, LLC' in bold blue sans-serif, tagline 'Your Health is our Priority' in lighter blue italic/script font"
+    },
+    "photography": {
+      "provider_headshots": false,
+      "office_photos": false,
+      "all_imagery_is_generic_stock_or_decorative": true
+    }
+  },
+  "gaps_summary_ref": "See research/audit-summary.md for the full narrative gap analysis and prioritized recommendations."
+}
