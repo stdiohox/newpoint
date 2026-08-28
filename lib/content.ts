@@ -62,6 +62,21 @@ export const HERO = {
     'Evaluation, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners. Most major insurance accepted.',
 } as const;
 
+/**
+ * Compact practice facts. Adapted from Grove AI's proof-point formula, with the
+ * big-number treatment and small-caps labels deliberately removed. See
+ * references/disposition.md for the reasoning.
+ *
+ * Every line restates something already confirmed in /research/people-trust.md.
+ * No figure is invented and no certifying body is named, because none is stated
+ * anywhere in the source material.
+ */
+export const PRACTICE_FACTS = [
+  { fact: 'Two providers', detail: 'Both hold a Doctor of Nursing Practice' },
+  { fact: 'Dual-certified', detail: 'PMHNP-BC and FNP-BC, both providers' },
+  { fact: 'Two states', detail: 'Licensed in New Jersey and Pennsylvania' },
+] as const;
+
 export const INSURANCE = {
   heading: 'In-network with major plans',
   body: 'We accept the plans below. If yours is not listed, ask us and we will check your coverage before your first appointment.',
@@ -308,7 +323,7 @@ export const OPEN_CLIENT_ITEMS = [
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   'Self-pay session fee and the sliding scale criteria',
   'Original logo file, vector preferred',
-  'Written permission or brand assets for insurer logos, if payer marks are to be shown',
+  'Optional upgrade only, no longer a gap: written permission or brand assets for insurer logos, if the practice ever wants payer marks instead of the typographic wall',
   'Patient testimonials with documented consent, if the practice wants them later',
   'Reshoot of both provider portraits at 2000px or more with headroom, to unlock the deferred hero treatment',
 ] as const;

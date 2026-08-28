@@ -42,15 +42,21 @@
   --font-body: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
 
   /* Type scale. Tracking tightens as size increases, body sits near zero. */
+  /* Display weight is 500, not 600. Superpower's whisper-weight principle says
+     display type should be lighter than instinct suggests. Their literal 400 is
+     not transferable here: it works as white type on dark photography, and this
+     hero is dark type on warm white where thin strokes lose presence rather than
+     gain elegance. 500 sheds the bluntness of 600 and keeps the authority.
+     Reverting is a one-line change if 600 reads better in situ. */
   --text-display-xl: clamp(2.75rem, 6vw, 4.5rem);
   --text-display-xl--line-height: 1.02;
   --text-display-xl--letter-spacing: -0.03em;
-  --text-display-xl--font-weight: 600;
+  --text-display-xl--font-weight: 500;
 
   --text-display-l: clamp(2.25rem, 4.5vw, 3.25rem);
   --text-display-l--line-height: 1.06;
   --text-display-l--letter-spacing: -0.025em;
-  --text-display-l--font-weight: 600;
+  --text-display-l--font-weight: 500;
 
   --text-h2: clamp(1.75rem, 3vw, 2.5rem);
   --text-h2--line-height: 1.1;
@@ -99,8 +105,12 @@
     --np-alpha-white-08: rgb(255 255 255 / 0.08);
     --np-alpha-white-14: rgb(255 255 255 / 0.14);
 
+    /* Whispered, never declared. Mintlify's rule is 2px offset at 3-5% opacity,
+       and if a component needs more separation it gets a 1px border instead.
+       --shadow-np-card already matched. --shadow-np-lift had drifted to a 12px
+       offset at 10%, well outside that discipline, so it is pulled back here. */
     --shadow-np-card: 0 2px 8px rgb(19 28 46 / 0.05);
-    --shadow-np-lift: 0 12px 32px -8px rgb(19 28 46 / 0.1);
+    --shadow-np-lift: 0 4px 16px -4px rgb(19 28 46 / 0.06);
   }
 
   html {

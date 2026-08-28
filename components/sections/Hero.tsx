@@ -35,12 +35,13 @@ export function Hero() {
                 <Button href={CTA.href} size="lg">
                   {CTA.label}
                 </Button>
-                <a
-                  href={`tel:${BUSINESS.phonePrimaryHref}`}
-                  className="text-body text-np-blue-600 ease-np-out hover:text-np-blue-700 font-medium underline-offset-4 transition-colors duration-[180ms] hover:underline"
-                >
+                {/* Canonical CTA pair, adapted from Grove AI: filled primary beside an
+                    outlined ghost. Distinct intents (book vs call), so this is not a
+                    duplicate CTA. The outlined variant also gives the phone number a
+                    real tap target on mobile, which a bare text link did not. */}
+                <Button href={`tel:${BUSINESS.phonePrimaryHref}`} variant="quiet" size="lg">
                   {BUSINESS.phonePrimary}
-                </a>
+                </Button>
               </div>
             </Reveal>
           </div>
