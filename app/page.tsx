@@ -1,0 +1,47 @@
+import { Nav } from '@/components/Nav';
+import { Footer } from '@/components/Footer';
+import { Hero } from '@/components/sections/Hero';
+import { InsuranceProof } from '@/components/sections/InsuranceProof';
+import { Providers } from '@/components/sections/Providers';
+import { WhatWeTreat } from '@/components/sections/WhatWeTreat';
+import { GettingStarted } from '@/components/sections/GettingStarted';
+import { Faq } from '@/components/sections/Faq';
+import { ContactCrisis } from '@/components/sections/ContactCrisis';
+import { medicalBusinessSchema, physicianSchema, faqSchema } from '@/lib/schema';
+import { FAQ } from '@/lib/content';
+
+/**
+ * Seven sections, seven distinct layout families, in the order confirmed in
+ * design-synthesis.md Part 4. No two consecutive sections share a family.
+ *
+ * Statically rendered. Only the accordion, the mobile nav, the contact form,
+ * and the reveal wrapper are client components, each an isolated leaf.
+ */
+export default function Home() {
+  const schemas = [medicalBusinessSchema(), ...physicianSchema(), faqSchema(FAQ.groups)];
+
+  return (
+    <>
+      {schemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+
+      <div id="top" />
+      <Nav />
+      <main id="main">
+        <Hero />
+        <InsuranceProof />
+        <Providers />
+        <WhatWeTreat />
+        <GettingStarted />
+        <Faq />
+        <ContactCrisis />
+      </main>
+      <Footer />
+    </>
+  );
+}

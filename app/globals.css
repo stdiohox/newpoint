@@ -1,0 +1,153 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Design tokens. Single source of truth is /design-research/design-tokens.md.
+   Every value below is declared here and consumed as a Tailwind theme value.
+   Do not hardcode hex, radius, or easing in components.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* Brand blue. #234598 is preserved brand equity, do not alter. */
+  --color-np-blue-900: #101f45;
+  --color-np-blue-700: #1b3576;
+  --color-np-blue-600: #234598;
+  --color-np-blue-500: #3d62b8;
+  --color-np-blue-300: #8fb0ee; /* on-ink use only */
+  --color-np-blue-100: #e3eaf8;
+  --color-np-blue-50: #f1f5fc;
+
+  /* Ink and warm neutrals */
+  --color-np-ink: #131c2e;
+  --color-np-neutral-900: #2a2822;
+  --color-np-neutral-700: #403d36;
+  --color-np-neutral-600: #5c584f;
+  --color-np-neutral-500: #7c776d;
+  --color-np-neutral-400: #a8a399;
+  --color-np-neutral-300: #d3cfc6;
+  --color-np-neutral-200: #e7e4dd;
+  --color-np-neutral-100: #f4f2ed;
+  --color-np-neutral-50: #fbfaf8;
+  --color-np-surface: #ffffff;
+
+  /* Single accent. Small non-text surfaces only, never text on light. */
+  --color-np-amber-500: #e9a93c;
+  --color-np-amber-100: #fbeed5;
+
+  /* Semantic */
+  --color-np-success: #2f7d4f;
+  --color-np-error: #b3261e;
+
+  /* Type families, wired to next/font/local variables */
+  --font-display: var(--font-cabinet-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale. Tracking tightens as size increases, body sits near zero. */
+  --text-display-xl: clamp(2.75rem, 6vw, 4.5rem);
+  --text-display-xl--line-height: 1.02;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-xl--font-weight: 600;
+
+  --text-display-l: clamp(2.25rem, 4.5vw, 3.25rem);
+  --text-display-l--line-height: 1.06;
+  --text-display-l--letter-spacing: -0.025em;
+  --text-display-l--font-weight: 600;
+
+  --text-h2: clamp(1.75rem, 3vw, 2.5rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 600;
+
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h3--font-weight: 550;
+
+  --text-body-l: 1.125rem;
+  --text-body-l--line-height: 1.6;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+  --text-small--letter-spacing: 0.005em;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.45;
+  --text-caption--letter-spacing: 0.01em;
+  --text-caption--font-weight: 500;
+
+  /* Radius. One documented rule:
+     pill for buttons, 14px cards, 10px inputs, 20px media, 6px chips, 0 dividers. */
+  --radius-pill: 999px;
+  --radius-card: 14px;
+  --radius-input: 10px;
+  --radius-media: 20px;
+  --radius-chip: 6px;
+
+  /* Motion */
+  --ease-np-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-np-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* Alpha tokens: composite correctly over white, warm white, and ink alike. */
+@layer base {
+  :root {
+    --np-alpha-ink-04: rgb(19 28 46 / 0.04);
+    --np-alpha-ink-08: rgb(19 28 46 / 0.08);
+    --np-alpha-ink-12: rgb(19 28 46 / 0.12);
+    --np-alpha-white-08: rgb(255 255 255 / 0.08);
+    --np-alpha-white-14: rgb(255 255 255 / 0.14);
+
+    --shadow-np-card: 0 2px 8px rgb(19 28 46 / 0.05);
+    --shadow-np-lift: 0 12px 32px -8px rgb(19 28 46 / 0.1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-np-neutral-50);
+    color: var(--color-np-neutral-700);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-np-ink);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible focus on every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--color-np-blue-600);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-np-blue-100);
+    color: var(--color-np-ink);
+  }
+}
+
+/* MOTION_INTENSITY 4. Reduced motion is mandatory at this level. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
