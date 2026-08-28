@@ -48,4 +48,8 @@ Skills applied throughout, per the mandate in [`CLAUDE.md`](../CLAUDE.md): `desi
 
 ## Status
 
-The direction in `design-synthesis.md` is committed but has one **critical path blocker**: it depends on provider portraits, and per [`research/people-trust.md`](../research/people-trust.md) no photographs of either provider exist anywhere. That request is the highest-priority client item in the project. Open questions are listed in Part 8 of the synthesis.
+The direction in `design-synthesis.md` is committed and **no longer blocked**. Both provider portraits were supplied on 2026-08-28 and are committed under [`assets/providers/`](assets/providers/) with a full technical report.
+
+They carry one real constraint. Both are phone selfies, square, EXIF-stripped and re-compressed, with mismatched backgrounds and no headroom above the head. That caps the pair at roughly 560px displayed and rules out the arch mask. **Section 3 is therefore revised from a hero-scale portrait moment to card scale**, documented in Part 4 of the synthesis and section 7.1 of the tokens. The arch-mask and hero-scale treatment are marked **deferred, not discarded**: a single-session reshoot at 2000px or more with headroom is the upgrade path that restores both.
+
+Remaining open questions are listed in Part 8 of the synthesis.

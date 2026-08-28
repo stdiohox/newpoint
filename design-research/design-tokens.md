@@ -155,7 +155,11 @@ One documented rule, applied everywhere. Mixed systems are only legitimate when 
 | Tags and small chips | `--r-chip` | `6px` |
 | Dividers and hairlines | `--r-none` | `0` |
 
-**Portrait variant:** the provider portraits in section 3 use the arch mask borrowed from Cerebral, `border-radius: 100% 100% 20px 20px`. It is the one characterful shape in the system and it appears only there.
+**Portrait treatment:** provider portraits in section 3 use `--r-media` (20px rounded rectangle), the same token as all other media. No special shape.
+
+> **Deferred: the arch mask.** The original proposal was an arch borrowed from Cerebral, `border-radius: 100% 100% 20px 20px`, as the one characterful shape in the system. It is **not viable with the supplied photos**: the arch needs clear space above the head for the dome to read, and neither portrait has headroom (both crop into the hair at the top edge). Cropping can only remove that space, never add it. See [`assets/providers/README.md`](assets/providers/README.md).
+>
+> **This idea is deferred, not discarded.** If better originals or a reshoot arrive at 2000px or more on the longest edge with headroom above the head, revisit the arch mask together with the hero-scale treatment in [`design-synthesis.md`](design-synthesis.md) Part 4. It remains the strongest available route to a distinctive shape in this system.
 
 ---
 
@@ -242,6 +246,22 @@ In Motion, gate with `useReducedMotion()` and pass `initial={false}`.
 - **Insurer logos:** real SVG marks, no text wordmarks, no category labels beneath them.
 - **Focus:** every interactive element ships a visible focus ring using `--np-focus` at 2px with 2px offset.
 - **Fonts:** self-host both families, subset to Latin, `font-display: swap`, preload the display weight used above the fold.
+
+### 7.1 Provider portrait constraint (provisional)
+
+The two supplied portraits are square, EXIF-stripped, and re-compressed, carrying the signature of transfer through a messaging app: **1346 x 1343** (Funmilayo Whitaker) and **1137 x 1138** (Anastasia Ofoegbu). The smaller file sets the ceiling for the pair at roughly **560px displayed at 2x**.
+
+Consequences for the build, all provisional:
+
+| | |
+|---|---|
+| Render size | Cap provider portraits at **560px** displayed. Do not upscale. |
+| Shape | `--r-media` (20px). The arch mask is deferred, see section 4. |
+| Aspect | Square, `1:1`. Both files match closely enough (1.002:1 and 0.999:1) to share one crop template. |
+| Preprocessing | Backgrounds and colour temperature differ between the two and must be normalized before use. |
+| Format | Convert to AVIF with WebP fallback at build time. Serve at `1x` and `2x` only; there is not enough source pixel data for `3x`. |
+
+**Upgrade path:** if originals at 2000px or more with headroom arrive, lift the render cap, restore the arch mask, and revisit the hero-scale treatment.
 
 ---
 

@@ -104,13 +104,38 @@ Seven sections. Linear ships seven. Two Chairs ships six. Meru ships twelve and 
 |---|---|---|
 | 1 | **Hero.** Headline naming psychiatric care and the two-state service area. One CTA. Insurance named in the supporting line. | Grow and Rula both put insurance in the hero itself and they are the two most conversion-engineered peers. Max 4 text elements, headline under 2 lines. |
 | 2 | **Insurance and payer proof.** Named insurers as real SVG logos (Aetna, Optum, Cigna Evernorth, United Healthcare, Medicare, NJ Medicaid, Horizon BCBS NJ, all confirmed in [`research/business-nap.md`](../research/business-nap.md)). Sliding scale noted. | Four of seven peers put this in position 1 or 2. It is the first objection. Logo wall sits under the hero, never inside it, and carries logos only with no category labels. |
-| 3 | **Meet your providers.** The ink-navy anchor section. Both providers, portraits, full credentials, states licensed. | Rula places providers at 4, Two Chairs at 3. Newpoint moves them **up** because for a two-person practice this is the differentiator, not a directory listing. This is the section a marketplace structurally cannot copy. |
+| 3 | **Meet your providers.** The ink-navy anchor section, built as **two provider cards at card scale**. Both providers, portraits at `--r-media`, full credentials, states licensed. See the constraint note below. | Rula places providers at 4, Two Chairs at 3. Newpoint moves them **up** because for a two-person practice this is the differentiator, not a directory listing. This is the section a marketplace structurally cannot copy. Rula's named-provider cards are now the closer structural reference than a full-bleed portrait moment. |
 | 4 | **What we treat and how care works.** Psychiatric evaluation, medication management, telehealth. Conditions named in clinical terms alongside patient-language framing. | Talkiatry's conditions grid and Grow's needs-based language, combined. Carries the SEO weight for condition and service queries. |
 | 5 | **Getting started.** What the first visit involves (the audit confirms it is a comprehensive psychiatric evaluation), how to book, what to expect. | Two Chairs and Meru both place process mid-page after trust is established. Addresses the audit's finding that no intake process is documented anywhere on the current site. |
 | 6 | **FAQ**, split into **Getting started** and **Insurance and costs**. | Rula's exact split. These are the two real objections, and the audit lists both as unanswered on the current site. |
 | 7 | **Contact and crisis guidance.** HIPAA-safe form. 988 and 911 guidance. Closing human beat before the footer. | The audit flags the total absence of crisis guidance as a gap on a behavioral-health site. Meru's "take a deep breath" close is the model for the tone. |
 
-**Layout families across those seven:** asymmetric split hero, logo band, dark full-bleed portrait section, two-column condition grid, numbered process sequence, accordion, contained form. Seven sections, seven distinct families. No two consecutive sections share a layout.
+**Layout families across those seven:** asymmetric split hero, logo band, dark two-card provider section, two-column condition grid, numbered process sequence, accordion, contained form. Seven sections, seven distinct families. No two consecutive sections share a layout.
+
+### Section 3 constraint: card scale, not hero scale (provisional)
+
+Section 3 was originally specified as a hero-scale focal moment with full-bleed arch-masked portraiture. **The supplied photographs cannot carry that treatment**, so the section is revised to card scale. This is a constraint on the assets, not a retreat from the strategy: the providers remain the page's differentiator and stay at position 3 on the ink ground.
+
+What the photos are, per [`assets/providers/README.md`](assets/providers/README.md):
+
+- **1346 x 1343** (Funmilayo Whitaker) and **1137 x 1138** (Anastasia Ofoegbu). Both square, both EXIF-stripped and re-compressed with the signature of transfer through a messaging app.
+- The smaller file caps the pair at roughly **560px displayed at 2x**.
+- **Neither has headroom.** Both crop into the hair at the top edge.
+
+What changes:
+
+| | Original | Revised |
+|---|---|---|
+| Scale | Hero-scale focal moment, full-bleed portraiture | **Two provider cards**, generously sized, on the ink ground |
+| Photo shape | Arch mask, `border-radius: 100% 100% 20px 20px` | **`--r-media`**, 20px rounded rectangle |
+| Render size | Unbounded, large | **Capped at 560px displayed.** No upscaling |
+| Aspect | Flexible | **Square 1:1**, one shared crop template |
+
+The arch mask fails for a specific and unfixable reason: the dome needs clear space above the head to read as an arch, and cropping can only remove that space, never add it.
+
+Card scale is also the honest treatment for what these images are. Phone selfies rendered at hero scale would advertise their own compression, flat lighting, and mismatched backgrounds. At card scale, with backgrounds normalized and colour temperature matched across the pair, they read as competent and human. The section still does its job, which is to make two specific named clinicians the first real thing a visitor meets.
+
+> **Deferred, not discarded.** If better originals or a reshoot arrive at 2000px or more on the longest edge, framed with headroom, then the arch mask and the hero-scale treatment should both be revisited as the upgrade path. That remains the stronger design and the reason to ask for the shoot. Tracked in Part 8.
 
 ---
 
@@ -130,7 +155,7 @@ Seven sections. Linear ships seven. Two Chairs ships six. Meru ships twelve and 
 12. **No two consecutive sections share a layout family** (Stripe)
 13. **Motion that resolves fast and ease-out dominant** (Linear)
 14. **Cost transparency placed high rather than buried** (Talkiatry's copay estimator)
-15. **The arch image mask** (`border-radius: 100% 100% 16px 16px`, Cerebral) as a warm, non-generic portrait treatment
+15. **The arch image mask** (`border-radius: 100% 100% 16px 16px`, Cerebral) as a warm, non-generic portrait treatment. **Deferred:** not viable with the current photographs, which have no headroom. Revisit if better originals arrive. See Part 4.
 
 ## Part 6: Avoid this
 
@@ -155,8 +180,8 @@ Seven sections. Linear ships seven. Two Chairs ships six. Meru ships twelve and 
 
 | Audit finding ([`research/`](../research/)) | Design consequence |
 |---|---|
-| **Two providers, both DNP / FNP-BC / PMHNP-BC** | Providers become section 3 on an ink anchor, the page's focal moment. Credentials are set as a typographic element, not shrunk into caption text. The dual FNP plus PMHNP certification is stated plainly because it is genuinely differentiating. |
-| **No provider photos exist anywhere** | The direction depends on portraiture, so this is now the **critical path blocker**. The design must specify the shot: warm natural light, mid-length, consistent treatment across both, per the Rula and Two Chairs reference. Until they arrive, ship a marked `<!-- CLIENT: -->` slot at the correct aspect ratio. Do not substitute stock photography, which is exactly the failure the audit already documents on the current site (`Picture1`, `ujuuu`). |
+| **Two providers, both DNP / FNP-BC / PMHNP-BC** | Providers become section 3 on an ink anchor, as two cards. Credentials are set as a typographic element, not shrunk into caption text. The dual FNP plus PMHNP certification is stated plainly because it is genuinely differentiating. With portraiture constrained, **the credential typography now carries more of the section's weight**, so it should be set larger and more deliberately than originally planned. |
+| **No provider photos existed at audit time** | **Resolved, with constraints.** Both portraits were supplied on 2026-08-28 and are committed under [`assets/providers/`](assets/providers/). They are phone selfies, square, EXIF-stripped, and re-compressed, with mismatched backgrounds and colour temperature and no headroom. They are usable at card scale after background normalization and a matched grade. They are **not** usable at hero scale or under the arch mask. A single-session reshoot of both providers remains the recommended fix and the trigger for the deferred upgrade path. Stock photography is still not an option, per the failure the audit documents on the current site (`Picture1`, `ujuuu`). |
 | **No license or NPI numbers published** | Design a credential line that reads complete with post-nominals alone, so it does not look broken while the numbers are absent. Reserve an optional slot beneath, marked as a client placeholder. |
 | **No street address, and no confirmation whether one exists** | **No map, no address block, no local-business footer card.** The layout must not contain an address-shaped hole. Frame geography as service area ("New Jersey and Pennsylvania") instead. `MedicalBusiness` schema ships with `areaServed` rather than `address`. Revisit only when the client confirms. |
 | **Business name spelled four ways** | The canonical form fixed in [`CLAUDE.md`](../CLAUDE.md), "Newpoint Healthcare Services, LLC", is used identically in copy, metadata, schema, and footer. NAP consistency is a ranking factor. |
@@ -174,7 +199,7 @@ Seven sections. Linear ships seven. Two Chairs ships six. Meru ships twelve and 
 
 These block specific design decisions, not the whole direction:
 
-1. **Provider headshots.** Blocks section 3, which is the centerpiece. Highest priority item in the entire project.
+1. **Provider headshots, at reshoot quality.** No longer blocking: both portraits were supplied on 2026-08-28 and section 3 can be built at card scale. But a single session covering both providers (same room, same light, same lens distance, headroom, 2000px or more on the longest edge) is the **deferred upgrade path** that restores the arch mask and the hero-scale treatment. Still the highest-value asset request in the project, now an upgrade rather than a blocker.
 2. **Original logo file** (vector preferred). Blocks final nav and footer treatment.
 3. **Physical address, or confirmation there is none.** Determines whether a location module and `address` schema ever exist.
 4. **Confirmation of "Newpoint" vs "New Point"** from the LLC formation documents. Blocks final wordmark lockup.
