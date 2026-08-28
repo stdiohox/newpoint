@@ -261,6 +261,8 @@ Consequences for the build, all provisional:
 | Preprocessing | Backgrounds and colour temperature differ between the two and must be normalized before use. |
 | Format | Convert to AVIF with WebP fallback at build time. Serve at `1x` and `2x` only; there is not enough source pixel data for `3x`. |
 
+**Build-ready assets:** processed derivatives are in [`assets/providers/processed/`](assets/providers/processed/) at 560 (`1x`) and 1120 (`2x`), WebP with JPEG fallback, backgrounds replaced with flat `--np-neutral-50`, colour graded to match, and cropped to a common face fraction of `0.610`. No `3x`; nothing upscaled. See that folder's README for the full recipe.
+
 **Upgrade path:** if originals at 2000px or more with headroom arrive, lift the render cap, restore the arch mask, and revisit the hero-scale treatment.
 
 ---
