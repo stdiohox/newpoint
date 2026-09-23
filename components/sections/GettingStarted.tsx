@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
@@ -25,6 +26,17 @@ export function GettingStarted() {
             <Reveal delay={0.08}>
               <p className="text-body text-np-neutral-600 mt-4 max-w-[36ch]">
                 {GETTING_STARTED.body}
+              </p>
+            </Reveal>
+            <Reveal delay={0.14}>
+              <p className="text-body mt-6">
+                <Link
+                  href="/new-patients"
+                  className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                >
+                  Read the new patient guide
+                  <span aria-hidden="true"> →</span>
+                </Link>
               </p>
             </Reveal>
           </div>

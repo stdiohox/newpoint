@@ -151,6 +151,17 @@
     border-radius: 2px;
   }
 
+  /* Interactive elements sitting on the ink ground need a light ring instead.
+     The default blue-600 outline measures 1.93:1 against --color-np-ink, well
+     under the 3:1 WCAG 2.2 SC 1.4.11 asks of a focus indicator; white measures
+     17:1. Applied by adding `on-ink` to any dark section — the footer, the
+     provider section, and the interior-page closing block all carry it, which
+     is what makes the 988 and 911 links keyboard-visible.
+     HeroNav does the same thing inline for the video hero. */
+  .on-ink :focus-visible {
+    outline-color: #ffffff;
+  }
+
   ::selection {
     background: var(--color-np-blue-100);
     color: var(--color-np-ink);

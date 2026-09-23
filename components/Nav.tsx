@@ -1,18 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { NAV, CTA, BUSINESS } from '@/lib/content';
 
 /**
- * Single line at desktop, 72px tall, inside the 80px cap.
- * Translucent with content scrolling underneath, per the Apple materials note.
+ * Interior-page navigation. The homepage uses <HeroNav /> instead, which sits
+ * transparently on the video; this is its opaque counterpart for pages that
+ * open on the warm ground.
  *
- * CLIENT: the wordmark is set in type. The original logo file (vector preferred)
- * has not been supplied, and the existing mark is carried forward unchanged
- * rather than redesigned.
+ * Single line at desktop, 72px tall, inside the 80px cap. Translucent with
+ * content scrolling underneath, per the Apple materials note.
+ *
+ * CLIENT: the wordmark is set in type beside the existing mark. The original
+ * logo file (vector preferred) has not been supplied, and the mark is carried
+ * forward unchanged rather than redesigned.
  */
 export function Nav() {
   const [open, setOpen] = useState(false);
@@ -22,23 +27,23 @@ export function Nav() {
     <header className="border-np-neutral-200 bg-np-neutral-50/85 supports-[not(backdrop-filter:blur(0))]:bg-np-neutral-50 sticky top-0 z-40 border-b backdrop-blur-md">
       <Container>
         <div className="flex h-[72px] items-center justify-between gap-6">
-          <a
-            href="#top"
+          <Link
+            href="/"
             className="font-display text-body-l text-np-ink font-semibold tracking-[-0.02em]"
           >
             {BUSINESS.shortName}
             <span className="sr-only"> {BUSINESS.legalName}, home</span>
-          </a>
+          </Link>
 
           <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
             {NAV.map((item) => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className="text-small text-np-neutral-700 ease-np-out hover:text-np-blue-600 transition-colors duration-[180ms]"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -74,13 +79,13 @@ export function Nav() {
               <ul className="flex flex-col py-2">
                 {NAV.map((item) => (
                   <li key={item.href}>
-                    <a
+                    <Link
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className="text-body text-np-neutral-700 block py-3"
                     >
                       {item.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
                 <li className="py-3 sm:hidden">

@@ -8,9 +8,24 @@ import { useState } from 'react';
  * Items are separated by a single hairline, no container boxes, per the
  * minimalist discipline. Toggle is a plain + / - mark, not an icon library glyph.
  */
-export function Accordion({ items }: { items: readonly { q: string; a: string }[] }) {
+export function Accordion({
+  items,
+  headingLevel = 4,
+  idPrefix = 'faq',
+}: {
+  items: readonly { q: string; a: string }[];
+  /**
+   * The heading level wrapping each trigger. Defaults to 4, which is correct
+   * under the homepage's h2 → h3 group titles. Interior pages put the FAQ
+   * directly under an h2 and pass 3, so the outline never skips a level.
+   */
+  headingLevel?: 3 | 4;
+  /** Disambiguates the aria ids when more than one accordion is on a page. */
+  idPrefix?: string;
+}) {
   const [open, setOpen] = useState<number | null>(null);
   const reduce = useReducedMotion();
+  const Heading = `h${headingLevel}` as 'h3' | 'h4';
 
   return (
     <ul className="border-np-neutral-200 border-t">
@@ -18,13 +33,13 @@ export function Accordion({ items }: { items: readonly { q: string; a: string }[
         const isOpen = open === i;
         return (
           <li key={item.q} className="border-np-neutral-200 border-b">
-            <h4>
+            <Heading>
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? null : i)}
                 aria-expanded={isOpen}
-                aria-controls={`faq-panel-${i}`}
-                id={`faq-trigger-${i}`}
+                aria-controls={`${idPrefix}-panel-${i}`}
+                id={`${idPrefix}-trigger-${i}`}
                 className="ease-np-out hover:text-np-blue-600 flex w-full items-start justify-between gap-6 py-5 text-left transition-colors duration-[180ms]"
               >
                 <span className="font-display text-h3 text-np-ink">{item.q}</span>
@@ -35,13 +50,13 @@ export function Accordion({ items }: { items: readonly { q: string; a: string }[
                   {isOpen ? '−' : '+'}
                 </span>
               </button>
-            </h4>
+            </Heading>
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div
-                  id={`faq-panel-${i}`}
+                  id={`${idPrefix}-panel-${i}`}
                   role="region"
-                  aria-labelledby={`faq-trigger-${i}`}
+                  aria-labelledby={`${idPrefix}-trigger-${i}`}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}

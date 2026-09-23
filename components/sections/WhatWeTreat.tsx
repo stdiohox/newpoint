@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
@@ -28,13 +29,38 @@ export function WhatWeTreat() {
         <ul className="mt-14 grid gap-6 sm:grid-cols-2">
           {WHAT_WE_TREAT.services.map((s, i) => (
             <Reveal as="li" key={s.title} delay={stagger(i, 0.07)}>
-              <article className="rounded-card bg-np-surface ease-np-out h-full p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)] md:p-8">
-                <h3 className="text-h3">{s.title}</h3>
+              <article className="rounded-card bg-np-surface ease-np-out focus-within:outline-np-blue-600 group relative h-full p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] focus-within:outline-2 focus-within:outline-offset-2 hover:shadow-[var(--shadow-np-card)] md:p-8">
+                <h3 className="text-h3">
+                  {s.href ? (
+                    /* Whole-card target via ::after, so the link text stays the
+                       service name rather than a bare "read more". */
+                    <Link
+                      href={s.href}
+                      className="group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms] after:absolute after:inset-0 focus-visible:outline-none"
+                    >
+                      {s.title}
+                    </Link>
+                  ) : (
+                    s.title
+                  )}
+                </h3>
                 <p className="text-body text-np-neutral-600 mt-3">{s.body}</p>
               </article>
             </Reveal>
           ))}
         </ul>
+
+        <Reveal delay={0.1}>
+          <p className="text-body mt-8">
+            <Link
+              href="/services"
+              className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
+            >
+              All services in detail
+              <span aria-hidden="true"> →</span>
+            </Link>
+          </p>
+        </Reveal>
 
         <div className="border-np-neutral-200 mt-16 border-t pt-10">
           <Reveal>

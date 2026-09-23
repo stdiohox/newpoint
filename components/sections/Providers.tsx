@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
@@ -20,7 +21,7 @@ import { PROVIDERS } from '@/lib/content';
  */
 export function Providers() {
   return (
-    <section id="providers" className="bg-np-ink scroll-mt-24 py-24 md:py-32">
+    <section id="providers" className="bg-np-ink on-ink scroll-mt-24 py-24 md:py-32">
       <Container>
         <Reveal>
           <h2 className="text-display-l max-w-[18ch] text-white">
@@ -39,7 +40,7 @@ export function Providers() {
             <Reveal as="li" key={p.slug} delay={stagger(i, 0.1)}>
               <article
                 id={`provider-${p.slug}`}
-                className="rounded-card h-full scroll-mt-24 bg-[var(--np-alpha-white-08)] p-6 ring-1 ring-[var(--np-alpha-white-14)] md:p-8"
+                className="rounded-card relative h-full scroll-mt-24 bg-[var(--np-alpha-white-08)] p-6 ring-1 ring-[var(--np-alpha-white-14)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-white md:p-8"
               >
                 <div className="flex items-start gap-5">
                   <ProviderPortrait
@@ -48,7 +49,16 @@ export function Providers() {
                     className="w-[104px] shrink-0 md:w-[136px]"
                   />
                   <div className="min-w-0">
-                    <h3 className="text-h3 text-white">{p.name}</h3>
+                    <h3 className="text-h3 text-white">
+                      {/* Whole-card target. The provider's own page is where the
+                          Physician schema lives and where name searches land. */}
+                      <Link
+                        href={`/providers/${p.slug}`}
+                        className="ease-np-out transition-colors duration-[180ms] after:absolute after:inset-0 hover:text-white/80 focus-visible:outline-none"
+                      >
+                        {p.name}
+                      </Link>
+                    </h3>
                     {/* Credentials set as a typographic element, not shrunk into caption text. */}
                     <p className="font-display text-body text-np-amber-500 mt-1 font-medium tracking-[-0.01em]">
                       {p.credentials}

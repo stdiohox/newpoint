@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
-import { BUSINESS, NAV, PROVIDERS } from '@/lib/content';
+import { BUSINESS, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
 
 /**
  * CLIENT: no street address is published or confirmed, so no address block
@@ -11,7 +12,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-np-ink py-16 text-white/70">
+    <footer className="bg-np-ink on-ink py-16 text-white/70">
       <Container>
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
@@ -22,6 +23,13 @@ export function Footer() {
               Outpatient psychiatric and behavioral health care for{' '}
               {BUSINESS.serviceArea.join(' and ')}, in person and by telehealth.
             </p>
+            {/* The town, stated as service area rather than as an address. The
+                live site names Lawrence Township on every page and it is the
+                practice's only place-level signal; dropping it along with the
+                unconfirmed street address would give up local relevance it
+                already holds.
+                CLIENT: replace with a full address once one is confirmed. */}
+            <p className="text-small mt-2 text-white/50">Based in {BUSINESS.serviceAreaNote}.</p>
             <p className="text-small mt-4">
               <a
                 href={`tel:${BUSINESS.phonePrimaryHref}`}
@@ -34,14 +42,28 @@ export function Footer() {
             </p>
           </div>
 
+          {/* Sitewide link surface. Every indexable page is reachable from every
+              other page through this block, which is how the service pages get
+              crawled from anywhere on the site and not only from /services. */}
           <nav aria-label="Footer" className="md:col-span-3">
             <h2 className="text-caption text-white/50">Explore</h2>
             <ul className="mt-3 space-y-2">
               {NAV.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} className="text-small hover:text-white">
+                  <Link href={item.href} className="text-small hover:text-white">
                     {item.label}
-                  </a>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <h2 className="text-caption mt-8 text-white/50">Services</h2>
+            <ul className="mt-3 space-y-2">
+              {SERVICE_PAGES.map((service) => (
+                <li key={service.slug}>
+                  <Link href={`/services/${service.slug}`} className="text-small hover:text-white">
+                    {service.nav}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -52,7 +74,9 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               {PROVIDERS.map((p) => (
                 <li key={p.slug} className="text-small">
-                  <span className="text-white">{p.name}</span>
+                  <Link href={`/providers/${p.slug}`} className="text-white hover:underline">
+                    {p.name}
+                  </Link>
                   <span className="text-white/50">, {p.credentials}</span>
                 </li>
               ))}

@@ -6,11 +6,11 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(BUSINESS.domain),
   title: {
-    default: 'Newpoint Healthcare Services | Psychiatric Care in NJ and PA',
+    default: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     template: `%s | ${BUSINESS.shortName}`,
   },
   description:
-    'Outpatient psychiatric care for New Jersey and Pennsylvania. Psychiatric evaluation, medication management, and telehealth from two doctorate-prepared nurse practitioners.',
+    'Psychiatric evaluation, medication management, and telehealth for New Jersey and Pennsylvania, from two doctorate-prepared nurse practitioners.',
   applicationName: BUSINESS.legalName,
   authors: [{ name: BUSINESS.legalName }],
   keywords: [
@@ -25,16 +25,16 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: BUSINESS.legalName,
     url: BUSINESS.domain,
-    title: 'Newpoint Healthcare Services | Psychiatric Care in NJ and PA',
+    title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
       'Psychiatric evaluation, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners serving New Jersey and Pennsylvania.',
     locale: 'en_US',
-    // CLIENT: no OG image asset exists. The current site reuses the logo JPEG.
-    // Supply a 1200x630 social card, or approve generating one from the wordmark.
+    // The 1200x630 card is generated at app/opengraph-image.tsx and applies to
+    // every route. CLIENT: replace it with a supplied asset if one exists.
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Newpoint Healthcare Services | Psychiatric Care in NJ and PA',
+    title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
       'Psychiatric evaluation, medication management, and telehealth for New Jersey and Pennsylvania.',
   },

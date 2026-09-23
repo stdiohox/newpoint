@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
@@ -60,9 +61,18 @@ export function InsuranceProof() {
               ))}
             </ul>
             <Reveal delay={0.3}>
-              <p className="border-np-neutral-300 text-small text-np-neutral-600 mt-10 max-w-[62ch] border-t pt-6">
-                {INSURANCE.selfPay}
-              </p>
+              <div className="border-np-neutral-300 mt-10 max-w-[62ch] border-t pt-6">
+                <p className="text-small text-np-neutral-600">{INSURANCE.selfPay}</p>
+                <p className="text-small mt-4">
+                  <Link
+                    href="/insurance"
+                    className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                  >
+                    Insurance and payment in full
+                    <span aria-hidden="true"> →</span>
+                  </Link>
+                </p>
+              </div>
             </Reveal>
           </div>
         </div>
