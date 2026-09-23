@@ -31,10 +31,10 @@
 
   /* Client-specified sky blue for the hero and navbar CTAs. Sits in the same
      family as the footage's sky so the buttons read as part of the scene.
-     CLIENT: white label on this measures 4.19:1, just under the 4.5:1 WCAG AA
-     asks for at 14px. #4a76a4 would clear it at 4.75:1 if that matters more
-     than the exact hue. */
-  --color-np-sky: #527faf;
+     Chosen for contrast: a white label on this measures 4.75:1, clearing the
+     4.5:1 WCAG AA asks for at 14px. Lightening it past roughly #4d79a7 drops
+     the label back under AA. */
+  --color-np-sky: #4a76a4;
 
   /* Single accent. Small non-text surfaces only, never text on light. */
   --color-np-amber-500: #e9a93c;

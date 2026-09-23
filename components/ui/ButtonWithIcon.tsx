@@ -8,23 +8,23 @@ import { ArrowUpRight } from 'lucide-react';
  * button would break middle-click, "open in new tab" and the link role.
  *
  * Colour, all measured against the 1080p poster frame:
- *   fill   --color-np-sky (#527faf), client-specified
- *   disc   white, 4.19:1 against the fill
- *   arrow  --color-np-sky on that white disc, 4.19:1, so it reads as cut out
+ *   label  white on --color-np-sky (#4a76a4) = 4.75:1, clears WCAG AA at 14px
+ *   disc   white, 4.75:1 against the fill
+ *   arrow  --color-np-sky on that white disc, 4.75:1, so it reads as cut out
  *          of the button rather than as a second colour
  *
- * The white ring carries the component boundary in the hero at 9.23:1, which
- * matters because this fill only reaches 2.20:1 against the hero's dark
- * gradient on its own.
+ * The white ring carries the component boundary in the hero at 9.23:1. That is
+ * load-bearing: this fill reaches only 1.94:1 against the hero's dark gradient
+ * on its own, so removing the ring would fail WCAG 1.4.11 there.
  *
- * CLIENT: two figures sit just under WCAG AA and are accepted design calls.
- * The white label on this fill is 4.19:1 against the 4.5:1 wanted at 14px, and
- * the white ring is 2.81:1 against the bright sky behind the navbar, against
- * the 3:1 WCAG 1.4.11 wants. Both are close misses; #4a76a4 would clear the
- * label at 4.75:1.
+ * CLIENT: one figure still sits under AA and is an accepted design call. The
+ * white ring measures 2.81:1 against the bright sky behind the navbar, just
+ * under the 3:1 WCAG 1.4.11 wants for a component boundary. It depends on the
+ * footage behind it rather than on the fill, so darkening the fill does not
+ * move it.
  *
- * The focus ring stays np-blue-900 rather than white: it is clearly visible on
- * this fill, where a white focus ring would vanish into the white resting ring.
+ * The focus ring stays np-blue-900 rather than white: at 3.39:1 on this fill it
+ * is visible, where a white focus ring would vanish into the white resting ring.
  */
 
 const sizes = {
