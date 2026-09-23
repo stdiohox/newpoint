@@ -4,7 +4,9 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { NAV, CTA, BUSINESS } from '@/lib/content';
 
 /**
- * The hero's glass navbar.
+ * The hero's navbar. The bar itself is transparent: it sits directly on the
+ * video and its overlays, with no tint, blur or gradient edge of its own. The
+ * mobile panel below still uses .liquid-glass.
  *
  * At md and above this is unchanged: wordmark, the five nav links, and the
  * primary CTA. Below md the links and CTA move into a full-screen panel behind
@@ -52,7 +54,7 @@ export function HeroNav() {
   return (
     <>
       <div className="px-6 pt-6 md:px-12 lg:px-16">
-        <div className="liquid-glass flex items-center justify-between rounded-xl px-4 py-2">
+        <div className="flex items-center justify-between rounded-xl px-4 py-2">
           <span className="text-2xl font-semibold tracking-tight">{BUSINESS.shortName}</span>
 
           <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
