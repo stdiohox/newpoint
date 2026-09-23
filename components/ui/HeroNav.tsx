@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { NAV, CTA, BUSINESS } from '@/lib/content';
+import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
 
 /**
  * The hero's navbar. The bar itself is transparent: it sits directly on the
@@ -69,12 +70,11 @@ export function HeroNav() {
             ))}
           </nav>
 
-          <a
-            href={CTA.href}
-            className="hidden rounded-lg bg-white px-6 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-100 md:inline-block"
-          >
-            {CTA.label}
-          </a>
+          <span className="hidden md:inline-block">
+            <ButtonWithIcon href={CTA.href} size="sm">
+              {CTA.label}
+            </ButtonWithIcon>
+          </span>
 
           <button
             ref={triggerRef}
