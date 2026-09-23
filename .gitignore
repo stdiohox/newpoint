@@ -31,3 +31,6 @@ yarn-error.log*
 # Stray media dropped in the repo root (keep public/video/ tracked)
 /*.mp4
 /*.mov
+
+# Stray source art dropped in the repo root
+/*.png
