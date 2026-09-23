@@ -61,9 +61,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        {/*
+         * focus:z-[70], not z-50.
+         *
+         * The skip link is the first thing a keyboard user reaches, and it
+         * positions itself at top-4 — inside the band the sticky navbar
+         * occupies. At z-50 it tied with the bar, and because the bar comes
+         * later in the DOM the bar won the paint order and covered the link
+         * completely on every route, at both widths, in both nav states. That
+         * is a WCAG 2.2 SC 2.4.11 Focus Not Obscured failure on the single most
+         * important focus target on the site, and it was invisible in review
+         * because the link only renders when focused.
+         *
+         * 70 clears both the bar (50) and the hero's mobile panel (60).
+         * Verified by scripts/focus-sweep.mjs.
+         */}
         <a
           href="#main"
-          className="focus:rounded-input focus:bg-np-surface focus:text-body focus:text-np-ink focus:ring-np-blue-600 sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:ring-2"
+          className="focus:rounded-input focus:bg-np-surface focus:text-body focus:text-np-ink focus:ring-np-blue-600 sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[70] focus:px-4 focus:py-2 focus:ring-2"
         >
           Skip to content
         </a>

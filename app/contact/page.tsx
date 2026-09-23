@@ -47,23 +47,44 @@ export default function ContactPage() {
           <Container>
             <div className="grid gap-12 md:grid-cols-12 md:gap-16">
               <div className="md:col-span-7">
-                {/* Appointments. One CTA intent, pointing at the same form the
-                    rest of the site points at. */}
+                {/*
+                 * This page's primary action is the one it can actually perform:
+                 * the call. Everywhere else on the site the CTA points at the
+                 * homepage form (CTA.href), which is right for pages that have no
+                 * contact mechanism of their own — but on /contact that sent the
+                 * highest-intent click away from the page whose whole job is to
+                 * handle it.
+                 *
+                 * No booking link is used because none exists: research/ records
+                 * no online scheduling widget, and the only absolute URL in the
+                 * content layer is the site's own domain. So the action is tel:,
+                 * per the fallback.
+                 *
+                 * The label names the action and the number rather than saying
+                 * "Request an appointment", so the accessible name matches what
+                 * activating it does. The form stays reachable underneath.
+                 */}
                 <Reveal>
                   <h2 className="text-h2">Request an appointment</h2>
                 </Reveal>
                 <Reveal delay={0.08}>
                   <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
-                    Send us your contact details on the appointment form on our homepage and we will
-                    get back to you. Please keep health information out of it — tell us how to reach
-                    you and we will take the clinical details directly.
+                    Calling is the fastest way to reach us. Please keep health information out of
+                    any message you send — tell us how to reach you and we will take the clinical
+                    details directly.
                   </p>
                 </Reveal>
                 <Reveal delay={0.14}>
-                  <div className="mt-8">
-                    <Button href={CTA.href} size="lg">
-                      {CTA.label}
+                  <div className="mt-8 flex flex-wrap items-center gap-5">
+                    <Button href={`tel:${BUSINESS.phonePrimaryHref}`} size="lg">
+                      Call {BUSINESS.phonePrimary}
                     </Button>
+                    <a
+                      href={CTA.href}
+                      className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                    >
+                      Or send the appointment form
+                    </a>
                   </div>
                 </Reveal>
 
