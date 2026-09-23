@@ -9,16 +9,19 @@ import { ArrowUpRight } from 'lucide-react';
  *
  * Colour, all measured against the poster frame:
  *   fill   --color-np-cloud (#7baad5), sampled from the footage's cloud band
- *   label  np-blue-900 on that fill = 6.56:1
  *   disc   np-blue-900 with a white arrow = 6.56:1 and 16.10:1
  *
- * The ring is load-bearing, not decoration, and the two placements need it for
- * opposite reasons. In the hero the fill alone clears the 3:1 that WCAG 1.4.11
- * wants for a component boundary (3.71:1 against the dark gradient). In the
- * navbar the background is bright sky, where the fill manages only 1.15:1, and
- * the np-blue-900 ring supplies the boundary instead at 5.70:1. One ring
- * colour therefore serves both, because whichever of the two fails, the other
- * carries it.
+ * CLIENT: the white label and white ring are an explicit design decision and
+ * both fall short of WCAG AA on this fill. White on #7baad5 measures 2.46:1
+ * against the 4.5:1 required for 14px text, and the white ring measures 2.82:1
+ * against the bright sky behind the navbar, just under the 3:1 WCAG 1.4.11
+ * wants for a component boundary. In the hero the fill itself still carries the
+ * boundary at 3.71:1. Darkening --color-np-cloud to about #2f5f8f would put the
+ * white label over 4.5:1 while keeping a sky-blue hue.
+ *
+ * The focus ring stays np-blue-900 rather than white: at 6.56:1 on this fill it
+ * is actually visible, where a white focus ring would vanish into the white
+ * resting ring.
  */
 
 const sizes = {
@@ -47,7 +50,7 @@ export function ButtonWithIcon({
   return (
     <a
       href={href}
-      className={`group bg-np-cloud text-np-blue-900 ring-np-blue-900 focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium ring-1 transition-all duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 ${s.root}`}
+      className={`group bg-np-cloud focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white ring-1 ring-white transition-all duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 ${s.root}`}
     >
       <span className="relative z-10 transition-all duration-500">{children}</span>
       <span
