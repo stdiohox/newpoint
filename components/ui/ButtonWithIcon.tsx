@@ -7,21 +7,24 @@ import { ArrowUpRight } from 'lucide-react';
  * Renders an <a>, not a <button>: these navigate to an in-page anchor, and a
  * button would break middle-click, "open in new tab" and the link role.
  *
- * Colour, all measured against the poster frame:
- *   fill   --color-np-cloud (#7baad5), sampled from the footage's cloud band
- *   disc   np-blue-900 with a white arrow = 6.56:1 and 16.10:1
+ * Colour, all measured against the 1080p poster frame:
+ *   fill   --color-np-sky (#527faf), client-specified
+ *   disc   white, 4.19:1 against the fill
+ *   arrow  --color-np-sky on that white disc, 4.19:1, so it reads as cut out
+ *          of the button rather than as a second colour
  *
- * CLIENT: the white label and white ring are an explicit design decision and
- * both fall short of WCAG AA on this fill. White on #7baad5 measures 2.46:1
- * against the 4.5:1 required for 14px text, and the white ring measures 2.82:1
- * against the bright sky behind the navbar, just under the 3:1 WCAG 1.4.11
- * wants for a component boundary. In the hero the fill itself still carries the
- * boundary at 3.71:1. Darkening --color-np-cloud to about #2f5f8f would put the
- * white label over 4.5:1 while keeping a sky-blue hue.
+ * The white ring carries the component boundary in the hero at 9.23:1, which
+ * matters because this fill only reaches 2.20:1 against the hero's dark
+ * gradient on its own.
  *
- * The focus ring stays np-blue-900 rather than white: at 6.56:1 on this fill it
- * is actually visible, where a white focus ring would vanish into the white
- * resting ring.
+ * CLIENT: two figures sit just under WCAG AA and are accepted design calls.
+ * The white label on this fill is 4.19:1 against the 4.5:1 wanted at 14px, and
+ * the white ring is 2.81:1 against the bright sky behind the navbar, against
+ * the 3:1 WCAG 1.4.11 wants. Both are close misses; #4a76a4 would clear the
+ * label at 4.75:1.
+ *
+ * The focus ring stays np-blue-900 rather than white: it is clearly visible on
+ * this fill, where a white focus ring would vanish into the white resting ring.
  */
 
 const sizes = {
@@ -50,12 +53,12 @@ export function ButtonWithIcon({
   return (
     <a
       href={href}
-      className={`group bg-np-cloud focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white ring-1 ring-white transition-all duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 ${s.root}`}
+      className={`group bg-np-sky focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white ring-1 ring-white transition-all duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 ${s.root}`}
     >
       <span className="relative z-10 transition-all duration-500">{children}</span>
       <span
         aria-hidden="true"
-        className={`bg-np-blue-900 absolute right-1 flex items-center justify-center rounded-full text-white transition-all duration-500 group-hover:rotate-45 ${s.disc}`}
+        className={`text-np-sky absolute right-1 flex items-center justify-center rounded-full bg-white transition-all duration-500 group-hover:rotate-45 ${s.disc}`}
       >
         <ArrowUpRight size={s.icon} />
       </span>
