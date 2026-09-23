@@ -27,3 +27,7 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Stray media dropped in the repo root (keep public/video/ tracked)
+/*.mp4
+/*.mov
