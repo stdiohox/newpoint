@@ -1,6 +1,7 @@
 import { CTA, HERO, INSURANCE } from '@/lib/content';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { AnimatedHeading } from '@/components/ui/AnimatedHeading';
+import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
 import { HeroNav } from '@/components/ui/HeroNav';
 
 /**
@@ -70,12 +71,7 @@ export function Hero() {
 
             <FadeIn delay={1200} duration={1000}>
               <div className="flex flex-wrap gap-4">
-                <a
-                  href={CTA.href}
-                  className="rounded-lg bg-white px-8 py-3 font-medium text-black"
-                >
-                  {CTA.label}
-                </a>
+                <ButtonWithIcon href={CTA.href}>{CTA.label}</ButtonWithIcon>
               </div>
             </FadeIn>
           </div>
