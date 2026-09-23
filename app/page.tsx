@@ -7,7 +7,7 @@ import { GettingStarted } from '@/components/sections/GettingStarted';
 import { Faq } from '@/components/sections/Faq';
 import { ContactCrisis } from '@/components/sections/ContactCrisis';
 import { JsonLd } from '@/components/JsonLd';
-import { medicalBusinessSchema, physicianSchema, serviceSchemaFor, faqSchema } from '@/lib/schema';
+import { medicalClinicSchema, providersSchema, serviceSchemaFor, faqSchema } from '@/lib/schema';
 import { FAQ, SERVICE_PAGES } from '@/lib/content';
 
 /**
@@ -19,14 +19,14 @@ import { FAQ, SERVICE_PAGES } from '@/lib/content';
  */
 export default function Home() {
   /**
-   * The full Physician and service nodes ship alongside the organization, not
+   * The full provider and service nodes ship alongside the organization, not
    * just `{'@id': ...}` stubs. Search engines evaluate structured data per
    * document, so a stub whose full node only exists on another URL resolves to
    * nothing here — `employee` and `availableService` would both be inert.
    */
   const schemas = [
-    medicalBusinessSchema(),
-    ...physicianSchema(),
+    medicalClinicSchema(),
+    ...providersSchema(),
     ...SERVICE_PAGES.map(serviceSchemaFor),
     faqSchema(FAQ.groups),
   ];

@@ -40,6 +40,8 @@ export const BUSINESS = {
    */
   serviceArea: ['New Jersey', 'Pennsylvania'],
   serviceAreaNote: 'Lawrence Township, New Jersey',
+  /** The town alone. schema.org's City node takes the state via containedInPlace. */
+  serviceAreaTown: 'Lawrence Township',
 } as const;
 
 /**
@@ -139,7 +141,7 @@ export const PROVIDERS: Provider[] = [
     slug: 'funmilayo-whitaker',
     name: 'Funmilayo Whitaker',
     credentials: 'DNP, FNP-BC, PMHNP-BC',
-    role: 'Psychiatric Mental Health Nurse Practitioner',
+    role: 'Psychiatric-Mental Health Nurse Practitioner',
     image: {
       webp560: '/images/providers/funmilayo-whitaker-560.webp',
       webp1120: '/images/providers/funmilayo-whitaker-1120.webp',
@@ -166,7 +168,7 @@ export const PROVIDERS: Provider[] = [
     slug: 'anastasia-ofoegbu',
     name: 'Anastasia O. Ofoegbu',
     credentials: 'DNP, FNP-BC, PMHNP-BC',
-    role: 'Psychiatric Mental Health Nurse Practitioner',
+    role: 'Psychiatric-Mental Health Nurse Practitioner',
     image: {
       webp560: '/images/providers/anastasia-ofoegbu-560.webp',
       webp1120: '/images/providers/anastasia-ofoegbu-1120.webp',
@@ -691,7 +693,8 @@ export const OPEN_CLIENT_ITEMS = [
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
-  'Whether a public office exists and in which state. The site currently promises telehealth only, because no address is confirmed',
+  "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent",
+  'Whether a public office exists and in which state. UNRESOLVED CONTRADICTION: the provider pages promise telehealth only, while the footer, the contact section, the services page and two copy strings still say "in person and by telehealth". research/services-analysis.md does describe in-office care, but no address is confirmed anywhere. Confirm premises, then make all of it say the same thing',
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   'Self-pay session fee and the sliding scale criteria',
   'Original logo file, vector preferred',

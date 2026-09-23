@@ -51,7 +51,7 @@ export function Providers() {
                   <div className="min-w-0">
                     <h3 className="text-h3 text-white">
                       {/* Whole-card target. The provider's own page is where the
-                          Physician schema lives and where name searches land. */}
+                          provider's Person schema lives and where name searches land. */}
                       <Link
                         href={`/providers/${p.slug}`}
                         className="ease-np-out transition-colors duration-[180ms] after:absolute after:inset-0 hover:text-white/80 focus-visible:outline-none"

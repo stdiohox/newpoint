@@ -3,7 +3,7 @@
  *
  * Only confirmed data is emitted. Address and license/NPI identifiers are
  * deliberately omitted rather than fabricated: an incorrect `address` or
- * `identifier` on a MedicalBusiness is worse than an absent one, and both are
+ * `identifier` on a MedicalClinic is worse than an absent one, and both are
  * listed in OPEN_CLIENT_ITEMS.
  *
  * `@id` values are stable and cross-referenced, so the organization, the two
@@ -12,10 +12,14 @@
  *
  * Note on scope: search engines evaluate structured data per document, not
  * across a site. An `{'@id': ...}` stub only resolves if the full node is in
- * the SAME page's markup. So the homepage emits the full Physician and
- * MedicalTherapy nodes alongside the organization, and each interior page
- * re-emits the node it is about. The shared `@id` is what lets engines
- * reconcile them as one entity across URLs.
+ * the SAME page's markup. So the homepage emits the full provider and service
+ * nodes alongside the organization, and each interior page re-emits the node
+ * it is about. The shared `@id` is what lets engines reconcile them as one
+ * entity across URLs.
+ *
+ * The practice is a `MedicalClinic`; the two providers are each a `Person`
+ * with a nurse-practitioner `jobTitle`. Never `Physician` — see
+ * `personSchemaFor` and this repo's CLAUDE.md.
  */
 import {
   BUSINESS,
@@ -29,13 +33,22 @@ import {
 
 const ORG_ID = `${BUSINESS.domain}/#organization`;
 
-export const providerId = (slug: string) => `${BUSINESS.domain}/providers/${slug}#physician`;
+export const providerId = (slug: string) => `${BUSINESS.domain}/providers/${slug}#provider`;
 export const serviceId = (slug: string) => `${BUSINESS.domain}/services/${slug}#service`;
 
-export function medicalBusinessSchema() {
+/**
+ * The job title both providers hold, written once.
+ *
+ * This is the expansion of PMHNP-BC, which is in both providers' post-nominals
+ * in /research/people-trust.md. It is not a credential claim beyond what the
+ * research already records.
+ */
+const PROVIDER_JOB_TITLE = 'Psychiatric-Mental Health Nurse Practitioner';
+
+export function medicalClinicSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'MedicalBusiness',
+    '@type': 'MedicalClinic',
     '@id': ORG_ID,
     name: BUSINESS.legalName,
     alternateName: BUSINESS.shortName,
@@ -58,7 +71,11 @@ export function medicalBusinessSchema() {
     // give up local relevance the practice already holds.
     areaServed: [
       ...BUSINESS.serviceArea.map((s) => ({ '@type': 'State', name: s })),
-      { '@type': 'City', name: BUSINESS.serviceAreaNote },
+      {
+        '@type': 'City',
+        name: BUSINESS.serviceAreaTown,
+        containedInPlace: { '@type': 'State', name: 'New Jersey' },
+      },
     ],
     availableService: SERVICE_PAGES.map((s) => ({ '@id': serviceId(s.slug) })),
     // CLIENT: confirm insurer relationships before treating these as formal
@@ -88,7 +105,7 @@ export function medicalBusinessSchema() {
 export function organizationRef() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'MedicalBusiness',
+    '@type': 'MedicalClinic',
     '@id': ORG_ID,
     name: BUSINESS.legalName,
     alternateName: BUSINESS.shortName,
@@ -98,7 +115,11 @@ export function organizationRef() {
     logo: `${BUSINESS.domain}/icon.png`,
     areaServed: [
       ...BUSINESS.serviceArea.map((s) => ({ '@type': 'State', name: s })),
-      { '@type': 'City', name: BUSINESS.serviceAreaNote },
+      {
+        '@type': 'City',
+        name: BUSINESS.serviceAreaTown,
+        containedInPlace: { '@type': 'State', name: 'New Jersey' },
+      },
     ],
   };
 }
@@ -106,44 +127,75 @@ export function organizationRef() {
 /**
  * One provider, fully described. Emitted on that provider's own page.
  *
- * `@type: 'Physician'` is what this repo's CLAUDE.md specifies. Worth the
- * client knowing: both providers are nurse practitioners, not physicians, and
- * schema.org's `Physician` descends from Organization rather than Person.
- * `jobTitle` and `hasOccupation` below state the actual role so the markup does
- * not imply a credential neither holds. Changing the type is a client decision,
- * not a unilateral one.
+ * `Person`, never `Physician`. Both providers are advanced practice nurses, not
+ * physicians, and New Jersey and Pennsylvania both have title-protection
+ * statutes around "physician". A machine-readable type assertion is exactly
+ * where that distinction gets flattened, because knowledge panels and answer
+ * engines read the type and not the disclaimer next to it.
  *
- * `givenName`/`familyName` are deliberately not set: they are Person
- * properties and are not valid on an Organization-hierarchy type.
+ * `Person` is also the structurally correct choice: schema.org's `Physician`
+ * descends from Organization, so the `givenName`, `familyName` and `jobTitle`
+ * this node needs were never valid on it. They are valid here.
+ *
+ * The role is carried by `jobTitle` and `hasOccupation`; the post-nominals go
+ * in `honorificSuffix` exactly as /research/people-trust.md records them.
  */
-export function physicianSchemaFor(p: Provider) {
+export function personSchemaFor(p: Provider) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Physician',
+    '@type': 'Person',
     '@id': providerId(p.slug),
     url: `${BUSINESS.domain}/providers/${p.slug}`,
-    name: `${p.name}, ${p.credentials}`,
-    jobTitle: p.role,
+    name: p.name,
+    givenName: p.name.split(' ')[0],
+    familyName: p.name.split(' ').slice(-1)[0],
+    // Verbatim from the research, split into the three distinct post-nominals
+    // rather than one comma-joined string. No credential is added to either.
+    honorificSuffix: p.credentials.split(',').map((c) => c.trim()),
+    jobTitle: PROVIDER_JOB_TITLE,
     hasOccupation: {
       '@type': 'Occupation',
-      name: 'Psychiatric Mental Health Nurse Practitioner',
+      name: PROVIDER_JOB_TITLE,
+      /**
+       * O*NET-SOC code for Nurse Practitioners. A standard occupational
+       * classification, not a claim about either individual. Tagged with its
+       * defining set, because a bare "29-1171.00" identifies no taxonomy.
+       *
+       * There is no PMHNP-specific SOC code, so this is broader than the role
+       * in `name` above — broader is the safe direction.
+       */
+      occupationalCategory: {
+        '@type': 'CategoryCode',
+        codeValue: '29-1171.00',
+        name: 'Nurse Practitioners',
+        inDefinedTermSet: 'https://www.onetonline.org/',
+      },
+      /**
+       * Licensure geography lives here, not in `areaServed`. `areaServed` is
+       * not a valid property of Person — it was only valid on the old
+       * `Physician` node because that type descends from Organization. On
+       * `Occupation` this also reads as "licensed to practise in", which is
+       * what is actually meant.
+       */
+      occupationalLocation: BUSINESS.serviceArea.map((s) => ({ '@type': 'State', name: s })),
     },
-    medicalSpecialty: 'Psychiatric',
     description: p.bio,
     image: `${BUSINESS.domain}${p.image.jpg1120}`,
     email: p.email,
     telephone: BUSINESS.phonePrimary,
     worksFor: { '@id': ORG_ID },
-    areaServed: BUSINESS.serviceArea.map((s) => ({ '@type': 'State', name: s })),
     knowsAbout: p.treats,
     // CLIENT: `identifier` (NPI) and license numbers omitted, not published.
     // CLIENT: `hasCredential` omitted, the certifying body is not stated anywhere.
+    // CLIENT: `sameAs` omitted. It is the strongest signal for tying this name
+    // to the same person on Psychology Today, LinkedIn or the NPI registry, and
+    // no profile URL is confirmed for either provider. Supply them and add here.
   };
 }
 
 /** Both providers. Used on the homepage, which lists them both. */
-export function physicianSchema() {
-  return PROVIDERS.map(physicianSchemaFor);
+export function providersSchema() {
+  return PROVIDERS.map(personSchemaFor);
 }
 
 /**

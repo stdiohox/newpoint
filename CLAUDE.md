@@ -44,7 +44,13 @@ Healthcare context does not mean visually dull. It means restrained and trustwor
 - **SEO/GEO is a core deliverable, not a finishing touch:**
   - Static or server rendering — never client-only for indexable content.
   - Per-page `metadata` (unique title + description; the current site has duplicate, over-length, self-contradicting titles — see [`research/seo-technical.md`](research/seo-technical.md)).
-  - **schema.org markup on every relevant page**: `MedicalBusiness` for the practice, `Physician` for each provider. The current site has only a generic `WebSite` block — this is a real, achievable win.
+  - **schema.org markup on every relevant page**: `MedicalClinic` (`medicalSpecialty: Psychiatric`) for the practice, and `Person` (jobTitle: Psychiatric-Mental Health Nurse Practitioner) per provider, `worksFor` the MedicalClinic. **Never `Physician`: both providers are APNs and NJ/PA have title-protection statutes.** See "Clinician titles" below for the full rule. The current site has only a generic `WebSite` block — this is a real, achievable win.
+  - Schema rules that are easy to break by accident:
+    - `medicalSpecialty` belongs on the **clinic only**. It is not a valid property of `Person`; a provider's specialty is carried by `jobTitle` + `hasOccupation` + `knowsAbout`.
+    - Licensure geography goes on `hasOccupation.occupationalLocation`. `areaServed` is **not** valid on `Person`.
+    - `honorificSuffix` is copied verbatim from `research/people-trust.md`. `hasCredential` and `identifier` (NPI) stay omitted until the certifying body and numbers are supplied.
+    - A `{"@id": …}` stub only resolves if the **full node is in the same page's markup**. Engines evaluate structured data per document, so every page that references the clinic must also emit it.
+    - `MedicalClinic` is a `LocalBusiness` subtype, so Google expects `address`. Leave it omitted and accept the validator warning. **Never synthesise an address to satisfy the type.**
   - Semantic HTML, real `alt` text on every image, correct heading order.
 
 ## Content
@@ -60,6 +66,23 @@ Generate professional marketing, service, and bio copy from `research/`.
 Applies to — license numbers, NPI numbers, DEA registration, street address / suite / ZIP, certifying or accrediting bodies, testimonials and patient quotes, hours of operation, and specific years of experience. If it could be checked against a registry or would embarrass the client if wrong, it is a placeholder.
 
 The open items are enumerated in [`research/audit-summary.md`](research/audit-summary.md) under "What we still need from the client."
+
+### Clinician titles — a regulated fact, not a style choice
+
+Both providers are **advanced practice nurses**, not physicians. New Jersey and Pennsylvania
+both have title-protection statutes. Treat the title as belonging in the list above.
+
+- **Never** `physician`, `psychiatrist`, or `Dr.` for either provider — in copy, metadata,
+  `alt` text, or schema. In schema that also means never `Physician`, `IndividualPhysician`,
+  or `PhysiciansOffice`.
+- **"Doctor" written in full is permitted only as the degree**: "Doctor of Nursing Practice",
+  "doctorate-prepared". Never as a title before a name.
+- The canonical role string, used identically in copy and in schema `jobTitle`, is
+  **"Psychiatric-Mental Health Nurse Practitioner"** (hyphenated, the ANCC form).
+
+> **Trap:** the live site calls both providers "Dr. Funmilayo Whitaker" and
+> "Dr. Anastasia Ofoegbu" — see [`research/content/contact.md`](research/content/contact.md).
+> `research/` is authoritative for **facts**, not for this. Do not port those titles forward.
 
 ### Canonical business name — ASSUMPTION, needs client confirmation
 

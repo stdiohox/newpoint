@@ -11,16 +11,16 @@ import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
 import { stagger } from '@/lib/motion';
 import { PROVIDERS, SERVICE_PAGES, BUSINESS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
-import { breadcrumbSchema, organizationRef, physicianSchemaFor } from '@/lib/schema';
+import { breadcrumbSchema, organizationRef, personSchemaFor } from '@/lib/schema';
 
 /**
  * A page per provider.
  *
  * Two reasons this exists rather than staying an anchor on the homepage. First,
  * people search clinicians by name before booking, and a named page is what
- * ranks for that. Second, `Physician` schema needs a canonical URL to attach to;
- * the homepage previously defined both providers' `@id` against itself, which
- * asked one URL to be three entities.
+ * ranks for that. Second, the provider's `Person` node needs a canonical URL to
+ * attach to; the homepage previously defined both providers' `@id` against
+ * itself, which asked one URL to be three entities.
  *
  * CLIENT: licence numbers, NPI numbers, and the certifying body behind the
  * board-certification claim are all unpublished. Each has a marked slot below.
@@ -77,9 +77,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <JsonLd
-        schemas={[organizationRef(), physicianSchemaFor(provider), breadcrumbSchema(crumbs)]}
-      />
+      <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
 
       <Nav />
       <main id="main">
