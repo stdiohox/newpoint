@@ -15,14 +15,38 @@ import type { NextConfig } from 'next';
  * treats 301 and 308 identically, but 301 is the older and more widely
  * understood status among third-party crawlers, analytics and link checkers,
  * and there is nothing here that needs 308's guarantee of method preservation.
+ *
+ * Next carries query strings through a redirect automatically, so a campaign
+ * link like /contact-us?utm_source=x arrives at /contact?utm_source=x with the
+ * parameters intact and readable by analytics.
  */
 const legacyRedirects = [
+  // NOTE: there is deliberately NO rule for `/contact`. It was previously
+  // redirected to `/#contact`; `app/contact/page.tsx` now serves that path
+  // directly, and a redirect here would shadow the route and never let it
+  // render. The legacy URL therefore keeps working by resolving, not by
+  // redirecting, which is strictly better for the equity it already holds.
   {
-    // The live Contact page. The rebuild has no standalone /contact route: the
-    // form, the practice phone numbers and the crisis panel all live in the
-    // homepage's contact section, which is the closest equivalent destination.
-    source: '/contact',
-    destination: '/#contact',
+    // UNVERIFIED, by construction. These three are not in research/sitemap.md —
+    // that crawl only captured what was still live and linked in August 2026,
+    // not everything ever indexed. They are the paths a stale link or a typed
+    // URL most plausibly uses, and a 301 nobody hits costs nothing.
+    // To replace guesswork with evidence: export the legacy property's
+    // Search Console "Performance > Pages" and "Links", or pull the Wayback
+    // Machine URL list for newpointnp.com, and redirect what actually exists.
+    // `/contact` itself is deliberately absent above, so there is no loop.
+    source: '/contact-us',
+    destination: '/contact',
+    statusCode: 301,
+  },
+  {
+    source: '/contactus',
+    destination: '/contact',
+    statusCode: 301,
+  },
+  {
+    source: '/get-in-touch',
+    destination: '/contact',
     statusCode: 301,
   },
   {

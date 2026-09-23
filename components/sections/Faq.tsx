@@ -12,7 +12,7 @@ import { FAQ } from '@/lib/content';
  */
 export function Faq() {
   return (
-    <section id="faq" className="scroll-mt-24 py-24 md:py-32">
+    <section id="faq" className="py-24 md:py-32">
       <Container>
         <Reveal>
           <h2 className="text-h2 max-w-[20ch]">{FAQ.heading}</h2>

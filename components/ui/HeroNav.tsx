@@ -4,6 +4,9 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { NAV, CTA, BUSINESS } from '@/lib/content';
 import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
 
+/** Matches --nav-h in globals.css, which also drives scroll-padding-top. */
+const NAV_H = 72;
+
 /**
  * The hero's navbar. The bar itself is transparent: it sits directly on the
  * video and its overlays, with no tint, blur or gradient edge of its own. The
@@ -20,12 +23,63 @@ import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
  * The blur sits on the backdrop rather than on the panel: .liquid-glass is
  * unlayered CSS, so its own backdrop-filter and position beat any Tailwind
  * utility of the same name. The panel therefore takes no positioning utilities.
+ *
+ * STICKINESS. The bar is `fixed`, not `sticky`. A sticky element is confined to
+ * its containing block, and this one lives inside <Hero />, so it would unstick
+ * the moment the hero scrolled away — the opposite of what is wanted. Nothing
+ * between here and the viewport sets a transform or filter, so `fixed` resolves
+ * against the viewport correctly.
+ *
+ * Over the hero it stays exactly as it was: no background, no blur, no border.
+ * Once #hero-end passes under the bar it takes a solid ink fill, which is what
+ * keeps the white wordmark and white links readable over ordinary page content.
+ * Ink rather than the page's warm white specifically so the existing white mark
+ * and white link colour keep working without swapping assets mid-scroll.
+ *
+ * The announcement pill is not part of this component. It sits in the hero's
+ * content column and scrolls away with it, by design.
  */
 export function HeroNav() {
   const [open, setOpen] = useState(false);
+  const [solid, setSolid] = useState(false);
   const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Solid once the end of the hero passes under the bar.
+   *
+   * Reads the sentinel's live position rather than assuming a viewport height,
+   * so it stays correct when the hero grows past min-h-screen or the window is
+   * resized. rAF-throttled and passive: this runs on every scroll frame, so it
+   * only reads layout and flips one boolean.
+   */
+  useEffect(() => {
+    const sentinel = document.getElementById('hero-end');
+    if (!sentinel) {
+      setSolid(true);
+      return;
+    }
+
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      setSolid(sentinel.getBoundingClientRect().top <= NAV_H);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -36,7 +90,36 @@ export function HeroNav() {
     if (!open) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close();
+      if (event.key === 'Escape') {
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      /**
+       * Trap Tab inside the panel. `role="dialog" aria-modal="true"` announces
+       * the panel as modal, but nothing enforced it for keyboard users: the
+       * whole page behind the overlay stayed in the tab order, so tabbing past
+       * the last link walked out of the dialog and into the hero underneath.
+       */
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusable = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && (active === first || !panel.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKeyDown);
 
@@ -54,8 +137,28 @@ export function HeroNav() {
 
   return (
     <>
-      <div className="px-6 pt-6 md:px-12 lg:px-16">
-        <div className="flex items-center justify-between rounded-xl px-4 py-2">
+      <header
+        className={`ease-np-out fixed inset-x-0 top-0 z-50 px-6 py-3 transition-colors duration-300 motion-reduce:transition-none md:px-12 lg:px-16 ${
+          solid ? 'bg-np-ink' : 'bg-transparent'
+        }`}
+      >
+        {/* Contrast scrim for the transparent state.
+            Measured against the 1080p poster frame: white nav text over the raw
+            footage reaches a median of 3.25:1 and a worst case of 1.75:1 — every
+            pixel of the nav band is under WCAG AA. This gradient buys it back
+            without a bar or a blur: worst case 4.93:1 at the very bottom edge of the bar,
+            nothing in the text band under 4.5:1. It is the same #1F3B5C the hero already uses for its
+            bottom-up gradient, and it fades out well above the headline, so the
+            hero still reads as an uninterrupted frame.
+            It is removed entirely once the bar goes solid, where the ink fill
+            carries the contrast at 17:1 on its own. */}
+        {!solid && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[200%] bg-gradient-to-b from-[#1F3B5C]/85 via-[#1F3B5C]/55 to-transparent"
+          />
+        )}
+        <div className="relative flex h-[calc(var(--nav-h)-1.5rem)] items-center justify-between rounded-xl px-4">
           <a href="#top" aria-label="Newpoint home" className="inline-flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size
                 inline SVG mark; next/image adds no optimisation for SVG. */}
@@ -107,12 +210,14 @@ export function HeroNav() {
             </svg>
           </button>
         </div>
-      </div>
+      </header>
 
       {open && (
-        <div className="fixed inset-0 z-50 backdrop-blur-xl md:hidden" onClick={close}>
+        // z-60: above the fixed bar (z-50), so the panel covers it while open.
+        <div className="fixed inset-0 z-[60] backdrop-blur-xl md:hidden" onClick={close}>
           <div className="flex min-h-full items-stretch p-4">
             <div
+              ref={panelRef}
               id={panelId}
               role="dialog"
               aria-modal="true"

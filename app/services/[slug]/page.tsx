@@ -66,7 +66,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       />
 
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           eyebrow="Services"
           title={service.title}
@@ -109,7 +109,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                     <section
                       id={slugify(section.heading)}
                       tabIndex={-1}
-                      className="border-np-neutral-200 scroll-mt-28 border-b pb-10 last:border-b-0 last:pb-0 focus:outline-none [&:not(:first-child)]:pt-10"
+                      className="border-np-neutral-200 border-b pb-10 last:border-b-0 last:pb-0 focus:outline-none [&:not(:first-child)]:pt-10"
                     >
                       <h2 className="text-h2">{section.heading}</h2>
                       <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">

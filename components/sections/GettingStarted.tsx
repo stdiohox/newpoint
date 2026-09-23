@@ -16,7 +16,7 @@ import { GETTING_STARTED } from '@/lib/content';
  */
 export function GettingStarted() {
   return (
-    <section id="getting-started" className="bg-np-neutral-100 scroll-mt-24 py-24 md:py-32">
+    <section id="getting-started" className="bg-np-neutral-100 py-24 md:py-32">
       <Container>
         <div className="grid gap-12 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-4">

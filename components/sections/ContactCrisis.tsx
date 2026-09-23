@@ -14,7 +14,7 @@ import { CONTACT, CRISIS, BUSINESS } from '@/lib/content';
  */
 export function ContactCrisis() {
   return (
-    <section id="contact" className="bg-np-neutral-100 scroll-mt-24 py-24 md:py-32">
+    <section id="contact" className="bg-np-neutral-100 py-24 md:py-32">
       <Container>
         <div className="grid gap-14 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-7">
@@ -67,7 +67,7 @@ export function ContactCrisis() {
                   </a>
                 </p>
                 <p className="text-small text-np-neutral-600">
-                  Serving {BUSINESS.serviceArea.join(' and ')}, in person and by telehealth.
+                  Telehealth across {BUSINESS.serviceArea.join(' and ')}, and in-person care.
                 </p>
               </div>
             </Reveal>

@@ -17,7 +17,7 @@ import { WHAT_WE_TREAT } from '@/lib/content';
  */
 export function WhatWeTreat() {
   return (
-    <section id="what-we-treat" className="scroll-mt-24 py-24 md:py-32">
+    <section id="what-we-treat" className="py-24 md:py-32">
       <Container>
         <Reveal>
           <h2 className="text-h2 max-w-[20ch]">{WHAT_WE_TREAT.heading}</h2>

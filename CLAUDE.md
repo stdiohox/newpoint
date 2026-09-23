@@ -84,6 +84,32 @@ both have title-protection statutes. Treat the title as belonging in the list ab
 > "Dr. Anastasia Ofoegbu" — see [`research/content/contact.md`](research/content/contact.md).
 > `research/` is authoritative for **facts**, not for this. Do not port those titles forward.
 
+### Care modality — CONFIRMED BY CLIENT, 2026-09-23
+
+**The practice delivers care both in person and by telehealth.** Confirmed verbally by
+the client on 2026-09-23 and recorded here because `research/` predates it.
+
+This supersedes the open question in
+[`research/business-nap.md`](research/business-nap.md) ("confirm this is a
+telehealth/service-area-only practice with no public office"),
+[`research/audit-summary.md`](research/audit-summary.md) item 2, and
+[`research/people-trust.md`](research/people-trust.md) ("if there is a physical office
+(currently unconfirmed)"). **Do not edit those crawl findings** — they are an accurate
+record of the site as it stood on 2026-08-27. They are simply no longer the live answer.
+
+Two things are confirmed and two are still open, and the distinction matters:
+
+| | Status |
+|---|---|
+| Telehealth across **both** NJ and PA | Confirmed — both providers licensed in both |
+| In-person care exists | Confirmed by the client |
+| **Which states** in-person covers | **Open.** The only place-level evidence anywhere in `research/` is Lawrence Township, **NJ**. There is no Pennsylvania location signal at all |
+| Street address | **Open, and now the highest-value item** — see `OPEN_CLIENT_ITEMS` |
+
+So: state telehealth across both states freely. State in-person care **without attaching
+it to a state**, until the client confirms where. Writing "in person across New Jersey and
+Pennsylvania" sends a PA patient to a location that is not known to exist.
+
 ### Canonical business name — ASSUMPTION, needs client confirmation
 
 The current site spells the name **four different ways**. Resolved for the rebuild to one canonical form:

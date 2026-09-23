@@ -40,10 +40,10 @@ export default function ServicesIndex() {
       />
 
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           title="What we do, and how it works"
-          intro="Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management, in person or by telehealth. Each of those is a page of its own below."
+          intro="Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management, in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of those is a page of its own below."
           crumbs={[{ name: 'Services', path: '/services' }]}
         />
 

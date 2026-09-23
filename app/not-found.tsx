@@ -22,7 +22,7 @@ export default function NotFound() {
   return (
     <>
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <div className="py-24 md:py-32">
           <Container>
             <p className="text-caption text-np-blue-600 tracking-[0.08em] uppercase">404</p>

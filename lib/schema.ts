@@ -55,15 +55,16 @@ export function medicalClinicSchema() {
     url: BUSINESS.domain,
     slogan: BUSINESS.tagline,
     description:
-      'Outpatient psychiatric and behavioral health nurse practitioner practice serving New Jersey and Pennsylvania. Psychiatric evaluation, medication management, and telehealth.',
+      'Outpatient psychiatric and behavioral health nurse practitioner practice. Telehealth across New Jersey and Pennsylvania, and in-person care. Psychiatric evaluation and medication management.',
     medicalSpecialty: 'Psychiatric',
     telephone: BUSINESS.phonePrimary,
     faxNumber: BUSINESS.fax,
     logo: `${BUSINESS.domain}/icon.png`,
     image: `${BUSINESS.domain}/opengraph-image`,
     // CLIENT: `address` intentionally omitted. No street address is published or
-    // confirmed. Add PostalAddress once the client supplies it, or keep
-    // areaServed alone if this is confirmed service-area only.
+    // confirmed. In-person care IS confirmed, so this is now the highest-value
+    // open item rather than an optional one — add PostalAddress the moment it
+    // arrives. The "service-area only" alternative is closed.
     //
     // The town is included as a served City, not as an address. The live site
     // names Lawrence Township on every page and it is the only place-level
@@ -215,6 +216,55 @@ export function serviceSchemaFor(s: ServicePage) {
     description: s.intro,
     provider: { '@id': ORG_ID },
     availableIn: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
+  };
+}
+
+/**
+ * The contact page as a ContactPage node, joined to the same graph.
+ *
+ * `mainEntity` points at the clinic's `@id` rather than restating the practice,
+ * and the page emits `organizationRef()` alongside it so that reference
+ * resolves in-document. Contact channels are expressed as ContactPoint nodes so
+ * the phone numbers and inboxes are machine-readable rather than only visible.
+ *
+ * CLIENT: no `address` and no `hoursAvailable`. Neither is confirmed, and an
+ * invented one on a ContactPage is exactly the kind of error a patient acts on.
+ */
+export function contactPageSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    '@id': `${BUSINESS.domain}/contact#page`,
+    url: `${BUSINESS.domain}/contact`,
+    name: `Contact ${BUSINESS.legalName}`,
+    description:
+      'Phone, email and appointment requests for Newpoint Healthcare Services. Telehealth across New Jersey and Pennsylvania, and in-person care.',
+    isPartOf: { '@id': ORG_ID },
+    mainEntity: { '@id': ORG_ID },
+    /**
+     * `contactType` is free text in schema.org. These values are chosen to read
+     * accurately for a clinical practice rather than to match Google's short
+     * recognised list, because the Knowledge Panel's call action reads
+     * `telephone` on the organization node — which medicalClinicSchema() already
+     * carries — not this array. This is additive detail, not load-bearing.
+     */
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'Appointments',
+        telephone: BUSINESS.phonePrimary,
+        areaServed: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
+        availableLanguage: 'English',
+      },
+      ...PROVIDERS.map((p) => ({
+        '@type': 'ContactPoint',
+        contactType: 'Provider',
+        name: `${p.name}, ${p.credentials}`,
+        email: p.email,
+        areaServed: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
+        availableLanguage: 'English',
+      })),
+    ],
   };
 }
 

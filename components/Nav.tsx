@@ -9,11 +9,17 @@ import { NAV, CTA, BUSINESS } from '@/lib/content';
 
 /**
  * Interior-page navigation. The homepage uses <HeroNav /> instead, which sits
- * transparently on the video; this is its opaque counterpart for pages that
- * open on the warm ground.
+ * transparently on the video and takes a solid fill once the hero scrolls away;
+ * this is its counterpart for pages that open on the warm ground.
  *
- * Single line at desktop, 72px tall, inside the 80px cap. Translucent with
- * content scrolling underneath, per the Apple materials note.
+ * Sticky on every route, and SOLID from the very top: there is no hero here for
+ * a transparent state to sit on, so the bar starts in the state HeroNav
+ * transitions into. The previous 85%-translucent + blur treatment is gone —
+ * a light translucent bar over light page content is the one stacking the
+ * Apple materials note rules out, and it left the links fighting whatever
+ * scrolled beneath them.
+ *
+ * Single line at desktop, 72px tall, inside the 80px cap.
  *
  * CLIENT: the wordmark is set in type beside the existing mark. The original
  * logo file (vector preferred) has not been supplied, and the mark is carried
@@ -24,9 +30,9 @@ export function Nav() {
   const reduce = useReducedMotion();
 
   return (
-    <header className="border-np-neutral-200 bg-np-neutral-50/85 supports-[not(backdrop-filter:blur(0))]:bg-np-neutral-50 sticky top-0 z-40 border-b backdrop-blur-md">
+    <header className="border-np-neutral-200 bg-np-neutral-50 sticky top-0 z-50 border-b">
       <Container>
-        <div className="flex h-[72px] items-center justify-between gap-6">
+        <div className="flex h-[var(--nav-h)] items-center justify-between gap-6">
           <Link
             href="/"
             className="font-display text-body-l text-np-ink font-semibold tracking-[-0.02em]"

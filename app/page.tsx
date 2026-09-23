@@ -37,7 +37,7 @@ export default function Home() {
 
       <div id="top" />
       {/* The primary navigation now lives inside <Hero />, per the hero spec. */}
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <Hero />
         <InsuranceProof />
         <Providers />

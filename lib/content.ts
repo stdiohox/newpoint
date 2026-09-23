@@ -34,9 +34,10 @@ export const BUSINESS = {
   },
 
   /**
-   * No street address is published anywhere and it is unconfirmed whether a
-   * public office exists. Geography is framed as service area only.
-   * CLIENT: supply practice address, or confirm this is service-area only.
+   * In-person care IS confirmed by the client (see CLAUDE.md, "Care modality").
+   * What is still missing is the street address, and which states in-person care
+   * covers. Geography is therefore framed as service area only.
+   * CLIENT: supply the practice address and the in-person service states.
    */
   serviceArea: ['New Jersey', 'Pennsylvania'],
   serviceAreaNote: 'Lawrence Township, New Jersey',
@@ -57,6 +58,7 @@ export const NAV = [
   { label: 'Insurance', href: '/insurance' },
   { label: 'New patients', href: '/new-patients' },
   { label: 'FAQ', href: '/#faq' },
+  { label: 'Contact', href: '/contact' },
 ] as const;
 
 /** Single CTA intent across the entire site. Never a second label for this action. */
@@ -320,7 +322,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         q: 'Can the evaluation be done by telehealth?',
-        a: 'Telehealth is available to patients in New Jersey and Pennsylvania. Ask us when you get in touch and we will confirm what works for your situation.',
+        a: 'Yes. The evaluation is available by telehealth to patients across New Jersey and Pennsylvania, and in person. Ask us when you get in touch and we will confirm what works for your situation.',
       },
       {
         q: 'What do I leave with?',
@@ -432,7 +434,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         q: 'Can I be seen if I live in Pennsylvania?',
-        a: 'Yes. Both providers are licensed in Pennsylvania as well as New Jersey.',
+        a: 'Yes, by telehealth. Both providers are licensed in Pennsylvania as well as New Jersey.',
       },
       {
         q: 'What do I need for a telehealth appointment?',
@@ -487,7 +489,7 @@ export const FAQ = {
         },
         {
           q: 'Where do you practice?',
-          a: 'We serve patients in New Jersey and Pennsylvania, with telehealth available across both states.',
+          a: 'Telehealth is available to patients across New Jersey and Pennsylvania. We also see patients in person — ask us when you get in touch and we will confirm what is available to you.',
         },
       ],
     },
@@ -635,8 +637,8 @@ export const NEW_PATIENTS_PAGE = {
       body: 'It is a comprehensive psychiatric evaluation: a full history, a review of risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end of it.',
     },
     {
-      heading: 'Follow-up appointments are available by video',
-      body: 'Telehealth runs on an expanded schedule including weekends, evenings, and holidays by request, across both New Jersey and Pennsylvania.',
+      heading: 'Follow-up appointments can be in person or by video',
+      body: 'Telehealth runs across New Jersey and Pennsylvania on an expanded schedule including weekends, evenings, and holidays by request. In-person appointments are available too — ask us which suits you.',
     },
   ],
   // CLIENT: no "what to bring" checklist is published anywhere and none is
@@ -656,6 +658,50 @@ export const NEW_PATIENTS_PAGE = {
 } as const;
 
 /**
+ * Contact page copy.
+ *
+ * Every fact is already in BUSINESS above or in /research/content/contact.md.
+ * Nothing new is introduced: no hours, no address, no general inbox, and no
+ * booking link — the research confirms the live site has no online scheduling
+ * widget, so the page routes to the existing appointment form, the phone
+ * numbers and the two provider inboxes.
+ */
+export const CONTACT_PAGE = {
+  title: 'Contact Newpoint',
+  metaTitle: 'Contact | Psychiatric Care in NJ and PA',
+  metaDescription:
+    'Contact Newpoint for psychiatric care across New Jersey and Pennsylvania, by telehealth and in person. Call, email, or request an appointment online.',
+  intro:
+    'Call us, email us, or request an appointment. We see patients across New Jersey and Pennsylvania by telehealth, and in person.',
+  /**
+   * CLIENT: no practice-wide inbox exists, so both named provider addresses are
+   * listed rather than inventing an info@ or contact@.
+   * CLIENT: hours of operation are not published anywhere, so none are stated.
+   * CLIENT: no street address is confirmed, so the service area is given instead.
+   */
+  // Verbatim roles only: research/business-nap.md records (609) 527-9438 as the
+  // primary number and the other two as additional lines. It does not say which
+  // is answered first, and it does not label any of them by state — the 215 area
+  // code is an inference, not a published fact.
+  phoneNote:
+    'The main line is the best number to try first. The other two also reach the practice.',
+  // Same prohibition set as CONTACT.privacyNote and NEW_PATIENTS_PAGE.privacyBody,
+  // including date of birth. /contact may be a patient's only read.
+  emailNote:
+    'Email reaches the providers directly. Please keep symptoms, diagnoses, medications, insurance ID numbers and dates of birth out of it — it is not a secure channel for them.',
+  /**
+   * Telehealth is stated across both states because both providers are licensed
+   * in both. In-person care is stated WITHOUT a state, because the only
+   * place-level evidence anywhere in /research is Lawrence Township, New Jersey
+   * — there is no Pennsylvania location signal at all. Saying "in person across
+   * New Jersey and Pennsylvania" would send a PA patient somewhere that is not
+   * known to exist.
+   */
+  areaNote:
+    'Telehealth is available to patients across New Jersey and Pennsylvania, on an expanded schedule including weekends, evenings, and holidays by request. In-person appointments are available as well — ask us what works for you.',
+} as const;
+
+/**
  * Every indexable route, in one place, consumed by app/sitemap.ts. Adding a
  * page means adding it here, or it will not be submitted to search engines.
  *
@@ -672,6 +718,7 @@ export const ROUTES: { path: string; priority: number }[] = [
   ...SERVICE_PAGES.map((s) => ({ path: `/services/${s.slug}`, priority: 0.8 })),
   { path: '/insurance', priority: 0.8 },
   { path: '/new-patients', priority: 0.8 },
+  { path: '/contact', priority: 0.9 },
   ...PROVIDERS.map((p) => ({ path: `/providers/${p.slug}`, priority: 0.7 })),
 ];
 
@@ -681,10 +728,11 @@ export const ROUTES: { path: string; priority: number }[] = [
  */
 export const OPEN_CLIENT_ITEMS = [
   'Exact legal business name from the LLC formation documents ("Newpoint" vs "New Point")',
-  'Street address, suite, and ZIP, or written confirmation that the practice is service-area only with no public office',
+  'Street address, suite and ZIP for the practice. NOW THE HIGHEST-VALUE OPEN ITEM: the client has confirmed care is delivered in person as well as by telehealth, so the site claims in-person care and the organization is marked up as a MedicalClinic. Google expects an address on that type, a patient told they can be seen in person has nowhere to go, and Local Pack and Maps eligibility are blocked until it exists. The former "or confirm service-area only" alternative is closed — in-person care is confirmed',
   'State nursing license numbers for both providers, or confirmation they prefer not to publish them',
   'NPI numbers for both providers, or confirmation they prefer not to publish them',
   'Certifying body for the "board-certified" claim (the post-nominals imply one, but it is not stated anywhere and must not be assumed)',
+  'Which states and locations in-person care is actually offered in. Telehealth is evidenced in both New Jersey and Pennsylvania (both providers are licensed in both), but the only place-level signal anywhere in /research is Lawrence Township, New Jersey. The site therefore states in-person care WITHOUT attaching it to a state',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers',
   'Confirmed age range served (adults only, or across the lifespan as a practice policy)',
   'Whether substance use and addiction treatment is an active service line',
@@ -694,7 +742,6 @@ export const OPEN_CLIENT_ITEMS = [
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
   "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent",
-  'Whether a public office exists and in which state. UNRESOLVED CONTRADICTION: the provider pages promise telehealth only, while the footer, the contact section, the services page and two copy strings still say "in person and by telehealth". research/services-analysis.md does describe in-office care, but no address is confirmed anywhere. Confirm premises, then make all of it say the same thing',
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   'Self-pay session fee and the sliding scale criteria',
   'Original logo file, vector preferred',

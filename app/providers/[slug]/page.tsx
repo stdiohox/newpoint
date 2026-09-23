@@ -80,7 +80,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
       <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
 
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           eyebrow="Provider"
           title={`${provider.name}, ${provider.credentials}`}
@@ -166,15 +166,17 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <h2 className="text-h2">Appointments</h2>
                   </Reveal>
                   <Reveal delay={0.08}>
-                    {/* CLIENT: "by telehealth" only. No street address is
-                        published and it is unconfirmed whether a public office
-                        exists, so this does not promise in-person appointments
-                        in two states. Widen it once a location is confirmed. */}
+                    {/* Telehealth is stated across both states, because both
+                        providers are licensed in both. In-person care is stated
+                        without a state: the only place-level evidence anywhere
+                        in /research is Lawrence Township, New Jersey, and there
+                        is no Pennsylvania location signal at all. The street
+                        address remains an open item — see OPEN_CLIENT_ITEMS. */}
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
                       {provider.name.split(' ')[0]} sees patients across{' '}
-                      {BUSINESS.serviceArea.join(' and ')} by telehealth. New patients start with a
-                      comprehensive psychiatric evaluation; care continues as medication management
-                      on a schedule agreed with you.
+                      {BUSINESS.serviceArea.join(' and ')} by telehealth, and in person. New
+                      patients start with a comprehensive psychiatric evaluation; care continues as
+                      medication management on a schedule agreed with you.
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>

@@ -116,12 +116,24 @@
        and if a component needs more separation it gets a 1px border instead.
        --shadow-np-card already matched. --shadow-np-lift had drifted to a 12px
        offset at 10%, well outside that discipline, so it is pulled back here. */
+    /* Height of the sticky navbar. Consumed by scroll-padding-top above and by
+       the hero nav's scroll threshold, so the two cannot drift. */
+    --nav-h: 72px;
+
     --shadow-np-card: 0 2px 8px rgb(19 28 46 / 0.05);
     --shadow-np-lift: 0 4px 16px -4px rgb(19 28 46 / 0.06);
   }
 
   html {
     scroll-behavior: smooth;
+    /* The navbar is sticky on every route, so an anchor target would otherwise
+       land underneath it. --nav-h clears the bar; the extra 1.5rem is the
+       breathing room the sections used to get from their own scroll-mt-24.
+       This is the ONLY anchor-offset mechanism on the site — scroll-padding on
+       the scroller and scroll-margin on the target COMBINE rather than taking
+       the greater of the two, so keeping both made every section land about
+       96px too low. */
+    scroll-padding-top: calc(var(--nav-h) + 1.5rem);
   }
 
   body {
@@ -177,6 +189,23 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Honour a request for less transparency: swap the glass for a solid ink panel
+   and drop the blur. No WCAG criterion covers this yet, but the material is
+   heavy and the preference exists precisely for people who cannot read through
+   it. forced-colors gets the same treatment, since backdrop-filter and the
+   masked gradient edge are stripped there anyway. */
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .liquid-glass {
+    background: var(--color-np-ink);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--color-np-neutral-400);
+  }
+  .liquid-glass::before {
+    display: none;
   }
 }
 

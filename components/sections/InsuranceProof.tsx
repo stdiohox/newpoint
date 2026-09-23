@@ -27,7 +27,7 @@ import { INSURANCE, PRACTICE_FACTS } from '@/lib/content';
  */
 export function InsuranceProof() {
   return (
-    <section id="insurance" className="bg-np-neutral-100 scroll-mt-24 py-20 md:py-28">
+    <section id="insurance" className="bg-np-neutral-100 py-20 md:py-28">
       <Container>
         {/* Practice facts. Plain statements, no invented figures, no eyebrow labels. */}
         <ul className="border-np-neutral-300 grid gap-6 border-b pb-10 sm:grid-cols-3 sm:gap-8">

@@ -35,7 +35,7 @@ export default function NewPatientsPage() {
       />
 
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           title={NEW_PATIENTS_PAGE.title}
           intro={NEW_PATIENTS_PAGE.intro}

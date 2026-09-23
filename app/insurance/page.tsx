@@ -37,7 +37,7 @@ export default function InsurancePage() {
       />
 
       <Nav />
-      <main id="main">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           title={INSURANCE_PAGE.title}
           intro={INSURANCE_PAGE.intro}

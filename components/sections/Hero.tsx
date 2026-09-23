@@ -51,7 +51,9 @@ export function Hero() {
       <div className="relative flex min-h-screen flex-col">
         <HeroNav />
 
-        <div className="flex flex-1 flex-col justify-end px-6 pb-12 md:px-12 lg:grid lg:grid-cols-2 lg:items-end lg:px-16 lg:pb-16">
+        {/* pt matches --nav-h: the bar is fixed now, so it no longer reserves
+            its own space in this column. */}
+        <div className="flex flex-1 flex-col justify-end px-6 pt-[var(--nav-h)] pb-12 md:px-12 lg:grid lg:grid-cols-2 lg:items-end lg:px-16 lg:pb-16">
           <div>
             <FadeIn delay={100} duration={1000} className="mb-4">
               <span className="inline-block rounded-full border border-white/30 px-4 py-2 text-sm text-white">
@@ -83,6 +85,12 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      {/* The navbar measures this to decide when to take its solid fill. Marking
+          the hero's real bottom edge rather than assuming a viewport height keeps
+          it correct when the hero grows past min-h-screen or the window resizes.
+          Its absence is also how <HeroNav /> detects a page with no hero. */}
+      <div id="hero-end" aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px" />
     </section>
   );
 }

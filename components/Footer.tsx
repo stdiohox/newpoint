@@ -20,8 +20,8 @@ export function Footer() {
               {BUSINESS.legalName}
             </p>
             <p className="text-small mt-2 max-w-[38ch]">
-              Outpatient psychiatric and behavioral health care for{' '}
-              {BUSINESS.serviceArea.join(' and ')}, in person and by telehealth.
+              Outpatient psychiatric and behavioral health care by telehealth across{' '}
+              {BUSINESS.serviceArea.join(' and ')}, and in person.
             </p>
             {/* The town, stated as service area rather than as an address. The
                 live site names Lawrence Township on every page and it is the
@@ -39,6 +39,11 @@ export function Footer() {
               </a>
               <span className="mx-2 text-white/30">/</span>
               <span>Fax {BUSINESS.fax}</span>
+            </p>
+            <p className="text-small mt-2">
+              <Link href="/contact" className="text-np-blue-300 underline-offset-4 hover:underline">
+                All the ways to reach us
+              </Link>
             </p>
           </div>
 
@@ -83,11 +88,19 @@ export function Footer() {
             </ul>
             <p className="text-small mt-5">
               In a crisis, call or text{' '}
-              <a href="tel:988" className="text-np-blue-300 underline-offset-4 hover:underline">
+              <a
+                href="tel:988"
+                aria-label="988, Suicide and Crisis Lifeline"
+                className="text-np-blue-300 underline-offset-4 hover:underline"
+              >
                 988
               </a>
               . In an emergency, call{' '}
-              <a href="tel:911" className="text-np-blue-300 underline-offset-4 hover:underline">
+              <a
+                href="tel:911"
+                aria-label="911, medical emergency"
+                className="text-np-blue-300 underline-offset-4 hover:underline"
+              >
                 911
               </a>
               .

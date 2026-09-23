@@ -21,7 +21,7 @@ import { PROVIDERS } from '@/lib/content';
  */
 export function Providers() {
   return (
-    <section id="providers" className="bg-np-ink on-ink scroll-mt-24 py-24 md:py-32">
+    <section id="providers" className="bg-np-ink on-ink py-24 md:py-32">
       <Container>
         <Reveal>
           <h2 className="text-display-l max-w-[18ch] text-white">
@@ -40,7 +40,7 @@ export function Providers() {
             <Reveal as="li" key={p.slug} delay={stagger(i, 0.1)}>
               <article
                 id={`provider-${p.slug}`}
-                className="rounded-card relative h-full scroll-mt-24 bg-[var(--np-alpha-white-08)] p-6 ring-1 ring-[var(--np-alpha-white-14)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-white md:p-8"
+                className="rounded-card relative h-full bg-[var(--np-alpha-white-08)] p-6 ring-1 ring-[var(--np-alpha-white-14)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-white md:p-8"
               >
                 <div className="flex items-start gap-5">
                   <ProviderPortrait
