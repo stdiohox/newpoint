@@ -50,6 +50,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${cabinetGrotesk.variable} ${switzer.variable}`}>
+      {/* Inter is loaded for the hero section only. The site's type stack stays
+          Cabinet Grotesk + Switzer; see the hero wrapper in components/sections/Hero.tsx. */}
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>
         <a
           href="#main"

@@ -1,74 +1,112 @@
-import { Container } from '@/components/ui/Container';
-import { Button } from '@/components/ui/Button';
-import { Reveal } from '@/components/ui/Reveal';
-import { stagger } from '@/lib/motion';
-import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
-import { HERO, CTA, PROVIDERS, BUSINESS } from '@/lib/content';
+import { NAV, CTA, HERO, BUSINESS } from '@/lib/content';
+import { FadeIn } from '@/components/ui/FadeIn';
+import { AnimatedHeading } from '@/components/ui/AnimatedHeading';
 
 /**
- * Layout family: asymmetric split. Copy left, the two providers right.
+ * Full-viewport video hero, built to the supplied spec.
  *
- * Hero discipline: 3 text elements (headline, subtext, CTA), no eyebrow, no
- * trust micro-strip, no scroll cue, no tagline under the CTA. Top padding is
- * capped so the content does not float down the viewport.
+ * The video plays raw: there is no overlay, gradient, scrim or dimming layer of
+ * any kind between it and the content. Every surface that sits over it is a
+ * .liquid-glass element with its own background.
  *
- * The providers appear here as identity and again in section 3 as full cards
- * with bios and conditions. Different role, different density, not a repeat.
+ * Inter is scoped to this section only. It is declared inline here rather than
+ * on `body`, so the rest of the site keeps Cabinet Grotesk + Switzer. The
+ * heading repeats it inline because the base layer sets a font-family directly
+ * on `h1`, which would otherwise beat inheritance from this wrapper.
  *
- * CLIENT: no practice or office photography exists. If real photography is
- * supplied later it belongs here, and the portrait duo moves down to section 3 only.
+ * This section also carries the site's primary navigation.
  */
+
+const INTER = "'Inter', sans-serif";
+
 export function Hero() {
   return (
-    <section className="pt-16 pb-20 md:pt-24 md:pb-32">
-      <Container>
-        <div className="grid items-center gap-12 md:grid-cols-12 md:gap-16">
-          <div className="md:col-span-7">
-            <Reveal>
-              <h1 className="text-display-xl text-np-ink">{HERO.headline}</h1>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <p className="text-body-l text-np-neutral-600 mt-6 max-w-[52ch]">{HERO.subtext}</p>
-            </Reveal>
-            <Reveal delay={0.16}>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
-                <Button href={CTA.href} size="lg">
-                  {CTA.label}
-                </Button>
-                {/* Canonical CTA pair, adapted from Grove AI: filled primary beside an
-                    outlined ghost. Distinct intents (book vs call), so this is not a
-                    duplicate CTA. The outlined variant also gives the phone number a
-                    real tap target on mobile, which a bare text link did not. */}
-                <Button href={`tel:${BUSINESS.phonePrimaryHref}`} variant="quiet" size="lg">
-                  {BUSINESS.phonePrimary}
-                </Button>
-              </div>
-            </Reveal>
-          </div>
+    <section
+      className="relative min-h-screen bg-black text-white"
+      style={{
+        fontFamily: INTER,
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+      }}
+    >
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        poster="/video/newpoint-hero-poster.jpg"
+        className="absolute inset-0 h-full w-full object-cover"
+      >
+        <source src="/video/newpoint-hero.webm" type="video/webm" />
+        <source src="/video/newpoint-hero.mp4" type="video/mp4" />
+      </video>
 
-          <div className="md:col-span-5">
-            <Reveal delay={0.24}>
-              <ul className="flex gap-4 sm:gap-6">
-                {PROVIDERS.map((p, i) => (
-                  <li key={p.slug} className="flex-1">
-                    <Reveal delay={0.24 + stagger(i, 0.08)}>
-                      <ProviderPortrait
-                        provider={p}
-                        sizes="(min-width: 768px) 240px, 44vw"
-                        className="w-full shadow-[var(--shadow-np-card)]"
-                      />
-                      <p className="font-display text-small text-np-ink mt-3 font-semibold">
-                        {p.name}
-                      </p>
-                      <p className="text-caption text-np-neutral-500">{p.credentials}</p>
-                    </Reveal>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
+      <div className="relative flex min-h-screen flex-col">
+        <div className="px-6 pt-6 md:px-12 lg:px-16">
+          <div className="liquid-glass flex items-center justify-between rounded-xl px-4 py-2">
+            <span className="text-2xl font-semibold tracking-tight">{BUSINESS.shortName}</span>
+
+            <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
+              {NAV.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm transition-colors hover:text-gray-300"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+
+            <a
+              href={CTA.href}
+              className="rounded-lg bg-white px-6 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-100"
+            >
+              {CTA.label}
+            </a>
           </div>
         </div>
-      </Container>
+
+        <div className="flex flex-1 flex-col justify-end px-6 pb-12 md:px-12 lg:grid lg:grid-cols-2 lg:items-end lg:px-16 lg:pb-16">
+          <div>
+            <AnimatedHeading
+              text={HERO.headlineLines}
+              className="mb-4 text-4xl font-normal text-white md:text-5xl lg:text-6xl xl:text-7xl"
+              style={{ letterSpacing: '-0.04em', fontFamily: INTER }}
+            />
+
+            <FadeIn delay={800} duration={1000}>
+              <p className="mb-5 text-base text-gray-300 md:text-lg">{HERO.subtext}</p>
+            </FadeIn>
+
+            <FadeIn delay={1200} duration={1000}>
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href={CTA.href}
+                  className="rounded-lg bg-white px-8 py-3 font-medium text-black"
+                >
+                  {CTA.label}
+                </a>
+                <a
+                  href={`tel:${BUSINESS.phonePrimaryHref}`}
+                  className="liquid-glass rounded-lg border border-white/20 px-8 py-3 font-medium text-white transition-colors hover:bg-white hover:text-black"
+                >
+                  {BUSINESS.phonePrimary}
+                </a>
+              </div>
+            </FadeIn>
+          </div>
+
+          <div className="flex items-end justify-start lg:justify-end">
+            <FadeIn delay={1400} duration={1000}>
+              <div className="liquid-glass rounded-xl border border-white/20 px-6 py-3">
+                <span className="text-lg font-light md:text-xl lg:text-2xl">{HERO.tag}</span>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

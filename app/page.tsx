@@ -1,4 +1,3 @@
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { Hero } from '@/components/sections/Hero';
 import { InsuranceProof } from '@/components/sections/InsuranceProof';
@@ -31,7 +30,7 @@ export default function Home() {
       ))}
 
       <div id="top" />
-      <Nav />
+      {/* The primary navigation now lives inside <Hero />, per the hero spec. */}
       <main id="main">
         <Hero />
         <InsuranceProof />

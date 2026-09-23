@@ -58,8 +58,19 @@ export const CTA = {
 
 export const HERO = {
   headline: 'Psychiatric care across New Jersey and Pennsylvania',
+  /**
+   * The same headline, broken into two lines. The literal \n is the split point
+   * for the hero's per-character entrance animation. No wording differs from
+   * `headline` above.
+   */
+  headlineLines: 'Psychiatric care across\nNew Jersey and Pennsylvania',
   subtext:
     'Evaluation, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners. Most major insurance accepted.',
+  /**
+   * Three service names for the hero's glass tag, word-for-word as `subtext`
+   * already names them. No new service is claimed here.
+   */
+  tag: 'Evaluation. Medication management. Telehealth.',
 } as const;
 
 /**
