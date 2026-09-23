@@ -65,7 +65,7 @@ export function Hero() {
             />
 
             <FadeIn delay={800} duration={1000}>
-              <p className="mb-5 text-base text-white/90 md:text-lg">{HERO.subtext}</p>
+              <p className="mb-5 text-sm text-white/90 md:text-base">{HERO.subtext}</p>
             </FadeIn>
 
             <FadeIn delay={1200} duration={1000}>
@@ -82,7 +82,7 @@ export function Hero() {
 
           <div className="flex items-end justify-start lg:justify-end">
             <FadeIn delay={1400} duration={1000}>
-              <span className="text-lg font-light md:text-xl lg:text-2xl">{HERO.tag}</span>
+              <span className="text-base font-light md:text-lg lg:text-xl">{HERO.tag}</span>
             </FadeIn>
           </div>
         </div>
