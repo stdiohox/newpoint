@@ -466,12 +466,101 @@ export const GETTING_STARTED = {
 } as const;
 
 /**
+ * Homepage "What to expect", the four-step patient journey.
+ *
+ * This is the homepage's process section. It replaces <GettingStarted /> on the
+ * homepage, which said the same thing in three steps; that export stays because
+ * /new-patients still renders it, and FEATURED_SERVICES still quotes its body.
+ *
+ * SOURCING: the whole sequence comes from one verbatim passage on the live
+ * Services page, recorded at /research/content/services.md line 18:
+ *
+ *   "The initial visit involves completing a comprehensive psychiatric
+ *   evaluation, which identifies risk factors that may impact a patient's
+ *   mental health. Mental illness diagnoses are made based on assessments, and
+ *   then an effective plan of care is determined using psychotherapy modalities
+ *   and psychopharmacology for the individual. The treatment plan involves
+ *   collaborating with other professionals to set a regimen of therapy and
+ *   prescription medication to improve the person's mental health. As we
+ *   evaluate progress, we will continue to provide support and education as
+ *   needed."
+ *
+ * Step 1 is the exception, and comes from /research/content/contact.md instead:
+ * contact is phone, email, or the form, and the research explicitly records
+ * that there is NO online scheduling widget. "Request an appointment" is the
+ * CTA label, not a booking tool, and the copy must not imply one.
+ *
+ * What is deliberately NOT said here, because no source states it:
+ * - How long any step takes, or how long until you are seen. No timings exist
+ *   anywhere in /research, and "no invented timings" is the rule for this list.
+ * - That the treatment plan is given to you in writing. The source says a plan
+ *   of care is "determined", not recorded or countersigned. Still open, see
+ *   OPEN_CLIENT_ITEMS.
+ * - Named therapy modalities. The source says "psychotherapy modalities"
+ *   generically and never names one, so neither does this.
+ * - Appointment length, frequency, or cost.
+ */
+export const WHAT_TO_EXPECT = {
+  heading: 'What to expect',
+  body: 'Four steps, from the first message to ongoing care. Every new patient starts with the same comprehensive psychiatric evaluation.',
+  steps: [
+    {
+      title: 'Request an appointment',
+      /**
+       * Form or phone, never "book online": /research/services-analysis.md
+       * records that intake is phone, email, or contact form only. The health
+       * details warning is the same HIPAA-aware line as CONTACT.privacyNote.
+       */
+      /**
+       * "through the form", never a bare "out of it". The sentence before this
+       * one offers two channels, so an unscoped pronoun reads as covering the
+       * phone call too, and telling a psychiatric patient to withhold clinical
+       * detail from a call with the practice is the opposite of the rule. The
+       * v1 no-PHI prohibition in CLAUDE.md is scoped to the contact flow, not
+       * to speaking to a provider. Phrasing matches GETTING_STARTED's, which
+       * already had this right, and carries NEW_PATIENTS_PAGE.privacyBody's
+       * reassurance clause so the patient knows where the detail does go.
+       */
+      body: 'Send the form or call us. Tell us how to reach you and why you are getting in touch. Please do not send health details through the form; we will take the clinical details directly.',
+    },
+    {
+      title: 'Comprehensive psychiatric evaluation',
+      /**
+       * "may be affecting", matching SERVICE_PAGES and the source verbatim
+       * ("identifies risk factors that MAY impact a patient's mental health").
+       * Dropping the hedge asserts to every reader that risk factors are
+       * affecting them, before anyone has assessed them.
+       */
+      body: 'Your first appointment. We take a full history, identify the risk factors that may be affecting your mental health, and use structured questionnaires and rating scales to set a baseline.',
+    },
+    {
+      title: 'Your treatment plan',
+      /**
+       * "where both are indicated" is not padding. Without it this promises
+       * that every plan includes medication, which is a stronger claim than
+       * the source makes ("for the individual") and contradicts this file's
+       * own sourced copy in SERVICE_PAGES, two clicks away. It also tells a
+       * patient who does not want to be prescribed that this practice will
+       * prescribe regardless.
+       */
+      body: 'A diagnosis is reached through assessment, then a plan of care combining psychotherapy approaches and medication where both are indicated. If other clinicians are already involved, we set the regimen with them.',
+    },
+    {
+      title: 'Follow-up care',
+      body: 'Follow-up appointments manage medication and track your progress against that baseline, in person or by telehealth. We adjust as your response becomes clear.',
+    },
+  ],
+} as const;
+
+/**
  * Featured services, for the homepage services section.
  *
  * Titles and descriptions are the existing service copy — WHAT_WE_TREAT.services
- * for the three service slots, GETTING_STARTED for the fourth. Nothing new is
- * claimed here; this is a presentation layer over content that already existed
- * and was already sourced from /research.
+ * for the three service slots. The fourth took GETTING_STARTED.body until
+ * <WhatToExpect /> arrived above this section with a different step count; it
+ * now carries its own literal description, for the reason recorded on that
+ * entry. Nothing new is claimed in either case; this is a presentation layer
+ * over content that already existed and was already sourced from /research.
  *
  * `footerText` states the care modality exactly as the site states it elsewhere.
  * Telehealth's slot says telehealth only, because that is what that service is.
@@ -549,7 +638,25 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     type: 'card',
     badge: null,
     title: 'New patients',
-    description: GETTING_STARTED.body,
+    /**
+     * A literal string, no longer GETTING_STARTED.body, and deliberately with
+     * no step count in it.
+     *
+     * GETTING_STARTED.body says "Three steps from first contact to ongoing
+     * care." That is still true of /new-patients, which lists exactly three and
+     * is where this card links. It stopped being true of the HOMEPAGE when
+     * <WhatToExpect /> landed directly above this section counting four: a
+     * visitor scrolled past four numbered steps and then read a card telling
+     * them the process is three, one screen apart. Self-contradiction on a
+     * single page is the specific failure the audit records against the live
+     * site, so the count comes out of the card rather than out of either
+     * section.
+     *
+     * Edited HERE and not at GETTING_STARTED.body on purpose: that constant is
+     * also rendered on /new-patients, above the three-step list it introduces,
+     * where "three steps" is the correct and useful thing to say.
+     */
+    description: 'How to get in touch, what the first appointment covers, and how ongoing care works.',
     /**
      * No modality line on this slot. The other three describe how CARE is
      * delivered; this one is a process, and "In person and by telehealth" next
