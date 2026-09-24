@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { outfit } from '@/app/fonts';
 import { stagger } from '@/lib/motion';
@@ -80,21 +79,28 @@ function assertSourced(slug: string, bio: string): string {
 
 /**
  * The enhanced card crops live beside the square portraits under the same slug.
- * 1068 is the widest framing available without upscaling either source - the
- * template is bounded by Anastasia's 1137x1138 original, which is the tighter
- * of the two. Cut at 7:6 to match the card, which also buys a smaller head in
- * frame (26.6% of the width against 30.6% at the old portrait aspect) and an
- * eye-line at 35.5% rather than 44.5%, so the face sits higher above the text.
+ * Cut at 5:4 to match the card exactly, so the card does no cover-cropping of
+ * its own on desktop, with the eye-line placed at 32% of height and head size
+ * matched between the two at 26.6% of frame width.
+ *
+ * What these crops CANNOT do is show the top of the head. Measured off a
+ * percentage grid on the originals, the crown-to-eye distance is 37% of
+ * Funmilayo's whole source frame and 40% of Anastasia's - these are close-range
+ * selfies. Putting the eyes at 32% of a 5:4 frame therefore cuts 229px off one
+ * crown and 164px off the other. Framing them to keep the crown instead drops
+ * the eye-line to about 51%, which pushes MORE of the face behind the text
+ * block and breaks the matched head size. Neither is fixable by cropping; it
+ * needs the reshoot already listed in OPEN_CLIENT_ITEMS.
  */
 function cardImage(slug: string) {
   return {
     w560: `/images/providers/${slug}-card-560.webp`,
-    w1068: `/images/providers/${slug}-card-1068.webp`,
+    w1120: `/images/providers/${slug}-card-1120.webp`,
   };
 }
 
 /**
- * Bottom scrim. Transparent until 45% down the card, then ramps to solid
+ * Bottom scrim. Transparent until 55% down the card, then ramps to solid
  * --color-np-blue-700, which is the blue the panel is showing behind the cards.
  * It is fully opaque well before the text block starts, so the role and bio sit
  * on flat blue rather than on whatever the photograph happens to be doing - the
@@ -104,9 +110,9 @@ function cardImage(slug: string) {
 const CARD_SCRIM =
   'linear-gradient(to top,' +
   ' var(--color-np-blue-700) 0%,' +
-  ' var(--color-np-blue-700) 30%,' +
-  ' color-mix(in srgb, var(--color-np-blue-700) 70%, transparent) 42%,' +
-  ' transparent 55%)';
+  ' var(--color-np-blue-700) 32%,' +
+  ' color-mix(in srgb, var(--color-np-blue-700) 70%, transparent) 38%,' +
+  ' transparent 45%)';
 
 /** Soft diagonal, dark top-left to --color-np-sky bottom-right. All tokens. */
 const PANEL_GRADIENT =
@@ -118,20 +124,25 @@ const PANEL_GRADIENT =
 export function Providers() {
   return (
     <section id="providers" className="bg-np-neutral-50 py-24 md:py-32">
-      <Container>
+      {/* Not <Container>: that caps content at 1200 and then eats 32px of it as
+          gutters, so the panel came out 1136 wide. FeaturedServices sets its own
+          max-width: 1200px with 20px gutters, so the panel is given the same
+          1200 cap with the gutters OUTSIDE it. The panel is therefore a true
+          1200 from 1240px up, and lines up with the services block below it. */}
+      <div className="px-5">
         {/* on-ink swaps the global focus ring to white, which is what the cards
             inside this panel need. It is scoped to the panel, not the section,
             because the section ground is now light. */}
         <div
-          className={`on-ink ${outfit.variable} overflow-hidden rounded-[28px] px-5 py-14 min-[769px]:rounded-[48px] min-[769px]:px-12 min-[769px]:py-20`}
+          className={`on-ink ${outfit.variable} mx-auto w-full max-w-[1200px] overflow-hidden rounded-[28px] px-5 py-10 min-[960px]:rounded-[48px] min-[960px]:px-7 min-[960px]:py-16`}
           style={{ backgroundImage: PANEL_GRADIENT }}
         >
           <Reveal>
             <h2
-              className="mx-auto max-w-[20ch] text-center font-medium text-white"
+              className="mx-auto max-w-[24ch] text-center font-medium text-white"
               style={{
                 fontFamily: 'var(--font-outfit), ui-sans-serif, system-ui, sans-serif',
-                fontSize: 'clamp(2rem, 4.4vw, 3.5rem)',
+                fontSize: 'clamp(2rem, 3.4vw, 3rem)',
                 letterSpacing: '-0.035em',
                 lineHeight: 1.05,
                 textWrap: 'balance',
@@ -148,7 +159,7 @@ export function Providers() {
               over sky itself would only make 3.9:1, so do not move this copy
               down the panel without re-measuring. */}
           <Reveal delay={0.08}>
-            <p className="text-body-l mx-auto mt-5 max-w-[620px] text-center text-white/85">
+            <p className="text-body-l mx-auto mt-4 max-w-[720px] text-center text-white/85">
               Not a directory, and not a rotating roster. Both hold a Doctor of Nursing Practice and
               are dual-certified in psychiatric mental health and family practice.
             </p>
@@ -158,7 +169,7 @@ export function Providers() {
               none, which makes WebKit drop the list semantics entirely. */}
           <ul
             role="list"
-            className="mt-12 flex flex-col items-center gap-6 min-[769px]:flex-row min-[769px]:items-stretch min-[769px]:justify-center min-[769px]:gap-6"
+            className="mt-10 grid gap-6 min-[960px]:grid-cols-2"
           >
             {PROVIDERS.map((p, i) => {
               const img = cardImage(p.slug);
@@ -168,7 +179,7 @@ export function Providers() {
                   as="li"
                   key={p.slug}
                   delay={stagger(i, 0.1)}
-                  className="w-full max-w-[420px] min-[769px]:max-w-[500px]"
+                  className="w-full"
                 >
                   {/* The link wraps the NAME and is stretched over the card by
                       ::after, rather than wrapping the whole card. Same hit
@@ -179,14 +190,15 @@ export function Providers() {
                       The focus ring is moved to the card with has-[], so the
                       indicator outlines the real target and not just the words.
 
-                      The card is wide and short from 769px up, where the panel
-                      has spare horizontal room the old 420px portrait cards
-                      left empty. Mobile only goes square, not 7:6: there is no
-                      spare width there to trade for the height, and the text
-                      block needs what is left. */}
+                      The card is 5:4 from 700px up. Below that it goes portrait
+                      instead: 5:4 is a function of the card's WIDTH, so on a
+                      310px-wide phone card it resolves to 248px of height while
+                      the text block alone needs 223px, which buries the photo
+                      almost completely. 700px is where the card is wide enough
+                      (about 620px) for the text to sit under half the card. */}
                   <article
                     id={`provider-${p.slug}`}
-                    className="group bg-np-blue-900 relative aspect-square w-full overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white min-[769px]:aspect-[7/6]"
+                    className="group bg-np-blue-900 relative aspect-[4/5] w-full overflow-hidden rounded-[28px] min-[700px]:aspect-[5/4] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white"
                   >
                     {/* Decorative: the link already carries the name and role,
                         and a described portrait here would be concatenated into
@@ -199,20 +211,20 @@ export function Providers() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.w560}
-                      srcSet={`${img.w560} 560w, ${img.w1068} 1068w`}
-                      sizes="(min-width: 769px) 500px, 100vw"
+                      srcSet={`${img.w560} 560w, ${img.w1120} 1120w`}
+                      sizes="(min-width: 960px) 560px, 100vw"
                       alt=""
-                      width={1068}
-                      height={916}
+                      width={1120}
+                      height={896}
                       loading="lazy"
                       decoding="async"
                       className="ease-np-out absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] group-has-[:focus-visible]:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-has-[:focus-visible]:scale-100"
-                      style={{ objectPosition: 'center 38%' }}
+                      style={{ objectPosition: 'center 32%' }}
                     />
 
                     <div className="absolute inset-0" style={{ backgroundImage: CARD_SCRIM }} />
 
-                    <div className="absolute inset-x-0 bottom-0 p-5 min-[769px]:p-7">
+                    <div className="absolute inset-x-0 bottom-0 p-5 min-[960px]:px-7 min-[960px]:pb-6">
                       <h3 className="flex items-center gap-3 text-white">
                         <Link
                           href={`/providers/${p.slug}`}
@@ -241,12 +253,12 @@ export function Providers() {
                         </span>
                       </h3>
 
-                      <p className="mt-2 text-[0.9375rem] leading-[1.5] text-white/90">{p.role}</p>
+                      <p className="mt-1 text-[0.9375rem] leading-[1.5] text-white/90">{p.role}</p>
                       {/* aria-describedby on the link points here, so the one
                           sentence that actually differentiates the two cards
                           still reaches a screen reader even though the link's
                           accessible name is fixed at name + role. */}
-                      <p id={bioId} className="mt-3 text-[0.9375rem] leading-[1.5] text-white/90">
+                      <p id={bioId} className="mt-2 text-[0.9375rem] leading-[1.5] text-white/90">
                         {assertSourced(p.slug, p.bio)}
                       </p>
                     </div>
@@ -256,7 +268,7 @@ export function Providers() {
             })}
           </ul>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }
