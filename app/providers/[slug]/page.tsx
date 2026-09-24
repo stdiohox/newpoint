@@ -73,6 +73,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     { label: 'Approach', value: provider.approach },
     // CLIENT: add { label: 'NPI', value: '…' } and a state licence number row
     // here once supplied, or confirm the practice prefers not to publish them.
+    // CLIENT: state licence numbers and NPI numbers are not published anywhere.
+    // Add them as a fourth <div> here, or confirm the practice prefers not to.
   ];
 
   return (
