@@ -2,7 +2,7 @@ import { Footer } from '@/components/Footer';
 import { Hero } from '@/components/sections/Hero';
 import { InsuranceProof } from '@/components/sections/InsuranceProof';
 import { Providers } from '@/components/sections/Providers';
-import { WhatWeTreat } from '@/components/sections/WhatWeTreat';
+import { FeaturedServices } from '@/components/sections/FeaturedServices';
 import { GettingStarted } from '@/components/sections/GettingStarted';
 import { Faq } from '@/components/sections/Faq';
 import { ContactCrisis } from '@/components/sections/ContactCrisis';
@@ -41,7 +41,7 @@ export default function Home() {
         <Hero />
         <InsuranceProof />
         <Providers />
-        <WhatWeTreat />
+        <FeaturedServices />
         <GettingStarted />
         <Faq />
         <ContactCrisis />

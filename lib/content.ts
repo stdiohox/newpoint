@@ -465,6 +465,114 @@ export const GETTING_STARTED = {
   ],
 } as const;
 
+/**
+ * Featured services, for the homepage services section.
+ *
+ * Titles and descriptions are the existing service copy — WHAT_WE_TREAT.services
+ * for the three service slots, GETTING_STARTED for the fourth. Nothing new is
+ * claimed here; this is a presentation layer over content that already existed
+ * and was already sourced from /research.
+ *
+ * `footerText` states the care modality exactly as the site states it elsewhere.
+ * Telehealth's slot says telehealth only, because that is what that service is.
+ * In-person care is never paired with a state — see CLAUDE.md, "Care modality":
+ * telehealth is evidenced in both NJ and PA, but the only place-level evidence
+ * anywhere in /research is Lawrence Township, New Jersey.
+ *
+ * `categoryColor` values are existing brand tokens. White 11px/600 on each
+ * measures: blue-600 8.84:1, blue-700 11.55:1, sky 4.75:1, success 5.04:1 —
+ * all clear of the 4.5:1 WCAG AA asks of small text.
+ */
+export type FeaturedService = {
+  type: 'featured' | 'card';
+  badge: string | null;
+  title: string;
+  description: string;
+  footerText: string | null;
+  category: string;
+  categoryColor: string;
+  video: string;
+  poster: string;
+  href: string;
+  displayOrder: number;
+};
+
+export const FEATURED_SERVICES: FeaturedService[] = [
+  {
+    type: 'featured',
+    badge: 'Start here',
+    title: 'Comprehensive psychiatric evaluation',
+    description:
+      'A full assessment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
+    footerText: 'In person and by telehealth',
+    category: 'Assessment',
+    categoryColor: 'var(--color-np-blue-600)',
+    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
+    // this footage depicts a person and must not imply a treatment outcome.
+    video: '/video/newpoint-hero.mp4',
+    poster: '/video/newpoint-hero-poster.jpg',
+    href: '/services/psychiatric-evaluation',
+    displayOrder: 1,
+  },
+  {
+    type: 'card',
+    badge: null,
+    title: 'Medication management',
+    description:
+      'Ongoing prescribing and review, with standardized rating scales used to track progress and catch changes early.',
+    footerText: 'In person and by telehealth',
+    category: 'Ongoing care',
+    categoryColor: 'var(--color-np-blue-700)',
+    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
+    // this footage depicts a person and must not imply a treatment outcome.
+    video: '/video/newpoint-hero.mp4',
+    poster: '/video/newpoint-hero-poster.jpg',
+    href: '/services/medication-management',
+    displayOrder: 2,
+  },
+  {
+    type: 'card',
+    badge: null,
+    title: 'Telehealth',
+    description:
+      'Appointments by video on an expanded schedule, including weekends, evenings, and holidays by request.',
+    // This slot is telehealth, so it says telehealth. Both providers are
+    // licensed in both states, which is what makes the reach claim safe here.
+    footerText: 'By telehealth across New Jersey and Pennsylvania',
+    category: 'Virtual care',
+    categoryColor: 'var(--color-np-sky)',
+    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
+    // this footage depicts a person and must not imply a treatment outcome.
+    video: '/video/newpoint-hero.mp4',
+    poster: '/video/newpoint-hero-poster.jpg',
+    href: '/services/telehealth',
+    displayOrder: 3,
+  },
+  {
+    type: 'card',
+    badge: null,
+    title: 'New patients',
+    description: GETTING_STARTED.body,
+    /**
+     * No modality line on this slot. The other three describe how CARE is
+     * delivered; this one is a process, and "In person and by telehealth" next
+     * to "New patients" reads as "you can start by walking in" — which, with
+     * the street address still an open item, is the exact impression the
+     * care-modality rule in CLAUDE.md exists to prevent. GETTING_STARTED.steps
+     * begins with the form or a phone call, not a visit.
+     */
+    footerText: null,
+    category: 'Getting started',
+    categoryColor: 'var(--color-np-success)',
+    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
+    // this footage depicts a person and must not imply a treatment outcome.
+    video: '/video/newpoint-hero.mp4',
+    poster: '/video/newpoint-hero-poster.jpg',
+    href: '/new-patients',
+    displayOrder: 4,
+  },
+];
+
 export const FAQ = {
   heading: 'Questions before you book',
   groups: [
@@ -745,6 +853,7 @@ export const OPEN_CLIENT_ITEMS = [
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   'Self-pay session fee and the sliding scale criteria',
   'Original logo file, vector preferred',
+  'Service-section footage. Every card on the homepage services section currently reuses the hero clip, which shows a person in a meadow. On a behavioural-health service tile that reads as an implied treatment outcome, which is the same category as a testimonial. Replacement clips must not depict a patient or imply an outcome',
   'Optional upgrade only, no longer a gap: written permission or brand assets for insurer logos, if the practice ever wants payer marks instead of the typographic wall',
   'Patient testimonials with documented consent, if the practice wants them later',
   'Reshoot of both provider portraits at 2000px or more with headroom, to unlock the deferred hero treatment',

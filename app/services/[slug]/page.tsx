@@ -15,7 +15,7 @@ import { breadcrumbSchema, faqSchemaFlat, organizationRef, serviceSchemaFor } fr
 /**
  * One indexable page per service.
  *
- * The homepage's WhatWeTreat cards summarise all four services in two sentences
+ * The homepage's services cards summarise each service in two sentences
  * each, which is the right density for an overview and far too thin to rank for
  * "psychiatric evaluation new jersey". These pages carry that weight instead,
  * each targeting a single query cluster, each with its own title, description,
