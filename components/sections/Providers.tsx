@@ -80,14 +80,16 @@ function assertSourced(slug: string, bio: string): string {
 
 /**
  * The enhanced card crops live beside the square portraits under the same slug.
- * 928 is the widest framing available without upscaling either source - the
+ * 1068 is the widest framing available without upscaling either source - the
  * template is bounded by Anastasia's 1137x1138 original, which is the tighter
- * of the two.
+ * of the two. Cut at 7:6 to match the card, which also buys a smaller head in
+ * frame (26.6% of the width against 30.6% at the old portrait aspect) and an
+ * eye-line at 35.5% rather than 44.5%, so the face sits higher above the text.
  */
 function cardImage(slug: string) {
   return {
     w560: `/images/providers/${slug}-card-560.webp`,
-    w928: `/images/providers/${slug}-card-928.webp`,
+    w1068: `/images/providers/${slug}-card-1068.webp`,
   };
 }
 
@@ -140,7 +142,7 @@ export function Providers() {
           </Reveal>
 
           {/* Measured from the rendered pixels at 1440px, worst case (lightest)
-              ground behind each run: heading 10.84:1, this intro 7.93:1, and the
+              ground behind each run: heading 10.53:1, this intro 7.73:1, and the
               card role and bio 9.68:1 each. The intro sits high on the 135deg
               gradient where it has not yet reached --color-np-sky; white at 85%
               over sky itself would only make 3.9:1, so do not move this copy
@@ -166,7 +168,7 @@ export function Providers() {
                   as="li"
                   key={p.slug}
                   delay={stagger(i, 0.1)}
-                  className="w-full max-w-[420px]"
+                  className="w-full max-w-[420px] min-[769px]:max-w-[500px]"
                 >
                   {/* The link wraps the NAME and is stretched over the card by
                       ::after, rather than wrapping the whole card. Same hit
@@ -175,10 +177,16 @@ export function Providers() {
                       bare heading with no hint that it goes anywhere. Same
                       technique as .cardLink in FeaturedServices.module.css.
                       The focus ring is moved to the card with has-[], so the
-                      indicator outlines the real target and not just the words. */}
+                      indicator outlines the real target and not just the words.
+
+                      The card is wide and short from 769px up, where the panel
+                      has spare horizontal room the old 420px portrait cards
+                      left empty. Mobile only goes square, not 7:6: there is no
+                      spare width there to trade for the height, and the text
+                      block needs what is left. */}
                   <article
                     id={`provider-${p.slug}`}
-                    className="group bg-np-blue-900 relative aspect-[87/100] w-full overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white"
+                    className="group bg-np-blue-900 relative aspect-square w-full overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white min-[769px]:aspect-[7/6]"
                   >
                     {/* Decorative: the link already carries the name and role,
                         and a described portrait here would be concatenated into
@@ -191,11 +199,11 @@ export function Providers() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.w560}
-                      srcSet={`${img.w560} 560w, ${img.w928} 928w`}
-                      sizes="(min-width: 769px) 420px, 100vw"
+                      srcSet={`${img.w560} 560w, ${img.w1068} 1068w`}
+                      sizes="(min-width: 769px) 500px, 100vw"
                       alt=""
-                      width={928}
-                      height={1066}
+                      width={1068}
+                      height={916}
                       loading="lazy"
                       decoding="async"
                       className="ease-np-out absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] group-has-[:focus-visible]:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-has-[:focus-visible]:scale-100"
@@ -204,7 +212,7 @@ export function Providers() {
 
                     <div className="absolute inset-0" style={{ backgroundImage: CARD_SCRIM }} />
 
-                    <div className="absolute inset-x-0 bottom-0 p-6 min-[769px]:p-7">
+                    <div className="absolute inset-x-0 bottom-0 p-5 min-[769px]:p-7">
                       <h3 className="flex items-center gap-3 text-white">
                         <Link
                           href={`/providers/${p.slug}`}
@@ -213,7 +221,11 @@ export function Providers() {
                           className="after:absolute after:inset-0 focus-visible:outline-none"
                           style={{
                             fontFamily: 'var(--font-outfit), ui-sans-serif, system-ui, sans-serif',
-                            fontSize: '1.75rem',
+                            // Down to 1.5rem on a narrow card so the name stays
+                            // on one line. At 1.75rem "Funmilayo Whitaker" plus
+                            // the arrow wraps at 390px, which cost the photo
+                            // another 37px of card height.
+                            fontSize: 'clamp(1.5rem, 1.2rem + 1.2vw, 1.75rem)',
                             fontWeight: 500,
                             letterSpacing: '-0.02em',
                             lineHeight: 1.15,
