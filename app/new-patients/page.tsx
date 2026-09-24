@@ -56,7 +56,14 @@ export default function NewPatientsPage() {
                 </Reveal>
               </div>
 
-              <ol className="md:col-span-8">
+              {/* role="list" is not redundant, exactly as Providers.tsx and
+                  WhatToExpect.tsx document for their own lists: Tailwind
+                  Preflight sets list-style: none, and WebKit then drops the
+                  list role entirely. That bites hardest here, because the
+                  numerals below are aria-hidden: without this, a VoiceOver
+                  reader gets neither "list, 3 items" nor the numeral, and the
+                  sequence this section exists to convey disappears. */}
+              <ol role="list" className="md:col-span-8">
                 {GETTING_STARTED.steps.map((step, i) => (
                   <Reveal as="li" key={step.title} delay={stagger(i, 0.08)}>
                     <div className="border-np-neutral-300 flex gap-6 border-b py-7 first:pt-0 last:border-b-0 last:pb-0">
@@ -96,7 +103,8 @@ export default function NewPatientsPage() {
               <Reveal>
                 <h2 className="text-h2 max-w-[22ch]">What to expect</h2>
               </Reveal>
-              <ul className="mt-10 grid gap-8 md:grid-cols-3">
+              {/* Same Preflight/WebKit list-role fix as the <ol> above. */}
+              <ul role="list" className="mt-10 grid gap-8 md:grid-cols-3">
                 {NEW_PATIENTS_PAGE.expectations.map((item, i) => (
                   <Reveal as="li" key={item.heading} delay={stagger(i, 0.08)}>
                     <div className="border-np-neutral-300 border-t pt-6">

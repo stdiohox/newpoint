@@ -63,6 +63,8 @@ export function HeroNav() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  /** The full-screen overlay. The inert walk starts here, not at the panel. */
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   /**
    * Solid once the end of the hero passes under the bar.
@@ -98,10 +100,14 @@ export function HeroNav() {
     };
   }, []);
 
-  const close = useCallback(() => {
-    setOpen(false);
-    triggerRef.current?.focus();
-  }, []);
+  /**
+   * Closing is state only. Focus used to be restored here, but the background
+   * is now `inert` while the panel is open, and an inert element cannot take
+   * focus. This runs synchronously, before React commits the re-render that
+   * lifts inert, so focusing the trigger here would silently do nothing. The
+   * restore happens in the effect cleanup below, after inert comes off.
+   */
+  const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     if (!open) return;
@@ -140,6 +146,53 @@ export function HeroNav() {
     };
     document.addEventListener('keydown', onKeyDown);
 
+    /**
+     * Take the rest of the document out of the accessibility tree.
+     *
+     * The Tab trap above only sees synthetic Tab keydowns. Screen-reader
+     * browse-mode arrows (NVDA, JAWS) and VoiceOver/TalkBack swipe gestures
+     * walk the accessibility tree directly and never fire one, so they walked
+     * straight out of the dialog and into the hero behind it. The APG treats
+     * `aria-modal` as a hint to AT, not an enforcement mechanism, and names
+     * inert-ing the siblings as the reliable half.
+     *
+     * This walks up from the overlay and inerts the siblings at each level
+     * rather than inert-ing <header> and <main> directly: <HeroNav /> renders
+     * inside <Hero />, which is inside <main>, so inert-ing <main> would inert
+     * the panel along with everything else. The walk reaches the bar, the hero
+     * content, the other six homepage sections, the footer, #top and the skip
+     * link, while never touching an ancestor of the panel itself.
+     *
+     * Elements that already carry inert are left alone and not restored, so a
+     * pre-existing inert elsewhere on the page survives the panel closing.
+     */
+    const inerted: Element[] = [];
+    for (let node: Element | null = overlayRef.current; node && node !== document.body;) {
+      const parent: HTMLElement | null = node.parentElement;
+      if (!parent) break;
+      for (const sibling of parent.children) {
+        if (sibling !== node && !sibling.hasAttribute('inert')) {
+          sibling.setAttribute('inert', '');
+          inerted.push(sibling);
+        }
+      }
+      node = parent;
+    }
+
+    /**
+     * Close if the viewport crosses back above the breakpoint while the panel
+     * is open. Without this, CSS alone hid the overlay AND the hamburger at
+     * 70em while `open` stayed true, so the cleanup below never ran: the page
+     * kept `overflow: hidden` with no visible way to unlock it. Dragging a
+     * window wider, un-maximising, or opening devtools was enough to freeze
+     * the page. Escape still worked, but nothing told the user that.
+     */
+    const desktop = window.matchMedia('(min-width: 70em)');
+    const onBreakpointChange = () => {
+      if (desktop.matches) setOpen(false);
+    };
+    desktop.addEventListener('change', onBreakpointChange);
+
     // Lock the page behind the panel, restoring whatever was there before.
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -148,7 +201,24 @@ export function HeroNav() {
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
+      desktop.removeEventListener('change', onBreakpointChange);
       document.body.style.overflow = previousOverflow;
+      for (const el of inerted) el.removeAttribute('inert');
+
+      /**
+       * Only after inert is off, or the trigger cannot take focus. It is also
+       * `min-[70em]:hidden`, so on the resize path above there is nothing to
+       * focus and this is a no-op: focus falls to the body and the desktop nav
+       * that just appeared is the next tab stop.
+       *
+       * Read at cleanup time on purpose. exhaustive-deps wants the node copied
+       * into a variable at effect setup, but that is the wrong node to focus:
+       * the point is to hand focus back to whatever the trigger is when the
+       * panel actually closes. A snapshot would go stale if React ever swapped
+       * the button, and focusing a detached node silently does nothing.
+       */
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
+      triggerRef.current?.focus();
     };
   }, [open, close]);
 
@@ -231,7 +301,11 @@ export function HeroNav() {
 
       {open && (
         // z-60: above the fixed bar (z-50), so the panel covers it while open.
-        <div className="fixed inset-0 z-[60] backdrop-blur-xl min-[70em]:hidden" onClick={close}>
+        <div
+          ref={overlayRef}
+          className="fixed inset-0 z-[60] backdrop-blur-xl min-[70em]:hidden"
+          onClick={close}
+        >
           <div className="flex min-h-full items-stretch p-4">
             <div
               ref={panelRef}
