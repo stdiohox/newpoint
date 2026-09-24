@@ -121,6 +121,18 @@ export const INSURANCE = {
   ],
   selfPay:
     'A session fee and a sliding scale are available for patients paying without insurance. We accept all major credit and debit cards and cash.',
+  /**
+   * Homepage grid only. Medicare and NJ Medicaid each get a card there and
+   * neither had a line of its own, so both use this one.
+   *
+   * It asserts nothing new. Acceptance of both plans is already recorded in
+   * `payers` above and in INSURANCE_PAGE.faqs ("Yes. We accept Medicare, and
+   * NJ Medicaid"), and the coverage-check promise is `body`'s, which already
+   * covers every plan in the list. This states it against a named plan rather
+   * than inventing a claim about either one.
+   */
+  coverageCheckNote:
+    'Tell us your plan details and we will check your coverage before your first appointment.',
 } as const;
 
 export type Provider = {
