@@ -129,10 +129,19 @@ const CARD_SCRIM =
  * so it scales with the block at any size. At desktop default it lands almost
  * exactly where CARD_SCRIM had already gone solid, so the card looks unchanged.
  */
+const TEXT_FADE_PX = 72;
+
+/**
+ * One number, used twice: it is both the padding above the first line and the
+ * height of the gradient's fade. They MUST stay equal - that equality is what
+ * puts the solid/fade boundary exactly at the text's top edge at any block
+ * height - so they are derived from the same constant rather than written out
+ * separately in a class and a template literal.
+ */
 const TEXT_SCRIM =
   'linear-gradient(to top,' +
   ' var(--color-np-blue-700) 0%,' +
-  ' var(--color-np-blue-700) calc(100% - 72px),' +
+  ` var(--color-np-blue-700) calc(100% - ${TEXT_FADE_PX}px),` +
   ' transparent 100%)';
 
 /** Soft diagonal, dark top-left to --color-np-sky bottom-right. All tokens. */
@@ -281,9 +290,19 @@ export function Providers() {
                     {/* Same grid cell as the spacer, pinned to its bottom.
                         `relative` is load-bearing: the scrim is positioned, so
                         static content would paint underneath it. */}
+                    {/* z-10, NOT relative. Both lift this above the absolutely
+                        positioned scrim, but `relative` also makes this div the
+                        containing block for the link's `after:inset-0`, which
+                        silently shrank the stretched hit area from the whole
+                        card to just this text panel - clicking the photograph
+                        stopped navigating while the hover zoom and the focus
+                        ring still covered the whole card. A grid item takes
+                        z-index while staying `position: static`, so the article
+                        remains the containing block and the hit area is the
+                        card again. */}
                     <div
-                      className="relative col-start-1 row-start-1 self-end px-5 pt-[72px] pb-5 min-[960px]:px-7 min-[960px]:pb-6"
-                      style={{ backgroundImage: TEXT_SCRIM }}
+                      className="z-10 col-start-1 row-start-1 self-end px-5 pb-5 min-[960px]:px-7 min-[960px]:pb-6"
+                      style={{ backgroundImage: TEXT_SCRIM, paddingTop: `${TEXT_FADE_PX}px` }}
                     >
                       <h3 className="flex items-center gap-3 text-white">
                         <Link
