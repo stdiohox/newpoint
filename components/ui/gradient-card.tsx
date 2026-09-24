@@ -100,7 +100,7 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
               run under it: icon width + its 24px inset + a 16px gap. It tracks
               the icon's responsive size. Below the switch the icon is in flow
               above the badge, so no margin is needed. */}
-          <div className="z-10 flex h-full flex-col min-[30rem]:me-[180px] sm:me-[216px] md:me-0 lg:me-[180px] xl:me-[240px]">
+          <div className="z-10 flex h-full flex-col min-[30rem]:me-[180px] sm:me-[216px] md:me-0 lg:me-[160px] xl:me-[240px]">
             {imageUrl && (
               /* THE ICON IS IN FLOW, not bled off a corner. Card-side, the key
                  parts of these icons are the middle (the heart, the check mark,
@@ -128,6 +128,12 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
                  right edge and vertically centred, and the column keeps a right
                  margin so the copy never runs under it.
 
+                 The art is TRIMMED to the icon, no transparent margin, so the
+                 rendered glyph fills its box on the long axis instead of
+                 floating inside it. The files are not square (0.74 to 1.01),
+                 so object-contain fits by height on the tall ones and the
+                 rendered width is box x aspect.
+
                  SIZES track card width rather than viewport, for the same
                  reason the layout does. 200px at xl, which is what 1440 gets,
                  down through 176 / 140 to 96 where the card is stacked. Each
@@ -144,7 +150,7 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
                 alt=""
                 variants={reduce ? undefined : imageAnimation}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="pointer-events-none mb-4 h-24 w-24 shrink-0 object-contain min-[30rem]:absolute min-[30rem]:top-1/2 min-[30rem]:right-6 min-[30rem]:mb-0 min-[30rem]:h-[140px] min-[30rem]:w-[140px] min-[30rem]:-translate-y-1/2 sm:h-[176px] sm:w-[176px] md:static md:mb-4 md:h-24 md:w-24 md:translate-y-0 lg:absolute lg:top-1/2 lg:right-6 lg:mb-0 lg:h-[140px] lg:w-[140px] lg:-translate-y-1/2 xl:h-[200px] xl:w-[200px]"
+                className="pointer-events-none mb-4 h-24 w-24 shrink-0 object-contain min-[30rem]:absolute min-[30rem]:top-1/2 min-[30rem]:right-6 min-[30rem]:mb-0 min-[30rem]:h-[140px] min-[30rem]:w-[140px] min-[30rem]:-translate-y-1/2 sm:h-[176px] sm:w-[176px] md:static md:mb-4 md:h-24 md:w-24 md:translate-y-0 lg:absolute lg:top-1/2 lg:right-6 lg:mb-0 lg:h-[120px] lg:w-[120px] lg:-translate-y-1/2 xl:h-[200px] xl:w-[200px]"
               />
             )}
             <div className="text-np-ink/80 mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-white/50 px-3 py-1 text-sm font-medium backdrop-blur-sm">
