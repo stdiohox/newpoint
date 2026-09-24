@@ -82,7 +82,7 @@ const CARDS = [
 
 export function InsuranceProof() {
   return (
-    <section id="insurance" className="bg-np-neutral-100 py-20 md:py-28">
+    <section id="insurance" className="bg-np-surface py-20 md:py-28">
       <div className="px-6 md:px-12 lg:px-16">
         <div className="md:max-w-[46ch]">
           <Reveal>
@@ -100,6 +100,15 @@ export function InsuranceProof() {
           {CARDS.map((card, i) => (
             <Reveal as="li" key={card.title} delay={stagger(i, 0.08)} className="h-full">
               <GradientCard
+                /* The section ground is white, and the gradients are too pale
+                   to define their own edge against it. Sampled from the
+                   rendered page, each card's lightest corner measures 1.095 to
+                   1.140:1 against white and the darkest only 1.21 to 1.30:1,
+                   so the top-left corner of every card was effectively
+                   invisible. The border is passed from here rather than baked
+                   into <GradientCard />, because it is the white ground that
+                   needs it, not the card. */
+                className="border-np-neutral-200 border"
                 gradient={card.gradient}
                 badgeText={card.badgeText}
                 badgeColor={card.badgeColor}
