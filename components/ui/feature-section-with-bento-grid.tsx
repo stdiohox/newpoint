@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { CalendarCheck, ClipboardList, FileText, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -81,6 +82,27 @@ const STEP_IMAGES = [
  * 4.6% respectively, both clear of the hairline with headroom to spare. The
  * ceiling is about 16% at 1440, the tightest case, so 12% is not on the edge.
  */
+/**
+ * Where each card's "Learn more" goes, in step order. Every one is a route that
+ * already exists in app/: /contact, /services/[slug] for the evaluation,
+ * /services, and /new-patients. Nothing here creates a page or links to one
+ * that has to be written.
+ *
+ * The visible text is "Learn more" on all four, which on its own would give a
+ * screen reader four identical links and no way to tell them apart, and would
+ * make the card's own heading the only thing distinguishing them. Each link
+ * carries an sr-only suffix naming the step, so the accessible name is
+ * "Learn more about Follow-up care". The visible words start the accessible
+ * name, which is what SC 2.5.3 Label in Name asks for, and the step name is
+ * the heading verbatim so voice control matches what is on screen.
+ */
+const STEP_LINKS = [
+  '/contact',
+  '/services/psychiatric-evaluation',
+  '/services',
+  '/new-patients',
+] as const;
+
 const STEP_IMAGE_POSITIONS = [
   'object-center',
   'object-center',
@@ -120,19 +142,28 @@ export function FeatureBentoGrid({
   children?: ReactNode;
 }) {
   /*
-   * TOP PADDING is pt-24 md:pt-32 (96px, 128px from 768px up), not the block's
-   * own pt-20 lg:pt-40. py-24 md:py-32 is this site's section rhythm:
-   * <Providers />, <Faq /> and <ContactCrisis /> all use it. The block's 160px
-   * at lg was the outlier, and it landed directly under the providers panel,
-   * which already contributes its own 128px bottom, for a 288px trough. It is
-   * now 128 + 128 = 256px, the same gap as Faq to ContactCrisis.
+   * TOP PADDING is pt-5 md:pt-8 (20px, 32px), down from the block's own
+   * pt-20 lg:pt-40 and from the pt-24 md:pt-32 that replaced it.
    *
-   * Bottom padding is deliberately untouched: the brief asked for the top. It
-   * stays pb-20 lg:pb-40, so the gap down to <InsuranceProof /> is still the
-   * block's 160px plus that section's own 112px.
+   * Measured at 1440, exactly two things separate the providers panel from this
+   * section's badge, and nothing else: <Providers />'s own padding-bottom and
+   * this padding-top. No wrapper, no margin, and no collapsing between them,
+   * since both sit inside their sections rather than between them. They were
+   * 128 + 128 = 256px on desktop and 96 + 96 = 192px on mobile.
+   *
+   * The pair is now split evenly, 32 + 32 = 64px on desktop and 20 + 20 = 40px
+   * on mobile. Split rather than zeroing one side: giving either section a
+   * 0-padding edge makes the panel touch the section boundary and leaves the
+   * spacing impossible to reason about from one file.
+   *
+   * This is deliberately tighter than the site's section rhythm. The two
+   * sections read as one sequence here, so they are set closer than the
+   * 240-272px that separates the unrelated sections further down the page.
+   *
+   * Bottom padding is untouched. It stays pb-20 lg:pb-40.
    */
   return (
-    <div className="w-full pt-24 pb-20 md:pt-32 lg:pb-40">
+    <div className="w-full pt-5 pb-20 md:pt-8 lg:pb-40">
       <div className="px-6 md:px-12 lg:px-16">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-start gap-4">
@@ -223,6 +254,23 @@ export function FeatureBentoGrid({
                             so the outline stays h2 -> h3 with no skip. */}
                         <h3 className="text-xl tracking-tight">{step.title}</h3>
                         <p className="text-np-neutral-600 max-w-xs text-base">{step.body}</p>
+                        {/* np-blue-600 on the card's np-neutral-100 measures
+                            7.90:1. Underline on hover AND focus-visible, so a
+                            keyboard user gets the same affordance a mouse user
+                            does; the global focus ring in globals.css still
+                            applies on top of it.
+
+                            The arrow is aria-hidden: it is punctuation, and
+                            "Learn more about Follow-up care right arrow" is
+                            not an improvement. */}
+                        <Link
+                          href={STEP_LINKS[i % STEP_LINKS.length]}
+                          className="text-np-blue-600 mt-4 inline-flex items-center gap-1 text-base font-medium underline-offset-4 hover:underline focus-visible:underline"
+                        >
+                          Learn more
+                          <span className="sr-only"> about {step.title}</span>
+                          <span aria-hidden="true">&rarr;</span>
+                        </Link>
                       </div>
                     </div>
                   </div>

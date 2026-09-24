@@ -62,7 +62,9 @@ const BANNED = /lifespan|child|adolescent|p(a?)ediatric|geriatric|substance|addi
 function assertSourced(slug: string, bio: string): string {
   const sentence = CARD_SENTENCE[slug];
   if (!sentence) {
-    throw new Error(`Providers: no approved card sentence for "${slug}". Add one to CARD_SENTENCE.`);
+    throw new Error(
+      `Providers: no approved card sentence for "${slug}". Add one to CARD_SENTENCE.`
+    );
   }
   if (!bio.includes(sentence)) {
     throw new Error(
@@ -179,8 +181,16 @@ const PANEL_GRADIENT =
   ' var(--color-np-sky) 100%)';
 
 export function Providers() {
+  /*
+   * Bottom padding is pb-5 md:pb-8 (20px, 32px), not the py-24 md:py-32 the top
+   * still carries. It is one of exactly two contributors to the trough between
+   * this panel and <WhatToExpect /> below, the other being that section's own
+   * top padding. The pair is split evenly to land on 40px of total separation
+   * on mobile and 64px on desktop. The top is untouched and stays on the site's
+   * section rhythm.
+   */
   return (
-    <section id="providers" className="bg-np-neutral-50 py-24 md:py-32">
+    <section id="providers" className="bg-np-neutral-50 pt-24 pb-5 md:pt-32 md:pb-8">
       {/* Site gutters, NOT <Container>. The homepage header is <HeroNav />, not
           <Nav />, and HeroNav is `fixed inset-x-0` with px-6 / md:px-12 /
           lg:px-16 - uncapped, full page width minus the gutter. <Hero />'s own
@@ -237,20 +247,12 @@ export function Providers() {
 
           {/* role="list" is not redundant: Tailwind Preflight sets list-style:
               none, which makes WebKit drop the list semantics entirely. */}
-          <ul
-            role="list"
-            className="mt-8 grid gap-6 min-[960px]:grid-cols-2"
-          >
+          <ul role="list" className="mt-8 grid gap-6 min-[960px]:grid-cols-2">
             {PROVIDERS.map((p, i) => {
               const img = cardImage(p.slug);
               const bioId = `provider-bio-${p.slug}`;
               return (
-                <Reveal
-                  as="li"
-                  key={p.slug}
-                  delay={stagger(i, 0.1)}
-                  className="w-full"
-                >
+                <Reveal as="li" key={p.slug} delay={stagger(i, 0.1)} className="w-full">
                   {/* The link wraps the NAME and is stretched over the card by
                       ::after, rather than wrapping the whole card. Same hit
                       area, but it keeps the anchor inside the h3, so a screen
@@ -394,7 +396,7 @@ export function Providers() {
                         </Link>
                         <span
                           aria-hidden="true"
-                          className="ease-np-out inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-white/45 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-has-[:focus-visible]:-translate-y-0.5 group-has-[:focus-visible]:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 motion-reduce:group-has-[:focus-visible]:translate-x-0 motion-reduce:group-has-[:focus-visible]:translate-y-0"
+                          className="ease-np-out inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-white/45 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-has-[:focus-visible]:translate-x-0.5 group-has-[:focus-visible]:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 motion-reduce:group-has-[:focus-visible]:translate-x-0 motion-reduce:group-has-[:focus-visible]:translate-y-0"
                         >
                           <ArrowUpRight className="size-4" strokeWidth={1.5} />
                         </span>
