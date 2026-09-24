@@ -49,7 +49,7 @@ export default function ServicesIndex() {
 
         <div className="py-20 md:py-28">
           <Container>
-            <ul className="grid gap-6 md:grid-cols-3 md:gap-8">
+            <ul role="list" className="grid gap-6 md:grid-cols-3 md:gap-8">
               {SERVICE_PAGES.map((service, i) => (
                 <Reveal as="li" key={service.slug} delay={stagger(i, 0.08)}>
                   <Link
@@ -85,7 +85,7 @@ export default function ServicesIndex() {
                   treatment option that fits.
                 </p>
               </Reveal>
-              <ul className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+              <ul role="list" className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   'Psychiatric consultation',
                   'Individual counseling',
@@ -113,7 +113,7 @@ export default function ServicesIndex() {
                   {WHAT_WE_TREAT.body}
                 </p>
               </Reveal>
-              <ul className="mt-8 flex flex-wrap gap-2.5">
+              <ul role="list" className="mt-8 flex flex-wrap gap-2.5">
                 {WHAT_WE_TREAT.conditions.map((condition, i) => (
                   <Reveal as="li" key={condition} delay={stagger(i, 0.03)}>
                     <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
@@ -133,7 +133,7 @@ export default function ServicesIndex() {
               <Reveal>
                 <h2 className="text-h2 max-w-[22ch]">Who you will see</h2>
               </Reveal>
-              <ul className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8">
+              <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8">
                 {PROVIDERS.map((p, i) => (
                   <Reveal as="li" key={p.slug} delay={stagger(i, 0.08)}>
                     <Link

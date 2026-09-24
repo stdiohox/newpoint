@@ -82,7 +82,7 @@ export function Nav() {
             className="border-np-neutral-200 overflow-hidden border-t lg:hidden"
           >
             <Container>
-              <ul className="flex flex-col py-2">
+              <ul role="list" className="flex flex-col py-2">
                 {NAV.map((item) => (
                   <li key={item.href}>
                     <Link

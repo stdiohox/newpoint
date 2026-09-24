@@ -30,7 +30,10 @@ export function InsuranceProof() {
     <section id="insurance" className="bg-np-neutral-100 py-20 md:py-28">
       <Container>
         {/* Practice facts. Plain statements, no invented figures, no eyebrow labels. */}
-        <ul className="border-np-neutral-300 grid gap-6 border-b pb-10 sm:grid-cols-3 sm:gap-8">
+        <ul
+          role="list"
+          className="border-np-neutral-300 grid gap-6 border-b pb-10 sm:grid-cols-3 sm:gap-8"
+        >
           {PRACTICE_FACTS.map((f, i) => (
             <Reveal as="li" key={f.fact} delay={stagger(i, 0.07)}>
               <p className="font-display text-h3 text-np-ink">{f.fact}</p>
@@ -51,7 +54,7 @@ export function InsuranceProof() {
 
           <div className="md:col-span-7">
             {/* Even baseline wall: no background, no border, no hover state. */}
-            <ul className="flex flex-wrap gap-x-10 gap-y-5">
+            <ul role="list" className="flex flex-wrap gap-x-10 gap-y-5">
               {INSURANCE.payers.map((payer, i) => (
                 <Reveal as="li" key={payer} delay={stagger(i)}>
                   <span className="font-display text-body-l text-np-ink font-medium tracking-[-0.01em]">

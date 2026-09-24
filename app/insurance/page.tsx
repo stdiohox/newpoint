@@ -52,7 +52,7 @@ export default function InsurancePage() {
             <Reveal>
               <h2 className="text-h2 max-w-[20ch]">{INSURANCE_PAGE.sections[0].heading}</h2>
             </Reveal>
-            <ul className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ul role="list" className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
               {INSURANCE.payers.map((payer, i) => (
                 <Reveal as="li" key={payer} delay={stagger(i, 0.05)}>
                   <p className="font-display text-body-l text-np-ink border-np-neutral-200 border-b pb-4 font-medium tracking-[-0.01em]">

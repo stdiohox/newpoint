@@ -118,7 +118,7 @@ export function FeaturedServices() {
 
         <div className={styles.conditions}>
           <h3 className={styles.conditionsHeading}>Conditions we treat</h3>
-          <ul className={styles.conditionsList}>
+          <ul role="list" className={styles.conditionsList}>
             {WHAT_WE_TREAT.conditions.map((condition) => (
               <li key={condition} className={styles.condition}>
                 {condition}

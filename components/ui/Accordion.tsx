@@ -28,7 +28,7 @@ export function Accordion({
   const Heading = `h${headingLevel}` as 'h3' | 'h4';
 
   return (
-    <ul className="border-np-neutral-200 border-t">
+    <ul role="list" className="border-np-neutral-200 border-t">
       {items.map((item, i) => {
         const isOpen = open === i;
         return (

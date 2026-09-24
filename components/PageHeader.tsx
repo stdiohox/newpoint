@@ -33,7 +33,10 @@ export function PageHeader({
           {/* neutral-600, not neutral-500: at 13px this is small text, and
               neutral-500 measures 4.27:1 on the warm ground, under the 4.5:1
               SC 1.4.3 requires. neutral-600 measures 6.79:1. */}
-          <ol className="text-caption text-np-neutral-600 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <ol
+            role="list"
+            className="text-caption text-np-neutral-600 flex flex-wrap items-center gap-x-2 gap-y-1"
+          >
             <li>
               <Link href="/" className="hover:text-np-blue-600 underline-offset-4 hover:underline">
                 Home

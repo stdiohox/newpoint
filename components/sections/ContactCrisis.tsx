@@ -36,7 +36,7 @@ export function ContactCrisis() {
               <aside className="rounded-card border-np-blue-600 bg-np-surface border-l-2 p-6 ring-1 ring-[var(--np-alpha-ink-08)] md:p-8">
                 <h3 className="text-h3">{CRISIS.heading}</h3>
                 <p className="text-small text-np-neutral-600 mt-3">{CRISIS.body}</p>
-                <ul className="mt-6 space-y-5">
+                <ul role="list" className="mt-6 space-y-5">
                   {CRISIS.items.map((item) => (
                     <li key={item.label}>
                       <a

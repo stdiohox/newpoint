@@ -98,7 +98,7 @@ export function RelatedLinks({
         <Reveal>
           <h2 className="text-h3 text-np-neutral-600">{heading}</h2>
         </Reveal>
-        <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {links.map((link, i) => (
             <Reveal as="li" key={link.href} delay={i * 0.06}>
               <Link

@@ -99,7 +99,7 @@ export default function ContactPage() {
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>
-                    <ul className="mt-6 space-y-3">
+                    <ul role="list" className="mt-6 space-y-3">
                       <li>
                         <a
                           href={`tel:${BUSINESS.phonePrimaryHref}`}
@@ -135,7 +135,7 @@ export default function ContactPage() {
                       {CONTACT_PAGE.emailNote}
                     </p>
                   </Reveal>
-                  <ul className="mt-6 space-y-4">
+                  <ul role="list" className="mt-6 space-y-4">
                     {PROVIDERS.map((p, i) => (
                       <Reveal as="li" key={p.slug} delay={stagger(i, 0.06)}>
                         <p className="text-body text-np-ink font-medium">
@@ -166,7 +166,7 @@ export default function ContactPage() {
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>
-                    <ul className="mt-6 flex flex-wrap gap-2.5">
+                    <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
                       {BUSINESS.serviceArea.map((state) => (
                         <li
                           key={state}
@@ -197,7 +197,7 @@ export default function ContactPage() {
                       {CRISIS.heading}
                     </h2>
                     <p className="text-small text-np-neutral-600 mt-3">{CRISIS.body}</p>
-                    <ul className="mt-6 space-y-5">
+                    <ul role="list" className="mt-6 space-y-5">
                       {CRISIS.items.map((item) => (
                         <li key={item.label}>
                           {/* aria-label, not bare "988": in a screen reader's

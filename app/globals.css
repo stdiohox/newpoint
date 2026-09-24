@@ -1,6 +1,18 @@
 @import 'tailwindcss';
 
 /* ---------------------------------------------------------------------------
+   Preflight, imported above, sets `list-style: none` on every ol and ul.
+   WebKit then drops the implicit list role, so VoiceOver never announces
+   "list, N items" and any sequence or grouping the list conveys is lost.
+
+   Because the reset is global, the fix has to be too: EVERY <ol> and <ul> in
+   this repo carries an explicit role="list". It is not redundant markup, and
+   removing it is a silent Safari-only regression that renders fine in Chrome.
+   Add role="list" to any new list. See components/sections/Providers.tsx and
+   components/sections/WhatToExpect.tsx for the original write-ups.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
    Design tokens. Single source of truth is /design-research/design-tokens.md.
    Every value below is declared here and consumed as a Tailwind theme value.
    Do not hardcode hex, radius, or easing in components.

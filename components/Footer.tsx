@@ -52,7 +52,7 @@ export function Footer() {
               crawled from anywhere on the site and not only from /services. */}
           <nav aria-label="Footer" className="md:col-span-3">
             <h2 className="text-caption text-white/50">Explore</h2>
-            <ul className="mt-3 space-y-2">
+            <ul role="list" className="mt-3 space-y-2">
               {NAV.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-small hover:text-white">
@@ -63,7 +63,7 @@ export function Footer() {
             </ul>
 
             <h2 className="text-caption mt-8 text-white/50">Services</h2>
-            <ul className="mt-3 space-y-2">
+            <ul role="list" className="mt-3 space-y-2">
               {SERVICE_PAGES.map((service) => (
                 <li key={service.slug}>
                   <Link href={`/services/${service.slug}`} className="text-small hover:text-white">
@@ -76,7 +76,7 @@ export function Footer() {
 
           <div className="md:col-span-4">
             <h2 className="text-caption text-white/50">Providers</h2>
-            <ul className="mt-3 space-y-2">
+            <ul role="list" className="mt-3 space-y-2">
               {PROVIDERS.map((p) => (
                 <li key={p.slug} className="text-small">
                   <Link href={`/providers/${p.slug}`} className="text-white hover:underline">

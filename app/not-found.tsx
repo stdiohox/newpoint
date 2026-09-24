@@ -48,7 +48,7 @@ export default function NotFound() {
               <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
                 Where you might be going
               </h2>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <ul role="list" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {NAV.map((item) => (
                   <li key={item.href}>
                     <Link

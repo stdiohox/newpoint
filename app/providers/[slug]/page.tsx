@@ -153,7 +153,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                 <Reveal>
                   <h2 className="text-h2">What {provider.name.split(' ')[0]} treats</h2>
                 </Reveal>
-                <ul className="mt-6 flex flex-wrap gap-2.5">
+                <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
                   {provider.treats.map((condition, i) => (
                     <Reveal as="li" key={condition} delay={stagger(i, 0.04)}>
                       <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
@@ -182,7 +182,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>
-                    <ul className="mt-8 space-y-3">
+                    <ul role="list" className="mt-8 space-y-3">
                       {SERVICE_PAGES.map((service) => (
                         <li key={service.slug}>
                           <Link

@@ -84,7 +84,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                   <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
                     On this page
                   </h2>
-                  <ul className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4">
+                  <ul role="list" className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4">
                     {service.sections.map((section) => (
                       <li key={section.heading}>
                         <a
@@ -116,7 +116,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                         {section.body}
                       </p>
                       {section.list && (
-                        <ul className="mt-6 flex flex-wrap gap-2.5">
+                        <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
                           {section.list.map((item) => (
                             <li
                               key={item}
