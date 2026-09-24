@@ -98,12 +98,39 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
       >
         <div className={cn(cardVariants({ gradient }), className)} {...props}>
           {imageUrl && (
+            /* Decorative: the card's own heading and body already say what it
+               is, so the graphic repeats nothing, and alt="" keeps it out of
+               the accessibility tree. The block shipped with a template
+               literal naming the card and the words "background graphic",
+               which announced a description of the decoration before the
+               heading it decorates. */
             <motion.img
               src={imageUrl}
-              alt={`${title} background graphic`}
+              alt=""
               variants={reduce ? undefined : imageAnimation}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              className="pointer-events-none absolute -right-1/4 -bottom-1/4 w-3/4 opacity-80 dark:opacity-30"
+              /* Position and the rest of the classes are the block's. Only the
+                 WIDTH is responsive, because the block's flat w-3/4 covered
+                 the text on every narrow card.
+
+                 The card's text does not scale with the card: p-8 and the
+                 body's max-w-xs are fixed, so on a narrow card the copy fills
+                 almost the whole width while a 75% image still eats the right
+                 half of it. Measured against the painted text rects, not the
+                 block rects, w-3/4 was clear at 1440 and 640 and covered the
+                 body copy at 1024, 768 and 390, and the CTA at 768 and 390.
+
+                 The ladder tracks card width, which is not monotonic with
+                 viewport: the grid goes to two columns at md, so cards get
+                 NARROWER at 768 (324px) and 1024 (436px) than they are at 640
+                 (592px, still one column). Hence the dip back to w-1/3 at md.
+
+                 The 2xl step exists because w-3/4 is safe at 1440 but not at
+                 1280, where the card is at its narrowest for that range (564px)
+                 and the icon clipped one glyph by 41px^2. xl carries w-2/3 and
+                 w-3/4 waits for 1536. Checked at 17 viewport widths, including
+                 both sides of every breakpoint. */
+              className="pointer-events-none absolute -right-1/4 -bottom-1/4 w-1/3 opacity-80 sm:w-3/4 md:w-1/3 lg:w-1/2 xl:w-2/3 2xl:w-3/4 dark:opacity-30"
             />
           )}
           <div className="z-10 flex h-full flex-col">

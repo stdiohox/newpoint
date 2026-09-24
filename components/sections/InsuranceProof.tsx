@@ -50,6 +50,7 @@ const CARDS = [
     badgeText: 'Accepted',
     badgeColor: ACCEPTED_DOT,
     title: 'Commercial insurance',
+    imageUrl: '/images/insurance/commercial.webp',
     description: `${COMMERCIAL.join(', ')}.`,
     ...CHECK_COVERAGE,
   },
@@ -58,6 +59,7 @@ const CARDS = [
     badgeText: 'Accepted',
     badgeColor: ACCEPTED_DOT,
     title: 'Medicare',
+    imageUrl: '/images/insurance/medicare.webp',
     description: INSURANCE.coverageCheckNote,
     ...CHECK_COVERAGE,
   },
@@ -66,6 +68,7 @@ const CARDS = [
     badgeText: 'Accepted',
     badgeColor: ACCEPTED_DOT,
     title: 'NJ Medicaid',
+    imageUrl: '/images/insurance/medicaid.webp',
     description: INSURANCE.coverageCheckNote,
     ...CHECK_COVERAGE,
   },
@@ -74,6 +77,7 @@ const CARDS = [
     badgeText: 'Self-pay',
     badgeColor: SELF_PAY_DOT,
     title: 'Paying without insurance',
+    imageUrl: '/images/insurance/self-pay.webp',
     description: INSURANCE.selfPay,
     ctaText: 'Insurance and payment in full',
     ctaHref: '/insurance',
@@ -116,6 +120,7 @@ export function InsuranceProof() {
                 description={card.description}
                 ctaText={card.ctaText}
                 ctaHref={card.ctaHref}
+                imageUrl={card.imageUrl}
               />
             </Reveal>
           ))}
