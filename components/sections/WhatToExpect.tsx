@@ -17,11 +17,11 @@ import { CTA, WHAT_TO_EXPECT } from '@/lib/content';
  * href anywhere in the repo), so dropping that anchor from the homepage breaks
  * no inbound target.
  *
- * NOTE: components/sections/GettingStarted.tsx is now imported by nothing. The
- * homepage was its only consumer; /new-patients renders the GETTING_STARTED
- * copy through its own markup and never touched the component. The file is left
- * in place rather than deleted because removing it was not part of this change,
- * but it is dead code and should either be deleted or given a consumer.
+ * NOTE: components/sections/GettingStarted.tsx has been deleted. The homepage
+ * was its only consumer, so this section taking its slot left it imported by
+ * nothing. The GETTING_STARTED copy in lib/content.ts is still live:
+ * /new-patients renders it through its own markup and never touched the
+ * component.
  *
  * Server component. The only client code is <Reveal>, which is already an
  * isolated leaf.
@@ -154,22 +154,22 @@ export function WhatToExpect() {
               delay={stagger(i, 0.08)}
               className="border-np-neutral-300 border-t pt-6 min-[56.25em]:row-span-3 min-[56.25em]:grid min-[56.25em]:grid-rows-subgrid min-[56.25em]:gap-0"
             >
-              {/* np-blue-600, NOT the np-amber-500 this numeral pattern uses in
-                  GettingStarted.tsx and on /new-patients. Measured on this
-                  section's own --color-np-neutral-100 ground, amber-500
-                  (#e9a93c) renders 1.84:1. That is below even the 3:1 floor for
-                  large text, and this numeral does not qualify as large text
-                  anyway (1.375rem at weight 600; the exemption wants 24px, or
-                  18.66px at 700).
+              {/* np-blue-600, NOT the np-amber-500 this numeral pattern used to
+                  use. Measured on this section's own --color-np-neutral-100
+                  ground, amber-500 (#e9a93c) renders 1.84:1. That is below even
+                  the 3:1 floor for large text, and this numeral does not
+                  qualify as large text anyway (1.375rem at weight 600; the
+                  exemption wants 24px, or 18.66px at 700).
 
                   aria-hidden is not a defence here. It keeps a screen reader
                   from reading the number twice, since the <ol> already conveys
                   position, but a sighted user with low vision has nothing else
                   marking the sequence, so the glyph is informative and 1.4.3
-                  applies to it. blue-600 on this ground measures 8.4:1.
+                  applies to it. blue-600 on this ground measures 7.90:1.
 
-                  The amber instances on /new-patients have the same problem and
-                  are untouched: that page was not in scope for this change. */}
+                  /new-patients carries the same numeral pattern and now uses
+                  blue-600 too; see the note there for its own measurements,
+                  which differ because that page sits on neutral-50. */}
               <span
                 aria-hidden="true"
                 className="font-display text-np-blue-600 block text-[1.375rem] leading-none font-semibold tabular-nums"

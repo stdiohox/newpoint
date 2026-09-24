@@ -60,9 +60,23 @@ export default function NewPatientsPage() {
                 {GETTING_STARTED.steps.map((step, i) => (
                   <Reveal as="li" key={step.title} delay={stagger(i, 0.08)}>
                     <div className="border-np-neutral-300 flex gap-6 border-b py-7 first:pt-0 last:border-b-0 last:pb-0">
+                      {/* np-blue-600, matching the numerals in WhatToExpect.tsx
+                          on the homepage, for the reason that section's own
+                          comment sets out. This was np-amber-500 (#e9a93c),
+                          which on this page's --color-np-neutral-50 ground
+                          (#fbfaf8) measures 1.97:1. That is below even the 3:1
+                          floor for large text, and text-h3 renders here at 22px
+                          / weight 550, so the numeral does not qualify as large
+                          text anyway (the exemption wants 24px, or 18.66px at
+                          700). aria-hidden is not a defence: it stops a screen
+                          reader reading the position twice, since the <ol>
+                          already conveys it, but a sighted low-vision reader
+                          has nothing else marking the sequence, so the glyph is
+                          informative and 1.4.3 applies. blue-600 measures
+                          8.47:1 on the same ground. */}
                       <span
                         aria-hidden="true"
-                        className="font-display text-h3 text-np-amber-500 tabular-nums"
+                        className="font-display text-h3 text-np-blue-600 tabular-nums"
                       >
                         {i + 1}
                       </span>

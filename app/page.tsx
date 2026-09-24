@@ -22,9 +22,8 @@ import { FAQ, SERVICE_PAGES } from '@/lib/content';
  * "who will I see" and then "what happens" before it sells any service.
  *
  * The GETTING_STARTED copy is still live: /new-patients renders it through its
- * own markup. The GettingStarted COMPONENT, however, is now imported by
- * nothing, since this page was its only consumer. See the note in
- * WhatToExpect.tsx.
+ * own markup. The GettingStarted COMPONENT has been deleted, since this page
+ * was its only consumer. See the note in WhatToExpect.tsx.
  *
  * Statically rendered. Only the accordion, the mobile nav, the contact form,
  * and the reveal wrapper are client components, each an isolated leaf.

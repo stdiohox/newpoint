@@ -12,9 +12,26 @@ const NAV_H = 72;
  * video and its overlays, with no tint, blur or gradient edge of its own. The
  * mobile panel below still uses .liquid-glass.
  *
- * At md and above this is unchanged: wordmark, the five nav links, and the
- * primary CTA. Below md the links and CTA move into a full-screen panel behind
- * a hamburger button, because the spec's navbar had no mobile navigation at all.
+ * At the desktop breakpoint and above: wordmark, the six nav links, and the
+ * primary CTA on one line. Below it the links and CTA move into a full-screen
+ * panel behind a hamburger button, because the spec's navbar had no mobile
+ * navigation at all.
+ *
+ * BREAKPOINT: 70em (1120px), not `md`. `md` is 768px, and the row does not fit
+ * anywhere near that, so every width from 768px up to ~1050px rendered the
+ * wordmark, the links and the CTA crushed together and overlapping. Measured in
+ * Chromium with the webfonts loaded, the three groups are 149px + 512px + 231px
+ * = 892px of content. The bar's own chrome is 160px at this width (`lg:px-16`
+ * on the header, `px-4` on the row), so they only stop overlapping at 1052px,
+ * and that is with the wordmark touching the first link.
+ *
+ * 1116px is where each group clears its neighbour by 32px, which is the same
+ * `gap-8` the links already use between themselves. 70em is the next clean
+ * value above it and leaves 34.7px. Expressed in em rather than px for the
+ * reason WhatToExpect.tsx documents for its own 56.25em: media-query em
+ * resolves against the browser's initial font size, so a reader who raises
+ * their default text size gets the hamburger at a proportionally wider
+ * viewport instead of six widened links overlapping the CTA again.
  *
  * Icon paths are lucide's own Menu and X geometry, inlined because lucide-react
  * is not a dependency of this repo. Swapping to <Menu /> and <X /> later is a
@@ -166,7 +183,7 @@ export function HeroNav() {
             <span className="text-2xl font-semibold tracking-tight">{BUSINESS.shortName}</span>
           </a>
 
-          <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-8 min-[70em]:flex">
             {NAV.map((item) => (
               <a
                 key={item.href}
@@ -178,7 +195,7 @@ export function HeroNav() {
             ))}
           </nav>
 
-          <span className="hidden md:inline-block">
+          <span className="hidden min-[70em]:inline-block">
             <ButtonWithIcon href={CTA.href} size="sm">
               {CTA.label}
             </ButtonWithIcon>
@@ -191,7 +208,7 @@ export function HeroNav() {
             aria-expanded={open}
             aria-controls={panelId}
             aria-label="Open menu"
-            className="inline-flex items-center justify-center rounded-lg p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:hidden"
+            className="inline-flex items-center justify-center rounded-lg p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[70em]:hidden"
           >
             <svg
               aria-hidden="true"
@@ -214,7 +231,7 @@ export function HeroNav() {
 
       {open && (
         // z-60: above the fixed bar (z-50), so the panel covers it while open.
-        <div className="fixed inset-0 z-[60] backdrop-blur-xl md:hidden" onClick={close}>
+        <div className="fixed inset-0 z-[60] backdrop-blur-xl min-[70em]:hidden" onClick={close}>
           <div className="flex min-h-full items-stretch p-4">
             <div
               ref={panelRef}
