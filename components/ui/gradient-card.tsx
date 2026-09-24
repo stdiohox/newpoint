@@ -109,28 +109,39 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
               alt=""
               variants={reduce ? undefined : imageAnimation}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              /* Position and the rest of the classes are the block's. Only the
-                 WIDTH is responsive, because the block's flat w-3/4 covered
-                 the text on every narrow card.
+              /* POSITION AND WIDTH ARE BOTH RESPONSIVE below lg. The block's
+                 flat w-3/4 at -right-1/4 -bottom-1/4 covered the copy on every
+                 narrow card, and shrinking the width alone then pushed the icon
+                 almost entirely off the card: 1-5% of it was still inside at
+                 390 and 768. Easing the offsets in step with the width is what
+                 puts it back on the card without touching the text.
 
                  The card's text does not scale with the card: p-8 and the
                  body's max-w-xs are fixed, so on a narrow card the copy fills
-                 almost the whole width while a 75% image still eats the right
-                 half of it. Measured against the painted text rects, not the
-                 block rects, w-3/4 was clear at 1440 and 640 and covered the
-                 body copy at 1024, 768 and 390, and the CTA at 768 and 390.
+                 nearly the whole width and the icon has to be both smaller and
+                 pulled further in.
 
-                 The ladder tracks card width, which is not monotonic with
-                 viewport: the grid goes to two columns at md, so cards get
-                 NARROWER at 768 (324px) and 1024 (436px) than they are at 640
-                 (592px, still one column). Hence the dip back to w-1/3 at md.
+                 Values were searched, not guessed. Card padding boxes and every
+                 painted text rect were harvested from the built page at 23
+                 widths, then width x right x bottom was swept analytically
+                 against two hard constraints: zero intersection with any
+                 painted text or CTA rect, and at least 40% of the icon's opaque
+                 bounding box inside the card. 40 rather than the required 35 to
+                 leave margin at widths not sampled. Of the combinations that
+                 passed, the one with the LARGEST icon was taken, so the card
+                 keeps the block's bleed-off-the-corner look rather than
+                 becoming a fully contained sticker.
 
-                 The 2xl step exists because w-3/4 is safe at 1440 but not at
-                 1280, where the card is at its narrowest for that range (564px)
-                 and the icon clipped one glyph by 41px^2. xl carries w-2/3 and
-                 w-3/4 waits for 1536. Checked at 17 viewport widths, including
-                 both sides of every breakpoint. */
-              className="pointer-events-none absolute -right-1/4 -bottom-1/4 w-1/3 opacity-80 sm:w-3/4 md:w-1/3 lg:w-1/2 xl:w-2/3 2xl:w-3/4 dark:opacity-30"
+                 lg and up are the block's own -right-1/4 -bottom-1/4, which
+                 already cleared the text there.
+
+                 The ladder tracks CARD width, which is not monotonic with
+                 viewport: the grid goes to two columns at md, so cards are
+                 narrower at 768 (324px) and 1024 (436px) than at 640 (592px,
+                 still one column). The 2xl step exists because w-3/4 is safe at
+                 1440 but not at 1280, where the card is narrowest for that
+                 range and the icon clipped one glyph by 41px^2. */
+              className="pointer-events-none absolute -right-[14%] -bottom-[10%] w-[38%] opacity-80 sm:-right-[10%] sm:-bottom-[18%] sm:w-[60%] md:-right-[18%] md:-bottom-[18%] md:w-[45%] lg:-right-1/4 lg:-bottom-1/4 lg:w-1/2 xl:w-2/3 2xl:w-3/4 dark:opacity-30"
             />
           )}
           <div className="z-10 flex h-full flex-col">

@@ -42,3 +42,8 @@ yarn-error.log*
 # Before/after boards for the provider portrait enhancement. Review artefacts,
 # multi-megabyte PNGs, and regenerable from the sources in assets/providers/.
 /design-research/enhanced-preview/
+
+# Source art for the insurance card icons. The shipped webp cutouts live in
+# public/images/insurance/; these are the untouched 1-1.6 MB JPEGs they came
+# from, kept out of git for weight.
+design-research/assets/insurance/
