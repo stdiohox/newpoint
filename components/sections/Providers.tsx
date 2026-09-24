@@ -114,6 +114,27 @@ const CARD_SCRIM =
   ' color-mix(in srgb, var(--color-np-blue-700) 70%, transparent) 38%,' +
   ' transparent 45%)';
 
+/**
+ * Backing for the text block itself, on top of CARD_SCRIM.
+ *
+ * CARD_SCRIM is a PERCENTAGE of the card, so it only guarantees solid blue
+ * under the text when the text occupies roughly the bottom third. It does not
+ * at narrow widths: at 390px the role line sits at about 48% of the card, up in
+ * the fade, over Anastasia's bright white background - measured 2.48:1, under
+ * AA, at default text size. Enlarging text makes it worse (1.0:1 at a 20px
+ * root), because the block grows upward while the scrim stays put.
+ *
+ * This one is anchored to the TEXT rather than the card: solid everywhere the
+ * text actually is, fading out across the 72px of padding above the first line,
+ * so it scales with the block at any size. At desktop default it lands almost
+ * exactly where CARD_SCRIM had already gone solid, so the card looks unchanged.
+ */
+const TEXT_SCRIM =
+  'linear-gradient(to top,' +
+  ' var(--color-np-blue-700) 0%,' +
+  ' var(--color-np-blue-700) calc(100% - 72px),' +
+  ' transparent 100%)';
+
 /** Soft diagonal, dark top-left to --color-np-sky bottom-right. All tokens. */
 const PANEL_GRADIENT =
   'linear-gradient(135deg,' +
@@ -142,7 +163,13 @@ export function Providers() {
               className="mx-auto max-w-[24ch] text-center font-medium text-white"
               style={{
                 fontFamily: 'var(--font-outfit), ui-sans-serif, system-ui, sans-serif',
-                fontSize: 'clamp(2rem, 3.4vw, 3rem)',
+                // A rem term, not pure vw: between about 588 and 1412px the old
+                // 3.4vw dominated its own clamp, so the heading tracked viewport
+                // width and ignored the user's font-size setting entirely (48px at
+                // a 16px root, 49px at 22px). 1.67vw rather than 1.4vw because
+                // 1.5rem + 1.4vw renders 44px at 1440/16px, and this heading holds
+                // its 48px.
+                fontSize: 'clamp(2rem, 1.5rem + 1.67vw, 3rem)',
                 letterSpacing: '-0.035em',
                 lineHeight: 1.05,
                 textWrap: 'balance',
@@ -195,17 +222,34 @@ export function Providers() {
                       310px-wide phone card it resolves to 248px of height while
                       the text block alone needs 223px, which buries the photo
                       almost completely. 700px is where the card is wide enough
-                      (about 620px) for the text to sit under half the card. */}
+                      (about 620px) for the text to sit under half the card.
+
+                      HEIGHT IS max(ratio, content), not the ratio alone. The
+                      article is a one-cell grid; the ratio spacer and the text
+                      block are both placed in that cell, so the taller of the
+                      two sets the row height. At default text size the spacer
+                      always wins and the card is exactly its 4:5 / 5:4 size.
+                      When text needs more room - a user font-size setting, a
+                      longer translation, a longer approved sentence - the card
+                      grows instead of clipping.
+
+                      The previous version put the aspect on the article and the
+                      text in `absolute bottom-0`, which meant nothing could
+                      grow: at a 320px viewport an 18px root font (112%) already
+                      clipped 61px off the TOP of the text block, taking the
+                      role line and part of the bio with it. The bio is the
+                      aria-describedby target, so it stayed announced to a
+                      screen reader while being invisible on screen. */}
                   <article
                     id={`provider-${p.slug}`}
-                    className="group bg-np-blue-900 relative aspect-[4/5] w-full overflow-hidden rounded-[28px] min-[700px]:aspect-[5/4] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white"
+                    className="group bg-np-blue-900 relative grid w-full grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white"
                   >
                     {/* Decorative: the link already carries the name and role,
                         and a described portrait here would be concatenated into
                         that name. The provider page renders the same person
                         with real alt text. */}
                     {/* Plain <img>, same call as ProviderPortrait: these assets
-                        are pre-cropped and pre-optimised at exactly 560 and 928,
+                        are pre-cropped and pre-optimised at exactly 560 and 1120,
                         so re-optimising through next/image would only degrade
                         work already done at a known, capped size. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -224,7 +268,23 @@ export function Providers() {
 
                     <div className="absolute inset-0" style={{ backgroundImage: CARD_SCRIM }} />
 
-                    <div className="absolute inset-x-0 bottom-0 p-5 min-[960px]:px-7 min-[960px]:pb-6">
+                    {/* Ratio spacer. Sets the card's MINIMUM height and nothing
+                        else - it paints nothing and is out of the a11y tree.
+                        The photo and scrim above are absolute against the
+                        article, so they fill whatever height wins: a taller
+                        card shows more photograph, never a blank band. */}
+                    <div
+                      aria-hidden="true"
+                      className="col-start-1 row-start-1 aspect-[4/5] min-[700px]:aspect-[5/4]"
+                    />
+
+                    {/* Same grid cell as the spacer, pinned to its bottom.
+                        `relative` is load-bearing: the scrim is positioned, so
+                        static content would paint underneath it. */}
+                    <div
+                      className="relative col-start-1 row-start-1 self-end px-5 pt-[72px] pb-5 min-[960px]:px-7 min-[960px]:pb-6"
+                      style={{ backgroundImage: TEXT_SCRIM }}
+                    >
                       <h3 className="flex items-center gap-3 text-white">
                         <Link
                           href={`/providers/${p.slug}`}
