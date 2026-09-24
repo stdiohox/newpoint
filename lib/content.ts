@@ -507,10 +507,9 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: 'In person and by telehealth',
     category: 'Assessment',
     categoryColor: 'var(--color-np-blue-600)',
-    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
-    // this footage depicts a person and must not imply a treatment outcome.
-    video: '/video/newpoint-hero.mp4',
-    poster: '/video/newpoint-hero-poster.jpg',
+    // This footage depicts a person and must not imply a treatment outcome.
+    video: '/video/services/evaluation.mp4',
+    poster: '/video/services/evaluation-poster.webp',
     href: '/services/psychiatric-evaluation',
     displayOrder: 1,
   },
@@ -523,10 +522,9 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: 'In person and by telehealth',
     category: 'Ongoing care',
     categoryColor: 'var(--color-np-blue-700)',
-    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
-    // this footage depicts a person and must not imply a treatment outcome.
-    video: '/video/newpoint-hero.mp4',
-    poster: '/video/newpoint-hero-poster.jpg',
+    // This footage depicts a person and must not imply a treatment outcome.
+    video: '/video/services/medication-management.mp4',
+    poster: '/video/services/medication-management-poster.webp',
     href: '/services/medication-management',
     displayOrder: 2,
   },
@@ -541,10 +539,9 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: 'By telehealth across New Jersey and Pennsylvania',
     category: 'Virtual care',
     categoryColor: 'var(--color-np-sky)',
-    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
-    // this footage depicts a person and must not imply a treatment outcome.
-    video: '/video/newpoint-hero.mp4',
-    poster: '/video/newpoint-hero-poster.jpg',
+    // This footage depicts a person and must not imply a treatment outcome.
+    video: '/video/services/telehealth.mp4',
+    poster: '/video/services/telehealth-poster.webp',
     href: '/services/telehealth',
     displayOrder: 3,
   },
@@ -564,10 +561,9 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: null,
     category: 'Getting started',
     categoryColor: 'var(--color-np-success)',
-    // CLIENT: placeholder — replace with generated clip. See OPEN_CLIENT_ITEMS:
-    // this footage depicts a person and must not imply a treatment outcome.
-    video: '/video/newpoint-hero.mp4',
-    poster: '/video/newpoint-hero-poster.jpg',
+    // This footage depicts a person and must not imply a treatment outcome.
+    video: '/video/services/new-patients.mp4',
+    poster: '/video/services/new-patients-poster.webp',
     href: '/new-patients',
     displayOrder: 4,
   },
