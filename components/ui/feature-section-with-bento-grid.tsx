@@ -65,6 +65,30 @@ const STEP_IMAGES = [
 ] as const;
 
 /**
+ * Per-card object-position, in step order. Default centring is right for three
+ * of the four.
+ *
+ * FOLLOW-UP (card 4) is the exception. Every card's image box is wider than the
+ * 1600x893 source, so object-cover always scales to the box WIDTH and crops
+ * vertically only, which makes the horizontal term irrelevant and the vertical
+ * one the whole problem. The man's head runs from roughly 10% to 36% of the
+ * source height, well above the middle, so centring cropped it: at 1440 the
+ * visible band was about 30% to 70% of the image and took the top of his head
+ * off, leaving a headless torso.
+ *
+ * 12% keeps the band's top edge above his hairline at every width. The band is
+ * 41% of the image tall at 1440 and 63% at 390, so the top edge lands at 7% and
+ * 4.6% respectively, both clear of the hairline with headroom to spare. The
+ * ceiling is about 16% at 1440, the tightest case, so 12% is not on the edge.
+ */
+const STEP_IMAGE_POSITIONS = [
+  'object-center',
+  'object-center',
+  'object-center',
+  'object-[50%_12%]',
+] as const;
+
+/**
  * The block's own rhythm: cards 1 and 4 run two columns wide at lg and drop
  * their square ratio, cards 2 and 3 stay square. Four steps, four cells, so
  * the grid never carries a filler tile.
@@ -95,8 +119,20 @@ export function FeatureBentoGrid({
   /** Rendered below the grid. Carries the section's CTA. */
   children?: ReactNode;
 }) {
+  /*
+   * TOP PADDING is pt-24 md:pt-32 (96px, 128px from 768px up), not the block's
+   * own pt-20 lg:pt-40. py-24 md:py-32 is this site's section rhythm:
+   * <Providers />, <Faq /> and <ContactCrisis /> all use it. The block's 160px
+   * at lg was the outlier, and it landed directly under the providers panel,
+   * which already contributes its own 128px bottom, for a 288px trough. It is
+   * now 128 + 128 = 256px, the same gap as Faq to ContactCrisis.
+   *
+   * Bottom padding is deliberately untouched: the brief asked for the top. It
+   * stays pb-20 lg:pb-40, so the gap down to <InsuranceProof /> is still the
+   * block's 160px plus that section's own 112px.
+   */
   return (
-    <div className="w-full py-20 lg:py-40">
+    <div className="w-full pt-24 pb-20 md:pt-32 lg:pb-40">
       <div className="px-6 md:px-12 lg:px-16">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-start gap-4">
@@ -119,7 +155,7 @@ export function FeatureBentoGrid({
               return (
                 <li
                   key={step.title}
-                  className={`bg-np-neutral-100 grid grid-cols-[minmax(0,1fr)] rounded-md ${
+                  className={`bg-np-neutral-100 grid grid-cols-[minmax(0,1fr)] rounded-2xl ${
                     isWide(i) ? 'h-full lg:col-span-2' : ''
                   }`}
                 >
@@ -163,17 +199,20 @@ export function FeatureBentoGrid({
                         text grows; past that point the text wins and the card
                         grows instead, which is the whole point of the spacer.
 
-                        overflow-hidden + rounded-t-md rather than
+                        overflow-hidden + rounded-t-2xl, matching the card's
+                        own rounded-2xl, rather than
                         overflow-hidden on the li: clipping the card itself
                         would silently crop the text if it ever did overflow,
                         and only the image needs the corners. */}
-                    <div className="relative min-h-[120px] w-full flex-1 overflow-hidden rounded-t-md">
+                    <div className="relative min-h-[120px] w-full flex-1 overflow-hidden rounded-t-2xl">
                       <Image
                         src={STEP_IMAGES[i % STEP_IMAGES.length]}
                         alt=""
                         fill
                         sizes={sizesFor(i)}
-                        className="object-cover"
+                        className={`object-cover ${
+                          STEP_IMAGE_POSITIONS[i % STEP_IMAGE_POSITIONS.length]
+                        }`}
                       />
                     </div>
 
