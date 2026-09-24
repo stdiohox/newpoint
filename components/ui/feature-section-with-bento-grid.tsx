@@ -91,18 +91,48 @@ export function FeatureBentoGrid({
               return (
                 <li
                   key={step.title}
-                  className={`bg-np-neutral-100 flex flex-col justify-between rounded-md p-6 ${
-                    isWide(i)
-                      ? 'aspect-square h-full lg:col-span-2 lg:aspect-auto'
-                      : 'aspect-square'
+                  className={`bg-np-neutral-100 grid grid-cols-[minmax(0,1fr)] rounded-md p-6 ${
+                    isWide(i) ? 'h-full lg:col-span-2' : ''
                   }`}
                 >
-                  <Icon aria-hidden="true" className="h-8 w-8 stroke-1" />
-                  <div className="flex flex-col">
-                    {/* h3: the section's h2 is above and nothing nests deeper,
-                        so the outline stays h2 -> h3 with no skip. */}
-                    <h3 className="text-xl tracking-tight">{step.title}</h3>
-                    <p className="text-np-neutral-600 max-w-xs text-base">{step.body}</p>
+                  {/* Ratio spacer. Sets the card's MINIMUM height and nothing
+                      else: it paints nothing and is out of the a11y tree.
+
+                      HEIGHT IS max(ratio, content), the same approach as the
+                      provider cards in Providers.tsx. The li is a one-cell
+                      grid and the spacer and the content share that cell, so
+                      the taller of the two sets the row height. At default
+                      text size the spacer wins and the card is exactly square,
+                      pixel for pixel what `aspect-square` on the li gave: the
+                      spacer sits inside p-6, so its height is the content-box
+                      width, and adding the padding back returns the card to
+                      the full width. When the text needs more room, from a
+                      user font-size setting or longer approved copy, the card
+                      grows instead of overflowing.
+
+                      The previous version put aspect-square on the li itself,
+                      which fixes height from width and cannot grow. Nothing
+                      clipped at a 16px root, but two cards were already at
+                      exactly 100% of their box at 1024 and 640, so any
+                      enlargement spilled the text straight out of the card. */}
+                  <div
+                    aria-hidden="true"
+                    className={`col-start-1 row-start-1 ${
+                      isWide(i) ? 'aspect-square lg:aspect-auto' : 'aspect-square'
+                    }`}
+                  />
+
+                  {/* Same grid cell as the spacer. The row stretches to the
+                      card's height, so justify-between still pins the icon to
+                      the top and the text to the bottom. */}
+                  <div className="col-start-1 row-start-1 flex flex-col justify-between">
+                    <Icon aria-hidden="true" className="h-8 w-8 stroke-1" />
+                    <div className="flex flex-col">
+                      {/* h3: the section's h2 is above and nothing nests deeper,
+                          so the outline stays h2 -> h3 with no skip. */}
+                      <h3 className="text-xl tracking-tight">{step.title}</h3>
+                      <p className="text-np-neutral-600 max-w-xs text-base">{step.body}</p>
+                    </div>
                   </div>
                 </li>
               );

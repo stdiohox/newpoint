@@ -42,13 +42,9 @@ import { CTA, WHAT_TO_EXPECT } from '@/lib/content';
  * np-blue-600 contrast note that used to live here no longer applies to this
  * file. /new-patients still carries that pattern and keeps its own note.
  *
- * BADGE AND HEADING ARE THE SAME STRING. The brief specified the badge text as
- * "What to expect" and the heading as the existing one, and WHAT_TO_EXPECT.heading
- * is already exactly "What to expect", so the section renders that phrase twice,
- * once as the pill and once as the h2. Both read from the one constant rather
- * than hardcoding a second copy of the string, since the brief also said no new
- * copy. Flagged rather than resolved: picking a different badge word would have
- * meant authoring copy that was explicitly out of scope.
+ * The badge is WHAT_TO_EXPECT.badge ("How it works"), not the heading. They were
+ * briefly the same string, which rendered "What to expect" twice, once as the
+ * pill and once as the h2.
  *
  * The old note here said this section must not carry an eyebrow because
  * <FeaturedServices /> renders one directly below it. That is no longer true:
@@ -62,7 +58,7 @@ export function WhatToExpect() {
   return (
     <section id="what-to-expect">
       <FeatureBentoGrid
-        badge={WHAT_TO_EXPECT.heading}
+        badge={WHAT_TO_EXPECT.badge}
         heading={WHAT_TO_EXPECT.heading}
         intro={WHAT_TO_EXPECT.body}
         steps={WHAT_TO_EXPECT.steps}

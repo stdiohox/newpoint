@@ -501,6 +501,13 @@ export const GETTING_STARTED = {
  * - Appointment length, frequency, or cost.
  */
 export const WHAT_TO_EXPECT = {
+  /**
+   * The section's eyebrow pill. Deliberately NOT `heading`: the two were the
+   * same string when the bento grid first landed, so the page rendered "What to
+   * expect" twice, once as the pill and once as the h2. This names what the
+   * section does instead of repeating its title.
+   */
+  badge: 'How it works',
   heading: 'What to expect',
   body: 'Four steps, from the first message to ongoing care. Every new patient starts with the same comprehensive psychiatric evaluation.',
   steps: [
