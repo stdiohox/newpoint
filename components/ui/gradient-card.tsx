@@ -132,8 +132,11 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
                  keeps the block's bleed-off-the-corner look rather than
                  becoming a fully contained sticker.
 
-                 lg and up are the block's own -right-1/4 -bottom-1/4, which
-                 already cleared the text there.
+                 lg keeps the block's -right-1/4 and w-1/2 but eases the bottom
+                 to 12%. At -bottom-1/4 the icon was only 35% visible at 1024,
+                 the narrowest card in that band, sitting exactly on the floor
+                 with no margin. 12% lifts it to 46% there and cascades to xl
+                 and 2xl, which gain visibility rather than losing it.
 
                  The ladder tracks CARD width, which is not monotonic with
                  viewport: the grid goes to two columns at md, so cards are
@@ -141,7 +144,7 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
                  still one column). The 2xl step exists because w-3/4 is safe at
                  1440 but not at 1280, where the card is narrowest for that
                  range and the icon clipped one glyph by 41px^2. */
-              className="pointer-events-none absolute -right-[14%] -bottom-[10%] w-[38%] opacity-80 sm:-right-[10%] sm:-bottom-[18%] sm:w-[60%] md:-right-[18%] md:-bottom-[18%] md:w-[45%] lg:-right-1/4 lg:-bottom-1/4 lg:w-1/2 xl:w-2/3 2xl:w-3/4 dark:opacity-30"
+              className="pointer-events-none absolute -right-[14%] -bottom-[10%] w-[38%] opacity-80 sm:-right-[10%] sm:-bottom-[18%] sm:w-[60%] md:-right-[18%] md:-bottom-[18%] md:w-[45%] lg:-right-1/4 lg:-bottom-[12%] lg:w-1/2 xl:w-2/3 2xl:w-3/4 dark:opacity-30"
             />
           )}
           <div className="z-10 flex h-full flex-col">

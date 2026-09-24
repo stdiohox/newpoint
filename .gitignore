@@ -43,7 +43,9 @@ yarn-error.log*
 # multi-megabyte PNGs, and regenerable from the sources in assets/providers/.
 /design-research/enhanced-preview/
 
-# Source art for the insurance card icons. The shipped webp cutouts live in
-# public/images/insurance/; these are the untouched 1-1.6 MB JPEGs they came
-# from, kept out of git for weight.
-design-research/assets/insurance/
+# Design source art. Untouched originals and intermediate exports for the
+# homepage sections, tens of MB and consumed only by the one-off resize/cutout
+# steps. Everything the site actually serves is committed under public/.
+# The README.md files in here stay tracked so the folders explain themselves.
+design-research/assets/
+!design-research/assets/**/README.md
