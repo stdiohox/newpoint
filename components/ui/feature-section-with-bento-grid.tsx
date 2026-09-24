@@ -142,28 +142,29 @@ export function FeatureBentoGrid({
   children?: ReactNode;
 }) {
   /*
-   * TOP PADDING is pt-5 md:pt-8 (20px, 32px), down from the block's own
-   * pt-20 lg:pt-40 and from the pt-24 md:pt-32 that replaced it.
+   * TOP PADDING is pt-9 md:pt-14 (36px, 56px).
    *
    * Measured at 1440, exactly two things separate the providers panel from this
    * section's badge, and nothing else: <Providers />'s own padding-bottom and
    * this padding-top. No wrapper, no margin, and no collapsing between them,
-   * since both sit inside their sections rather than between them. They were
-   * 128 + 128 = 256px on desktop and 96 + 96 = 192px on mobile.
+   * since both sit inside their sections rather than between them. The block
+   * shipped with 128 + 128 = 256px on desktop, went to 32 + 32 = 64px, and is
+   * now 56 + 56 = 112px on desktop and 36 + 36 = 72px on mobile.
    *
-   * The pair is now split evenly, 32 + 32 = 64px on desktop and 20 + 20 = 40px
-   * on mobile. Split rather than zeroing one side: giving either section a
+   * Split evenly rather than zeroing one side: giving either section a
    * 0-padding edge makes the panel touch the section boundary and leaves the
-   * spacing impossible to reason about from one file.
+   * spacing impossible to reason about from one file. Both halves move
+   * together, so <Providers />'s pb-9 md:pb-14 is the other half of this
+   * number and changing one without the other puts the total off.
    *
-   * This is deliberately tighter than the site's section rhythm. The two
+   * This is still deliberately tighter than the site's section rhythm. The two
    * sections read as one sequence here, so they are set closer than the
    * 240-272px that separates the unrelated sections further down the page.
    *
    * Bottom padding is untouched. It stays pb-20 lg:pb-40.
    */
   return (
-    <div className="w-full pt-5 pb-20 md:pt-8 lg:pb-40">
+    <div className="w-full pt-9 pb-20 md:pt-14 lg:pb-40">
       <div className="px-6 md:px-12 lg:px-16">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-start gap-4">

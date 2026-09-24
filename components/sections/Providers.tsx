@@ -182,15 +182,18 @@ const PANEL_GRADIENT =
 
 export function Providers() {
   /*
-   * Bottom padding is pb-5 md:pb-8 (20px, 32px), not the py-24 md:py-32 the top
-   * still carries. It is one of exactly two contributors to the trough between
+   * Bottom padding is pb-9 md:pb-14 (36px, 56px), not the py-24 md:py-32 the
+   * top still carries. It is one of exactly two contributors to the gap between
    * this panel and <WhatToExpect /> below, the other being that section's own
-   * top padding. The pair is split evenly to land on 40px of total separation
-   * on mobile and 64px on desktop. The top is untouched and stays on the site's
-   * section rhythm.
+   * top padding. The pair is split evenly to land on 72px of total separation
+   * on mobile and 112px on desktop. The top is untouched and stays on the
+   * site's section rhythm.
+   *
+   * Both halves have to move together: changing only one side leaves the total
+   * off by whatever the other still contributes.
    */
   return (
-    <section id="providers" className="bg-np-neutral-50 pt-24 pb-5 md:pt-32 md:pb-8">
+    <section id="providers" className="bg-np-neutral-50 pt-24 pb-9 md:pt-32 md:pb-14">
       {/* Site gutters, NOT <Container>. The homepage header is <HeroNav />, not
           <Nav />, and HeroNav is `fixed inset-x-0` with px-6 / md:px-12 /
           lg:px-16 - uncapped, full page width minus the gutter. <Hero />'s own
