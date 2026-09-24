@@ -1,10 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
 /**
@@ -97,57 +96,50 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
         ref={ref}
       >
         <div className={cn(cardVariants({ gradient }), className)} {...props}>
-          {imageUrl && (
-            /* Decorative: the card's own heading and body already say what it
-               is, so the graphic repeats nothing, and alt="" keeps it out of
-               the accessibility tree. The block shipped with a template
-               literal naming the card and the words "background graphic",
-               which announced a description of the decoration before the
-               heading it decorates. */
-            <motion.img
-              src={imageUrl}
-              alt=""
-              variants={reduce ? undefined : imageAnimation}
-              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              /* POSITION AND WIDTH ARE BOTH RESPONSIVE below lg. The block's
-                 flat w-3/4 at -right-1/4 -bottom-1/4 covered the copy on every
-                 narrow card, and shrinking the width alone then pushed the icon
-                 almost entirely off the card: 1-5% of it was still inside at
-                 390 and 768. Easing the offsets in step with the width is what
-                 puts it back on the card without touching the text.
+          {/* The right margin reserves the icon's column so the copy can never
+              run under it: icon width + its 24px inset + a 16px gap. It tracks
+              the icon's responsive size. Below the switch the icon is in flow
+              above the badge, so no margin is needed. */}
+          <div className="z-10 flex h-full flex-col min-[30rem]:me-[136px] md:me-0 lg:me-[136px] xl:me-[168px]">
+            {imageUrl && (
+              /* THE ICON IS IN FLOW, not bled off a corner. Card-side, the key
+                 parts of these icons are the middle (the heart, the check mark,
+                 the card in the wallet), so anything that clips an edge clips
+                 the subject.
 
-                 The card's text does not scale with the card: p-8 and the
-                 body's max-w-xs are fixed, so on a narrow card the copy fills
-                 nearly the whole width and the icon has to be both smaller and
-                 pulled further in.
+                 Two layouts, one element, switched at min-[30rem] on the card
+                 rather than the viewport... except Tailwind has no container
+                 query configured here, so the switch is by viewport and the
+                 breakpoints below were chosen from the CARD widths they produce.
 
-                 Values were searched, not guessed. Card padding boxes and every
-                 painted text rect were harvested from the built page at 23
-                 widths, then width x right x bottom was swept analytically
-                 against two hard constraints: zero intersection with any
-                 painted text or CTA rect, and at least 40% of the icon's opaque
-                 bounding box inside the card. 40 rather than the required 35 to
-                 leave margin at widths not sampled. Of the combinations that
-                 passed, the one with the LARGEST icon was taken, so the card
-                 keeps the block's bleed-off-the-corner look rather than
-                 becoming a fully contained sticker.
+                 Where the card is too narrow for anything to sit beside the
+                 copy, the icon runs ABOVE THE BADGE at a small fixed size, in
+                 normal flow. It is the first child of this column, which is
+                 what puts it there without needing a second element.
 
-                 lg keeps the block's -right-1/4 and w-1/2 but eases the bottom
-                 to 12%. At -bottom-1/4 the icon was only 35% visible at 1024,
-                 the narrowest card in that band, sitting exactly on the floor
-                 with no margin. 12% lifts it to 46% there and cascades to xl
-                 and 2xl, which gain visibility rather than losing it.
+                 That happens TWICE, because card width is not monotonic with
+                 viewport: once below 30rem, and again across the whole md band,
+                 where the grid goes to two columns and the card drops from
+                 719px at 767 to 324px at 768. Beside-the-text at md left the
+                 body wrapping to three words a line. So the ladder is
+                 above -> beside -> above -> beside, not a single switch.
 
-                 The ladder tracks CARD width, which is not monotonic with
-                 viewport: the grid goes to two columns at md, so cards are
-                 narrower at 768 (324px) and 1024 (436px) than at 640 (592px,
-                 still one column). The 2xl step exists because w-3/4 is safe at
-                 1440 but not at 1280, where the card is narrowest for that
-                 range and the icon clipped one glyph by 41px^2. */
-              className="pointer-events-none absolute -right-[14%] -bottom-[10%] w-[38%] opacity-80 sm:-right-[10%] sm:-bottom-[18%] sm:w-[60%] md:-right-[18%] md:-bottom-[18%] md:w-[45%] lg:-right-1/4 lg:-bottom-[12%] lg:w-1/2 xl:w-2/3 2xl:w-3/4 dark:opacity-30"
-            />
-          )}
-          <div className="z-10 flex h-full flex-col">
+                 At and above the switch it becomes absolute, pinned to the
+                 right edge and vertically centred, and the column keeps a right
+                 margin so the copy never runs under it. Sizes are the largest
+                 that clear the text at every width, searched against the
+                 painted text rects.
+
+                 Decorative: the heading and body already say what the card is,
+                 so alt="" keeps it out of the accessibility tree. */
+              <motion.img
+                src={imageUrl}
+                alt=""
+                variants={reduce ? undefined : imageAnimation}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                className="pointer-events-none mb-4 h-16 w-16 shrink-0 object-contain min-[30rem]:absolute min-[30rem]:top-1/2 min-[30rem]:right-6 min-[30rem]:mb-0 min-[30rem]:h-24 min-[30rem]:w-24 min-[30rem]:-translate-y-1/2 md:static md:mb-4 md:h-16 md:w-16 md:translate-y-0 lg:absolute lg:top-1/2 lg:right-6 lg:mb-0 lg:h-24 lg:w-24 lg:-translate-y-1/2 xl:h-32 xl:w-32"
+              />
+            )}
             <div className="text-np-ink/80 mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-white/50 px-3 py-1 text-sm font-medium backdrop-blur-sm">
               <span
                 aria-hidden="true"
@@ -160,16 +152,11 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
               <h3 className="text-np-ink mb-2 text-2xl font-bold">{title}</h3>
               <p className="text-np-ink/70 max-w-xs">{description}</p>
             </div>
-            <Link
-              href={ctaHref}
-              className="group text-np-ink mt-6 inline-flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline focus-visible:underline"
-            >
-              {ctaText}
-              <ArrowRight
-                aria-hidden="true"
-                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
-              />
-            </Link>
+            <div className="mt-6">
+              <Button href={ctaHref} variant="sky" withArrow>
+                {ctaText}
+              </Button>
+            </div>
           </div>
         </div>
       </motion.div>
