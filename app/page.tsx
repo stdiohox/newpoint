@@ -11,8 +11,15 @@ import { medicalClinicSchema, providersSchema, serviceSchemaFor, faqSchema } fro
 import { FAQ, SERVICE_PAGES } from '@/lib/content';
 
 /**
- * Seven sections, seven distinct layout families, in the order confirmed in
- * design-synthesis.md Part 4. No two consecutive sections share a family.
+ * Seven sections, seven distinct layout families. No two consecutive sections
+ * share a family.
+ *
+ * ORDER, after the hero: services, providers, what to expect, insurance, FAQ,
+ * contact and crisis. This is NOT the order in design-synthesis.md Part 4,
+ * which put insurance at position 2 directly under the hero. The page now
+ * answers what we treat, who you will see and what happens first, and raises
+ * cost and coverage once the visitor has a reason to care. design-synthesis.md
+ * still documents the original sequence and has not been rewritten.
  *
  * <WhatToExpect /> took <GettingStarted />'s slot in that count rather than
  * adding an eighth: both are the numbered-process family and both describe the
@@ -20,6 +27,11 @@ import { FAQ, SERVICE_PAGES } from '@/lib/content';
  * put one layout family on the page twice. The new one carries four steps
  * instead of three and sits directly after <Providers />, so the page answers
  * "who will I see" and then "what happens" before it sells any service.
+ *
+ * NOTE: <WhatToExpect /> and <InsuranceProof /> are now adjacent and both set
+ * bg-np-neutral-100, so no tonal seam separates them. Their layout families
+ * still differ (numbered rail, then payer wall), so this is a visual question,
+ * not a repetition one, and it was not in scope to change either ground.
  *
  * The GETTING_STARTED copy is still live: /new-patients renders it through its
  * own markup. The GettingStarted COMPONENT has been deleted, since this page
@@ -50,10 +62,10 @@ export default function Home() {
       {/* The primary navigation now lives inside <Hero />, per the hero spec. */}
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <Hero />
-        <InsuranceProof />
+        <FeaturedServices />
         <Providers />
         <WhatToExpect />
-        <FeaturedServices />
+        <InsuranceProof />
         <Faq />
         <ContactCrisis />
       </main>
