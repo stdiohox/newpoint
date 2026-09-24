@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import { CalendarCheck, ClipboardList, FileText, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -47,11 +48,38 @@ export type BentoStep = {
 const STEP_ICONS = [CalendarCheck, ClipboardList, FileText, RefreshCw] as const;
 
 /**
+ * In step order, and decorative in exactly the way the icons are: each card's
+ * heading and body already say what the step is, so the photograph repeats
+ * nothing and carries alt="". A description here would be read out before the
+ * heading and add nothing a screen reader user does not already get.
+ *
+ * Source aspect ratios were chosen to match the cells: the two 2752x1536 files
+ * are on the wide cards, the two 2048x2048 on the square ones. Resized to
+ * 1600px (wide) and 1200px (square), webp q80, 77-146 KB each.
+ */
+const STEP_IMAGES = [
+  '/images/what-to-expect/request.webp',
+  '/images/what-to-expect/evaluation.webp',
+  '/images/what-to-expect/treatment-plan.webp',
+  '/images/what-to-expect/follow-up.webp',
+] as const;
+
+/**
  * The block's own rhythm: cards 1 and 4 run two columns wide at lg and drop
  * their square ratio, cards 2 and 3 stay square. Four steps, four cells, so
  * the grid never carries a filler tile.
  */
 const isWide = (i: number) => i === 0 || i === 3;
+
+/**
+ * What share of the viewport the card occupies, so next/image picks a sensible
+ * source instead of assuming 100vw. The grid is 1 column, then 2 at sm (640),
+ * then 3 at lg (1024), where the wide cards span two of the three.
+ */
+const sizesFor = (i: number) =>
+  isWide(i)
+    ? '(min-width: 1024px) 66vw, (min-width: 640px) 50vw, 100vw'
+    : '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
 
 export function FeatureBentoGrid({
   badge,
@@ -91,7 +119,7 @@ export function FeatureBentoGrid({
               return (
                 <li
                   key={step.title}
-                  className={`bg-np-neutral-100 grid grid-cols-[minmax(0,1fr)] rounded-md p-6 ${
+                  className={`bg-np-neutral-100 grid grid-cols-[minmax(0,1fr)] rounded-md ${
                     isWide(i) ? 'h-full lg:col-span-2' : ''
                   }`}
                 >
@@ -122,16 +150,41 @@ export function FeatureBentoGrid({
                     }`}
                   />
 
-                  {/* Same grid cell as the spacer. The row stretches to the
-                      card's height, so justify-between still pins the icon to
-                      the top and the text to the bottom. */}
-                  <div className="col-start-1 row-start-1 flex flex-col justify-between">
-                    <Icon aria-hidden="true" className="h-8 w-8 stroke-1" />
-                    <div className="flex flex-col">
-                      {/* h3: the section's h2 is above and nothing nests deeper,
-                          so the outline stays h2 -> h3 with no skip. */}
-                      <h3 className="text-xl tracking-tight">{step.title}</h3>
-                      <p className="text-np-neutral-600 max-w-xs text-base">{step.body}</p>
+                  {/* Same grid cell as the spacer, so the taller of the two
+                      still sets the height. p-6 moved off the li and onto the
+                      text block below, because the photograph runs to the
+                      card's edges and padding around it would inset it. */}
+                  <div className="col-start-1 row-start-1 flex flex-col">
+                    {/* The photograph takes the slack. `flex-1` means it
+                        absorbs whatever height is left once the text has
+                        taken what it needs, so at default size the card is
+                        still exactly square and the image fills the top of
+                        it. The floor stops it collapsing to a sliver when the
+                        text grows; past that point the text wins and the card
+                        grows instead, which is the whole point of the spacer.
+
+                        overflow-hidden + rounded-t-md rather than
+                        overflow-hidden on the li: clipping the card itself
+                        would silently crop the text if it ever did overflow,
+                        and only the image needs the corners. */}
+                    <div className="relative min-h-[120px] w-full flex-1 overflow-hidden rounded-t-md">
+                      <Image
+                        src={STEP_IMAGES[i % STEP_IMAGES.length]}
+                        alt=""
+                        fill
+                        sizes={sizesFor(i)}
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <div className="flex shrink-0 flex-col p-6">
+                      <Icon aria-hidden="true" className="h-8 w-8 stroke-1" />
+                      <div className="mt-4 flex flex-col">
+                        {/* h3: the section's h2 is above and nothing nests deeper,
+                            so the outline stays h2 -> h3 with no skip. */}
+                        <h3 className="text-xl tracking-tight">{step.title}</h3>
+                        <p className="text-np-neutral-600 max-w-xs text-base">{step.body}</p>
+                      </div>
                     </div>
                   </div>
                 </li>
