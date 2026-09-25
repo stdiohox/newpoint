@@ -675,7 +675,8 @@ export const FEATURED_SERVICES: FeaturedService[] = [
      * also rendered on /new-patients, above the three-step list it introduces,
      * where "three steps" is the correct and useful thing to say.
      */
-    description: 'How to get in touch, what the first appointment covers, and how ongoing care works.',
+    description:
+      'How to get in touch, what the first appointment covers, and how ongoing care works.',
     /**
      * No modality line on this slot. The other three describe how CARE is
      * delivered; this one is a process, and "In person and by telehealth" next
@@ -696,7 +697,19 @@ export const FEATURED_SERVICES: FeaturedService[] = [
 ];
 
 export const FAQ = {
+  /**
+   * The section's eyebrow. A label for the block, not a claim.
+   */
+  eyebrow: 'FAQ',
   heading: 'Questions before you book',
+  /**
+   * The only new string in this block, and deliberately not a fact: it
+   * restates the invitation the answers below already make ("ask us", in
+   * `groups`, and INSURANCE.body's "If yours is not listed, ask us"). Nothing
+   * here asserts anything verifiable about the practice.
+   */
+  intro:
+    'If your question is not here, ask us when you get in touch and we will answer it before you book.',
   groups: [
     {
       title: 'Getting started',
