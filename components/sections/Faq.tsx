@@ -37,7 +37,9 @@ export function Faq() {
         heading={FAQ.heading}
         intro={FAQ.intro}
         faqs={faqs}
-        imageSrc="/images/what-to-expect/evaluation.webp"
+        imageSrc="/images/faq/faq.webp"
+        imageWidth={800}
+        imageHeight={597}
       />
     </section>
   );

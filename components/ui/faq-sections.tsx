@@ -18,6 +18,8 @@ import Image from 'next/image';
  *
  * IMAGE is next/image against a local file, not the CDN URL the block came
  * with. Decorative, so alt="": the questions beside it say what the section is.
+ * It is laid out `w-full h-auto` from its true dimensions, so the frame is
+ * never cropped and the subject cannot be cut off at any width.
  *
  * COLOURS, mapped off Tailwind's stock palette onto Newpoint's:
  *   text-indigo-600 -> np-blue-600   eyebrow
@@ -47,12 +49,24 @@ export function FaqSections({
   intro,
   faqs,
   imageSrc,
+  imageWidth,
+  imageHeight,
 }: {
   eyebrow: string;
   heading: string;
   intro: string;
   faqs: readonly FaqItem[];
   imageSrc: string;
+  /**
+   * The file's real pixel dimensions. They are props rather than constants
+   * because next/image derives the intrinsic aspect ratio from them, and CSS
+   * here is `w-full h-auto`, so a wrong pair does not crop, it STRETCHES: the
+   * box is sized from the attributes while the decoded pixels are fitted into
+   * it with object-fit's default of `fill`. The placeholder was square and
+   * these numbers were hardcoded to 1200x1200 to match it.
+   */
+  imageWidth: number;
+  imageHeight: number;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const baseId = useId();
@@ -66,9 +80,14 @@ export function FaqSections({
       <Image
         src={imageSrc}
         alt=""
-        width={1200}
-        height={1200}
+        width={imageWidth}
+        height={imageHeight}
         sizes="(min-width: 768px) 384px, 100vw"
+        /* No object-fit and no object-position on purpose. `w-full h-auto`
+           with the true intrinsic ratio means the whole frame is laid out and
+           the whole frame is painted, so there is no crop box for a face to
+           fall outside of at any width. object-position would only matter if
+           this were object-cover in a fixed-ratio box, which it is not. */
         className="h-auto w-full max-w-sm rounded-xl"
       />
       <div className="w-full md:flex-1">
