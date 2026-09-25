@@ -84,7 +84,16 @@ export function FaqSections({
               alt=""
               width={imageWidth}
               height={imageHeight}
-              sizes="(min-width: 768px) 42vw, 100vw"
+              /* NOT the layout width. object-cover crops horizontally here,
+                 so the intrinsic pixels needed are set by the box HEIGHT: the
+                 box is 4:5, the source 4:3, so the required width is
+                 boxWidth x 1.25 x 1.34 = boxWidth x 1.675. Describing the box
+                 width instead made the browser fetch a variant sized for 42vw
+                 when ~70vw of pixels were being painted, which is most of why
+                 this looked soft. The column measures 33-36vw from md up, so
+                 62vw covers it; 150vw is the same arithmetic against a
+                 full-width mobile box. */
+              sizes="(min-width: 768px) 62vw, 150vw"
               className="aspect-[4/5] w-full rounded-2xl object-cover"
             />
           </div>

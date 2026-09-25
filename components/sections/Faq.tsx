@@ -46,8 +46,8 @@ export function Faq() {
         intro={FAQ.intro}
         faqs={faqs}
         imageSrc="/images/faq/faq.webp"
-        imageWidth={800}
-        imageHeight={597}
+        imageWidth={2000}
+        imageHeight={1493}
       />
     </section>
   );
