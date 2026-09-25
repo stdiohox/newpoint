@@ -19,6 +19,14 @@ import { FAQ } from '@/lib/content';
  * mainEntity array, so the schema lists exactly the eight questions rendered
  * here, in the same order.
  *
+ * PADDING is py-20 md:py-28, down from py-24 md:py-32, matching
+ * <InsuranceProof /> directly above it. Measured on the page, the gap from the
+ * insurance section to this one goes 176 -> 160 on mobile and 240 -> 224 at
+ * desktop. It cannot go much below that from this side alone: InsuranceProof
+ * contributes 80/112 of it on its own, so matching the deliberately tight
+ * 112/72 that separates Providers from What to expect would need that section's
+ * bottom padding to move too, which was not in scope.
+ *
  * Server component. <FaqSections /> is the only client code, and it is a leaf.
  */
 export function Faq() {
@@ -31,7 +39,7 @@ export function Faq() {
   const faqs = FAQ.groups.flatMap((g): FaqItem[] => [...g.items]);
 
   return (
-    <section id="faq" className="py-24 md:py-32">
+    <section id="faq" className="py-20 md:py-28">
       <FaqSections
         eyebrow={FAQ.eyebrow}
         heading={FAQ.heading}
