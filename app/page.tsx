@@ -59,7 +59,8 @@ export default function Home() {
       <JsonLd schemas={schemas} />
 
       <div id="top" />
-      {/* The primary navigation now lives inside <Hero />, per the hero spec. */}
+      {/* The primary navigation is <Navbar1 />, rendered once in app/layout.tsx
+          for every route. It is not part of this page or of <Hero />. */}
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <Hero />
         <FeaturedServices />

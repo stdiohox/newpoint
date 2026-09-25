@@ -1,6 +1,6 @@
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
-import { ContactForm } from '@/components/ui/ContactForm';
+import { OnboardingForm } from '@/components/ui/onboarding-form';
 import { CONTACT, CRISIS, BUSINESS } from '@/lib/content';
 
 /**
@@ -11,24 +11,36 @@ import { CONTACT, CRISIS, BUSINESS } from '@/lib/content';
  * on a behavioral-health site, and CLAUDE.md requires it.
  *
  * The section closes on a human beat rather than another CTA.
+ *
+ * THE GROUND IS A GRADIENT, not the flat np-neutral-100 it used to be: the
+ * form is a white/70 glass card now, and glass over a flat fill is just a
+ * lighter flat fill. blue-50 → white gives the blur something to pick up at
+ * the top of the card and lets it resolve to plain white by the bottom.
+ *
+ * The heading and intro moved INTO the card, which is where the block puts
+ * them. The crisis panel and the practice phone line are untouched.
  */
 export function ContactCrisis() {
   return (
-    <section id="contact" className="bg-np-neutral-100 py-24 md:py-32">
+    <section
+      id="contact"
+      className="from-np-blue-50 bg-gradient-to-b to-white py-24 md:py-32"
+    >
       <Container>
         <div className="grid gap-14 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-7">
-            <Reveal>
-              <h2 className="text-h2">{CONTACT.heading}</h2>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <p className="text-body text-np-neutral-600 mt-4 max-w-[52ch]">{CONTACT.body}</p>
-            </Reveal>
-            <Reveal delay={0.16}>
-              <div className="mt-9">
-                <ContactForm />
-              </div>
-            </Reveal>
+            {/* No <Reveal> wrapper: the card runs its own staggered entrance
+                on whileInView, and nesting the two would fade the card in
+                twice over. */}
+            <OnboardingForm
+              className="max-w-xl"
+              imageSrc="/images/what-to-expect/request.webp"
+              title={CONTACT.heading}
+              description={CONTACT.body}
+              buttonText="Send"
+              reasons={CONTACT.reasons}
+              privacyNote={CONTACT.privacyNote}
+            />
           </div>
 
           <div className="md:col-span-5">
