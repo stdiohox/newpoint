@@ -40,25 +40,58 @@ const sizes = {
   },
 } as const;
 
+/**
+ * `glass` is the hero's treatment now that the photograph sits behind it: a
+ * translucent white fill over a backdrop blur rather than the solid np-sky
+ * pill. The label stays white and the disc goes white/90 with an np-blue-900
+ * arrow, so the arrow reads as cut out of the disc the way it does on np-sky.
+ *
+ * The focus ring is np-blue-900 in both, for the reason documented above: on
+ * this fill a white ring would vanish into the white resting ring.
+ */
+const variants = {
+  sky: {
+    root: 'bg-np-sky ring-1 ring-white',
+    disc: 'bg-white text-np-sky',
+  },
+  /**
+   * The fill is np-blue-900/35, NOT white/15 as first specified. White glass
+   * over this photograph cannot carry a white label: sampling the label's own
+   * rect found 142 pure white pixels in it, sunlit daisies reading straight
+   * through the 15% fill, for 1.0:1. Tinting the glass dark keeps the
+   * treatment, translucent over a backdrop blur with a white hairline, and
+   * gives the label something to sit on. The disc and arrow are as specified.
+   */
+  glass: {
+    root: 'bg-np-blue-900/35 backdrop-blur-md ring-1 ring-white/40 hover:bg-np-blue-900/50',
+    disc: 'bg-white/90 text-np-blue-900',
+  },
+} as const;
+
 export function ButtonWithIcon({
   href,
   children,
   size = 'md',
+  variant = 'sky',
 }: {
   href: string;
   children: React.ReactNode;
   size?: keyof typeof sizes;
+  variant?: keyof typeof variants;
 }) {
   const s = sizes[size];
+  const v = variants[variant];
   return (
     <a
       href={href}
-      className={`group bg-np-sky focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white ring-1 ring-white transition-all duration-500 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 ${s.root}`}
+      className={`group focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] motion-reduce:transition-none ${v.root} ${s.root}`}
     >
-      <span className="relative z-10 transition-all duration-500">{children}</span>
+      <span className="relative z-10 transition-all duration-500 motion-reduce:transition-none">
+        {children}
+      </span>
       <span
         aria-hidden="true"
-        className={`text-np-sky absolute right-1 flex items-center justify-center rounded-full bg-white transition-all duration-500 group-hover:rotate-45 ${s.disc}`}
+        className={`absolute right-1 flex items-center justify-center rounded-full transition-all duration-500 group-hover:rotate-45 motion-reduce:transition-none ${v.disc} ${s.disc}`}
       >
         <ArrowUpRight size={s.icon} />
       </span>
