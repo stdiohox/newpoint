@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHeader } from '@/components/PageHeader';
@@ -38,8 +37,6 @@ export default function ServicesIndex() {
           breadcrumbSchema([{ name: 'Services', path: '/services' }]),
         ]}
       />
-
-      <Nav />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           title="What we do, and how it works"

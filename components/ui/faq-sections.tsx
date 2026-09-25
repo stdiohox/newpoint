@@ -11,7 +11,7 @@ import Image from 'next/image';
  *
  * GRID is 5/12 image, 7/12 content, with a 64px gap, collapsing to one column
  * below md with the image on top. The image column is sticky from md up, offset
- * below the fixed navbar by --nav-h plus 2rem, so the photograph holds while
+ * below the sticky navbar by --nav-h plus 2rem, so the photograph holds while
  * the list scrolls past it.
  *
  * THE IMAGE IS object-cover IN A 4:5 BOX, so unlike the `w-full h-auto` version
@@ -75,7 +75,7 @@ export function FaqSections({
     <div className="px-6 md:px-12 lg:px-16">
       <div className="grid gap-8 md:grid-cols-12 md:gap-16">
         <div className="md:col-span-5">
-          {/* --nav-h is the fixed bar's height and also drives
+          {/* --nav-h is the sticky bar's height and also drives
               scroll-padding-top in globals.css. The extra 2rem keeps the
               photograph clear of the bar rather than tucked under it. */}
           <div className="md:sticky md:top-[calc(var(--nav-h)+2rem)]">

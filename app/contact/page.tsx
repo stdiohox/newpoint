@@ -1,4 +1,3 @@
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHeader } from '@/components/PageHeader';
@@ -38,8 +37,6 @@ export default function ContactPage() {
   return (
     <>
       <JsonLd schemas={[organizationRef(), contactPageSchema(), breadcrumbSchema(crumbs)]} />
-
-      <Nav />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} crumbs={crumbs} />
 

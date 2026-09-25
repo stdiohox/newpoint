@@ -194,8 +194,8 @@ export function Providers() {
    */
   return (
     <section id="providers" className="bg-np-neutral-50 pt-24 pb-9 md:pt-32 md:pb-14">
-      {/* Site gutters, NOT <Container>. The homepage header is <HeroNav />, not
-          <Nav />, and HeroNav is `fixed inset-x-0` with px-6 / md:px-12 /
+      {/* Site gutters, NOT <Container>. The site header is <Navbar1 />, a
+          floating pill inside px-6 / md:px-12 /
           lg:px-16 - uncapped, full page width minus the gutter. <Hero />'s own
           body uses that identical gutter scale. Matching it here is what makes
           the panel's edges land on the same vertical lines as the wordmark and

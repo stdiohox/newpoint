@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHeader } from '@/components/PageHeader';
@@ -64,8 +63,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           breadcrumbSchema(crumbs),
         ]}
       />
-
-      <Nav />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           eyebrow="Services"

@@ -130,7 +130,7 @@
        offset at 10%, well outside that discipline, so it is pulled back here. */
     /* Height of the sticky navbar. Consumed by scroll-padding-top above and by
        the hero nav's scroll threshold, so the two cannot drift. */
-    --nav-h: 72px;
+    --nav-h: 108px;
 
     --shadow-np-card: 0 2px 8px rgb(19 28 46 / 0.05);
     --shadow-np-lift: 0 4px 16px -4px rgb(19 28 46 / 0.06);
@@ -181,7 +181,8 @@
      17:1. Applied by adding `on-ink` to any dark section — the footer, the
      provider section, and the interior-page closing block all carry it, which
      is what makes the 988 and 911 links keyboard-visible.
-     HeroNav does the same thing inline for the video hero. */
+     The navbar no longer needs it: Navbar1 sits on a white pill rather than
+     on the hero image, so the default blue-600 outline applies there. */
   .on-ink :focus-visible {
     outline-color: #ffffff;
   }

@@ -1,4 +1,3 @@
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHeader } from '@/components/PageHeader';
@@ -33,8 +32,6 @@ export default function NewPatientsPage() {
           breadcrumbSchema([{ name: 'New patients', path: '/new-patients' }]),
         ]}
       />
-
-      <Nav />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHeader
           title={NEW_PATIENTS_PAGE.title}

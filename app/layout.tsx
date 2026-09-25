@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { cabinetGrotesk, switzer } from './fonts';
 import { BUSINESS } from '@/lib/content';
+import { Navbar1 } from '@/components/ui/navbar-1';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -82,6 +83,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
+        {/* One navbar for every route. It is STICKY rather than fixed, so it
+            reserves its own space on interior pages and no page needs to pad
+            for it. The homepage hero pulls itself up by --nav-h to sit under
+            it, which is the only special case. z-50 stays below the skip
+            link's z-70. */}
+        <div className="sticky top-0 z-50">
+          <Navbar1 />
+        </div>
         {children}
       </body>
     </html>

@@ -3,7 +3,6 @@ import { CTA, HERO, INSURANCE } from '@/lib/content';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { AnimatedHeading } from '@/components/ui/AnimatedHeading';
 import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
-import { HeroNav } from '@/components/ui/HeroNav';
 
 /**
  * Full-viewport photographic hero.
@@ -30,7 +29,9 @@ import { HeroNav } from '@/components/ui/HeroNav';
  * heading repeats it inline because the base layer sets a font-family directly
  * on `h1`, which would otherwise beat inheritance from this wrapper.
  *
- * This section also carries the site's primary navigation, in <HeroNav />.
+ * The navbar is no longer part of this section. <Navbar1 /> renders once in
+ * app/layout.tsx for every route and floats over this hero, which pulls itself
+ * up by --nav-h to sit beneath it.
  */
 
 const INTER = "'Inter', sans-serif";
@@ -38,7 +39,7 @@ const INTER = "'Inter', sans-serif";
 export function Hero() {
   return (
     <section
-      className="relative min-h-screen bg-black text-white"
+      className="relative -mt-[var(--nav-h)] min-h-screen bg-black text-white"
       style={{
         fontFamily: INTER,
         WebkitFontSmoothing: 'antialiased',
@@ -96,10 +97,10 @@ export function Hero() {
       />
 
       <div className="relative flex min-h-screen flex-col">
-        <HeroNav />
-
-        {/* pt matches --nav-h: the bar is fixed now, so it no longer reserves
-            its own space in this column. */}
+        {/* pt matches --nav-h, undoing the section's negative margin for the
+            content. The bar is sticky, so it does reserve its own space in the
+            document; the section pulls up by --nav-h so the photograph runs
+            behind it, and this padding puts the text back below it. */}
         <div className="flex flex-1 flex-col justify-end px-6 pt-[var(--nav-h)] pb-12 md:px-12 lg:grid lg:grid-cols-2 lg:items-end lg:px-16 lg:pb-16">
           <div>
             <FadeIn delay={100} duration={1000} className="mb-4">
@@ -138,12 +139,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-
-      {/* The navbar measures this to decide when to take its solid fill. Marking
-          the hero's real bottom edge rather than assuming a viewport height keeps
-          it correct when the hero grows past min-h-screen or the window resizes.
-          Its absence is also how <HeroNav /> detects a page with no hero. */}
-      <div id="hero-end" aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px" />
     </section>
   );
 }

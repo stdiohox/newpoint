@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
@@ -21,7 +20,6 @@ export const metadata = {
 export default function NotFound() {
   return (
     <>
-      <Nav />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <div className="py-24 md:py-32">
           <Container>
