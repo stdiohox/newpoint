@@ -94,11 +94,36 @@ interface OnboardingFormProps
   reasons: readonly string[];
   /** The "do not include health information" notice, rendered above the button. */
   privacyNote: string;
+  /**
+   * What a valid submit shows while nothing receives submissions.
+   *
+   * The sentence arrives in pieces because its phone number and addresses are
+   * rendered as real tel:/mailto: links. A caller that one day has a working
+   * backend swaps this branch for CONTACT.success rather than editing it.
+   */
+  unavailable: {
+    heading: string;
+    before: string;
+    between: string;
+    after: string;
+    phone: { label: string; href: string };
+    emails: readonly { label: string; href: string }[];
+  };
 }
 
 const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
   (
-    { className, imageSrc, title, description, buttonText, reasons, privacyNote, ...props },
+    {
+      className,
+      imageSrc,
+      title,
+      description,
+      buttonText,
+      reasons,
+      privacyNote,
+      unavailable,
+      ...props
+    },
     ref
   ) => {
     const [errors, setErrors] = useState<Errors>({});
@@ -112,20 +137,25 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       email: useRef<HTMLInputElement>(null),
       phone: useRef<HTMLInputElement>(null),
     };
-    const thanksRef = useRef<HTMLHeadingElement>(null);
+    const noticeRef = useRef<HTMLHeadingElement>(null);
 
     /**
-     * Send focus into the success message once it replaces the form.
+     * Send focus into the notice once it replaces the form.
      *
      * Two things need this. The form that held focus has just unmounted, so
      * without it focus falls to <body> and a keyboard user restarts from the
      * top of the document. And role="status" on a node that is mounted at the
      * moment of the update is not reliably announced — several AT and browser
      * pairings only watch live regions that were already in the tree — so
-     * moving focus here is what actually gets the confirmation read out.
+     * moving focus here is what actually gets the notice read out.
+     *
+     * It matters more now than it did for a thank-you. The notice is not a
+     * courtesy: it carries the only working way to reach the practice, and it
+     * is followed by two links the visitor is being asked to use. Landing on
+     * its heading puts those links next in the tab order.
      */
     useEffect(() => {
-      if (submitted) thanksRef.current?.focus();
+      if (submitted) noticeRef.current?.focus();
     }, [submitted]);
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -165,16 +195,19 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       setIsSubmitting(true);
       try {
         /*
-         * CLIENT: no submission endpoint is wired yet. Before launch, post to
-         * a BAA-covered handler. NOT a plain mail relay: a name arriving
-         * alongside reason "Existing patient", on this domain, identifies
-         * someone as receiving behavioral-health treatment, which makes the
-         * payload PHI and the relay an uncovered disclosure. Do not add PHI
-         * fields either.
+         * CLIENT: no submission endpoint is wired yet. Needs a BAA-covered
+         * form backend before launch. Before launch, post to a BAA-covered
+         * handler. NOT a plain mail relay: a name arriving alongside reason
+         * "Existing patient", on this domain, identifies someone as receiving
+         * behavioral-health treatment, which makes the payload PHI and the
+         * relay an uncovered disclosure. Do not add PHI fields either.
          *
          * Until then this resolves immediately, so the spinner is wired but
-         * never visibly spins, and the success message below claims a receipt
-         * that nothing actually took. See the note in ContactCrisis.tsx.
+         * never visibly spins, and a valid submit renders CONTACT.unavailable
+         * — the honest "online requests aren't active yet" hand-off to the
+         * phone and the provider addresses — rather than CONTACT.success,
+         * which would claim a receipt that nothing actually took. Restore the
+         * success branch and this POST together, not separately.
          */
         await Promise.resolve();
         setSubmitted(true);
@@ -236,15 +269,41 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
           </motion.div>
 
           {submitted ? (
+            /*
+             * NOT a success message. Nothing receives this form, so the one
+             * useful thing it can do on submit is hand over a channel that
+             * works. role="status" is polite rather than assertive: the focus
+             * move below is what guarantees the announcement, and an alert
+             * would interrupt on top of it.
+             */
             <div role="status" className="py-4">
               {/* tabIndex={-1} so the effect above can move focus here. It is
                   not in the tab order; it is only a focus destination. */}
-              <h3 ref={thanksRef} tabIndex={-1} className="text-h3 focus:outline-none">
-                Thank you
+              <h3 ref={noticeRef} tabIndex={-1} className="text-h3 focus:outline-none">
+                {unavailable.heading}
               </h3>
               <p className="text-body text-np-neutral-600 mt-3">
-                We have your details and will be in touch about an appointment. If you need to
-                reach us sooner, please call the practice.
+                {unavailable.before}{' '}
+                <a
+                  href={unavailable.phone.href}
+                  className="text-np-blue-600 underline underline-offset-2"
+                >
+                  {unavailable.phone.label}
+                </a>{' '}
+                {unavailable.between}{' '}
+                {/* Both provider addresses. There is no practice-wide inbox —
+                    see the note on CONTACT.unavailable. The separator is
+                    rendered between items rather than after each so the
+                    sentence does not trail "or" into its closing clause. */}
+                {unavailable.emails.map((e, i) => (
+                  <React.Fragment key={e.href}>
+                    {i > 0 && ' or '}
+                    <a href={e.href} className="text-np-blue-600 underline underline-offset-2">
+                      {e.label}
+                    </a>
+                  </React.Fragment>
+                ))}{' '}
+                {unavailable.after}
               </p>
             </div>
           ) : (

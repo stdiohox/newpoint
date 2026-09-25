@@ -40,6 +40,22 @@ export function ContactCrisis() {
               buttonText="Send"
               reasons={CONTACT.reasons}
               privacyNote={CONTACT.privacyNote}
+              /* Composed here rather than in content.ts so the copy stays
+                 strings and the hrefs stay derived from BUSINESS, which is the
+                 single source for the practice's NAP data. Both provider
+                 addresses, because there is no practice-wide inbox — same
+                 resolution app/contact/page.tsx already reached. */
+              unavailable={{
+                ...CONTACT.unavailable,
+                phone: {
+                  label: BUSINESS.phonePrimary,
+                  href: `tel:${BUSINESS.phonePrimaryHref}`,
+                },
+                emails: Object.values(BUSINESS.emails).map((address) => ({
+                  label: address,
+                  href: `mailto:${address}`,
+                })),
+              }}
             />
           </div>
 
