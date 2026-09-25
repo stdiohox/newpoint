@@ -1,6 +1,10 @@
 # Design Synthesis v2 — proposal
 
-**Status: PROPOSAL. Nothing implemented.** v1 ([`design-synthesis.md`](design-synthesis.md), [`design-tokens.md`](design-tokens.md)) remains intact and is still what ships today.
+> **Proposal, not adopted except amber retirement (2026-09-25)**
+
+**Status: PROPOSAL. Reference only.** Reviewed 2026-09-25. Exactly one item was adopted — the retirement of the amber accent — and it is now live in `app/globals.css`. Everything else was **declined**: no serif display (the current fonts stay), no dark hero (the meadow hero stays exactly as it is), the section order is unchanged, and the Providers blue panel stays dark rather than moving into the light. The floating pill nav shipped separately and does not derive from this document. Build nothing else from this file.
+
+v1 ([`design-synthesis.md`](design-synthesis.md), [`design-tokens.md`](design-tokens.md)) remains what ships today, amber aside.
 
 **Date:** 2026-08-28
 **Inputs:** [`references/superpower.md`](references/superpower.md), [`references/grove-ai.md`](references/grove-ai.md), [`references/mintlify.md`](references/mintlify.md), reconciled against [`../research/`](../research/) and v1.

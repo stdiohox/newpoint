@@ -48,9 +48,23 @@
      the label back under AA. */
   --color-np-sky: #4a76a4;
 
-  /* Single accent. Small non-text surfaces only, never text on light. */
-  --color-np-amber-500: #e9a93c;
-  --color-np-amber-100: #fbeed5;
+  /* AMBER RETIRED 2026-09-25. --color-np-amber-500 (#e9a93c) and its tint
+     --color-np-amber-100 (#fbeed5) are gone. This is the one part of
+     design-research/design-synthesis-v2.md that was adopted; the rest of that
+     proposal was declined and the docs are kept for reference only.
+
+     Nothing referenced either token at the point of removal. Amber's two
+     documented jobs had already moved off it: the step numerals in
+     app/new-patients/page.tsx carry np-blue-600 (see the comment there), and
+     the provider credentials render in np-neutral-600 on light and white/50
+     on the dark panel. So this removes two definitions, not two usages.
+
+     np-blue-600 is the accent now, and it is the reason the retirement costs
+     nothing: amber could never legally carry text on any light ground in this
+     system — 1.97:1 on np-neutral-50, 2.06:1 on np-surface, 1.84:1 on
+     np-neutral-100, all far below the 4.5:1 floor — while np-blue-600 clears
+     AA on every one of them (8.47, 8.84, 7.90 respectively). Do not
+     reintroduce a second accent. */
 
   /* Semantic */
   --color-np-success: #2f7d4f;

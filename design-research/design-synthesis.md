@@ -88,6 +88,8 @@ Four peers reach for a serif display. Newpoint uses **Cabinet Grotesk** for disp
 **5. One accent, rationed.**
 A warm amber `#E9A93C`, borrowed in spirit from Talkiatry's slate-plus-yellow, which is the most differentiated color decision in the peer set. It appears only on small non-text surfaces: active indicators, rule markers, icon fills. It never carries a section background and never carries text on a light ground.
 
+> **Superseded 2026-09-25.** Amber is retired; the rationed accent is now the brand blue `--np-blue-600` `#234598`. The principle — one accent, strictly rationed — is unchanged and still holds. Only the colour did.
+
 **6. Motion at intensity 4, and no higher.**
 Scroll reveal at short travel distance, hover effects, press feedback, accordion collapse. That is the complete inventory. No parallax, no pinned sections, no marquee, no scroll hijack. Springs are critically damped by default, with bounce reserved for nothing on this site, because there is no momentum-driven interaction anywhere in the brief.
 

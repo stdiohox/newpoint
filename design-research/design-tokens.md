@@ -44,12 +44,16 @@ The neutral ramp is warm (yellow-shifted), not cool grey. This is where the cate
 
 ### 1.3 Accent
 
+> **Superseded 2026-09-25: amber is retired and both tokens are deleted from `app/globals.css`.** The accent is now `--np-blue-600` `#234598`. The table below is kept as the record of what v1 specified; it no longer describes the shipping system. See § 1.4 of [`design-tokens-v2.md`](design-tokens-v2.md).
+
 | Token | Hex | Notes |
 |---|---|---|
-| `--np-amber-500` | `#E9A93C` | The single accent. Small non-text surfaces only |
-| `--np-amber-100` | `#FBEED5` | Tint wash |
+| `--np-amber-500` | `#E9A93C` | ~~The single accent. Small non-text surfaces only~~ **Retired 2026-09-25** |
+| `--np-amber-100` | `#FBEED5` | ~~Tint wash~~ **Retired 2026-09-25** |
 
 **Hard rule, verified by calculation:** amber on the light ground measures **1.97:1** and fails WCAG at every size. It must never carry text on `--np-neutral-50`. On `--np-ink` it measures **8.28:1** and is safe. Use it for active indicators, rule markers, and icon fills, never for body or link text on light.
+
+That hard rule is what made amber cheap to retire: it was barred from text everywhere except the ink panel, so no text moved. `--np-blue-600` carries the accent job with 8.47:1 on `--np-neutral-50` and 8.84:1 on `--np-surface`, clearing AA for text at any size.
 
 ### 1.4 Semantic
 
@@ -271,4 +275,4 @@ Consequences for the build, all provisional:
 
 1. **Type pairing** is a recommendation. If the client has a brand guide, per the redesign protocol it wins over this proposal.
 2. **The logo is not redesigned.** The existing mark (blue medical cross with a white human figure, plus the "Your Health is our Priority" tagline) carries forward unchanged until the client explicitly asks otherwise. The original vector file is still an open request.
-3. **`--np-amber-500` is the one accent.** If the client's brand guide names a different secondary, replace it globally rather than adding a second accent.
+3. ~~**`--np-amber-500` is the one accent.**~~ **Resolved 2026-09-25: amber is retired and `--np-blue-600` is the one accent.** The rule it carried still stands — if the client's brand guide names a different secondary, replace it globally rather than adding a second accent.

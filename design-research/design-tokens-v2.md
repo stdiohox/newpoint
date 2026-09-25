@@ -1,6 +1,8 @@
 # Design Tokens v2 — proposal
 
-**Status: PROPOSAL. Not implemented.** [`design-tokens.md`](design-tokens.md) (v1) is untouched and is what ships today. Companion to [`design-synthesis-v2.md`](design-synthesis-v2.md).
+> **Proposal, not adopted except amber retirement (2026-09-25)**
+
+**Status: PROPOSAL. Reference only.** Reviewed 2026-09-25. The only token change adopted from this file is the retirement of `--np-amber-500` and `--np-amber-100` (§ 1.4, and see the note in `app/globals.css`). No other token here — type ramp, spacing, radii, elevation, motion — was taken up. [`design-tokens.md`](design-tokens.md) (v1) is what ships today, amber aside. Companion to [`design-synthesis-v2.md`](design-synthesis-v2.md).
 
 All contrast ratios below are **calculated** with the WCAG relative-luminance formula, not estimated. Failing pairs are recorded as hard rules rather than quietly avoided.
 
