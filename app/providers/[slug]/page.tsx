@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
-import { PageHeader } from '@/components/PageHeader';
+import { PageHero } from '@/components/PageHero';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
@@ -80,7 +80,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     <>
       <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHeader
+        <PageHero
           eyebrow="Provider"
           title={`${provider.name}, ${provider.credentials}`}
           intro={provider.bio}

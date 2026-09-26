@@ -1,6 +1,6 @@
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
-import { PageHeader } from '@/components/PageHeader';
+import { PageHero } from '@/components/PageHero';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
@@ -39,7 +39,7 @@ export default function ContactPage() {
     <>
       <JsonLd schemas={[organizationRef(), contactPageSchema(), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHeader title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} crumbs={crumbs} />
+        <PageHero title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} crumbs={crumbs} />
 
         <div className="py-20 md:py-28">
           <Container>

@@ -1,11 +1,11 @@
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
-import { PageHeader } from '@/components/PageHeader';
+import { PageHero } from '@/components/PageHero';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { GETTING_STARTED, NEW_PATIENTS_PAGE } from '@/lib/content';
+import { GETTING_STARTED, NEW_PATIENTS_PAGE, cardPosterFor } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef } from '@/lib/schema';
 
@@ -24,6 +24,8 @@ export const metadata = pageMetadata({
 });
 
 export default function NewPatientsPage() {
+  const poster = cardPosterFor('/new-patients');
+
   return (
     <>
       <JsonLd
@@ -33,10 +35,11 @@ export default function NewPatientsPage() {
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHeader
+        <PageHero
           title={NEW_PATIENTS_PAGE.title}
           intro={NEW_PATIENTS_PAGE.intro}
           crumbs={[{ name: 'New patients', path: '/new-patients' }]}
+          image={poster ? { src: poster } : undefined}
         />
 
         <div className="py-20 md:py-28">
@@ -117,8 +120,19 @@ export default function NewPatientsPage() {
             </div>
 
             <Reveal delay={0.1}>
-              <aside className="rounded-card border-np-blue-600 bg-np-surface mt-20 border-l-2 p-7 ring-1 ring-[var(--np-alpha-ink-08)] md:p-9">
-                <h2 className="text-h3">{NEW_PATIENTS_PAGE.privacyHeading}</h2>
+              {/* Same card treatment as CrisisPanel and the contact cards:
+                  white, hairline np-neutral-200, rounded-2xl. The blue-600
+                  left bar is gone for the reason recorded on CrisisPanel — on
+                  a page read by people about to start psychiatric care, a
+                  warning-callout bar is the one element that raises the
+                  temperature. The copy inside is unchanged. */}
+              <aside
+                aria-labelledby="privacy-heading"
+                className="bg-np-surface border-np-neutral-200 mt-20 rounded-2xl border p-7 md:p-9"
+              >
+                <h2 id="privacy-heading" className="text-h3">
+                  {NEW_PATIENTS_PAGE.privacyHeading}
+                </h2>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[70ch]">
                   {NEW_PATIENTS_PAGE.privacyBody}
                 </p>
@@ -126,14 +140,14 @@ export default function NewPatientsPage() {
                   If you need help now, call or text{' '}
                   <a
                     href="tel:988"
-                    className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                    className="text-np-blue-600 font-medium underline underline-offset-4"
                   >
                     988
                   </a>{' '}
                   for the Suicide and Crisis Lifeline. In an emergency, call{' '}
                   <a
                     href="tel:911"
-                    className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                    className="text-np-blue-600 font-medium underline underline-offset-4"
                   >
                     911
                   </a>{' '}

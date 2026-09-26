@@ -1,13 +1,13 @@
 import { notFound } from 'next/navigation';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
-import { PageHeader } from '@/components/PageHeader';
+import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { SERVICE_PAGES, PROVIDERS } from '@/lib/content';
+import { SERVICE_PAGES, PROVIDERS, cardPosterFor } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, faqSchemaFlat, organizationRef, serviceSchemaFor } from '@/lib/schema';
 
@@ -46,6 +46,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   if (!service) notFound();
 
   const siblings = SERVICE_PAGES.filter((s) => s.slug !== service.slug);
+  const poster = cardPosterFor(`/services/${service.slug}`);
 
   /** One trail, used for both the visible breadcrumb and the schema, so the two cannot drift. */
   const crumbs = [
@@ -64,11 +65,14 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHeader
+        <PageHero
           eyebrow="Services"
           title={service.title}
           intro={service.intro}
           crumbs={crumbs}
+          /* The same frame the homepage card for this service shows at rest,
+             so arriving here from that card is continuous. */
+          image={poster ? { src: poster } : undefined}
         />
 
         <div className="py-20 md:py-28">
@@ -76,25 +80,43 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             <div className="grid gap-12 md:grid-cols-12 md:gap-16">
               {/* Sticky in-page contents. On a long page reached from search, this
                   is what tells a reader the page answers their question. */}
-              <nav aria-label="On this page" className="md:col-span-4">
+              <div className="md:col-span-4">
                 <div className="md:sticky md:top-28">
-                  <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                    On this page
-                  </h2>
-                  <ul role="list" className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4">
-                    {service.sections.map((section) => (
-                      <li key={section.heading}>
-                        <a
-                          href={`#${slugify(section.heading)}`}
-                          className="text-small text-np-neutral-600 hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]"
-                        >
-                          {section.heading}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                  <nav aria-label="On this page">
+                    <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                      On this page
+                    </h2>
+                    <ul role="list" className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4">
+                      {service.sections.map((section) => (
+                        <li key={section.heading}>
+                          <a
+                            href={`#${slugify(section.heading)}`}
+                            className="text-small text-np-neutral-600 hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]"
+                          >
+                            {section.heading}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+
+                  {/* How care is delivered, in the same words the service's own
+                    homepage card uses, so the two cannot disagree. The body
+                    sections describe what the service IS; none of them stated
+                    the modality outright, which left it on the card and in the
+                    FAQ but nowhere on the page itself. Outside the <nav>
+                    because it is page content, not navigation. */}
+                  <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
+                    {/* h3, not h2: "On this page" above it is already an h2, and
+                        two sidebar labels ahead of the first topical heading
+                        pushes UI chrome to the front of the heading outline. */}
+                    <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                      How it is delivered
+                    </h3>
+                    <p className="text-body text-np-ink mt-2">{service.modality}</p>
+                  </div>
                 </div>
-              </nav>
+              </div>
 
               <div className="md:col-span-8">
                 {service.sections.map((section, i) => (

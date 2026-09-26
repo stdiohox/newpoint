@@ -1,6 +1,6 @@
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
-import { PageHeader } from '@/components/PageHeader';
+import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
@@ -35,7 +35,7 @@ export default function InsurancePage() {
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHeader
+        <PageHero
           title={INSURANCE_PAGE.title}
           intro={INSURANCE_PAGE.intro}
           crumbs={[{ name: 'Insurance', path: '/insurance' }]}

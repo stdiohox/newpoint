@@ -46,12 +46,22 @@ const sizes = {
  * pill. The label stays white and the disc goes white/90 with an np-blue-900
  * arrow, so the arrow reads as cut out of the disc the way it does on np-sky.
  *
- * The focus ring is np-blue-900 in both, for the reason documented above: on
- * this fill a white ring would vanish into the white resting ring.
+ * THE FOCUS RING IS PER-VARIANT, and that is the point. It used to be
+ * np-blue-900 on both, on the reasoning that a white ring would vanish into the
+ * button's own white resting hairline. That reasoning missed where the ring
+ * actually lands: outline-offset-2 draws it OUTSIDE the pill, on whatever the
+ * button sits on. For `glass` that is the hero scrim, which is literally
+ * np-blue-900 — so the ring was the same colour as its own background, 1:1,
+ * failing SC 1.4.11 outright on every hero. White measures about 16:1 there,
+ * and the 2px offset keeps it clear of the white/40 hairline it was supposed to
+ * be confused with.
+ *
+ * `sky` keeps np-blue-900: that pill is np-sky (#4a76a4), where the ring
+ * measures 3.39:1, and it is used on light grounds where white would vanish.
  */
 const variants = {
   sky: {
-    root: 'bg-np-sky ring-1 ring-white',
+    root: 'bg-np-sky ring-1 ring-white focus-visible:outline-np-blue-900',
     disc: 'bg-white text-np-sky',
   },
   /**
@@ -63,7 +73,7 @@ const variants = {
    * gives the label something to sit on. The disc and arrow are as specified.
    */
   glass: {
-    root: 'bg-np-blue-900/35 backdrop-blur-md ring-1 ring-white/40 hover:bg-np-blue-900/50',
+    root: 'bg-np-blue-900/35 backdrop-blur-md ring-1 ring-white/40 hover:bg-np-blue-900/50 focus-visible:outline-white',
     disc: 'bg-white/90 text-np-blue-900',
   },
 } as const;
@@ -84,7 +94,7 @@ export function ButtonWithIcon({
   return (
     <a
       href={href}
-      className={`group focus-visible:outline-np-blue-900 relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] motion-reduce:transition-none ${v.root} ${s.root}`}
+      className={`group relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] motion-reduce:transition-none ${v.root} ${s.root}`}
     >
       <span className="relative z-10 transition-all duration-500 motion-reduce:transition-none">
         {children}

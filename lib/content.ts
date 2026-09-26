@@ -282,6 +282,22 @@ export type ServicePage = {
   metaTitle: string;
   metaDescription: string;
   intro: string;
+  /**
+   * How this service is delivered, in one sentence.
+   *
+   * Deliberately NOT read off the homepage card's `footerText`. That field is
+   * card chrome; promoted to a titled card on a page whose metaTitle is scoped
+   * "in NJ and PA", "In person and by telehealth" reads in-person-first on a
+   * state-scoped page, which is the exact composition CLAUDE.md's care-modality
+   * rule exists to prevent. These put telehealth first and bind the states to
+   * it, matching the phrasing the evaluation FAQ already uses.
+   *
+   * Only psychiatric evaluation carries the state scope, because only its own
+   * content states it (see its "Can the evaluation be done by telehealth?"
+   * FAQ). Medication management says telehealth and in person without a
+   * geography, because nothing in its own content scopes it.
+   */
+  modality: string;
   sections: { heading: string; body: string; list?: string[] }[];
   faqs: { q: string; a: string }[];
 };
@@ -297,6 +313,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       'What happens at a comprehensive psychiatric evaluation in New Jersey and Pennsylvania: full history, rating scales, a diagnosis, and a treatment plan.',
     intro:
       'Every patient at Newpoint starts here. A comprehensive psychiatric evaluation is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
+    modality: 'By telehealth across New Jersey and Pennsylvania, and in person.',
     sections: [
       {
         heading: 'What the evaluation covers',
@@ -352,6 +369,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       'Ongoing psychiatric medication management in New Jersey and Pennsylvania, with standardized rating scales used to track how you are responding.',
     intro:
       'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting treatment as your response becomes clear. Both of our providers are psychiatric mental health nurse practitioners, so the person prescribing your medication is the same person tracking how it is working.',
+    modality: 'By telehealth and in person.',
     sections: [
       {
         heading: 'Prescribing that follows the plan',
@@ -421,6 +439,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       'Psychiatric appointments by video across New Jersey and Pennsylvania, on an expanded schedule including weekends, evenings, and holidays by request.',
     intro:
       'Both of our providers are licensed in New Jersey and Pennsylvania, and both see patients by telehealth. For a lot of people it is the difference between keeping psychiatric care going and quietly letting it lapse.',
+    modality: 'By telehealth across New Jersey and Pennsylvania.',
     sections: [
       {
         heading: 'An expanded schedule',
@@ -695,6 +714,17 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     displayOrder: 4,
   },
 ];
+
+/**
+ * The homepage card image for a route, so an interior page's hero and the card
+ * that links to it show the same frame. Returns the poster rather than the
+ * video: a hero is a still, and the poster is the frame the card shows at rest
+ * anyway. Undefined for any route with no card, which is the signal to fall
+ * back to the gradient.
+ */
+export function cardPosterFor(href: string): string | undefined {
+  return FEATURED_SERVICES.find((service) => service.href === href)?.poster;
+}
 
 export const FAQ = {
   /**
