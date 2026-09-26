@@ -115,10 +115,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             reserves its own space on interior pages and no page needs to pad
             for it. The homepage hero pulls itself up by --nav-h to sit under
             it, which is the only special case. z-50 stays below the skip
-            link's z-70. */}
-        <div className="sticky top-0 z-50">
+            link's z-70.
+
+            A <header>, not a <div>: as a direct child of <body> this is the
+            site's banner landmark, and it was the only thing missing one. Every
+            route audited at 0 banners before this — the PageHero <header> sits
+            inside <main>, which correctly does NOT compute to banner, so there
+            was nothing for a screen-reader user to jump to. Purely semantic;
+            nothing about the layout or the sticky behaviour changes. */}
+        <header className="sticky top-0 z-50">
           <Navbar1 />
-        </div>
+        </header>
         {children}
       </body>
     </html>
