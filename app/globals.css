@@ -207,6 +207,57 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Entrance start states.
+
+   NOTHING ON THIS SITE MAY SHIP HIDDEN IN THE SERVER-RENDERED HTML. Motion
+   serialises an `initial` prop into the style attribute during SSR, so an
+   element that animates in from opacity 0 arrives invisible and stays that way
+   if JS is disabled, blocked, still loading, or throws during hydration. That
+   previously applied to the crisis panel, the whole contact form, the primary
+   navigation and the hero H1 — i.e. every route was unreadable without JS.
+
+   So the hidden state is expressed here instead, behind two gates that both
+   fail open:
+
+     .js    added by the inline script in app/layout.tsx before first paint.
+            Absent when scripting is off, so the content is simply visible.
+     media  no-preference only. A reduced-motion visitor never gets a start
+            state at all, which is stronger than animating instantly.
+
+   Components mark themselves with data-enter and re-apply the same values as
+   inline styles once useHydrated() flips (see lib/useHydrated.ts). The CSS and
+   the inline values are deliberately identical, so the handover does not flash.
+
+   Keep every value here in sync with the matching component. If you add a
+   direction, add it in both places.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-enter] {
+    opacity: 0;
+  }
+  /* Reveal */
+  .js [data-enter='up'] {
+    transform: translateY(16px);
+  }
+  /* OnboardingForm's staggered children */
+  .js [data-enter='up-sm'] {
+    transform: translateY(10px);
+  }
+  /* Navbar links */
+  .js [data-enter='down'] {
+    transform: translateY(-10px);
+  }
+  /* Navbar CTA */
+  .js [data-enter='right'] {
+    transform: translateX(20px);
+  }
+  /* AnimatedHeading's per-character spans */
+  .js [data-enter='left'] {
+    transform: translateX(-18px);
+  }
+}
+
 /* MOTION_INTENSITY 4. Reduced motion is mandatory at this level. */
 @media (prefers-reduced-motion: reduce) {
   *,

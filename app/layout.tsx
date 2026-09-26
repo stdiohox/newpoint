@@ -50,10 +50,38 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cabinetGrotesk.variable} ${switzer.variable}`}>
+    /* suppressHydrationWarning because the inline script in <head> adds the
+       `js` class to this element before React hydrates, so the className React
+       finds here legitimately differs from the one the server sent. It applies
+       to this element only and does not extend into the tree. */
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${cabinetGrotesk.variable} ${switzer.variable}`}
+    >
       {/* Inter is loaded for the hero section only. The site's type stack stays
           Cabinet Grotesk + Switzer; see the hero wrapper in components/sections/Hero.tsx. */}
       <head>
+        {/*
+         * Marks the document as scripted, before first paint.
+         *
+         * Every entrance animation on this site hides its element to begin
+         * with. That hidden state lives in CSS behind this class (see the
+         * [data-enter] block in globals.css) rather than in a server-rendered
+         * inline style, so that markup which arrives without working JS is
+         * never invisible. The class is what tells CSS "JS is running, so
+         * something will animate this back in".
+         *
+         * It must stay a plain synchronous script in <head>: next/script, or
+         * anything deferred, runs after first paint, which would show the
+         * content and then hide it again. beforeInteractive is not available
+         * to a Server Component here.
+         */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.classList.add('js')`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link

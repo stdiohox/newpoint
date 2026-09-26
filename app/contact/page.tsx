@@ -5,8 +5,9 @@ import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
+import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { stagger } from '@/lib/motion';
-import { BUSINESS, CONTACT_PAGE, CTA, CRISIS, PROVIDERS } from '@/lib/content';
+import { BUSINESS, CONTACT_PAGE, CTA, PROVIDERS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, contactPageSchema, organizationRef } from '@/lib/schema';
 
@@ -186,35 +187,10 @@ export default function ContactPage() {
                   and a chip list before reaching 988. */}
               <div className="order-first md:order-none md:col-span-5">
                 <Reveal delay={0.12}>
-                  <aside
-                    aria-labelledby="crisis-heading"
-                    className="rounded-card border-np-blue-600 bg-np-surface sticky top-28 border-l-2 p-6 ring-1 ring-[var(--np-alpha-ink-08)] md:p-8"
-                  >
-                    <h2 id="crisis-heading" className="text-h3">
-                      {CRISIS.heading}
-                    </h2>
-                    <p className="text-small text-np-neutral-600 mt-3">{CRISIS.body}</p>
-                    <ul role="list" className="mt-6 space-y-5">
-                      {CRISIS.items.map((item) => (
-                        <li key={item.label}>
-                          {/* aria-label, not bare "988": in a screen reader's
-                              links list the number alone is indistinguishable
-                              from any other three digits on the page. */}
-                          <a
-                            href={item.href}
-                            aria-label={`${item.label}, ${item.title}`}
-                            className="font-display text-h3 text-np-blue-600 ease-np-out hover:text-np-blue-700 underline-offset-4 transition-colors duration-[180ms] hover:underline"
-                          >
-                            {item.label}
-                          </a>
-                          <p className="text-small text-np-ink mt-1 font-medium">{item.title}</p>
-                          <p className="text-small text-np-neutral-600 mt-1 max-w-[40ch]">
-                            {item.body}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </aside>
+                  {/* h2 here, not the homepage's h3: this panel is a sibling of
+                      the page's other h2 sections rather than sitting under
+                      one. */}
+                  <CrisisPanel headingAs="h2" className="sticky top-28" />
                 </Reveal>
               </div>
             </div>

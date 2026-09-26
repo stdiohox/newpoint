@@ -810,6 +810,16 @@ export const CONTACT = {
   },
 } as const;
 
+/**
+ * `textable` records whether the line accepts SMS, and is a clinical fact, not
+ * a presentation flag — which is why it lives here beside the number rather
+ * than in whichever component happens to render it.
+ *
+ * 988 accepts text nationwide. 911 does not: text-to-911 depends on the local
+ * PSAP supporting it and is not available everywhere, so offering a Text
+ * button would promise a route that can silently go nowhere in an emergency.
+ * Any line added here must have this checked, not guessed.
+ */
 export const CRISIS = {
   heading: 'If you need help now',
   body: 'This website is not for emergencies and is not monitored around the clock.',
@@ -817,12 +827,14 @@ export const CRISIS = {
     {
       label: '988',
       href: 'tel:988',
+      textable: true,
       title: 'Suicide and Crisis Lifeline',
       body: 'Call or text 988, any time, for free and confidential support in a crisis.',
     },
     {
       label: '911',
       href: 'tel:911',
+      textable: false,
       title: 'Medical emergency',
       body: 'Call 911 or go to your nearest emergency room if you or someone else is in immediate danger.',
     },

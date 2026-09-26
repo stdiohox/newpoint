@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Menu, X } from 'lucide-react';
 import { NAV, CTA, BUSINESS } from '@/lib/content';
+import { useHydrated } from '@/lib/useHydrated';
 
 /**
  * The supplied Navbar1 block. Layout, classes and motion are the block's; the
@@ -41,6 +42,7 @@ const DESKTOP = '(min-width: 70em)';
 export function Navbar1() {
   const [isOpen, setIsOpen] = useState(false);
   const reduce = useReducedMotion();
+  const hydrated = useHydrated();
   const pathname = usePathname();
   const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -202,8 +204,15 @@ export function Navbar1() {
           {NAV.map((item) => (
             <motion.div
               key={item.href}
-              initial={reduce ? false : { opacity: 0, y: -10 }}
-              animate={reduce ? undefined : { opacity: 1, y: 0 }}
+              /* The start state is CSS, never a server-rendered inline style:
+                 the primary navigation must not need JS to be visible. Motion
+                 writes nothing on the server because `initial` is false and
+                 `animate` is undefined until hydration; once `animate` lands it
+                 picks the hidden values up from the computed style that the
+                 .js-gated [data-enter] rule applied before first paint. */
+              data-enter="down"
+              initial={false}
+              animate={hydrated && !reduce ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.3 }}
               whileHover={reduce ? undefined : { scale: 1.05 }}
             >
@@ -220,8 +229,10 @@ export function Navbar1() {
 
         <motion.div
           className="hidden min-[70em]:block"
-          initial={reduce ? false : { opacity: 0, x: 20 }}
-          animate={reduce ? undefined : { opacity: 1, x: 0 }}
+          /* Same handover as the nav links above. */
+          data-enter="right"
+          initial={false}
+          animate={hydrated && !reduce ? { opacity: 1, x: 0 } : undefined}
           transition={{ duration: 0.3, delay: 0.2 }}
           whileHover={reduce ? undefined : { scale: 1.05 }}
         >
