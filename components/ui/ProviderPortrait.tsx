@@ -16,10 +16,17 @@ export function ProviderPortrait({
   provider,
   className = '',
   sizes = '(min-width: 768px) 240px, 160px',
+  loading = 'lazy',
 }: {
   provider: Provider;
   className?: string;
   sizes?: string;
+  /**
+   * Lazy by default, which is right for the homepage grid well below the fold.
+   * The provider page renders this as its first content and it is that route's
+   * likely LCP element, so it passes 'eager'.
+   */
+  loading?: 'lazy' | 'eager';
 }) {
   const { image } = provider;
   return (
@@ -37,7 +44,8 @@ export function ProviderPortrait({
         alt={image.alt}
         width={560}
         height={560}
-        loading="lazy"
+        loading={loading}
+        fetchPriority={loading === 'eager' ? 'high' : undefined}
         decoding="async"
         className={`rounded-media bg-np-neutral-50 object-cover ${className}`}
       />

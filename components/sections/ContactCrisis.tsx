@@ -1,74 +1,103 @@
+import { Phone } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
-import { ContactForm } from '@/components/ui/ContactForm';
-import { CONTACT, CRISIS, BUSINESS } from '@/lib/content';
+import { CrisisPanel } from '@/components/ui/CrisisPanel';
+import { OnboardingForm } from '@/components/ui/onboarding-form';
+import { CONTACT, BUSINESS } from '@/lib/content';
 
 /**
  * Layout family: contained form beside a crisis panel.
  *
- * Crisis guidance is styled calm and clearly readable, deliberately not as an
- * alarm banner. The audit flags its total absence on the current site as a gap
- * on a behavioral-health site, and CLAUDE.md requires it.
- *
  * The section closes on a human beat rather than another CTA.
+ *
+ * THE GROUND IS A GRADIENT, not the flat np-neutral-100 it used to be: the
+ * form is a white/70 glass card now, and glass over a flat fill is just a
+ * lighter flat fill. blue-50 → white gives the blur something to pick up at
+ * the top of the card and lets it resolve to plain white by the bottom.
+ *
+ * The heading and intro moved INTO the card, which is where the block puts
+ * them.
+ *
+ * The crisis panel itself lives in components/ui/CrisisPanel.tsx and is shared
+ * with /contact, so the two cannot drift apart again.
  */
 export function ContactCrisis() {
   return (
-    <section id="contact" className="bg-np-neutral-100 scroll-mt-24 py-24 md:py-32">
+    <section id="contact" className="from-np-blue-50 bg-gradient-to-b to-white py-24 md:py-32">
       <Container>
         <div className="grid gap-14 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-7">
-            <Reveal>
-              <h2 className="text-h2">{CONTACT.heading}</h2>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <p className="text-body text-np-neutral-600 mt-4 max-w-[52ch]">{CONTACT.body}</p>
-            </Reveal>
-            <Reveal delay={0.16}>
-              <div className="mt-9">
-                <ContactForm />
-              </div>
-            </Reveal>
+            {/* No <Reveal> wrapper: the card runs its own staggered entrance
+                on whileInView, and nesting the two would fade the card in
+                twice over. */}
+            <OnboardingForm
+              className="max-w-xl"
+              imageSrc="/images/what-to-expect/request.webp"
+              title={CONTACT.heading}
+              description={CONTACT.body}
+              buttonText="Send"
+              reasons={CONTACT.reasons}
+              privacyNote={CONTACT.privacyNote}
+              /* Composed here rather than in content.ts so the copy stays
+                 strings and the hrefs stay derived from BUSINESS, which is the
+                 single source for the practice's NAP data. Both provider
+                 addresses, because there is no practice-wide inbox — same
+                 resolution app/contact/page.tsx already reached. */
+              unavailable={{
+                ...CONTACT.unavailable,
+                phone: {
+                  label: BUSINESS.phonePrimary,
+                  href: `tel:${BUSINESS.phonePrimaryHref}`,
+                },
+                emails: Object.values(BUSINESS.emails).map((address) => ({
+                  label: address,
+                  href: `mailto:${address}`,
+                })),
+              }}
+            />
           </div>
 
-          <div className="md:col-span-5">
+          {/* order-first below md, matching app/contact/page.tsx: the grid
+              stacks on a phone, and left in DOM order a distressed visitor
+              would scroll past the form image, four fields and the submit
+              button before reaching 988.
+
+              Sticky from md up so the numbers stay reachable for the whole
+              length of the form, which is the taller column. self-start stops
+              the grid stretching the item to the row height, without which it
+              has no slack to stick in. The offset is --nav-h plus the same
+              1.5rem globals.css gives scroll-padding-top, so a stuck panel
+              clears the navbar by the same margin an anchored section does. */}
+          <div className="order-first md:sticky md:top-[calc(var(--nav-h)+1.5rem)] md:order-none md:col-span-5 md:self-start">
             <Reveal delay={0.12}>
-              <aside className="rounded-card border-np-blue-600 bg-np-surface border-l-2 p-6 ring-1 ring-[var(--np-alpha-ink-08)] md:p-8">
-                <h3 className="text-h3">{CRISIS.heading}</h3>
-                <p className="text-small text-np-neutral-600 mt-3">{CRISIS.body}</p>
-                <ul className="mt-6 space-y-5">
-                  {CRISIS.items.map((item) => (
-                    <li key={item.label}>
-                      <a
-                        href={item.href}
-                        className="font-display text-h3 text-np-blue-600 ease-np-out hover:text-np-blue-700 underline-offset-4 transition-colors duration-[180ms] hover:underline"
-                      >
-                        {item.label}
-                      </a>
-                      <p className="text-small text-np-ink mt-1 font-medium">{item.title}</p>
-                      <p className="text-small text-np-neutral-600 mt-1 max-w-[40ch]">
-                        {item.body}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </aside>
+              <CrisisPanel />
             </Reveal>
 
             <Reveal delay={0.2}>
-              <div className="mt-8 space-y-2 px-1">
-                <p className="text-small text-np-neutral-600">
-                  Call the practice:{' '}
-                  <a
-                    href={`tel:${BUSINESS.phonePrimaryHref}`}
-                    className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
-                  >
-                    {BUSINESS.phonePrimary}
-                  </a>
-                </p>
-                <p className="text-small text-np-neutral-600">
-                  Serving {BUSINESS.serviceArea.join(' and ')}, in person and by telehealth.
-                </p>
+              <div className="bg-np-surface border-np-neutral-200 mt-6 flex items-start gap-3 rounded-2xl border p-5">
+                <Phone
+                  aria-hidden="true"
+                  size={18}
+                  strokeWidth={1.75}
+                  className="text-np-blue-900 mt-0.5 shrink-0"
+                />
+                <div className="space-y-1">
+                  <p className="text-small text-np-neutral-600">
+                    Call the practice:{' '}
+                    <a
+                      href={`tel:${BUSINESS.phonePrimaryHref}`}
+                      className="text-np-blue-600 font-medium underline-offset-4 hover:underline focus-visible:underline"
+                    >
+                      {BUSINESS.phonePrimary}
+                    </a>
+                  </p>
+                  {/* U+2011 non-breaking hyphen in "in-person": at the narrow
+                      end of this column the line was breaking after "in-",
+                      which leaves a dangling prefix mid-sentence. */}
+                  <p className="text-small text-np-neutral-600">
+                    Telehealth across {BUSINESS.serviceArea.join(' and ')}, and in‑person care.
+                  </p>
+                </div>
               </div>
             </Reveal>
           </div>

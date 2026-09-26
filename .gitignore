@@ -27,3 +27,25 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Stray media dropped in the repo root (keep public/video/ tracked)
+/*.mp4
+/*.mov
+
+# Stray source art dropped in the repo root
+/*.png
+
+# Pre-encode masters. The web-sized derivatives under public/video/ are what
+# ship; these stay local so the repo never carries two copies of every clip.
+/media-src/
+
+# Before/after boards for the provider portrait enhancement. Review artefacts,
+# multi-megabyte PNGs, and regenerable from the sources in assets/providers/.
+/design-research/enhanced-preview/
+
+# Design source art. Untouched originals and intermediate exports for the
+# homepage sections, tens of MB and consumed only by the one-off resize/cutout
+# steps. Everything the site actually serves is committed under public/.
+# The README.md files in here stay tracked so the folders explain themselves.
+design-research/assets/
+!design-research/assets/**/README.md

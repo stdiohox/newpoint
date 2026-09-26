@@ -1,6 +1,18 @@
 @import 'tailwindcss';
 
 /* ---------------------------------------------------------------------------
+   Preflight, imported above, sets `list-style: none` on every ol and ul.
+   WebKit then drops the implicit list role, so VoiceOver never announces
+   "list, N items" and any sequence or grouping the list conveys is lost.
+
+   Because the reset is global, the fix has to be too: EVERY <ol> and <ul> in
+   this repo carries an explicit role="list". It is not redundant markup, and
+   removing it is a silent Safari-only regression that renders fine in Chrome.
+   Add role="list" to any new list. See components/sections/Providers.tsx and
+   components/sections/WhatToExpect.tsx for the original write-ups.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
    Design tokens. Single source of truth is /design-research/design-tokens.md.
    Every value below is declared here and consumed as a Tailwind theme value.
    Do not hardcode hex, radius, or easing in components.
@@ -29,9 +41,30 @@
   --color-np-neutral-50: #fbfaf8;
   --color-np-surface: #ffffff;
 
-  /* Single accent. Small non-text surfaces only, never text on light. */
-  --color-np-amber-500: #e9a93c;
-  --color-np-amber-100: #fbeed5;
+  /* Client-specified sky blue for the hero and navbar CTAs. Sits in the same
+     family as the footage's sky so the buttons read as part of the scene.
+     Chosen for contrast: a white label on this measures 4.75:1, clearing the
+     4.5:1 WCAG AA asks for at 14px. Lightening it past roughly #4d79a7 drops
+     the label back under AA. */
+  --color-np-sky: #4a76a4;
+
+  /* AMBER RETIRED 2026-09-25. --color-np-amber-500 (#e9a93c) and its tint
+     --color-np-amber-100 (#fbeed5) are gone. This is the one part of
+     design-research/design-synthesis-v2.md that was adopted; the rest of that
+     proposal was declined and the docs are kept for reference only.
+
+     Nothing referenced either token at the point of removal. Amber's two
+     documented jobs had already moved off it: the step numerals in
+     app/new-patients/page.tsx carry np-blue-600 (see the comment there), and
+     the provider credentials render in np-neutral-600 on light and white/50
+     on the dark panel. So this removes two definitions, not two usages.
+
+     np-blue-600 is the accent now, and it is the reason the retirement costs
+     nothing: amber could never legally carry text on any light ground in this
+     system — 1.97:1 on np-neutral-50, 2.06:1 on np-surface, 1.84:1 on
+     np-neutral-100, all far below the 4.5:1 floor — while np-blue-600 clears
+     AA on every one of them (8.47, 8.84, 7.90 respectively). Do not
+     reintroduce a second accent. */
 
   /* Semantic */
   --color-np-success: #2f7d4f;
@@ -109,12 +142,24 @@
        and if a component needs more separation it gets a 1px border instead.
        --shadow-np-card already matched. --shadow-np-lift had drifted to a 12px
        offset at 10%, well outside that discipline, so it is pulled back here. */
+    /* Height of the sticky navbar. Consumed by scroll-padding-top above and by
+       the hero nav's scroll threshold, so the two cannot drift. */
+    --nav-h: 108px;
+
     --shadow-np-card: 0 2px 8px rgb(19 28 46 / 0.05);
     --shadow-np-lift: 0 4px 16px -4px rgb(19 28 46 / 0.06);
   }
 
   html {
     scroll-behavior: smooth;
+    /* The navbar is sticky on every route, so an anchor target would otherwise
+       land underneath it. --nav-h clears the bar; the extra 1.5rem is the
+       breathing room the sections used to get from their own scroll-mt-24.
+       This is the ONLY anchor-offset mechanism on the site — scroll-padding on
+       the scroller and scroll-margin on the target COMBINE rather than taking
+       the greater of the two, so keeping both made every section land about
+       96px too low. */
+    scroll-padding-top: calc(var(--nav-h) + 1.5rem);
   }
 
   body {
@@ -144,9 +189,72 @@
     border-radius: 2px;
   }
 
+  /* Interactive elements sitting on the ink ground need a light ring instead.
+     The default blue-600 outline measures 1.93:1 against --color-np-ink, well
+     under the 3:1 WCAG 2.2 SC 1.4.11 asks of a focus indicator; white measures
+     17:1. Applied by adding `on-ink` to any dark section — the footer, the
+     provider section, and the interior-page closing block all carry it, which
+     is what makes the 988 and 911 links keyboard-visible.
+     The navbar no longer needs it: Navbar1 sits on a white pill rather than
+     on the hero image, so the default blue-600 outline applies there. */
+  .on-ink :focus-visible {
+    outline-color: #ffffff;
+  }
+
   ::selection {
     background: var(--color-np-blue-100);
     color: var(--color-np-ink);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Entrance start states.
+
+   NOTHING ON THIS SITE MAY SHIP HIDDEN IN THE SERVER-RENDERED HTML. Motion
+   serialises an `initial` prop into the style attribute during SSR, so an
+   element that animates in from opacity 0 arrives invisible and stays that way
+   if JS is disabled, blocked, still loading, or throws during hydration. That
+   previously applied to the crisis panel, the whole contact form, the primary
+   navigation and the hero H1 — i.e. every route was unreadable without JS.
+
+   So the hidden state is expressed here instead, behind two gates that both
+   fail open:
+
+     .js    added by the inline script in app/layout.tsx before first paint.
+            Absent when scripting is off, so the content is simply visible.
+     media  no-preference only. A reduced-motion visitor never gets a start
+            state at all, which is stronger than animating instantly.
+
+   Components mark themselves with data-enter and re-apply the same values as
+   inline styles once useHydrated() flips (see lib/useHydrated.ts). The CSS and
+   the inline values are deliberately identical, so the handover does not flash.
+
+   Keep every value here in sync with the matching component. If you add a
+   direction, add it in both places.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-enter] {
+    opacity: 0;
+  }
+  /* Reveal */
+  .js [data-enter='up'] {
+    transform: translateY(16px);
+  }
+  /* OnboardingForm's staggered children */
+  .js [data-enter='up-sm'] {
+    transform: translateY(10px);
+  }
+  /* Navbar links */
+  .js [data-enter='down'] {
+    transform: translateY(-10px);
+  }
+  /* Navbar CTA */
+  .js [data-enter='right'] {
+    transform: translateX(20px);
+  }
+  /* AnimatedHeading's per-character spans */
+  .js [data-enter='left'] {
+    transform: translateX(-18px);
   }
 }
 
@@ -160,4 +268,71 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Honour a request for less transparency: swap the glass for a solid ink panel
+   and drop the blur. No WCAG criterion covers this yet, but the material is
+   heavy and the preference exists precisely for people who cannot read through
+   it. forced-colors gets the same treatment, since backdrop-filter and the
+   masked gradient edge are stripped there anyway. */
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .liquid-glass {
+    background: var(--color-np-ink);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--color-np-neutral-400);
+  }
+  .liquid-glass::before {
+    display: none;
+  }
+  /* Same policy, light ground. The contact form card is white/70 over the
+     section's blue-50 → white gradient, so its opaque fallback is the surface
+     white rather than ink, and its border goes to a token that actually reads
+     against that fill once the blur is gone. */
+  .glass-card {
+    background: var(--color-np-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: var(--color-np-neutral-300);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Hero glass material. Verbatim from the hero spec. This is a web glassmorphism
+   approximation (backdrop-filter + a masked gradient edge), not Apple's Liquid
+   Glass, which is an Apple-platform material with no public web CSS package.
+   Deliberately unlayered so it composites the same way it does on the stack the
+   spec was written for.
+   --------------------------------------------------------------------------- */
+.liquid-glass {
+  background: rgba(0, 0, 0, 0.4);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.1) 80%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }

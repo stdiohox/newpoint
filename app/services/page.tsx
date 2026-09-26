@@ -1,0 +1,250 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { Footer } from '@/components/Footer';
+import { JsonLd } from '@/components/JsonLd';
+import { PageHero } from '@/components/PageHero';
+import { PageCta } from '@/components/sections/PageCta';
+import { Container } from '@/components/ui/Container';
+import { Reveal } from '@/components/ui/Reveal';
+import { stagger } from '@/lib/motion';
+import { SERVICE_PAGES, WHAT_WE_TREAT, PROVIDERS, cardPosterFor } from '@/lib/content';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbSchema, organizationRef, serviceSchemaFor } from '@/lib/schema';
+
+/**
+ * Services hub.
+ *
+ * Its job is structural as much as editorial: it is the single page that links
+ * to all three service pages, which is how they get crawled and how link equity
+ * reaches them. The live site's Services page is a single undifferentiated wall
+ * of copy; this splits it into destinations and keeps the wall's content on them.
+ */
+export const metadata = pageMetadata({
+  // The homepage owns the practice/provider angle; this page owns "psychiatric
+  // services" as its head term, so the two are not arbitrating the same query.
+  title: 'Psychiatric Services in NJ and PA',
+  description:
+    'Psychiatric evaluation, medication management, and telehealth in New Jersey and Pennsylvania. What each involves and how to get started.',
+  path: '/services',
+});
+
+export default function ServicesIndex() {
+  return (
+    <>
+      <JsonLd
+        schemas={[
+          organizationRef(),
+          ...SERVICE_PAGES.map(serviceSchemaFor),
+          breadcrumbSchema([{ name: 'Services', path: '/services' }]),
+        ]}
+      />
+      <main id="main" tabIndex={-1} className="focus:outline-none">
+        <PageHero
+          title="What we do, and how it works"
+          intro="Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management, in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of those is a page of its own below."
+          crumbs={[{ name: 'Services', path: '/services' }]}
+        />
+
+        <div className="py-20 md:py-28">
+          <Container>
+            {/* One detailed section per service, replacing the three-card grid
+                that used to sit here. That grid repeated the homepage's cards
+                almost exactly — same titles, same one-line summaries, one click
+                further in — so a reader who followed "View all services" landed
+                on a thinner copy of what they had just left.
+
+                Everything below is existing sourced content re-laid-out, not
+                rewritten: the intro and the opening section come from
+                SERVICE_PAGES, the modality line from that service's own
+                homepage card, and the names from PROVIDERS. No new claim is
+                made about any service. */}
+            <ul role="list" className="space-y-20 md:space-y-28">
+              {SERVICE_PAGES.map((service, i) => {
+                const href = `/services/${service.slug}`;
+                const poster = cardPosterFor(href);
+
+                return (
+                  <Reveal as="li" key={service.slug} delay={stagger(i, 0.06)}>
+                    <div className="grid items-center gap-8 md:grid-cols-2 md:gap-14">
+                      {/* Alternates sides from md up and stacks below it. The
+                          image takes md:order-2 on odd rows rather than the
+                          text taking order-1, so the DOM order stays
+                          image-then-text and the reading order is identical in
+                          both directions. */}
+                      <div
+                        className={`rounded-media relative aspect-[4/3] overflow-hidden ${
+                          i % 2 === 1 ? 'md:order-2' : ''
+                        }`}
+                      >
+                        {poster && (
+                          /* Decorative: the h2 immediately beside it names the
+                             service, so an alt would only say it a second
+                             time. */
+                          <Image
+                            src={poster}
+                            alt=""
+                            fill
+                            sizes="(min-width: 768px) 50vw, 100vw"
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+
+                      <div>
+                        <h2 className="text-h2 max-w-[20ch]">{service.title}</h2>
+                        <p className="text-body-l text-np-neutral-600 mt-4 max-w-[52ch]">
+                          {service.intro}
+                        </p>
+
+                        <dl className="border-np-neutral-200 mt-8 space-y-5 border-t pt-8">
+                          {/* WHAT HAPPENS, AS THE STAGES THEMSELVES, NOT AS A
+                              QUOTED PARAGRAPH. This block first carried the
+                              service's opening section verbatim — heading and
+                              full body — which put 60-90 words of each child
+                              page's unique prose on the hub as well, for three
+                              pages already competing on the same query cluster.
+                              Listing the section headings says what the service
+                              involves, in the page's own words, without
+                              duplicating a sentence of it. It also fixes the
+                              telehealth block, which led with "An expanded
+                              schedule" simply because that is section one. */}
+                          <div>
+                            <dt className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                              What happens
+                            </dt>
+                            <dd className="text-body text-np-neutral-700 mt-2">
+                              {service.sections.map((s) => s.heading).join(' · ')}
+                            </dd>
+                          </div>
+
+                          {/* NO "Who you will see" HERE, deliberately.
+                              Naming both providers under each service asserts
+                              that both personally deliver it. That is sourced
+                              for medication management and telehealth, and NOT
+                              for the comprehensive psychiatric evaluation:
+                              Ofoegbu's bio names evaluations, Whitaker's names
+                              medication management only. The page-wide "Who you
+                              will see" section below says what is actually
+                              sourced — these are the two clinicians — without
+                              binding either to a named service.
+                              CLIENT: confirm whether both providers perform
+                              initial psychiatric evaluations, and this becomes
+                              a per-service field. */}
+
+                          <div>
+                            <dt className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                              How it is delivered
+                            </dt>
+                            <dd className="text-body text-np-neutral-700 mt-2">
+                              {service.modality}
+                            </dd>
+                          </div>
+                        </dl>
+
+                        <Link
+                          href={href}
+                          className="text-np-blue-600 ease-np-out hover:text-np-blue-700 mt-8 inline-flex items-center gap-1 font-medium underline-offset-4 transition-colors duration-[180ms] hover:underline focus-visible:underline motion-reduce:transition-none"
+                        >
+                          Full details
+                          <span aria-hidden="true">→</span>
+                          <span className="sr-only"> about {service.title}</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </ul>
+
+            {/* Treatment options named on the live Services page but not built out
+                as pages of their own, because the source material describes them
+                in a single line each.
+                CLIENT: skill-building groups and support groups are listed as
+                treatment options but never described anywhere — no cadence,
+                format, or topics. Supply those and each becomes a page. */}
+            <div className="border-np-neutral-200 mt-20 border-t pt-12">
+              <Reveal>
+                <h2 className="text-h2 max-w-[22ch]">Also available</h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                  Alongside evaluation and medication management, we will work with you to find the
+                  treatment option that fits.
+                </p>
+              </Reveal>
+              <ul role="list" className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  'Psychiatric consultation',
+                  'Individual counseling',
+                  'Skill-building groups',
+                  'Support groups',
+                  'Referral to follow-up services',
+                  // Only options the practice itself names on its live Services
+                  // page. Nothing is added to this menu.
+                ].map((option, i) => (
+                  <Reveal as="li" key={option} delay={stagger(i, 0.04)}>
+                    <p className="border-np-neutral-200 text-body text-np-neutral-700 border-b pb-3">
+                      {option}
+                    </p>
+                  </Reveal>
+                ))}
+              </ul>
+            </div>
+
+            <div className="border-np-neutral-200 mt-20 border-t pt-12">
+              <Reveal>
+                <h2 className="text-h2 max-w-[22ch]">Conditions we treat</h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                  {WHAT_WE_TREAT.body}
+                </p>
+              </Reveal>
+              <ul role="list" className="mt-8 flex flex-wrap gap-2.5">
+                {WHAT_WE_TREAT.conditions.map((condition, i) => (
+                  <Reveal as="li" key={condition} delay={stagger(i, 0.03)}>
+                    <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
+                      {condition}
+                    </span>
+                  </Reveal>
+                ))}
+              </ul>
+              {/* CLIENT: no therapy modality (CBT, DBT, EMDR and similar) is named
+                  anywhere in the source material, and none is invented here.
+                  Naming the ones actually practised is the single highest-value
+                  content addition left on this page.
+                  CLIENT: age range served is not stated as a practice policy. */}
+            </div>
+
+            <div className="border-np-neutral-200 mt-20 border-t pt-12">
+              <Reveal>
+                <h2 className="text-h2 max-w-[22ch]">Who you will see</h2>
+              </Reveal>
+              <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8">
+                {PROVIDERS.map((p, i) => (
+                  <Reveal as="li" key={p.slug} delay={stagger(i, 0.08)}>
+                    <Link
+                      href={`/providers/${p.slug}`}
+                      className="rounded-card bg-np-surface ease-np-out group block h-full p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)]"
+                    >
+                      <h3 className="text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]">
+                        {p.name}
+                      </h3>
+                      <p className="font-display text-small text-np-neutral-600 mt-1 font-medium">
+                        {p.credentials}
+                      </p>
+                      <p className="text-small text-np-neutral-600 mt-3">{p.licensed}</p>
+                    </Link>
+                  </Reveal>
+                ))}
+              </ul>
+            </div>
+          </Container>
+        </div>
+
+        <PageCta />
+      </main>
+      <Footer />
+    </>
+  );
+}

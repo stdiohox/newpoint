@@ -1,16 +1,17 @@
 import type { Metadata, Viewport } from 'next';
 import { cabinetGrotesk, switzer } from './fonts';
 import { BUSINESS } from '@/lib/content';
+import { Navbar1 } from '@/components/ui/navbar-1';
 import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BUSINESS.domain),
   title: {
-    default: 'Newpoint Healthcare Services | Psychiatric Care in NJ and PA',
+    default: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     template: `%s | ${BUSINESS.shortName}`,
   },
   description:
-    'Outpatient psychiatric care for New Jersey and Pennsylvania. Psychiatric evaluation, medication management, and telehealth from two doctorate-prepared nurse practitioners.',
+    'Psychiatric evaluation, medication management, and telehealth for New Jersey and Pennsylvania, from two doctorate-prepared nurse practitioners.',
   applicationName: BUSINESS.legalName,
   authors: [{ name: BUSINESS.legalName }],
   keywords: [
@@ -25,16 +26,16 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: BUSINESS.legalName,
     url: BUSINESS.domain,
-    title: 'Newpoint Healthcare Services | Psychiatric Care in NJ and PA',
+    title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
       'Psychiatric evaluation, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners serving New Jersey and Pennsylvania.',
     locale: 'en_US',
-    // CLIENT: no OG image asset exists. The current site reuses the logo JPEG.
-    // Supply a 1200x630 social card, or approve generating one from the wordmark.
+    // The 1200x630 card is generated at app/opengraph-image.tsx and applies to
+    // every route. CLIENT: replace it with a supplied asset if one exists.
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Newpoint Healthcare Services | Psychiatric Care in NJ and PA',
+    title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
       'Psychiatric evaluation, medication management, and telehealth for New Jersey and Pennsylvania.',
   },
@@ -49,14 +50,82 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cabinetGrotesk.variable} ${switzer.variable}`}>
+    /* suppressHydrationWarning because the inline script in <head> adds the
+       `js` class to this element before React hydrates, so the className React
+       finds here legitimately differs from the one the server sent. It applies
+       to this element only and does not extend into the tree. */
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${cabinetGrotesk.variable} ${switzer.variable}`}
+    >
+      {/* Inter is loaded for the hero section only. The site's type stack stays
+          Cabinet Grotesk + Switzer; see the hero wrapper in components/sections/Hero.tsx. */}
+      <head>
+        {/*
+         * Marks the document as scripted, before first paint.
+         *
+         * Every entrance animation on this site hides its element to begin
+         * with. That hidden state lives in CSS behind this class (see the
+         * [data-enter] block in globals.css) rather than in a server-rendered
+         * inline style, so that markup which arrives without working JS is
+         * never invisible. The class is what tells CSS "JS is running, so
+         * something will animate this back in".
+         *
+         * It must stay a plain synchronous script in <head>: next/script, or
+         * anything deferred, runs after first paint, which would show the
+         * content and then hide it again. beforeInteractive is not available
+         * to a Server Component here.
+         */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.classList.add('js')`,
+          }}
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>
+        {/*
+         * focus:z-[70], not z-50.
+         *
+         * The skip link is the first thing a keyboard user reaches, and it
+         * positions itself at top-4 — inside the band the sticky navbar
+         * occupies. At z-50 it tied with the bar, and because the bar comes
+         * later in the DOM the bar won the paint order and covered the link
+         * completely on every route, at both widths, in both nav states. That
+         * is a WCAG 2.2 SC 2.4.11 Focus Not Obscured failure on the single most
+         * important focus target on the site, and it was invisible in review
+         * because the link only renders when focused.
+         *
+         * 70 clears both the bar (50) and the hero's mobile panel (60).
+         * Verified by scripts/focus-sweep.mjs.
+         */}
         <a
           href="#main"
-          className="focus:rounded-input focus:bg-np-surface focus:text-body focus:text-np-ink focus:ring-np-blue-600 sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:ring-2"
+          className="focus:rounded-input focus:bg-np-surface focus:text-body focus:text-np-ink focus:ring-np-blue-600 sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[70] focus:px-4 focus:py-2 focus:ring-2"
         >
           Skip to content
         </a>
+        {/* One navbar for every route. It is STICKY rather than fixed, so it
+            reserves its own space on interior pages and no page needs to pad
+            for it. The homepage hero pulls itself up by --nav-h to sit under
+            it, which is the only special case. z-50 stays below the skip
+            link's z-70.
+
+            A <header>, not a <div>: as a direct child of <body> this is the
+            site's banner landmark, and it was the only thing missing one. Every
+            route audited at 0 banners before this — the PageHero <header> sits
+            inside <main>, which correctly does NOT compute to banner, so there
+            was nothing for a screen-reader user to jump to. Purely semantic;
+            nothing about the layout or the sticky behaviour changes. */}
+        <header className="sticky top-0 z-50">
+          <Navbar1 />
+        </header>
         {children}
       </body>
     </html>

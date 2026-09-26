@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
-import { BUSINESS, NAV, PROVIDERS } from '@/lib/content';
+import { BUSINESS, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
 
 /**
  * CLIENT: no street address is published or confirmed, so no address block
@@ -11,7 +12,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-np-ink py-16 text-white/70">
+    <footer className="bg-np-ink on-ink py-16 text-white/70">
       <Container>
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
@@ -19,9 +20,16 @@ export function Footer() {
               {BUSINESS.legalName}
             </p>
             <p className="text-small mt-2 max-w-[38ch]">
-              Outpatient psychiatric and behavioral health care for{' '}
-              {BUSINESS.serviceArea.join(' and ')}, in person and by telehealth.
+              Outpatient psychiatric and behavioral health care by telehealth across{' '}
+              {BUSINESS.serviceArea.join(' and ')}, and in person.
             </p>
+            {/* The town, stated as service area rather than as an address. The
+                live site names Lawrence Township on every page and it is the
+                practice's only place-level signal; dropping it along with the
+                unconfirmed street address would give up local relevance it
+                already holds.
+                CLIENT: replace with a full address once one is confirmed. */}
+            <p className="text-small mt-2 text-white/50">Based in {BUSINESS.serviceAreaNote}.</p>
             <p className="text-small mt-4">
               <a
                 href={`tel:${BUSINESS.phonePrimaryHref}`}
@@ -32,16 +40,35 @@ export function Footer() {
               <span className="mx-2 text-white/30">/</span>
               <span>Fax {BUSINESS.fax}</span>
             </p>
+            <p className="text-small mt-2">
+              <Link href="/contact" className="text-np-blue-300 underline-offset-4 hover:underline">
+                All the ways to reach us
+              </Link>
+            </p>
           </div>
 
+          {/* Sitewide link surface. Every indexable page is reachable from every
+              other page through this block, which is how the service pages get
+              crawled from anywhere on the site and not only from /services. */}
           <nav aria-label="Footer" className="md:col-span-3">
             <h2 className="text-caption text-white/50">Explore</h2>
-            <ul className="mt-3 space-y-2">
+            <ul role="list" className="mt-3 space-y-2">
               {NAV.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} className="text-small hover:text-white">
+                  <Link href={item.href} className="text-small hover:text-white">
                     {item.label}
-                  </a>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <h2 className="text-caption mt-8 text-white/50">Services</h2>
+            <ul role="list" className="mt-3 space-y-2">
+              {SERVICE_PAGES.map((service) => (
+                <li key={service.slug}>
+                  <Link href={`/services/${service.slug}`} className="text-small hover:text-white">
+                    {service.nav}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -49,21 +76,31 @@ export function Footer() {
 
           <div className="md:col-span-4">
             <h2 className="text-caption text-white/50">Providers</h2>
-            <ul className="mt-3 space-y-2">
+            <ul role="list" className="mt-3 space-y-2">
               {PROVIDERS.map((p) => (
                 <li key={p.slug} className="text-small">
-                  <span className="text-white">{p.name}</span>
+                  <Link href={`/providers/${p.slug}`} className="text-white hover:underline">
+                    {p.name}
+                  </Link>
                   <span className="text-white/50">, {p.credentials}</span>
                 </li>
               ))}
             </ul>
             <p className="text-small mt-5">
               In a crisis, call or text{' '}
-              <a href="tel:988" className="text-np-blue-300 underline-offset-4 hover:underline">
+              <a
+                href="tel:988"
+                aria-label="988, Suicide and Crisis Lifeline"
+                className="text-np-blue-300 underline-offset-4 hover:underline"
+              >
                 988
               </a>
               . In an emergency, call{' '}
-              <a href="tel:911" className="text-np-blue-300 underline-offset-4 hover:underline">
+              <a
+                href="tel:911"
+                aria-label="911, medical emergency"
+                className="text-np-blue-300 underline-offset-4 hover:underline"
+              >
                 911
               </a>
               .
