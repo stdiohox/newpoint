@@ -45,15 +45,32 @@ export default function InsurancePage() {
             <Reveal>
               <h2 className="text-h2 max-w-[20ch]">{INSURANCE_PAGE.sections[0].heading}</h2>
             </Reveal>
-            <ul role="list" className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
-              {INSURANCE.payers.map((payer, i) => (
-                <Reveal as="li" key={payer} delay={stagger(i, 0.05)}>
-                  <p className="font-display text-body-l text-np-ink border-np-neutral-200 border-b pb-4 font-medium tracking-[-0.01em]">
-                    {payer}
-                  </p>
+            {/* GROUPED BY STATE, not one flat wall. The wall carried no
+                Pennsylvania plan at all, so a PA visitor scanning it could not
+                tell "your plan is not listed" from "we do not cover your
+                state". The scope label above each run answers that before they
+                start reading names. See PAYER_GROUPS in lib/content.ts. */}
+            {INSURANCE.groups.map((group, gi) => (
+              <div key={group.scope} className={gi === 0 ? 'mt-10' : 'mt-14'}>
+                <Reveal>
+                  <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                    {group.scope}
+                  </h3>
                 </Reveal>
-              ))}
-            </ul>
+                <ul
+                  role="list"
+                  className="mt-5 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                  {group.payers.map((payer, i) => (
+                    <Reveal as="li" key={payer} delay={stagger(i, 0.05)}>
+                      <p className="font-display text-body-l text-np-ink border-np-neutral-200 border-b pb-4 font-medium tracking-[-0.01em]">
+                        {payer}
+                      </p>
+                    </Reveal>
+                  ))}
+                </ul>
+              </div>
+            ))}
             <Reveal delay={0.2}>
               <p className="text-body-l text-np-neutral-600 mt-10 max-w-[62ch]">
                 {INSURANCE_PAGE.sections[0].body}

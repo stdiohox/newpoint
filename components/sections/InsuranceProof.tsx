@@ -31,8 +31,25 @@ import { INSURANCE } from '@/lib/content';
  */
 
 /** The commercial plans: everything in `payers` that is not a government one. */
-const GOVERNMENT_PLANS = ['Medicare', 'NJ Medicaid'];
+const GOVERNMENT_PLANS: string[] = ['Medicare', 'NJ Medicaid'];
 const COMMERCIAL = INSURANCE.payers.filter((p) => !GOVERNMENT_PLANS.includes(p));
+
+/**
+ * The card names the first few and counts the rest.
+ *
+ * It used to print every commercial payer, which worked at five names and
+ * stopped working at ten, when the Pennsylvania carriers were added: a card
+ * description is two or three lines of supporting copy, not a directory, and a
+ * twelve-name run turned this card into a wall while the other three stayed
+ * short. The count is exact rather than "and more" so the sentence still says
+ * how much is missing, and /insurance carries the full list grouped by state.
+ */
+const NAMED_ON_CARD = 6;
+const REMAINDER = COMMERCIAL.length - NAMED_ON_CARD;
+const COMMERCIAL_SUMMARY =
+  REMAINDER > 0
+    ? `${COMMERCIAL.slice(0, NAMED_ON_CARD).join(', ')}, and ${REMAINDER} more.`
+    : `${COMMERCIAL.join(', ')}.`;
 
 /**
  * The dot is the card's one piece of semantic state, accepted vs self-pay, so
@@ -51,7 +68,7 @@ const CARDS = [
     badgeColor: ACCEPTED_DOT,
     title: 'Commercial insurance',
     imageUrl: '/images/insurance/commercial.webp',
-    description: `${COMMERCIAL.join(', ')}.`,
+    description: COMMERCIAL_SUMMARY,
     ...CHECK_COVERAGE,
   },
   {

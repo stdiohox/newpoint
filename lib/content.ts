@@ -130,6 +130,87 @@ export const PRACTICE_FACTS = [
   { fact: 'Two states', detail: 'Licensed in New Jersey and Pennsylvania' },
 ] as const;
 
+/**
+ * Accepted plans, grouped by where they apply. Source of truth for the flat
+ * `INSURANCE.payers` below, which is derived from it.
+ *
+ * WHY GROUPED: the list used to be seven flat names with NOT ONE Pennsylvania
+ * plan among them, on a site that sells care in two states. A Pennsylvania
+ * visitor with Highmark scanned it, saw nothing from their state, and had no
+ * way to tell "not listed" from "not covered". That is the single biggest
+ * conversion problem this page had.
+ *
+ * WHERE THE NEW NAMES COME FROM, and the caveat that governs all of them:
+ * research/provider-directories.md, captured 2026-09-29. Those lists are the
+ * plans GROW THERAPY and HEADWAY are contracted with for these providers — a
+ * patient who books through a marketplace is billed by the marketplace. That is
+ * not automatically the same as Newpoint accepting a plan directly, which is
+ * why only names corroborated across BOTH platforms were taken, and why every
+ * one of them is flagged in OPEN_CLIENT_ITEMS for the practice to confirm
+ * before launch.
+ *
+ * Deliberately excluded despite appearing in the capture:
+ * - Blue Cross Blue Shield of Massachusetts. On both providers' Headway
+ *   profiles and on neither Grow profile, and Massachusetts is not a state this
+ *   practice serves. It is a Headway national-network artifact.
+ * - UPMC, Amerihealth, Humana, Braven, Surest, Centivo, AvMed and the long tail
+ *   of Aetna and UnitedHealthcare sub-plans. All Grow-only, i.e. one
+ *   marketplace's network and nothing else.
+ *
+ * "Accept", never "in network", throughout — see `heading` below.
+ */
+const PAYER_GROUPS = [
+  {
+    /* National carriers and Medicare: they do not vary by state, so they lead.
+       Aetna, Cigna, United Healthcare and Optum are the practice's own, from
+       research/business-nap.md. Oscar and Oxford are new and are the
+       best-evidenced additions in the whole capture — both providers, both
+       platforms. Carelon is new, both providers, Headway only; it is a
+       behavioral-health carve-out network rather than a plan, which is exactly
+       the kind of thing a practice contracts with directly, so it is included
+       and flagged rather than dropped. */
+    scope: 'Accepted in both states',
+    payers: [
+      'Aetna',
+      'Cigna Evernorth',
+      'United Healthcare',
+      'Optum',
+      'Oscar',
+      'Oxford',
+      'Carelon Behavioral Health',
+      'Medicare',
+    ],
+  },
+  {
+    /* Both the practice's own, from research/business-nap.md. Unchanged. */
+    scope: 'New Jersey',
+    payers: ['Blue Cross Blue Shield Horizon NJ', 'NJ Medicaid'],
+  },
+  {
+    /* ALL FOUR ARE NEW, and they are the point of this restructure. Each
+       appears on BOTH Grow Therapy and Headway, and each is a major
+       Pennsylvania carrier, which is the coverage a PA patient is actually
+       looking for.
+
+       They are Whitaker-only on Headway. That is not evidence Ofoegbu does not
+       take them: her entire Headway profile is configured NJ-only, including a
+       licensure field the client has since confirmed understates her — she is
+       licensed in both states. Per-provider marketplace configuration is not a
+       practice-level payer fact either way.
+
+       CLIENT: these four carry the most risk on the page. A PA patient who
+       sees Highmark listed and books on that basis has been told something the
+       practice has not yet confirmed. Confirm or cut before launch. */
+    scope: 'Pennsylvania',
+    payers: [
+      'Capital Blue Cross',
+      'Highmark Blue Cross Blue Shield',
+      'Independence Blue Cross',
+      'Geisinger',
+    ],
+  },
+] as const;
+
 export const INSURANCE = {
   /**
    * "Accept", never "in network". The research records only "Accepted Insurance
@@ -140,16 +221,10 @@ export const INSURANCE = {
    */
   heading: 'We accept most major plans',
   body: 'We accept the plans below. If yours is not listed, ask us and we will check your coverage before your first appointment.',
-  // Confirmed in /research/business-nap.md and /research/services-analysis.md
-  payers: [
-    'Aetna',
-    'Optum',
-    'Cigna Evernorth',
-    'United Healthcare',
-    'Medicare',
-    'NJ Medicaid',
-    'Blue Cross Blue Shield Horizon NJ',
-  ],
+  groups: PAYER_GROUPS,
+  /* Flat, and derived so it cannot drift from the groups above. Every existing
+     consumer — the homepage card, the schema emitter — keeps working unchanged. */
+  payers: PAYER_GROUPS.flatMap((g) => g.payers),
   selfPay:
     'A session fee and a sliding scale are available for patients paying without insurance. We accept all major credit and debit cards and cash.',
   /**
@@ -1365,6 +1440,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   'Whether ADHD is treated. It is one of the highest-volume queries for a psychiatric NP practice and appears nowhere in the source material, so it is not claimed — but it may be an omission rather than a deliberate exclusion. THE DIRECTORIES SAY IT IS AN OMISSION: Grow lists ADHD for Whitaker and Headway lists ADD/ADHD for BOTH providers. Highest-value content addition available from the 2026-09-29 capture. Insomnia/sleep is in the same position — Grow, Headway and U.S. News all carry it and WHAT_WE_TREAT.conditions does not',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
+  "CONFIRM THE SEVEN PAYERS ADDED ON 2026-09-29, or cut them. Oscar, Oxford and Carelon Behavioral Health, plus the four Pennsylvania carriers — Capital Blue Cross, Highmark, Independence Blue Cross and Geisinger. Every one comes from the providers' Grow Therapy and Headway profiles, which list the plans THOSE MARKETPLACES are contracted with for them; a patient who books through a marketplace is billed by the marketplace, so this is not automatically the same as Newpoint accepting the plan directly. Only names corroborated across both platforms were taken, and the Massachusetts and Grow-only entries were left out, but corroboration between two marketplaces is still not the practice's own billing. THE FOUR PENNSYLVANIA ONES CARRY THE MOST RISK: they are the reason a PA patient will book, and the page previously listed no PA plan at all. The original seven payers are unaffected — those are from the practice's own site",
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
   "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one",
