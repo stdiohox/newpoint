@@ -158,39 +158,66 @@ export const PRACTICE_FACTS = [
  *   marketplace's network and nothing else.
  *
  * "Accept", never "in network", throughout — see `heading` below.
+ *
+ * ---
+ *
+ * `confirmed` IS THE GATE, AND IT IS THE ONLY THING THAT PUBLISHES A PAYER.
+ *
+ * true  = the practice's own, from research/business-nap.md. Rendered and
+ *         emitted in schema.
+ * false = from the 2026-09-29 directory capture and NOT yet confirmed by the
+ *         practice. Kept here, deliberately, but filtered out of every surface:
+ *         the insurance page, the homepage card and the JSON-LD. Nothing a
+ *         patient or a crawler can see.
+ *
+ * So a name sitting in this file is not a claim. Only `confirmed: true` is.
+ * When the practice confirms one, flip its flag and it appears everywhere at
+ * once — the page, the card and its count, and the schema all derive from here.
+ * Deleting the entry instead throws away the sourcing notes and the reason it
+ * was a candidate, so flip, do not delete.
  */
-const PAYER_GROUPS = [
+type Payer = { readonly name: string; readonly confirmed: boolean };
+
+const PAYER_GROUPS: readonly { readonly scope: string; readonly payers: readonly Payer[] }[] = [
   {
     /* National carriers and Medicare: they do not vary by state, so they lead.
        Aetna, Cigna, United Healthcare and Optum are the practice's own, from
-       research/business-nap.md. Oscar and Oxford are new and are the
-       best-evidenced additions in the whole capture — both providers, both
-       platforms. Carelon is new, both providers, Headway only; it is a
-       behavioral-health carve-out network rather than a plan, which is exactly
-       the kind of thing a practice contracts with directly, so it is included
-       and flagged rather than dropped. */
+       research/business-nap.md. Oscar and Oxford are the best-evidenced
+       additions in the whole capture — both providers, both platforms. Carelon
+       is both providers, Headway only; it is a behavioral-health carve-out
+       network rather than a plan, which is exactly the kind of thing a practice
+       contracts with directly, so it is kept as a candidate rather than
+       dropped. All three stay unconfirmed until the practice says otherwise. */
     scope: 'Accepted in both states',
     payers: [
-      'Aetna',
-      'Cigna Evernorth',
-      'United Healthcare',
-      'Optum',
-      'Oscar',
-      'Oxford',
-      'Carelon Behavioral Health',
-      'Medicare',
+      { name: 'Aetna', confirmed: true },
+      { name: 'Cigna Evernorth', confirmed: true },
+      { name: 'United Healthcare', confirmed: true },
+      { name: 'Optum', confirmed: true },
+      { name: 'Oscar', confirmed: false },
+      { name: 'Oxford', confirmed: false },
+      { name: 'Carelon Behavioral Health', confirmed: false },
+      { name: 'Medicare', confirmed: true },
     ],
   },
   {
     /* Both the practice's own, from research/business-nap.md. Unchanged. */
     scope: 'New Jersey',
-    payers: ['Blue Cross Blue Shield Horizon NJ', 'NJ Medicaid'],
+    payers: [
+      { name: 'Blue Cross Blue Shield Horizon NJ', confirmed: true },
+      { name: 'NJ Medicaid', confirmed: true },
+    ],
   },
   {
-    /* ALL FOUR ARE NEW, and they are the point of this restructure. Each
-       appears on BOTH Grow Therapy and Headway, and each is a major
+    /* ALL FOUR UNCONFIRMED, so this group currently renders as the
+       coverage-check invitation instead of a list — see `unconfirmedScopeNote`
+       below and the insurance page. That is the honest state of it: the
+       practice has never published a Pennsylvania plan, and these four come
+       from the providers' marketplace profiles.
+
+       Each appears on BOTH Grow Therapy and Headway, and each is a major
        Pennsylvania carrier, which is the coverage a PA patient is actually
-       looking for.
+       looking for — so they are worth confirming rather than discarding.
 
        They are Whitaker-only on Headway. That is not evidence Ofoegbu does not
        take them: her entire Headway profile is configured NJ-only, including a
@@ -198,18 +225,19 @@ const PAYER_GROUPS = [
        licensed in both states. Per-provider marketplace configuration is not a
        practice-level payer fact either way.
 
-       CLIENT: these four carry the most risk on the page. A PA patient who
-       sees Highmark listed and books on that basis has been told something the
-       practice has not yet confirmed. Confirm or cut before launch. */
+       CLIENT: these four carry the most upside on the page and the most risk.
+       A PA patient who saw Highmark listed and booked on that basis would have
+       been told something the practice has not confirmed, which is why they are
+       gated. Confirm and flip, or cut. */
     scope: 'Pennsylvania',
     payers: [
-      'Capital Blue Cross',
-      'Highmark Blue Cross Blue Shield',
-      'Independence Blue Cross',
-      'Geisinger',
+      { name: 'Capital Blue Cross', confirmed: false },
+      { name: 'Highmark Blue Cross Blue Shield', confirmed: false },
+      { name: 'Independence Blue Cross', confirmed: false },
+      { name: 'Geisinger', confirmed: false },
     ],
   },
-] as const;
+];
 
 export const INSURANCE = {
   /**
@@ -222,9 +250,41 @@ export const INSURANCE = {
   heading: 'We accept most major plans',
   body: 'We accept the plans below. If yours is not listed, ask us and we will check your coverage before your first appointment.',
   groups: PAYER_GROUPS,
-  /* Flat, and derived so it cannot drift from the groups above. Every existing
-     consumer — the homepage card, the schema emitter — keeps working unchanged. */
-  payers: PAYER_GROUPS.flatMap((g) => g.payers),
+  /**
+   * CONFIRMED PAYERS ONLY, flat, and derived so it cannot drift from the groups
+   * above. This is what the homepage card and the schema emitter consume, so
+   * gating happens once, here, rather than at each call site where a future
+   * consumer could forget it. The card's "and N more" count follows from it.
+   *
+   * Anything needing the unconfirmed candidates too — which is nothing on the
+   * site today — reads `groups` directly and filters for itself.
+   *
+   * KEEP THE @__PURE__ ANNOTATION. It is not decoration. `navbar-1.tsx` is a
+   * client component and imports NAV, CTA and BUSINESS from this file, which
+   * pulls the whole module into the browser bundle; tree-shaking then drops
+   * whatever the client provably does not use. A bare `PAYER_GROUPS.flatMap(…)`
+   * is a call expression the bundler cannot prove is side-effect free, so it
+   * kept PAYER_GROUPS alive and shipped all seven UNCONFIRMED payer names in
+   * static/chunks/app/layout-*.js — readable by anyone who opened devtools,
+   * even though nothing rendered them. Measured before and after: with the
+   * annotation the names are absent from the client bundle entirely.
+   *
+   * So the gate holds in three places, not two: the page, the schema, and the
+   * bytes we serve.
+   */
+  payers: /* @__PURE__ */ PAYER_GROUPS.flatMap((g) =>
+    g.payers.filter((p) => p.confirmed).map((p) => p.name)
+  ),
+  /**
+   * Shown in place of a group's list while that group has no confirmed plan.
+   *
+   * Near-identical to `coverageCheckNote` and deliberately its own string: that
+   * one sits on a card about a plan we DO accept, this one stands where a list
+   * would be and has to carry the absence without drawing attention to it. They
+   * will diverge the moment either context changes.
+   */
+  unconfirmedScopeNote:
+    'Tell us your plan and we will check your coverage before your first appointment.',
   selfPay:
     'A session fee and a sliding scale are available for patients paying without insurance. We accept all major credit and debit cards and cash.',
   /**
@@ -1440,7 +1500,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   'Whether ADHD is treated. It is one of the highest-volume queries for a psychiatric NP practice and appears nowhere in the source material, so it is not claimed — but it may be an omission rather than a deliberate exclusion. THE DIRECTORIES SAY IT IS AN OMISSION: Grow lists ADHD for Whitaker and Headway lists ADD/ADHD for BOTH providers. Highest-value content addition available from the 2026-09-29 capture. Insomnia/sleep is in the same position — Grow, Headway and U.S. News all carry it and WHAT_WE_TREAT.conditions does not',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
-  "CONFIRM THE SEVEN PAYERS ADDED ON 2026-09-29, or cut them. Oscar, Oxford and Carelon Behavioral Health, plus the four Pennsylvania carriers — Capital Blue Cross, Highmark, Independence Blue Cross and Geisinger. Every one comes from the providers' Grow Therapy and Headway profiles, which list the plans THOSE MARKETPLACES are contracted with for them; a patient who books through a marketplace is billed by the marketplace, so this is not automatically the same as Newpoint accepting the plan directly. Only names corroborated across both platforms were taken, and the Massachusetts and Grow-only entries were left out, but corroboration between two marketplaces is still not the practice's own billing. THE FOUR PENNSYLVANIA ONES CARRY THE MOST RISK: they are the reason a PA patient will book, and the page previously listed no PA plan at all. The original seven payers are unaffected — those are from the practice's own site",
+  "CONFIRM THE SEVEN GATED PAYERS, or cut them. Oscar, Oxford and Carelon Behavioral Health, plus the four Pennsylvania carriers — Capital Blue Cross, Highmark Blue Cross Blue Shield, Independence Blue Cross and Geisinger. All seven sit in PAYER_GROUPS in this file with `confirmed: false`, which keeps them and their sourcing notes in the codebase while removing them from the insurance page, the homepage card and the JSON-LD. NOTHING A PATIENT OR A CRAWLER SEES ASSERTS THEM. To publish one, flip its flag: the page, the card, the card's \"and N more\" count and the schema all derive from that single field. Each comes from the providers' Grow Therapy and Headway profiles, which list the plans THOSE MARKETPLACES are contracted with for them — a patient who books through a marketplace is billed by the marketplace, so this is not automatically the same as Newpoint accepting the plan directly. Only names corroborated across both platforms were taken, and the Massachusetts and Grow-only entries were left out, but corroboration between two marketplaces is still not the practice's own billing. THE FOUR PENNSYLVANIA ONES MATTER MOST: they are the reason a PA patient would book, and with all four gated the Pennsylvania group currently shows a coverage-check invitation instead of a list. The original seven payers are unaffected and still render — those are from the practice's own site",
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
   "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one",

@@ -317,6 +317,18 @@ export function breadcrumbSchema(trail: { name: string; path: string }[]) {
   };
 }
 
+/**
+ * The payer names, for any structured-data consumer that wants them.
+ *
+ * `INSURANCE.payers` is already filtered to `confirmed` plans, so the candidates
+ * from the directory capture cannot reach a JSON-LD block through here. The gate
+ * lives on the data rather than in this function on purpose: a second emitter
+ * added later inherits it instead of having to remember it.
+ *
+ * NOTE this is currently unreferenced — no page emits payer names today. It is
+ * kept because it is the obvious place to wire them up, and it is correct now if
+ * something does.
+ */
 export function insuranceNote() {
   return INSURANCE.payers;
 }
