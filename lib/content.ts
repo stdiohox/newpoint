@@ -355,18 +355,23 @@ export const PROVIDERS: Provider[] = [
       alt: 'Anastasia O. Ofoegbu, DNP, FNP-BC, PMHNP-BC, psychiatric mental health nurse practitioner at Newpoint',
     },
     /**
-     * UNCHANGED, AND UNDER ACTIVE DOUBT. Headway's structured licensure field
-     * gives her New Jersey ONLY, while this line, her bio on the practice site,
-     * and her own free text on that same Headway page all say both states.
-     * Whitaker's profile lists both states in that same field, so it holds two
-     * when two are entered.
+     * CONFIRMED BY THE CLIENT, 2026-09-29. Both providers are licensed in New
+     * Jersey and Pennsylvania, and the telehealth page may keep reasoning from
+     * it.
      *
-     * Not weakened here, because a directory field is not a primary source and
-     * quietly dropping Pennsylvania would be as unsourced as keeping it. But
-     * this is the top item in OPEN_CLIENT_ITEMS and it is a real booking risk:
-     * the telehealth page currently tells a Pennsylvania patient that either
-     * provider can see them. Verify against the PA Department of State
-     * licensee search before launch.
+     * Kept here because the question was live for a few hours and the reasoning
+     * is worth not repeating: Headway's structured licensure field gives her New
+     * Jersey ONLY, and her whole profile there is NJ-shaped — one NJ location,
+     * no PA-specific payers, where Whitaker's carries both states, a PA office
+     * and five PA plans. That is a deliberate NJ-only configuration of her
+     * Headway practice, not a blank field, which is why it was worth asking
+     * about. It says nothing about the licence itself: a clinician can hold a
+     * PA licence and simply not route one marketplace's bookings through it.
+     *
+     * Recorded as the client's confirmation, NOT as a register check. The PA
+     * Department of State's licensee search sits behind reCAPTCHA and was not
+     * queried. The licence NUMBER is still outstanding and is folded into the
+     * licence-numbers item in OPEN_CLIENT_ITEMS.
      */
     licensed: 'Licensed in New Jersey and Pennsylvania',
     /* Headway's own field says "8 years of experience", contradicting her bio
@@ -385,10 +390,8 @@ export const PROVIDERS: Provider[] = [
      * stop, "reading an most of all" becomes "reading and, most of all", and
      * "travelling" is Americanised.
      *
-     * NOTE she states her own Pennsylvania licensure here, in her own words.
-     * That is the claim Headway's structured licensure field contradicts — see
-     * `licensed` above and the top item in OPEN_CLIENT_ITEMS. Adopting her bio
-     * does not make the claim safer; it makes it hers. Still resolve it.
+     * She states her own Pennsylvania licensure here, in her own words, and the
+     * client confirmed it on 2026-09-29. See `licensed` above.
      *
      * The second sentence is reproduced verbatim on the homepage cards and
      * asserted at build time by assertSourced() in components/sections/
@@ -1340,17 +1343,20 @@ export const ROUTES: { path: string; priority: number }[] = [
  * NPI, both state licence numbers, a Pennsylvania office, and candidate answers
  * on ADHD, substance use, age range and therapy modalities.
  *
- * A directory profile is not a primary source and nothing from it has been
- * applied to copy. Items below say where the evidence now sits; they stay open
- * until the client confirms. That file also opens ONE NEW ITEM, listed last and
- * the most urgent thing in this array: the site currently claims a Pennsylvania
- * licence for Ofoegbu that her own Headway licensure field does not support.
+ * A directory profile is not a primary source. Items below say where the
+ * evidence now sits; they stay open until the client confirms.
+ *
+ * One item the capture opened has already closed. Headway's licensure field
+ * gave Ofoegbu New Jersey only, which put the site's two-state claim for her in
+ * doubt; the client confirmed on 2026-09-29 that both providers are licensed in
+ * both states. Her licence NUMBER is still outstanding and lives in the
+ * licence-numbers item below.
  */
 export const OPEN_CLIENT_ITEMS = [
   'Exact legal business name from the LLC formation documents ("Newpoint" vs "New Point")',
   'Street address, suite and ZIP for the practice. NOW THE HIGHEST-VALUE OPEN ITEM: the client has confirmed care is delivered in person as well as by telehealth, so the site claims in-person care and the organization is marked up as a MedicalClinic. Google expects an address on that type, a patient told they can be seen in person has nowhere to go, and Local Pack and Maps eligibility are blocked until it exists. The former "or confirm service-area only" alternative is closed — in-person care is confirmed. EVIDENCE NOW EXISTS: 6 Colonial Lake Drive, Suite D, Lawrence Township (Lawrenceville), NJ 08648 — named by Grow Therapy, Headway and U.S. News, across BOTH providers, and U.S. News pairs it with (609) 527-9438, which is already BUSINESS.phonePrimary. Needs the client to confirm in writing, and to confirm the suite format, before it ships',
   'Which states in-person care covers. A SECOND ADDRESS HAS SURFACED: Headway lists 803 West Trenton Avenue Ste 3, Morrisville, PA 19067 for Whitaker as "Location 1 of 2". This is the first Pennsylvania place-level signal in any Newpoint research and would relax CLAUDE.md\'s rule that in-person care is stated without a state. One platform, one provider, unconfirmed — it may be a Headway location rather than a Newpoint office',
-  'State nursing license numbers for both providers, or confirmation they prefer not to publish them. CANDIDATES for Whitaker: NJ 26NJ00646400 (APN) and PA SP016195 (CRNP), per Grow Therapy and Headway. Note the two states use different regulatory titles for the same role — APN in New Jersey, CRNP in Pennsylvania — so publish each number with the right one. Nothing found for Ofoegbu',
+  'State nursing license numbers for both providers, or confirmation they prefer not to publish them. CANDIDATES for Whitaker: NJ 26NJ00646400 (APN) and PA SP016195 (CRNP), per Grow Therapy and Headway. Note the two states use different regulatory titles for the same role — APN in New Jersey, CRNP in Pennsylvania — so publish each number with the right one. NOTHING FOUND FOR OFOEGBU IN EITHER STATE: the client confirmed on 2026-09-29 that she holds both, but no number for her appears on any directory, so both of hers have to come from the practice',
   'NPI numbers for both providers, or confirmation they prefer not to publish them. CANDIDATE for Whitaker: 1760719512, per U.S. News. Nothing found for Ofoegbu',
   'Certifying body for the "board-certified" claim (the post-nominals imply one, but it is not stated anywhere and must not be assumed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
@@ -1364,7 +1370,6 @@ export const OPEN_CLIENT_ITEMS = [
   "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one",
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   "Self-pay session fee and the sliding scale criteria. Grow Therapy lists $150 per session for Whitaker, but that is the marketplace's rate for her time on that platform and is not Newpoint's fee",
-  "Ofoegbu's Pennsylvania licence number — or confirmation that she does not hold one. THE MOST URGENT ITEM IN THIS LIST, and the only one where the site may currently be making a claim it cannot support. PROVIDERS[].licensed and the telehealth service page both state that BOTH providers are licensed in New Jersey and Pennsylvania, sourced from her bio on the practice's own site, and her free-text Headway bio repeats it. But Headway's STRUCTURED licensure fields give her New Jersey only, where Whitaker's give both states — so the field can hold two and was not left blank by accident. Stale free text is common; a licensure field the platform routes bookings on is not. If the PA licence has lapsed or never existed, the site is telling a Pennsylvania patient that either provider can see them. Verify against the PA Department of State licensee search or get the number from the client BEFORE this branch ships",
   'Original logo file, vector preferred',
   'Service-section footage. Every card on the homepage services section currently reuses the hero clip, which shows a person in a meadow. On a behavioral-health service tile that reads as an implied treatment outcome, which is the same category as a testimonial. Replacement clips must not depict a patient or imply an outcome',
   'Optional upgrade only, no longer a gap: written permission or brand assets for insurer logos, if the practice ever wants payer marks instead of the typographic wall',

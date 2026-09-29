@@ -144,7 +144,20 @@ Ofoegbu". Nothing here requires changing how the site names her.
 
 ## Conflicts — resolve these with the client, do not pick a side
 
-### 1. Ofoegbu's Pennsylvania licensure — the serious one
+### 1. Ofoegbu's Pennsylvania licensure — RESOLVED 2026-09-29
+
+> **The client confirmed that both providers are licensed in New Jersey and
+> Pennsylvania.** No copy changed; the telehealth page keeps reasoning from it.
+> Recorded as the client's confirmation, not as a register check — PA's
+> licensee search is behind reCAPTCHA and was not queried.
+>
+> The analysis below is kept because it is why the question was asked, and
+> because the reasoning generalises: a structured field on a booking platform is
+> a stronger signal than free text, and worth checking against. In this case it
+> reflected how she configures her Headway practice, not the licence itself.
+
+The original finding follows.
+
 
 - **The site says** both providers are licensed in New Jersey *and*
   Pennsylvania. `SERVICE_PAGES` telehealth page: "Funmilayo Whitaker and
@@ -355,8 +368,10 @@ Other phrasing worth having:
    item in `OPEN_CLIENT_ITEMS` and all Local SEO work.
 2. **Confirm the Morrisville, PA location** — is it a Newpoint office? Unblocks
    in-person claims in Pennsylvania.
-3. **Ofoegbu's Pennsylvania licence** — number, or confirmation she does not
-   hold one. The site currently claims she does.
+3. ~~**Ofoegbu's Pennsylvania licence.**~~ **Closed 2026-09-29** — the client
+   confirmed both providers hold both states. Her licence numbers are still
+   wanted, but that is now the ordinary publishing question at item 8, not a
+   correctness one.
 4. **ADHD** — treated or not. Highest-value content addition available.
 5. **Substance use / addiction** — an active service line, or incidental to
    Ofoegbu's history.

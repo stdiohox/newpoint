@@ -124,11 +124,12 @@ Pennsylvania" sends a PA patient to a location that is not known to exist.
 > Headway location rather than a Newpoint office. Get the client to confirm, then this
 > restriction can be lifted and the site can claim in-person care in both states.
 >
-> **A separate and more serious finding is in that file:** Headway's structured licensure
-> field gives Ofoegbu **New Jersey only**, while this site, her own bio and her own
-> free-text on that same page all say New Jersey and Pennsylvania. The site currently tells
-> a Pennsylvania patient that either provider can see them. Resolve before launch — it is
-> the top item in `OPEN_CLIENT_ITEMS`.
+> **A licensure question that file raised is now closed.** Headway's structured licensure
+> field gives Ofoegbu **New Jersey only**, which put the site's two-state claim for her in
+> doubt. **The client confirmed on 2026-09-29 that both providers are licensed in both
+> states**, so the telehealth page may keep reasoning from it and no copy changed. Recorded
+> as the client's confirmation, not as a register check — PA's licensee search sits behind
+> reCAPTCHA and was not queried. Her licence numbers are still outstanding.
 
 ### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29
 
