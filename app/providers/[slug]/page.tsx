@@ -63,17 +63,25 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     { label: 'Credentials', value: provider.credentials },
     { label: 'Role', value: provider.role },
     { label: 'Licensure', value: provider.licensed },
-    // CLIENT: one provider's experience line names addiction nursing. That is
-    // her own bio and is sourced, but substance-use treatment is NOT a confirmed
-    // service line, and a credentials row reading "addiction" next to a booking
-    // CTA can read as an offer. Confirm whether the practice treats substance
-    // use before this page implies it.
+    { label: 'Education', value: provider.education },
+    // The addiction-nursing caveat that used to sit here is resolved. It asked
+    // for confirmation that substance use is a real service line before the
+    // experience row implied one; both providers now publish it as a specialty
+    // on their own directory profiles (Headway lists it FIRST for Ofoegbu), and
+    // it appears in `treats` below, so the row no longer implies more than the
+    // rest of the page states. See research/provider-directories.md.
     { label: 'Experience', value: provider.experience },
     { label: 'Approach', value: provider.approach },
-    // CLIENT: add { label: 'NPI', value: '…' } and a state licence number row
-    // here once supplied, or confirm the practice prefers not to publish them.
-    // CLIENT: state licence numbers and NPI numbers are not published anywhere.
-    // Add them as a fourth <div> here, or confirm the practice prefers not to.
+    // Languages last: it is the row a patient scans for rather than reads in
+    // order, and both providers speak more than English, which is a real reason
+    // someone picks this practice over another.
+    { label: 'Languages', value: provider.languages },
+    // CLIENT: licence numbers and NPI are still not published. Candidates now
+    // exist for Whitaker — NPI 1760719512, NJ 26NJ00646400 (APN), PA SP016195
+    // (CRNP) — from U.S. News, Grow Therapy and Headway respectively. Add them
+    // as rows here once the client confirms them and agrees to publish, noting
+    // that NJ and PA use different title strings (APN vs CRNP) for one role.
+    // Nothing was found for Ofoegbu.
   ];
 
   return (

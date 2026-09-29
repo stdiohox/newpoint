@@ -175,12 +175,38 @@ export type Provider = {
   licensed: string;
   experience: string;
   approach: string;
+  /**
+   * Degree-granting institutions. NOT the certifying body for the
+   * "board-certified" claim, which is still unknown and must not be inferred
+   * from a university — see OPEN_CLIENT_ITEMS and CLAUDE.md's schema rules,
+   * where `hasCredential` stays omitted for exactly this reason.
+   */
+  education: string;
+  /** Languages the provider sees patients in. */
+  languages: string;
   bio: string;
   treats: string[];
   email: string;
 };
 
-/** Every fact below is drawn from /research/people-trust.md. Nothing is added. */
+/**
+ * Facts here come from /research/people-trust.md (the practice's own site,
+ * crawled 2026-08-27) and, since 2026-09-29, from
+ * /research/provider-directories.md — the providers' own profiles on Grow
+ * Therapy, Headway, U.S. News and Doximity.
+ *
+ * The directory capture is self-entered by the providers and in several places
+ * self-contradictory, so only two classes of fact were taken from it:
+ * corroborated ones, and ones that are not regulated. Applied below: education
+ * (three sources agree on the doctorate), languages, and additions to `treats`
+ * that BOTH providers publish on at least one platform each.
+ *
+ * Deliberately NOT applied, and still open: licence numbers, NPI, the street
+ * address, years of experience (Grow says 15 for Whitaker, Headway says 10,
+ * and CLAUDE.md makes it a regulated fact), ages served (the two platforms
+ * directly contradict each other), named therapy modalities (four candidates,
+ * no two agreeing), and anything from the patient reviews.
+ */
 export const PROVIDERS: Provider[] = [
   {
     slug: 'funmilayo-whitaker',
@@ -195,9 +221,55 @@ export const PROVIDERS: Provider[] = [
       alt: 'Funmilayo Whitaker, DNP, FNP-BC, PMHNP-BC, psychiatric mental health nurse practitioner at Newpoint',
     },
     licensed: 'Licensed in New Jersey and Pennsylvania',
+    /**
+     * UNCHANGED at "more than 10", although the directories now offer two other
+     * numbers: Headway says 10 years, Grow Therapy says 15. CLAUDE.md makes
+     * specific years of experience a regulated fact, this is the version the
+     * practice itself published, and it is the only one of the three that is
+     * true whichever of the others is right. CLIENT: 10 or 15?
+     */
     experience: 'More than 10 years of direct patient care',
     approach: 'Warm, empathic, non-judgmental, and collaborative',
-    bio: 'Funmilayo is dual board-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner. She has practiced in group practice, community settings, and telehealth, and provides medication management for individuals across the lifespan living with a wide range of psychiatric conditions.',
+    /* Doximity, Headway and U.S. News independently give the doctorate as
+       University of North Florida, which is as corroborated as anything in the
+       directory capture gets. The master's is Headway only. */
+    education: 'DNP, University of North Florida · MSN, Tennessee State University',
+    /* Headway lists Yoruba; U.S. News records "Speaks English". */
+    languages: 'English and Yoruba',
+    /**
+     * "ACROSS THE LIFESPAN" IS GONE from the second sentence, deliberately.
+     * It was an age-range claim the practice's own site made and that
+     * OPEN_CLIENT_ITEMS has always flagged as unconfirmed — and the directory
+     * capture makes it worse rather than better: Grow Therapy says she serves
+     * adults 18-64 and elders 65+ with no children, Headway says adults,
+     * adolescents AND children. Two platforms, one clinician, opposite answers.
+     * The sentence says what she does without saying who to.
+     *
+     * The first sentence is reproduced verbatim on the homepage cards and is
+     * asserted at build time by assertSourced() in components/sections/
+     * Providers.tsx. Do not reword it here without updating CARD_SENTENCE.
+     */
+    bio: 'Funmilayo is dual board-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner. She holds a Doctor of Nursing Practice from the University of North Florida and a Master of Science in Nursing from Tennessee State University, and has practiced in group practice, community settings, and telehealth. She provides medication management for a wide range of psychiatric conditions, and sees patients in English and Yoruba.',
+    /**
+     * The last three are new on 2026-09-29, from her own directory profiles.
+     * ADHD and substance use are each published by her on BOTH Grow Therapy
+     * and Headway; insomnia comes from Grow and from U.S. News, which names
+     * "insomnia and sleep apnea" among her areas of expertise.
+     *
+     * Both were live CLIENT questions — OPEN_CLIENT_ITEMS asked whether ADHD's
+     * absence was "an omission rather than a deliberate exclusion", and whether
+     * substance use is an active service line. Her own published profiles
+     * answer both, and they are a better source than the practice site these
+     * lists were originally built from, because they are more recent and she
+     * maintains them herself.
+     *
+     * NOTE they are NOT added to SERVICE_PAGES' "Conditions we prescribe for"
+     * list on the medication-management page. Treating a condition and
+     * prescribing for it are different claims, and for ADHD the prescribing
+     * claim implies controlled substances and a DEA registration that CLAUDE.md
+     * lists as a regulated fact we do not hold. CLIENT: confirm prescribing
+     * scope for ADHD before that list changes.
+     */
     treats: [
       'Depression',
       'Anxiety',
@@ -206,6 +278,9 @@ export const PROVIDERS: Provider[] = [
       'OCD',
       'PTSD',
       'Schizophrenia',
+      'ADHD',
+      'Insomnia and sleep problems',
+      'Substance use and addiction',
     ],
     email: BUSINESS.emails.whitaker,
   },
@@ -221,16 +296,58 @@ export const PROVIDERS: Provider[] = [
       jpg1120: '/images/providers/anastasia-ofoegbu-1120.jpg',
       alt: 'Anastasia O. Ofoegbu, DNP, FNP-BC, PMHNP-BC, psychiatric mental health nurse practitioner at Newpoint',
     },
+    /**
+     * UNCHANGED, AND UNDER ACTIVE DOUBT. Headway's structured licensure field
+     * gives her New Jersey ONLY, while this line, her bio on the practice site,
+     * and her own free text on that same Headway page all say both states.
+     * Whitaker's profile lists both states in that same field, so it holds two
+     * when two are entered.
+     *
+     * Not weakened here, because a directory field is not a primary source and
+     * quietly dropping Pennsylvania would be as unsourced as keeping it. But
+     * this is the top item in OPEN_CLIENT_ITEMS and it is a real booking risk:
+     * the telehealth page currently tells a Pennsylvania patient that either
+     * provider can see them. Verify against the PA Department of State
+     * licensee search before launch.
+     */
     licensed: 'Licensed in New Jersey and Pennsylvania',
+    /* Headway's own field says "8 years of experience", contradicting her bio
+       on the same page. This keeps the bio's framing, which the practice site
+       also uses. CLIENT: confirm. */
     experience: '14 years in nursing, the last 11 focused on mental health and addiction',
     approach: 'Evidence-based and patient-centered',
-    bio: 'Anastasia is dual-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner. She provides psychiatric assessments, medication management, and supportive counseling. Outside of practice she enjoys traveling, reading, and spending time with her family.',
+    /* Headway: DNP at University of North Florida, plus La Salle University
+       with the degree unspecified — so La Salle is deliberately not named here
+       rather than guessed at. CLIENT: which degree, and in what? */
+    education: 'DNP, University of North Florida',
+    languages: 'English, Igbo, and Yoruba',
+    /**
+     * The second sentence is reproduced verbatim on the homepage cards and
+     * asserted at build time by assertSourced() in components/sections/
+     * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
+     */
+    bio: 'Anastasia is dual-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner, and holds a Doctor of Nursing Practice from the University of North Florida. She provides psychiatric assessments, medication management, and supportive counseling. She sees patients in English, Igbo, and Yoruba. Outside of practice she enjoys traveling, reading, and spending time with her family.',
+    /**
+     * Expanded 2026-09-29 from her Headway profile, which lists all of these as
+     * her specialties. Substance use is listed FIRST there, which together with
+     * her existing experience line ("the last 11 focused on mental health and
+     * addiction") is what moves it from a hint to a stated service.
+     *
+     * Same carve-out as Whitaker: treated, not claimed as prescribed. See the
+     * note on her `treats` above.
+     */
     treats: [
       'Depression',
       'Anxiety and panic attacks',
       'Bipolar disorder',
       'Mood disorders',
       'Psychotic disorders',
+      'ADHD',
+      'OCD',
+      'PTSD',
+      'Sleep problems',
+      'Anger management',
+      'Substance use and addiction',
     ],
     email: BUSINESS.emails.ofoegbu,
   },
@@ -239,10 +356,26 @@ export const PROVIDERS: Provider[] = [
 export const WHAT_WE_TREAT = {
   heading: 'What we treat, and how',
   body: 'Care begins with a comprehensive psychiatric assessment and a treatment plan built around it. From there we manage medication, monitor progress with standardized clinical measures, and adjust as your needs change.',
-  /** Conditions aggregated in /research/services-analysis.md */
+  /**
+   * Conditions aggregated in /research/services-analysis.md, plus three added
+   * on 2026-09-29 from /research/provider-directories.md.
+   *
+   * The practice-wide list is the union of what the two providers treat, so a
+   * condition earns a place here when it is in either `PROVIDERS[].treats`.
+   * ADHD, sleep and substance use are each published by both providers on their
+   * own profiles; see the notes on those arrays above for the sourcing and for
+   * why none of the three is added to the medication-management page's
+   * "Conditions we prescribe for" list.
+   *
+   * ADHD IS THE MOST VALUABLE LINE IN THIS ARRAY. OPEN_CLIENT_ITEMS has carried
+   * it as one of the highest-volume queries a psychiatric NP practice can
+   * answer, absent from the source material and possibly by accident. It was by
+   * accident.
+   */
   conditions: [
     'Depression',
     'Anxiety',
+    'ADHD',
     'Bipolar disorder',
     'Panic attacks',
     'OCD',
@@ -250,6 +383,8 @@ export const WHAT_WE_TREAT = {
     'Schizophrenia',
     'Mood disorders',
     'Psychosis',
+    'Substance use and addiction',
+    'Insomnia and sleep problems',
     'Irritability and anger',
     'Stress and burnout',
   ],
