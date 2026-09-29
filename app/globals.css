@@ -21,6 +21,11 @@
 @theme {
   /* Brand blue. #234598 is preserved brand equity, do not alter. */
   --color-np-blue-900: #101f45;
+  /* Sits between 900 and 700, for a raised panel ON a 900 ground: the footer's
+     crisis strip. It measures only 1.22:1 against 900, which is deliberate for
+     a surface rather than a component, so anything using it carries a
+     white/15 hairline to define its edge. White on it measures 13.2:1. */
+  --color-np-blue-800: #172d63;
   --color-np-blue-700: #1b3576;
   --color-np-blue-600: #234598;
   --color-np-blue-500: #3d62b8;

@@ -296,6 +296,46 @@ export const INSURANCE = {
     'Tell us your plan details and we will check your coverage before your first appointment.',
 } as const;
 
+/**
+ * Footer copy.
+ *
+ * NOTHING HERE IS NEW. `description` is the sentence the old footer already
+ * carried, lifted out of the component so the copy lives where the rest of it
+ * does. `modality` restates the care-modality rule verbatim, the same way
+ * SERVICE_PAGES' telehealth `modality` does. No claim on this surface is made
+ * that is not already made on a page.
+ *
+ * CLIENT: still no street address and still no hours, so the footer carries
+ * neither. Geography stays service-area only. Add a PostalAddress here and in
+ * lib/schema.ts together, once one is confirmed.
+ */
+export const FOOTER = {
+  description:
+    'Outpatient psychiatric and behavioral health care by telehealth across New Jersey and Pennsylvania, and in person.',
+  /**
+   * U+2011 NON-BREAKING HYPHEN in "in‑person", not an ordinary hyphen.
+   * This sits in a narrow footer column and wraps at almost every width; an
+   * ordinary hyphen lets the browser break the line after it, leaving "in-" at
+   * the end of one line and "person" at the start of the next. It reads as a
+   * typo rather than a line break.
+   */
+  modality: 'Telehealth across New Jersey and Pennsylvania, and in‑person care.',
+  /** Column headings. Labels only. */
+  columns: {
+    services: 'Services',
+    practice: 'Practice',
+    contact: 'Contact',
+  },
+  crisis: {
+    before: 'In a crisis, call or text',
+    between: '. In an emergency, call',
+    after: '.',
+  },
+  /** Not a disclaimer the practice invented; it is the one the old footer had. */
+  legalNote:
+    'This website is for general information and is not medical advice, and it is not monitored around the clock.',
+} as const;
+
 export type Provider = {
   slug: string;
   name: string;
