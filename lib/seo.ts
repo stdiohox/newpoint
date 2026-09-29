@@ -45,7 +45,7 @@ export function pageMetadata({
     url: `${BUSINESS.domain}/opengraph-image`,
     width: 1200,
     height: 630,
-    alt: `${BUSINESS.legalName} — psychiatric care in New Jersey and Pennsylvania`,
+    alt: `${BUSINESS.legalName} — mental and behavioral care in New Jersey and Pennsylvania`,
   };
 
   return {

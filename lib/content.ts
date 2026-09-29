@@ -68,20 +68,51 @@ export const CTA = {
 } as const;
 
 export const HERO = {
-  headline: 'Psychiatric care across New Jersey and Pennsylvania',
+  /**
+   * "Mental and behavioral care", not "Psychiatric care" — the owners' wording,
+   * 2026-09-29. It widens the door: a lot of people who would never search for
+   * a psychiatrist will search for mental health help, and "behavioral health"
+   * is the term their insurer uses on the benefit they are trying to spend.
+   *
+   * WHAT THIS COSTS, stated honestly: "psychiatric" is now in no heading on the
+   * homepage at all. It was in the H1 and it is not in any H2 — checked against
+   * the rendered page, not assumed. What still carries it is the title tag
+   * ("Psychiatric Nurse Practitioners in NJ and PA"), `subtext` immediately
+   * below, and WHAT_WE_TREAT.body's opening sentence.
+   *
+   * That is judged acceptable rather than ideal, and it is the owners' call.
+   * If the term needs a heading back, the honest place is an H2 — NOT this
+   * headline, which they specified. Watch Search Console after launch for
+   * Google rewriting the homepage title toward the H1, which it does when the
+   * two diverge this much.
+   */
+  headline: 'Mental and behavioral care across New Jersey and Pennsylvania',
   /**
    * The same headline, broken into two lines. The literal \n is the split point
    * for the hero's per-character entrance animation. No wording differs from
    * `headline` above.
+   *
+   * THE \n DOES NOT CONTROL THE RENDERED LINE COUNT, and never did. The copy
+   * occupies one half of a two-column grid at lg — about 656px at 1440 — and
+   * xl:text-7xl overruns that well before either of these lines ends, so both
+   * wrap again on their own. Measured at 1440: the old "Psychiatric care
+   * across / New Jersey and Pennsylvania" rendered as four lines, and this
+   * longer headline renders as five. That is the design as it shipped, not a
+   * regression introduced with the new wording.
+   *
+   * So treat the \n as what AnimatedHeading actually uses it for: the boundary
+   * that restarts the character stagger. Re-splitting it does not change the
+   * rag. Changing the rag means changing the type scale or the column, and
+   * neither has been asked for.
    */
-  headlineLines: 'Psychiatric care across\nNew Jersey and Pennsylvania',
+  headlineLines: 'Mental and behavioral care across\nNew Jersey and Pennsylvania',
   subtext:
-    'Evaluation, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners. Most major insurance accepted.',
+    'Assessment, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners. Most major insurance accepted.',
   /**
    * Three service names for the hero's glass tag, word-for-word as `subtext`
    * already names them. No new service is claimed here.
    */
-  tag: 'Evaluation. Medication management. Telehealth.',
+  tag: 'Assessment. Medication management. Telehealth.',
 } as const;
 
 /**
@@ -193,7 +224,7 @@ export const PROVIDERS: Provider[] = [
     licensed: 'Licensed in New Jersey and Pennsylvania',
     experience: '14 years in nursing, the last 11 focused on mental health and addiction',
     approach: 'Evidence-based and patient-centered',
-    bio: 'Anastasia is dual-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner. She provides psychiatric evaluations, medication management, and supportive counseling. Outside of practice she enjoys traveling, reading, and spending time with her family.',
+    bio: 'Anastasia is dual-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner. She provides psychiatric assessments, medication management, and supportive counseling. Outside of practice she enjoys traveling, reading, and spending time with her family.',
     treats: [
       'Depression',
       'Anxiety and panic attacks',
@@ -207,7 +238,7 @@ export const PROVIDERS: Provider[] = [
 
 export const WHAT_WE_TREAT = {
   heading: 'What we treat, and how',
-  body: 'Care begins with a comprehensive psychiatric evaluation and a treatment plan built around it. From there we manage medication, monitor progress with standardized clinical measures, and adjust as your needs change.',
+  body: 'Care begins with a comprehensive psychiatric assessment and a treatment plan built around it. From there we manage medication, monitor progress with standardized clinical measures, and adjust as your needs change.',
   /** Conditions aggregated in /research/services-analysis.md */
   conditions: [
     'Depression',
@@ -231,8 +262,8 @@ export const WHAT_WE_TREAT = {
    */
   services: [
     {
-      title: 'Comprehensive psychiatric evaluation',
-      body: 'A full assessment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
+      title: 'Comprehensive psychiatric assessment',
+      body: 'A structured first appointment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
       href: '/services/psychiatric-evaluation',
     },
     {
@@ -272,12 +303,19 @@ export type ServicePage = {
   nav: string;
   /**
    * schema.org type for this service. Not MedicalTherapy across the board: an
-   * evaluation is a diagnostic procedure, and telehealth is how care is
+   * assessment is a diagnostic procedure, and telehealth is how care is
    * delivered rather than a treatment in itself.
    */
   schemaType: 'MedicalProcedure' | 'MedicalTherapy' | 'Service';
   /** H1. */
   title: string;
+  /**
+   * A second name the same service genuinely goes by, emitted as schema.org
+   * `alternateName`. Set it ONLY when the page's own visible copy uses the
+   * synonym too — it is a statement about what the service is called, not a
+   * keyword slot.
+   */
+  alternateName?: string;
   /** The `%s` in the layout's title template. Keep under ~50 characters. */
   metaTitle: string;
   metaDescription: string;
@@ -290,10 +328,10 @@ export type ServicePage = {
    * "in NJ and PA", "In person and by telehealth" reads in-person-first on a
    * state-scoped page, which is the exact composition CLAUDE.md's care-modality
    * rule exists to prevent. These put telehealth first and bind the states to
-   * it, matching the phrasing the evaluation FAQ already uses.
+   * it, matching the phrasing the assessment FAQ already uses.
    *
-   * Only psychiatric evaluation carries the state scope, because only its own
-   * content states it (see its "Can the evaluation be done by telehealth?"
+   * Only psychiatric assessment carries the state scope, because only its own
+   * content states it (see its "Can the assessment be done by telehealth?"
    * FAQ). Medication management says telehealth and in person without a
    * geography, because nothing in its own content scopes it.
    */
@@ -304,26 +342,58 @@ export type ServicePage = {
 
 export const SERVICE_PAGES: ServicePage[] = [
   {
+    /**
+     * The URL keeps "evaluation" while every visible string on the page says
+     * "assessment", and that mismatch is deliberate.
+     *
+     * The practice's own word is assessment (owners, 2026-09-29), so that is
+     * what patients read. But "psychiatric evaluation" is the far higher-volume
+     * query of the two in US search, and the slug is the one high-weight slot
+     * where it can sit without contradicting the owners' copy. The synonym is
+     * also stated in `metaDescription` and once in the body below, so the page
+     * answers to both words.
+     *
+     * NOT kept for its history — it has none. The site has not launched, so
+     * this path has never been indexed and a rename now would need no redirect.
+     * That makes this a free decision TODAY and an expensive one after launch,
+     * when it would need a 301 from the old path in next.config.ts.
+     */
     slug: 'psychiatric-evaluation',
-    nav: 'Psychiatric evaluation',
+    nav: 'Psychiatric assessment',
     schemaType: 'MedicalProcedure',
-    title: 'Comprehensive psychiatric evaluation',
-    metaTitle: 'Psychiatric Evaluation in NJ and PA',
+    title: 'Comprehensive psychiatric assessment',
+    alternateName: 'Psychiatric evaluation',
+    metaTitle: 'Psychiatric Assessment in NJ and PA',
+    /**
+     * "also called a psychiatric evaluation" is the highest-value of the four
+     * retained uses of the old word, and the one most at risk from a later
+     * "remove every evaluation" sweep — it is the only one a patient reads, in
+     * the search result that brought them. It survives mobile truncation: it
+     * lands around characters 65-77, well inside the ~120 shown. See the slug
+     * note above and CLAUDE.md's terminology section before touching it.
+     */
     metaDescription:
-      'What happens at a comprehensive psychiatric evaluation in New Jersey and Pennsylvania: full history, rating scales, a diagnosis, and a treatment plan.',
+      'A comprehensive psychiatric assessment, also called a psychiatric evaluation, in NJ and PA: full history, rating scales, a diagnosis, and a treatment plan.',
     intro:
-      'Every patient at Newpoint starts here. A comprehensive psychiatric evaluation is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
+      'Every patient at Newpoint starts here. A comprehensive psychiatric assessment is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
     modality: 'By telehealth across New Jersey and Pennsylvania, and in person.',
     sections: [
       {
-        heading: 'What the evaluation covers',
-        body: 'The evaluation is structured rather than conversational-only, so nothing important gets missed. We work through your history and current symptoms, and we identify the risk factors that may be affecting your mental health — the things that make a condition harder to manage, or easier to miss.',
+        heading: 'What the assessment covers',
+        /**
+         * The closing sentence is the page's one deliberate use of the older
+         * word. A patient referred here by a GP or a plan will almost always
+         * have been told "psychiatric evaluation", and the two names for one
+         * appointment is exactly the thing that makes someone hesitate to book.
+         * It doubles as the page's synonym coverage — see the slug note above.
+         */
+        body: 'The assessment is structured rather than conversational-only, so nothing important gets missed. We work through your history and current symptoms, and we identify the risk factors that may be affecting your mental health — the things that make a condition harder to manage, or easier to miss. If you were referred for a psychiatric evaluation, this is the same appointment under the name we use for it.',
       },
       {
         heading: 'The tools we use',
         body: 'Structured instruments sit alongside the clinical conversation. They give us a baseline to measure against later, which is what makes it possible to tell real progress from a good week.',
         list: [
-          'A comprehensive psychiatric evaluation questionnaire',
+          'A comprehensive psychiatric assessment questionnaire',
           'Standardized clinical rating scales, recorded at baseline',
           'Screening tests, both to identify conditions and to rule others out',
         ],
@@ -337,7 +407,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         // "A treatment plan", not "a written treatment plan you have agreed to":
         // the source says a plan of care is determined, not that it is written
         // down or countersigned. CLIENT: confirm if patients receive it in writing.
-        body: 'The plan that comes out of the evaluation combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your circumstances. Where other clinicians are already involved in your care, we collaborate with them to establish the therapy regimen and the medication protocol together rather than in parallel.',
+        body: 'The plan that comes out of the assessment combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your circumstances. Where other clinicians are already involved in your care, we collaborate with them to establish the therapy regimen and the medication protocol together rather than in parallel.',
       },
       {
         heading: 'What happens after',
@@ -346,12 +416,12 @@ export const SERVICE_PAGES: ServicePage[] = [
     ],
     faqs: [
       {
-        q: 'Is the first appointment always an evaluation?',
-        a: 'Yes. Every new patient begins with a comprehensive psychiatric evaluation, because the treatment plan depends on it.',
+        q: 'Is the first appointment always an assessment?',
+        a: 'Yes. Every new patient begins with a comprehensive psychiatric assessment, because the treatment plan depends on it.',
       },
       {
-        q: 'Can the evaluation be done by telehealth?',
-        a: 'Yes. The evaluation is available by telehealth to patients across New Jersey and Pennsylvania, and in person. Ask us when you get in touch and we will confirm what works for your situation.',
+        q: 'Can the assessment be done by telehealth?',
+        a: 'Yes. The assessment is available by telehealth to patients across New Jersey and Pennsylvania, and in person. Ask us when you get in touch and we will confirm what works for your situation.',
       },
       {
         q: 'What do I leave with?',
@@ -373,11 +443,11 @@ export const SERVICE_PAGES: ServicePage[] = [
     sections: [
       {
         heading: 'Prescribing that follows the plan',
-        body: 'Medication is prescribed as part of the treatment plan established at your comprehensive psychiatric evaluation, not in isolation from it. Psychopharmacology is combined with psychotherapy approaches where both are indicated.',
+        body: 'Medication is prescribed as part of the treatment plan established at your comprehensive psychiatric assessment, not in isolation from it. Psychopharmacology is combined with psychotherapy approaches where both are indicated.',
       },
       {
         heading: 'Measured, not guessed',
-        body: 'We use standardized clinical rating scales to monitor your progress against the baseline taken at your evaluation. The same measures also help catch decompensation early — a change in the wrong direction is easier to act on when it shows up as a number and not only as a feeling.',
+        body: 'We use standardized clinical rating scales to monitor your progress against the baseline taken at your assessment. The same measures also help catch decompensation early — a change in the wrong direction is easier to act on when it shows up as a number and not only as a feeling.',
       },
       {
         heading: 'Adjusting as things change',
@@ -412,12 +482,12 @@ export const SERVICE_PAGES: ServicePage[] = [
     ],
     faqs: [
       {
-        q: 'Can I get medication management without an evaluation first?',
-        a: 'No. The comprehensive psychiatric evaluation establishes the diagnosis and the baseline measurements that medication management depends on.',
+        q: 'Can I get medication management without an assessment first?',
+        a: 'No. The comprehensive psychiatric assessment establishes the diagnosis and the baseline measurements that medication management depends on.',
       },
       {
         q: 'How often are follow-up appointments?',
-        a: 'That depends on your treatment plan and how you are responding. We will agree a schedule with you at your evaluation.',
+        a: 'That depends on your treatment plan and how you are responding. We will agree a schedule with you at your assessment.',
       },
       /**
        * CLIENT: the age range served is not stated as a practice policy
@@ -451,7 +521,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'What telehealth is good for',
-        body: 'Follow-up medication management works particularly well by video: the appointment is a structured review of how you are responding, which does not depend on being in the same room. Comprehensive psychiatric evaluations can also be arranged by telehealth — ask us and we will confirm what suits your situation.',
+        body: 'Follow-up medication management works particularly well by video: the appointment is a structured review of how you are responding, which does not depend on being in the same room. Comprehensive psychiatric assessments can also be arranged by telehealth — ask us and we will confirm what suits your situation.',
       },
       {
         heading: 'When telehealth is not the right call',
@@ -486,8 +556,8 @@ export const GETTING_STARTED = {
       body: 'Send the form below or call us. Tell us how to reach you and, in general terms, what you are looking for. Please do not send health details through the form.',
     },
     {
-      title: 'Comprehensive psychiatric evaluation',
-      body: 'Your first appointment is a full psychiatric evaluation. We review your history, identify risk factors, reach a diagnosis, and build a treatment plan with you.',
+      title: 'Comprehensive psychiatric assessment',
+      body: 'Your first appointment is a full psychiatric assessment. We review your history, identify risk factors, reach a diagnosis, and build a treatment plan with you.',
     },
     {
       title: 'Ongoing care',
@@ -540,7 +610,7 @@ export const WHAT_TO_EXPECT = {
    */
   badge: 'How it works',
   heading: 'What to expect',
-  body: 'Four steps, from the first message to ongoing care. Every new patient starts with the same comprehensive psychiatric evaluation.',
+  body: 'Four steps, from the first contact to ongoing care. Every new patient starts with the same comprehensive psychiatric assessment.',
   steps: [
     {
       title: 'Request an appointment',
@@ -562,7 +632,7 @@ export const WHAT_TO_EXPECT = {
       body: 'Send the form or call us. Tell us how to reach you and why you are getting in touch. Please do not send health details through the form; we will take the clinical details directly.',
     },
     {
-      title: 'Comprehensive psychiatric evaluation',
+      title: 'Comprehensive psychiatric assessment',
       /**
        * "may be affecting", matching SERVICE_PAGES and the source verbatim
        * ("identifies risk factors that MAY impact a patient's mental health").
@@ -628,9 +698,9 @@ export const FEATURED_SERVICES: FeaturedService[] = [
   {
     type: 'featured',
     badge: 'Start here',
-    title: 'Comprehensive psychiatric evaluation',
+    title: 'Comprehensive psychiatric assessment',
     description:
-      'A full assessment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
+      'A structured first appointment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
     footerText: 'In person and by telehealth',
     category: 'Assessment',
     categoryColor: 'var(--color-np-blue-600)',
@@ -750,7 +820,7 @@ export const FAQ = {
         },
         {
           q: 'What happens at the first appointment?',
-          a: 'A comprehensive psychiatric evaluation. We take a full history, identify risk factors, use standardized screening and rating scales where helpful, and finish with a diagnosis and a treatment plan.',
+          a: 'A comprehensive psychiatric assessment. We take a full history, identify risk factors, use standardized screening and rating scales where helpful, and finish with a diagnosis and a treatment plan.',
         },
         {
           q: 'Do you offer telehealth?',
@@ -943,7 +1013,7 @@ export const NEW_PATIENTS_PAGE = {
   title: 'Starting care at Newpoint',
   metaTitle: 'New Patients | Starting Psychiatric Care',
   metaDescription:
-    'What to expect as a new patient at Newpoint: how to get in touch, your first psychiatric evaluation, and how ongoing care works in NJ and PA.',
+    'What to expect as a new patient at Newpoint: how to get in touch, your first psychiatric assessment, and how ongoing care works in NJ and PA.',
   intro:
     'Starting psychiatric care is an awkward thing to do from a standing start, so here is the whole process written down. Three steps, no surprises, and nothing you need to prepare beyond being willing to talk.',
   expectations: [
@@ -955,7 +1025,7 @@ export const NEW_PATIENTS_PAGE = {
       // Scope, not duration: session length is not published anywhere, so no
       // relative claim about appointment length is made.
       heading: 'Your first appointment covers more ground than the ones after it',
-      body: 'It is a comprehensive psychiatric evaluation: a full history, a review of risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end of it.',
+      body: 'It is a comprehensive psychiatric assessment: a full history, a review of risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end of it.',
     },
     {
       heading: 'Follow-up appointments can be in person or by video',
@@ -1057,7 +1127,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers',
   'Confirmed age range served (adults only, or across the lifespan as a practice policy)',
   'Whether substance use and addiction treatment is an active service line',
-  'Named therapy modalities offered (CBT, DBT, and similar), if any',
+  'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page',
   'Whether ADHD is treated. It is one of the highest-volume queries for a psychiatric NP practice and appears nowhere in the source material, so it is not claimed — but it may be an omission rather than a deliberate exclusion',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
@@ -1066,7 +1136,7 @@ export const OPEN_CLIENT_ITEMS = [
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   'Self-pay session fee and the sliding scale criteria',
   'Original logo file, vector preferred',
-  'Service-section footage. Every card on the homepage services section currently reuses the hero clip, which shows a person in a meadow. On a behavioural-health service tile that reads as an implied treatment outcome, which is the same category as a testimonial. Replacement clips must not depict a patient or imply an outcome',
+  'Service-section footage. Every card on the homepage services section currently reuses the hero clip, which shows a person in a meadow. On a behavioral-health service tile that reads as an implied treatment outcome, which is the same category as a testimonial. Replacement clips must not depict a patient or imply an outcome',
   'Optional upgrade only, no longer a gap: written permission or brand assets for insurer logos, if the practice ever wants payer marks instead of the typographic wall',
   'Patient testimonials with documented consent, if the practice wants them later',
   'Reshoot of both provider portraits at 2000px or more with headroom, to unlock the deferred hero treatment',

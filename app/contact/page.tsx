@@ -212,7 +212,7 @@ export default function ContactPage() {
             },
             {
               label: 'Our services',
-              description: 'Evaluation, medication management and telehealth, in detail.',
+              description: 'Assessment, medication management and telehealth, in detail.',
               href: '/services',
             },
           ]}

@@ -55,7 +55,7 @@ export function medicalClinicSchema() {
     url: BUSINESS.domain,
     slogan: BUSINESS.tagline,
     description:
-      'Outpatient psychiatric and behavioral health nurse practitioner practice. Telehealth across New Jersey and Pennsylvania, and in-person care. Psychiatric evaluation and medication management.',
+      'Outpatient psychiatric and behavioral health nurse practitioner practice. Telehealth across New Jersey and Pennsylvania, and in-person care. Psychiatric assessment and medication management.',
     medicalSpecialty: 'Psychiatric',
     telephone: BUSINESS.phonePrimary,
     faxNumber: BUSINESS.fax,
@@ -203,7 +203,7 @@ export function providersSchema() {
  * One service page, as a service offered by the practice.
  *
  * The type varies per service rather than being MedicalTherapy across the
- * board: an evaluation is diagnostic, not therapeutic, and telehealth is a
+ * board: an assessment is diagnostic, not therapeutic, and telehealth is a
  * delivery modality rather than a treatment. See `schemaType` in content.ts.
  */
 export function serviceSchemaFor(s: ServicePage) {
@@ -213,6 +213,12 @@ export function serviceSchemaFor(s: ServicePage) {
     '@id': serviceId(s.slug),
     url: `${BUSINESS.domain}/services/${s.slug}`,
     name: s.title,
+    /* Only where the service has a second name that the page itself uses in
+       visible copy. `alternateName` is valid on any schema.org Thing, and it is
+       how the assessment page tells an engine that "psychiatric evaluation"
+       names the same procedure without the H1 having to say it. Omitted rather
+       than emitted empty when a service has no synonym. */
+    ...(s.alternateName ? { alternateName: s.alternateName } : {}),
     description: s.intro,
     provider: { '@id': ORG_ID },
     availableIn: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),

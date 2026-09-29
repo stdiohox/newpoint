@@ -13,7 +13,7 @@ import { BUSINESS } from '@/lib/content';
  * supplied asset. If the practice has photography or a designed card it would
  * rather use, drop it in as app/opengraph-image.jpg and delete this file.
  */
-export const alt = `${BUSINESS.legalName} — psychiatric care in New Jersey and Pennsylvania`;
+export const alt = `${BUSINESS.legalName} — mental and behavioral care in New Jersey and Pennsylvania`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -49,18 +49,22 @@ export default function OpengraphImage() {
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div
           style={{
-            fontSize: 68,
+            // 60/1000, down from 68/900. The headline gained 11 characters when
+            // it became "Mental and behavioral care across …", which wrapped to
+            // three lines in the old measure and crowded the card. This holds it
+            // at two, which is the composition the card was set for.
+            fontSize: 60,
             lineHeight: 1.08,
             color: '#ffffff',
             fontWeight: 600,
             letterSpacing: '-0.03em',
-            maxWidth: 900,
+            maxWidth: 1000,
           }}
         >
-          Psychiatric care across New Jersey and Pennsylvania
+          Mental and behavioral care across New Jersey and Pennsylvania
         </div>
         <div style={{ fontSize: 30, color: '#8fb0ee', marginTop: 28, letterSpacing: '-0.01em' }}>
-          Evaluation. Medication management. Telehealth.
+          Assessment. Medication management. Telehealth.
         </div>
       </div>
 

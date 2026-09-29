@@ -24,7 +24,7 @@ export const metadata = pageMetadata({
   // services" as its head term, so the two are not arbitrating the same query.
   title: 'Psychiatric Services in NJ and PA',
   description:
-    'Psychiatric evaluation, medication management, and telehealth in New Jersey and Pennsylvania. What each involves and how to get started.',
+    'Psychiatric assessment, medication management, and telehealth in New Jersey and Pennsylvania. What each involves and how to get started.',
   path: '/services',
 });
 
@@ -39,9 +39,36 @@ export default function ServicesIndex() {
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
+        {/* The care pathway in one sentence, per the owners, 2026-09-29:
+            assessment first, then medication management visits, with
+            psychotherapy alongside them. The psychotherapy half is not a new
+            claim — SERVICE_PAGES already states that the plan "combines
+            psychotherapy approaches and psychopharmacology", sourced verbatim
+            from the live Services page — but this is the first place the site
+            names it as a way care is actually delivered rather than as
+            something a plan may contain.
+
+            "WHERE IT IS INDICATED" IS NOT PADDING, and an earlier draft of this
+            line lost it. That draft read "on their own, or combined with
+            psychotherapy", which frames therapy as an option the patient picks
+            off a menu. Every sibling statement of this same fact hedges it as a
+            clinical judgement — SERVICE_PAGES' "where both are indicated"
+            twice, and the assessment FAQ's "where appropriate" — and
+            WHAT_TO_EXPECT carries a comment explaining that the hedge is
+            load-bearing. A patient who books expecting to choose talk therapy
+            and is told at the assessment that it is a clinical call was
+            mis-sold by this sentence.
+
+            "Each of the three below" rather than "each of those": psychotherapy
+            now appears in the preceding list and has no page, so an unscoped
+            "those" promises a destination that does not exist. It is written as
+            a mode of the medication-management track for the same reason, and
+            because the source names no modality. Who delivers it, in what form,
+            and whether it warrants a page of its own are all open — see
+            OPEN_CLIENT_ITEMS. */}
         <PageHero
           title="What we do, and how it works"
-          intro="Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management, in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of those is a page of its own below."
+          intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
         />
 
         <div className="py-20 md:py-28">
@@ -120,14 +147,14 @@ export default function ServicesIndex() {
                               Naming both providers under each service asserts
                               that both personally deliver it. That is sourced
                               for medication management and telehealth, and NOT
-                              for the comprehensive psychiatric evaluation:
-                              Ofoegbu's bio names evaluations, Whitaker's names
+                              for the comprehensive psychiatric assessment:
+                              Ofoegbu's bio names assessments, Whitaker's names
                               medication management only. The page-wide "Who you
                               will see" section below says what is actually
                               sourced — these are the two clinicians — without
                               binding either to a named service.
                               CLIENT: confirm whether both providers perform
-                              initial psychiatric evaluations, and this becomes
+                              initial psychiatric assessments, and this becomes
                               a per-service field. */}
 
                           <div>
@@ -167,7 +194,7 @@ export default function ServicesIndex() {
               </Reveal>
               <Reveal delay={0.08}>
                 <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
-                  Alongside evaluation and medication management, we will work with you to find the
+                  Alongside assessment and medication management, we will work with you to find the
                   treatment option that fits.
                 </p>
               </Reveal>

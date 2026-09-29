@@ -16,7 +16,7 @@ import { breadcrumbSchema, faqSchemaFlat, organizationRef, serviceSchemaFor } fr
  *
  * The homepage's services cards summarise each service in two sentences
  * each, which is the right density for an overview and far too thin to rank for
- * "psychiatric evaluation new jersey". These pages carry that weight instead,
+ * "psychiatric assessment new jersey". These pages carry that weight instead,
  * each targeting a single query cluster, each with its own title, description,
  * its own schema.org node, and FAQ block.
  *

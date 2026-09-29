@@ -35,10 +35,7 @@ export default function InsurancePage() {
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHero
-          title={INSURANCE_PAGE.title}
-          intro={INSURANCE_PAGE.intro}
-        />
+        <PageHero title={INSURANCE_PAGE.title} intro={INSURANCE_PAGE.intro} />
 
         <div className="py-20 md:py-28">
           <Container>
@@ -86,7 +83,7 @@ export default function InsurancePage() {
               href: '/new-patients',
             },
             {
-              label: 'Psychiatric evaluation',
+              label: 'Psychiatric assessment',
               description: 'The appointment every new patient starts with, described in full.',
               href: '/services/psychiatric-evaluation',
             },

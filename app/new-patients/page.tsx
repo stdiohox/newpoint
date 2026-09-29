@@ -160,7 +160,7 @@ export default function NewPatientsPage() {
         <RelatedLinks
           links={[
             {
-              label: 'Psychiatric evaluation',
+              label: 'Psychiatric assessment',
               description: 'Your first appointment, described step by step.',
               href: '/services/psychiatric-evaluation',
             },

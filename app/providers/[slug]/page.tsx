@@ -170,11 +170,23 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                         in /research is Lawrence Township, New Jersey, and there
                         is no Pennsylvania location signal at all. The street
                         address remains an open item — see OPEN_CLIENT_ITEMS. */}
+                    {/* "New patients at Newpoint start with", practice-voiced,
+                        NOT a second clause about this provider. Sitting under a
+                        named clinician's photograph, "New patients start with a
+                        comprehensive psychiatric assessment" reads as a claim
+                        that SHE performs it. That is sourced for Ofoegbu, whose
+                        bio names assessments, and not for Whitaker, whose names
+                        medication management only — which is exactly why
+                        app/services/page.tsx refuses to bind either provider to
+                        a named service and files the question under CLIENT.
+                        Naming the practice keeps the sentence true on both
+                        pages. */}
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
                       {provider.name.split(' ')[0]} sees patients across{' '}
                       {BUSINESS.serviceArea.join(' and ')} by telehealth, and in person. New
-                      patients start with a comprehensive psychiatric evaluation; care continues as
-                      medication management on a schedule agreed with you.
+                      patients at {BUSINESS.shortName} start with a comprehensive psychiatric
+                      assessment; care continues as medication management on a schedule agreed with
+                      you.
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>

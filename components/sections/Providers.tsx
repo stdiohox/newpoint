@@ -45,7 +45,7 @@ const CARD_SENTENCE: Record<string, string> = {
   'funmilayo-whitaker':
     'Funmilayo is dual board-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner.',
   'anastasia-ofoegbu':
-    'She provides psychiatric evaluations, medication management, and supportive counseling.',
+    'She provides psychiatric assessments, medication management, and supportive counseling.',
 };
 
 /**
@@ -231,7 +231,7 @@ export function Providers() {
                 textWrap: 'balance',
               }}
             >
-              You will see one of two providers. Here they are.
+              You will see the providers
             </h2>
           </Reveal>
 
