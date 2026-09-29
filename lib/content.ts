@@ -5,16 +5,33 @@
  * from /research. Verifiable regulated facts are never invented. Anything not
  * confirmed in /research is listed in `OPEN_CLIENT_ITEMS` below and marked at
  * its point of use with a `CLIENT:` comment.
+ *
+ * SERVER ONLY, AND IT MATTERS. Nothing under a `'use client'` directive may
+ * import from this file: a client component's import graph is shipped to the
+ * browser, so one import here puts every bio, FAQ answer and payer name into a
+ * public JS chunk. The three constants a client component legitimately needs —
+ * the nav, the CTA and the practice name — live in `lib/nav.ts`, which imports
+ * nothing. See the note at the top of that file.
  */
+
+import { BRAND } from './nav';
+
+/**
+ * Re-exported so the server components that already read these from here keep
+ * working. `lib/nav.ts` is the definition; this is an alias, not a copy.
+ */
+export { NAV, CTA } from './nav';
 
 export const BUSINESS = {
   /**
-   * Canonical name per CLAUDE.md. The live site spells this four different ways.
+   * Canonical name per CLAUDE.md, defined in lib/nav.ts because the navbar
+   * needs it without needing the rest of this file. The live site spells it
+   * four different ways.
    * CLIENT: confirm exact legal name from the LLC formation documents,
    * "Newpoint" (one word) vs "New Point" (two words), before any GBP or citation work.
    */
-  legalName: 'Newpoint Healthcare Services, LLC',
-  shortName: 'Newpoint',
+  legalName: BRAND.legal,
+  shortName: BRAND.short,
   tagline: 'Your Health is our Priority',
   domain: 'https://www.newpointnp.com',
 
@@ -43,28 +60,6 @@ export const BUSINESS = {
   serviceAreaNote: 'Lawrence Township, New Jersey',
   /** The town alone. schema.org's City node takes the state via containedInPlace. */
   serviceAreaTown: 'Lawrence Township',
-} as const;
-
-/**
- * Primary navigation.
- *
- * Every href is root-relative, never a bare `#anchor`, because the nav now
- * renders on interior routes as well as the homepage. A bare `#providers` on
- * /insurance would resolve against /insurance and go nowhere.
- */
-export const NAV = [
-  { label: 'Services', href: '/services' },
-  { label: 'Providers', href: '/#providers' },
-  { label: 'Insurance', href: '/insurance' },
-  { label: 'New patients', href: '/new-patients' },
-  { label: 'FAQ', href: '/#faq' },
-  { label: 'Contact', href: '/contact' },
-] as const;
-
-/** Single CTA intent across the entire site. Never a second label for this action. */
-export const CTA = {
-  label: 'Request an appointment',
-  href: '/#contact',
 } as const;
 
 export const HERO = {

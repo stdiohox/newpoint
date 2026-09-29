@@ -6,7 +6,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Menu, X } from 'lucide-react';
-import { NAV, CTA, BUSINESS } from '@/lib/content';
+/* lib/nav.ts, NOT lib/content.ts. This is a client component, so whatever it
+   imports is shipped to the browser — importing the copy module put every
+   provider bio, FAQ answer and payer name into a public chunk. nav.ts holds
+   only these three and imports nothing. See the note at the top of it. */
+import { NAV, CTA, BRAND } from '@/lib/nav';
 import { useHydrated } from '@/lib/useHydrated';
 
 /**
@@ -179,8 +183,8 @@ export function Navbar1() {
           inline SVG mark; next/image adds no optimisation for SVG. */}
       <img src="/brand/newpoint-mark-ink.svg" alt="" className="h-8 w-auto" />
       <span className="text-np-ink text-xl font-semibold tracking-tight">
-        {BUSINESS.shortName}
-        <span className="sr-only"> {BUSINESS.legalName}, home</span>
+        {BRAND.short}
+        <span className="sr-only"> {BRAND.legal}, home</span>
       </span>
     </Link>
   );
