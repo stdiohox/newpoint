@@ -48,7 +48,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const siblings = SERVICE_PAGES.filter((s) => s.slug !== service.slug);
   const poster = cardPosterFor(`/services/${service.slug}`);
 
-  /** One trail, used for both the visible breadcrumb and the schema, so the two cannot drift. */
+  /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [
     { name: 'Services', path: '/services' },
     { name: service.nav, path: `/services/${service.slug}` },
@@ -69,7 +69,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           eyebrow="Services"
           title={service.title}
           intro={service.intro}
-          crumbs={crumbs}
           /* The same frame the homepage card for this service shows at rest,
              so arriving here from that card is continuous. */
           image={poster ? { src: poster } : undefined}

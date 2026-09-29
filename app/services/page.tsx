@@ -42,7 +42,6 @@ export default function ServicesIndex() {
         <PageHero
           title="What we do, and how it works"
           intro="Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management, in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of those is a page of its own below."
-          crumbs={[{ name: 'Services', path: '/services' }]}
         />
 
         <div className="py-20 md:py-28">

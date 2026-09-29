@@ -38,7 +38,6 @@ export default function InsurancePage() {
         <PageHero
           title={INSURANCE_PAGE.title}
           intro={INSURANCE_PAGE.intro}
-          crumbs={[{ name: 'Insurance', path: '/insurance' }]}
         />
 
         <div className="py-20 md:py-28">

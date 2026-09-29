@@ -38,7 +38,6 @@ export default function NewPatientsPage() {
         <PageHero
           title={NEW_PATIENTS_PAGE.title}
           intro={NEW_PATIENTS_PAGE.intro}
-          crumbs={[{ name: 'New patients', path: '/new-patients' }]}
           image={poster ? { src: poster } : undefined}
         />
 

@@ -56,7 +56,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   const colleague = PROVIDERS.find((p) => p.slug !== provider.slug);
 
-  /** One trail, used for both the visible breadcrumb and the schema, so the two cannot drift. */
+  /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [{ name: provider.name, path: `/providers/${provider.slug}` }];
 
   const facts = [
@@ -84,7 +84,6 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           eyebrow="Provider"
           title={`${provider.name}, ${provider.credentials}`}
           intro={provider.bio}
-          crumbs={crumbs}
         />
 
         <div className="py-20 md:py-28">

@@ -1,10 +1,7 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
 import { CTA } from '@/lib/content';
-
-export type Crumb = { name: string; path: string };
 
 /**
  * Interior page hero, in the homepage's treatment.
@@ -26,20 +23,21 @@ export type Crumb = { name: string; path: string };
  * running to the top right, so the deep end sits under the copy and the scrim
  * reinforces it rather than muddying the light end.
  *
- * The breadcrumb stays visible rather than schema-only, as it was before: it is
- * the only way back up a level on a page reached directly from a search result.
+ * The breadcrumb is schema-only. It used to render above the H1 as a visible
+ * "Home / Services" trail; that read as a second, older navigation bar sitting
+ * under the real one. `breadcrumbSchema()` still runs on every page below the
+ * root, so search results keep their trail, and the sticky navbar carries every
+ * top-level destination for getting back up a level.
  */
 export function PageHero({
   eyebrow,
   title,
   intro,
-  crumbs,
   image,
 }: {
   eyebrow?: string;
   title: string;
   intro: string;
-  crumbs: Crumb[];
   /**
    * The page's own photograph. Decorative: the H1 beside it already names the
    * page, so it renders with an empty alt and is not described twice.
@@ -48,14 +46,12 @@ export function PageHero({
   image?: { src: string; objectPosition?: string };
 }) {
   return (
-    /* on-ink: every focus ring in here would otherwise fall back to the
-       global np-blue-600 outline, which globals.css itself measures at 1.93:1
-       against np-blue-900 — the colour this hero's scrim is built from. The
-       class swaps it for white, the same way Footer and Providers do.
-       It fixes the breadcrumb links only. The CTA carries its own
-       focus-visible utility, and utilities beat the base layer this class
-       lives in, so that one is fixed inside ButtonWithIcon instead. */
-    <header className="on-ink bg-np-blue-900 relative -mt-[var(--nav-h)] flex min-h-[50dvh] flex-col text-white md:min-h-[60vh]">
+    /* No `on-ink` here, unlike Footer, PageCta and Providers. That class only
+       swaps the focus-ring colour, it was carried solely for the breadcrumb
+       links, and the CTA — now the one focusable thing in this header — fixes
+       its own ring inside ButtonWithIcon with a utility that beats the base
+       layer `on-ink` lives in anyway. */
+    <header className="bg-np-blue-900 relative -mt-[var(--nav-h)] flex min-h-[50dvh] flex-col text-white md:min-h-[60vh]">
       {image ? (
         <Image
           src={image.src}
@@ -79,12 +75,14 @@ export function PageHero({
           frame. The homepage's ramp holds full strength for the bottom 52% and
           fades out above it, which works there because that hero is a full
           viewport with its copy anchored in the bottom corner. Here the hero is
-          60vh and the copy fills it: the breadcrumb lands about a quarter of
-          the way down, which on that ramp is the fully transparent part. Shot
-          and measured, the breadcrumb came out at 1.3:1 over a bright window.
-          0.62 is the floor that puts 13px white at 4.99:1 against the worst
-          pixel in these posters (a blown window, about rgb(240,243,247)); it
-          still ramps to 0.85 at the bottom so the frame keeps some depth.
+          60vh and the copy fills it: the eyebrow sits high enough to land in
+          that ramp's fully transparent part, where it was shot and measured at
+          1.3:1 over a bright window. 0.62 is the floor that puts 13px white at
+          4.99:1 against the worst pixel in these posters (a blown window, about
+          rgb(240,243,247)); it still ramps to 0.85 at the bottom so the frame
+          keeps some depth. The floor is kept now that the breadcrumb above the
+          eyebrow is gone: the copy block simply starts one line lower, and
+          nothing about the posters got darker.
 
           The gradient pages keep the lighter ramp. They have no photograph to
           fight, measure between 5.3:1 and 14.3:1 as they are, and flattening
@@ -105,51 +103,23 @@ export function PageHero({
           the JavaScript critical path. */}
       <div className="relative flex flex-1 flex-col justify-end pt-[calc(var(--nav-h)+3rem)] pb-12 md:pb-16">
         <Container>
-          <nav aria-label="Breadcrumb">
-            <ol
-              role="list"
-              /* Full white, not white/85. Measured against the brightest of these
-                 posters (a blown window behind the psychiatric-evaluation frame)
-                 85% white came out at 4.41:1, just under the floor for 13px.
-                 Full white measures 5.37:1 there. The separator stays dimmer:
-                 it is aria-hidden decoration, not information. */
-              className="text-caption flex flex-wrap items-center gap-x-2 gap-y-1 text-white"
-            >
-              <li>
-                <Link href="/" className="underline-offset-4 hover:text-white hover:underline">
-                  Home
-                </Link>
-              </li>
-              {crumbs.map((crumb, i) => {
-                const isLast = i === crumbs.length - 1;
-                return (
-                  <li key={crumb.path} className="flex items-center gap-2">
-                    <span aria-hidden="true" className="text-white/50">
-                      /
-                    </span>
-                    {isLast ? (
-                      <span className="text-white" aria-current="page">
-                        {crumb.name}
-                      </span>
-                    ) : (
-                      <Link
-                        href={crumb.path}
-                        className="underline-offset-4 hover:text-white hover:underline"
-                      >
-                        {crumb.name}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
-
+          {/* Full white, not white/85. Measured against the brightest of these
+              posters (a blown window behind the psychiatric-evaluation frame)
+              85% white came out at 4.41:1, just under the floor for 13px. Full
+              white measures 5.37:1 there. */}
           {eyebrow && (
-            <p className="text-caption mt-6 tracking-[0.08em] text-white uppercase">{eyebrow}</p>
+            <p className="text-caption tracking-[0.08em] text-white uppercase">{eyebrow}</p>
           )}
 
-          <h1 className="text-display-l mt-4 max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)]">
+          {/* mt only under an eyebrow. With the breadcrumb removed the H1 is
+              the first thing in this column on the pages that have no eyebrow,
+              and a top margin there would only pad the block against the
+              navbar clearance above it. */}
+          <h1
+            className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
+              eyebrow ? 'mt-4' : ''
+            }`}
+          >
             {title}
           </h1>
 
