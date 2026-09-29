@@ -110,6 +110,26 @@ So: state telehealth across both states freely. State in-person care **without a
 it to a state**, until the client confirms where. Writing "in person across New Jersey and
 Pennsylvania" sends a PA patient to a location that is not known to exist.
 
+> **Update, 2026-09-29 — the rule above still stands, but its premise has weakened.**
+> [`research/provider-directories.md`](research/provider-directories.md) captures the
+> providers' own third-party listings. Three platforms independently give the NJ address as
+> **6 Colonial Lake Drive, Suite D, Lawrence Township, NJ 08648**, and U.S. News pairs it
+> with the practice's own main phone number — so the address is effectively confirmed. More
+> importantly, Headway lists a **second, Pennsylvania office** for Whitaker (803 West
+> Trenton Avenue Ste 3, Morrisville, PA 19067, "Location 1 of 2"). The sentence above
+> — "there is no Pennsylvania location signal at all" — was true of the 2026-08-27 crawl and
+> is no longer true of everything we hold.
+>
+> **Do not relax the rule on that alone.** One platform, one provider, and it may be a
+> Headway location rather than a Newpoint office. Get the client to confirm, then this
+> restriction can be lifted and the site can claim in-person care in both states.
+>
+> **A separate and more serious finding is in that file:** Headway's structured licensure
+> field gives Ofoegbu **New Jersey only**, while this site, her own bio and her own
+> free-text on that same page all say New Jersey and Pennsylvania. The site currently tells
+> a Pennsylvania patient that either provider can see them. Resolve before launch — it is
+> the top item in `OPEN_CLIENT_ITEMS`.
+
 ### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29
 
 Agreed in a meeting with the owners. Like the care-modality note above, this
