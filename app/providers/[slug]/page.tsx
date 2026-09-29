@@ -64,6 +64,11 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     { label: 'Role', value: provider.role },
     { label: 'Licensure', value: provider.licensed },
     { label: 'Education', value: provider.education },
+    // No 'Approach' row any more. It carried a clipped third-person paraphrase
+    // of the same sentence the page now prints in the provider's own words,
+    // under "My approach" below, so the two read as a stutter side by side.
+    // PROVIDERS[].approach is kept as the short form for anywhere that needs a
+    // scannable version.
     // The addiction-nursing caveat that used to sit here is resolved. It asked
     // for confirmation that substance use is a real service line before the
     // experience row implied one; both providers now publish it as a specialty
@@ -71,7 +76,6 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     // it appears in `treats` below, so the row no longer implies more than the
     // rest of the page states. See research/provider-directories.md.
     { label: 'Experience', value: provider.experience },
-    { label: 'Approach', value: provider.approach },
     // Languages last: it is the row a patient scans for rather than reads in
     // order, and both providers speak more than English, which is a real reason
     // someone picks this practice over another.
@@ -88,10 +92,15 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     <>
       <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
+        {/* The standfirst is the FIRST paragraph of her bio, not the whole
+            thing. `bio` is the provider's own Headway introduction and runs to
+            two paragraphs for Whitaker; all of it in a hero would push the page
+            below the fold before anything is said. The remainder is printed as
+            body copy beside her portrait, in order, so nothing is lost. */}
         <PageHero
           eyebrow="Provider"
           title={`${provider.name}, ${provider.credentials}`}
-          intro={provider.bio}
+          intro={provider.bio[0]}
         />
 
         <div className="py-20 md:py-28">
@@ -154,18 +163,67 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
               </div>
 
               <div className="md:col-span-7">
-                <Reveal>
-                  <h2 className="text-h2">What {provider.name.split(' ')[0]} treats</h2>
-                </Reveal>
-                <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                  {provider.treats.map((condition, i) => (
-                    <Reveal as="li" key={condition} delay={stagger(i, 0.04)}>
-                      <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
-                        {condition}
-                      </span>
-                    </Reveal>
-                  ))}
-                </ul>
+                {/* HER OWN WORDS, IN HER OWN ORDER, and the first prose this
+                    page has carried. Until now everything below the hero was a
+                    definition list and a chip cloud — facts about a clinician
+                    rather than a clinician talking. These three blocks are the
+                    provider's Headway profile: the rest of her introduction,
+                    then her approach, then what a patient can expect. The
+                    headings are hers too, lightly shortened.
+
+                    Rendered before "What she treats" deliberately: someone who
+                    has just read her name and credentials in the hero wants to
+                    know who she is, not to be handed a taxonomy. */}
+                {provider.bio.slice(1).map((para, i) => (
+                  <Reveal key={i} delay={stagger(i, 0.06)}>
+                    <p className="text-body-l text-np-neutral-600 max-w-[62ch] not-first:mt-4">
+                      {para}
+                    </p>
+                  </Reveal>
+                ))}
+
+                <div
+                  className={
+                    provider.bio.length > 1
+                      ? 'border-np-neutral-200 mt-12 border-t pt-10'
+                      : undefined
+                  }
+                >
+                  <Reveal>
+                    <h2 className="text-h2">My approach</h2>
+                  </Reveal>
+                  <Reveal delay={0.08}>
+                    <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                      {provider.approachFull}
+                    </p>
+                  </Reveal>
+                </div>
+
+                <div className="border-np-neutral-200 mt-12 border-t pt-10">
+                  <Reveal>
+                    <h2 className="text-h2">What you can expect</h2>
+                  </Reveal>
+                  <Reveal delay={0.08}>
+                    <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                      {provider.expect}
+                    </p>
+                  </Reveal>
+                </div>
+
+                <div className="border-np-neutral-200 mt-12 border-t pt-10">
+                  <Reveal>
+                    <h2 className="text-h2">What {provider.name.split(' ')[0]} treats</h2>
+                  </Reveal>
+                  <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
+                    {provider.treats.map((condition, i) => (
+                      <Reveal as="li" key={condition} delay={stagger(i, 0.04)}>
+                        <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
+                          {condition}
+                        </span>
+                      </Reveal>
+                    ))}
+                  </ul>
+                </div>
 
                 <div className="border-np-neutral-200 mt-12 border-t pt-10">
                   <Reveal>

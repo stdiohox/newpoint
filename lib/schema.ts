@@ -180,7 +180,11 @@ export function personSchemaFor(p: Provider) {
        */
       occupationalLocation: BUSINESS.serviceArea.map((s) => ({ '@type': 'State', name: s })),
     },
-    description: p.bio,
+    /* The whole bio, paragraphs rejoined. `bio` became an array when the
+       providers' own multi-paragraph Headway text replaced the third-person
+       summary; schema.org wants one string, and truncating to the first
+       paragraph would drop half of what each provider says about herself. */
+    description: p.bio.join(' '),
     image: `${BUSINESS.domain}${p.image.jpg1120}`,
     email: p.email,
     telephone: BUSINESS.phonePrimary,

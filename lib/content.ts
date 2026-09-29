@@ -184,7 +184,20 @@ export type Provider = {
   education: string;
   /** Languages the provider sees patients in. */
   languages: string;
-  bio: string;
+  /**
+   * The provider's own introduction, in her own voice, one entry per paragraph.
+   *
+   * FIRST PERSON, AND AN ARRAY, both since 2026-09-29. These are the providers'
+   * own Headway bios, which the client asked for verbatim — see
+   * research/provider-directories.md and the note on PROVIDERS below. The array
+   * exists because Whitaker's runs to two paragraphs; the provider page uses
+   * [0] as the hero standfirst and renders the rest as body copy.
+   */
+  bio: string[];
+  /** Her own answer to "My approach to therapy". First person. */
+  approachFull: string;
+  /** Her own answer to "What you can expect from me". First person. */
+  expect: string;
   treats: string[];
   email: string;
 };
@@ -206,6 +219,31 @@ export type Provider = {
  * and CLAUDE.md makes it a regulated fact), ages served (the two platforms
  * directly contradict each other), named therapy modalities (four candidates,
  * no two agreeing), and anything from the patient reviews.
+ *
+ * ---
+ *
+ * BIOS ARE THE PROVIDERS' OWN HEADWAY PROFILES, VERBATIM, at the client's
+ * request (2026-09-29). `bio`, `approachFull` and `expect` map one-to-one onto
+ * Headway's "Great to meet you!", "My approach to therapy" and "What you can
+ * expect from me" blocks. They are reproduced as written, in the first person,
+ * with four classes of exception and no others:
+ *
+ * 1. THE APPOINTMENT IS AN ASSESSMENT, NOT AN EVALUATION. Both providers wrote
+ *    "evaluation"; the owners instructed on the same day that the site says
+ *    "assessment". The owners' rule is the more recent and the more specific to
+ *    this site, so it wins here — but it IS a deviation from verbatim, it is
+ *    the only one that changes meaning, and CLAUDE.md's terminology section is
+ *    where to reverse it if the client would rather keep their own word.
+ * 2. Objective typos are fixed: a stray full stop in "My name is Anastasia.
+ *    Ofoegbu", and "reading an most of all".
+ * 3. British spellings are Americanised ("travelling"), matching the rest of
+ *    the site and both states served.
+ * 4. Mid-sentence capitals on common nouns are lowered, and one missing article
+ *    restored, in Ofoegbu's approach line. Marketplace profiles are typed into
+ *    a form; a practice site is typeset.
+ *
+ * The unedited originals are in research/directories/headway-*.txt. Diff
+ * against those before changing anything here.
  */
 export const PROVIDERS: Provider[] = [
   {
@@ -237,19 +275,39 @@ export const PROVIDERS: Provider[] = [
     /* Headway lists Yoruba; U.S. News records "Speaks English". */
     languages: 'English and Yoruba',
     /**
-     * "ACROSS THE LIFESPAN" IS GONE from the second sentence, deliberately.
-     * It was an age-range claim the practice's own site made and that
-     * OPEN_CLIENT_ITEMS has always flagged as unconfirmed — and the directory
-     * capture makes it worse rather than better: Grow Therapy says she serves
-     * adults 18-64 and elders 65+ with no children, Headway says adults,
-     * adolescents AND children. Two platforms, one clinician, opposite answers.
-     * The sentence says what she does without saying who to.
+     * Verbatim from Headway, unedited. Her paragraph break is kept.
      *
-     * The first sentence is reproduced verbatim on the homepage cards and is
+     * The "across the lifespan" age claim that the practice's own site made,
+     * and that OPEN_CLIENT_ITEMS has always flagged, does not appear in her own
+     * bio — so adopting her wording resolves that exposure rather than
+     * reintroducing it. Good, because the directory capture makes the age
+     * question worse, not better: Grow says adults and elders with no children,
+     * Headway says adults, adolescents AND children.
+     *
+     * The first paragraph is reproduced verbatim on the homepage cards and is
      * asserted at build time by assertSourced() in components/sections/
-     * Providers.tsx. Do not reword it here without updating CARD_SENTENCE.
+     * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
-    bio: 'Funmilayo is dual board-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner. She holds a Doctor of Nursing Practice from the University of North Florida and a Master of Science in Nursing from Tennessee State University, and has practiced in group practice, community settings, and telehealth. She provides medication management for a wide range of psychiatric conditions, and sees patients in English and Yoruba.',
+    bio: [
+      'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over ten years of direct patient care experience.',
+      'I have worked in diverse roles, diagnosing and treating mental health disorders in group practice, community settings, and telehealth. I offer medication management for various mental health conditions for individuals with psychiatric disorders such as depression, anxiety, bipolar disorder, panic attacks, PTSD, schizophrenia, addiction, etc.',
+    ],
+    /* Verbatim. The short `approach` above is the scannable version of this
+       same sentence and is what the facts list used to show; the page now
+       prints her own words instead, so the two never appear together. */
+    approachFull:
+      'I use a warm, empathic, non-judgmental, and collaborative approach in treating individuals with mental illness.',
+    /**
+     * Verbatim except for ONE word: she wrote "comprehensive psychiatric
+     * evaluation" and this says "assessment", per the owners' 2026-09-29
+     * terminology rule. See the block comment above PROVIDERS.
+     *
+     * This passage is also the origin of WHAT_TO_EXPECT on the homepage — the
+     * live practice site carries a near-identical version, recorded verbatim at
+     * research/content/services.md. The two should stay in step.
+     */
+    expect:
+      'The initial visit consists of completing a comprehensive psychiatric assessment and identifying risk factors that might affect an individual’s mental health. Diagnoses of mental illness are made based on assessment, and then the most effective care plan for the individual is determined. The treatment plan consists of psychotherapy modalities and psychopharmacology to improve the person’s mental health. As we evaluate progress, we will continue to provide support and education as needed.',
     /**
      * The last three are new on 2026-09-29, from her own directory profiles.
      * ADHD and substance use are each published by her on BOTH Grow Therapy
@@ -322,11 +380,34 @@ export const PROVIDERS: Provider[] = [
     education: 'DNP, University of North Florida',
     languages: 'English, Igbo, and Yoruba',
     /**
+     * Verbatim from Headway, as one paragraph, with two typo fixes and one
+     * spelling change: her "My name is Anastasia. Ofoegbu" loses its stray full
+     * stop, "reading an most of all" becomes "reading and, most of all", and
+     * "travelling" is Americanised.
+     *
+     * NOTE she states her own Pennsylvania licensure here, in her own words.
+     * That is the claim Headway's structured licensure field contradicts — see
+     * `licensed` above and the top item in OPEN_CLIENT_ITEMS. Adopting her bio
+     * does not make the claim safer; it makes it hers. Still resolve it.
+     *
      * The second sentence is reproduced verbatim on the homepage cards and
      * asserted at build time by assertSourced() in components/sections/
      * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
-    bio: 'Anastasia is dual-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner, and holds a Doctor of Nursing Practice from the University of North Florida. She provides psychiatric assessments, medication management, and supportive counseling. She sees patients in English, Igbo, and Yoruba. Outside of practice she enjoys traveling, reading, and spending time with her family.',
+    bio: [
+      'My name is Anastasia Ofoegbu, a dual certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania. I enjoy traveling, reading and, most of all, love spending time with my family.',
+    ],
+    /**
+     * Verbatim except: "evaluations" becomes "assessments" per the owners'
+     * terminology rule, the missing article in "I utilize Evidence-based ...
+     * approach" is restored, and her mid-sentence capitals on common nouns are
+     * lowered. Her sentence structure and word choices are untouched.
+     */
+    approachFull:
+      'I utilize an evidence-based and patient-centered therapeutic approach to provide psychiatric assessments, medication management and supportive counseling for patients with depression, anxiety and panic attacks, bipolar disorder, and other psychotic and mood disorders.',
+    /* Verbatim, unedited. */
+    expect:
+      'I am passionate about working with patients with mental health disorders to manage symptoms and improve their quality of life.',
     /**
      * Expanded 2026-09-29 from her Headway profile, which lists all of these as
      * her specialties. Substance use is listed FIRST there, which together with
