@@ -108,10 +108,21 @@ export function PageHero({
    * Horizontal alignment of the copy column. `left` is the default and what the
    * other five callers get.
    *
-   * `center` is not just text-align. The scrim below switches with it, because
-   * the `hero` scrim's shape is built around where the copy sits: a left ramp
-   * under a centred block would darken the empty side and leave the text on the
-   * bright middle.
+   * `center` IS lg AND UP ONLY, and the breakpoint is doing real work rather
+   * than hedging.
+   *
+   * Below lg the crop is tight enough that the subject fills almost the whole
+   * frame: at 390 the visible window is 35% of the source width and she spans
+   * 19% to 98% of it. A centred heading lands across her face, where the
+   * left-aligned one sat clear of it. The intro is also eight lines at that
+   * width, and centring eight lines gives every line a different starting x,
+   * which is worse to read whatever is behind it. Centring earns its keep on a
+   * short heading in a wide frame and costs on a tall mobile paragraph.
+   *
+   * It is not just text-align either. The scrim switches with it, because the
+   * `hero` scrim's shape is built around where the copy sits: the left ramp
+   * stays below lg where the copy is left-aligned, and is dropped at lg where
+   * it would darken the empty margin and leave the text on the bright middle.
    */
   copyAlign?: 'left' | 'center';
   /**
@@ -296,10 +307,10 @@ export function PageHero({
           is. The flat tint on layer 1 still guarantees the frame is never fully
           transparent anywhere, which is the property this layer was originally
           added to protect, so dropping it here costs nothing. */}
-      {image && scrim === 'hero' && copyAlign === 'left' && (
+      {image && scrim === 'hero' && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]"
+          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''}bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]`}
         />
       )}
 
@@ -332,7 +343,7 @@ export function PageHero({
           aria-hidden="true"
           className={`pointer-events-none absolute inset-0 ${
             copyAlign === 'center'
-              ? 'bg-[radial-gradient(ellipse_96%_72%_at_50%_58%,rgba(16,31,69,0.58)_0%,rgba(16,31,69,0.58)_50.0%,rgba(16,31,69,0.548)_57.1%,rgba(16,31,69,0.465)_64.3%,rgba(16,31,69,0.352)_71.4%,rgba(16,31,69,0.228)_78.6%,rgba(16,31,69,0.115)_85.7%,rgba(16,31,69,0.032)_92.9%,rgba(16,31,69,0)_100.0%)] lg:bg-[radial-gradient(ellipse_58%_64%_at_50%_58%,rgba(16,31,69,0.58)_0%,rgba(16,31,69,0.58)_50.0%,rgba(16,31,69,0.548)_57.1%,rgba(16,31,69,0.465)_64.3%,rgba(16,31,69,0.352)_71.4%,rgba(16,31,69,0.228)_78.6%,rgba(16,31,69,0.115)_85.7%,rgba(16,31,69,0.032)_92.9%,rgba(16,31,69,0)_100.0%)]'
+              ? 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(16,31,69,0.54)_0%,rgba(16,31,69,0.54)_50%,rgba(16,31,69,0.51)_57.1%,rgba(16,31,69,0.433)_64.3%,rgba(16,31,69,0.327)_71.4%,rgba(16,31,69,0.213)_78.6%,rgba(16,31,69,0.107)_85.7%,rgba(16,31,69,0.03)_92.9%,rgba(16,31,69,0)_100.0%)] lg:bg-[radial-gradient(ellipse_58%_64%_at_50%_58%,rgba(16,31,69,0.58)_0%,rgba(16,31,69,0.58)_50.0%,rgba(16,31,69,0.548)_57.1%,rgba(16,31,69,0.465)_64.3%,rgba(16,31,69,0.352)_71.4%,rgba(16,31,69,0.228)_78.6%,rgba(16,31,69,0.115)_85.7%,rgba(16,31,69,0.032)_92.9%,rgba(16,31,69,0)_100.0%)]'
               : 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(16,31,69,0.48)_0%,rgba(16,31,69,0.48)_50%,rgba(16,31,69,0.453)_57.1%,rgba(16,31,69,0.385)_64.3%,rgba(16,31,69,0.291)_71.4%,rgba(16,31,69,0.189)_78.6%,rgba(16,31,69,0.095)_85.7%,rgba(16,31,69,0.027)_92.9%,rgba(16,31,69,0)_100%)] lg:bg-[radial-gradient(ellipse_62%_70%_at_28%_56%,rgba(16,31,69,0.48)_0%,rgba(16,31,69,0.48)_50%,rgba(16,31,69,0.453)_57.1%,rgba(16,31,69,0.385)_64.3%,rgba(16,31,69,0.291)_71.4%,rgba(16,31,69,0.189)_78.6%,rgba(16,31,69,0.095)_85.7%,rgba(16,31,69,0.027)_92.9%,rgba(16,31,69,0)_100%)]'
           }`}
         />
@@ -355,7 +366,7 @@ export function PageHero({
               still pinned to the left edge would centre the words within a
               column sitting off to one side, which looks like a mistake rather
               than a centred composition. */}
-          <div className={centred ? 'text-center' : undefined}>
+          <div className={centred ? 'lg:text-center' : undefined}>
             {/* Full white, not white/85. Measured against the brightest of these
                 posters (a blown window behind the psychiatric-evaluation frame)
                 85% white came out at 4.41:1, just under the floor for 13px. Full
@@ -370,7 +381,7 @@ export function PageHero({
                 navbar clearance above it. */}
             <h1
               className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
-                centred ? 'mx-auto' : ''
+                centred ? 'lg:mx-auto' : ''
               } ${eyebrow ? 'mt-4' : ''}`}
               style={{ maxWidth: copyMaxWidth?.title }}
             >
@@ -378,13 +389,13 @@ export function PageHero({
             </h1>
 
             <p
-              className={`text-body-l mt-5 max-w-[56ch] text-white/90 ${centred ? 'mx-auto' : ''}`}
+              className={`text-body-l mt-5 max-w-[56ch] text-white/90 ${centred ? 'lg:mx-auto' : ''}`}
               style={{ maxWidth: copyMaxWidth?.intro }}
             >
               {intro}
             </p>
 
-            <div className={`mt-8 ${centred ? 'flex justify-center' : ''}`}>
+            <div className={`mt-8 ${centred ? 'lg:flex lg:justify-center' : ''}`}>
               <ButtonWithIcon href={CTA.href} variant="glass">
                 {CTA.label}
               </ButtonWithIcon>
