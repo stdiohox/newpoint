@@ -742,6 +742,32 @@ export type ServicePage = {
    * geography, because nothing in its own content scopes it.
    */
   modality: string;
+  /**
+   * The delivery block's own copy: a wide two-column beat below the body
+   * sections, left column text and right column the service's own looping
+   * video with copy over it.
+   *
+   * IT IS WHERE `modality` IS NOW STATED. That sentence used to sit in a small
+   * card in the sticky sidebar, and the field comment above still describes it
+   * as "promoted to a titled card" — this is that card, at the size the fact
+   * deserves. Said in one place only: a reader who has scrolled into the prose
+   * has left the sidebar behind, and printing the same sentence twice on one
+   * page to cover that is worse than moving it to where the reader is.
+   *
+   * `heading` and the card's copy are the only new strings. Everything they
+   * assert is already confirmed elsewhere in this file — the card bodies
+   * restate the telehealth page's own section copy — so this block adds a
+   * surface, not a claim. Keep it that way: it sits on three pages at once and
+   * is the wrong place to introduce a fact with no source.
+   *
+   * `cta.href` never points at the page it renders on. On /services/telehealth
+   * a "how telehealth works" link would be a self-link, so that page's card
+   * carries the schedule and points at /new-patients instead.
+   */
+  delivery: {
+    heading: string;
+    card: { heading: string; body: string; cta: { label: string; href: string } };
+  };
   sections: { heading: string; body: string; list?: string[] }[];
   faqs: { q: string; a: string }[];
 };
@@ -806,6 +832,19 @@ export const SERVICE_PAGES: ServicePage[] = [
     intro:
       'Every patient at Newpoint starts here. A comprehensive psychiatric assessment is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
     modality: 'By telehealth across New Jersey and Pennsylvania, and in person.',
+    delivery: {
+      heading: 'Two ways to be seen',
+      card: {
+        heading: 'Telehealth',
+        /* Restates this page's own "Can the assessment be done by telehealth?"
+           FAQ and the telehealth page's section on the same point. The hedge —
+           "ask us and we will confirm" — is load-bearing and is theirs, not a
+           softener added here: the practice has not published a rule about
+           which assessments suit video, so the page must not invent one. */
+        body: 'A comprehensive psychiatric assessment can be arranged by video. Ask us and we will confirm what suits your situation.',
+        cta: { label: 'How telehealth works', href: '/services/telehealth' },
+      },
+    },
     sections: [
       {
         heading: 'What the assessment covers',
@@ -869,6 +908,19 @@ export const SERVICE_PAGES: ServicePage[] = [
     intro:
       'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting treatment as your response becomes clear. Both of our providers are psychiatric mental health nurse practitioners, so the person prescribing your medication is the same person tracking how it is working.',
     modality: 'By telehealth and in person.',
+    delivery: {
+      heading: 'Two ways to be seen',
+      card: {
+        heading: 'Telehealth',
+        /* The telehealth page's own words for why follow-up review travels
+           well by video, said here because this is the page whose reader is
+           deciding about their own follow-ups. NO GEOGRAPHY, matching
+           `modality` above: nothing in this service's content scopes it to a
+           state, and CLAUDE.md's care-modality rule turns on exactly that. */
+        body: 'Follow-up medication management works particularly well by video: the appointment is a structured review of how you are responding, which does not depend on being in the same room.',
+        cta: { label: 'How telehealth works', href: '/services/telehealth' },
+      },
+    },
     sections: [
       {
         heading: 'Prescribing that follows the plan',
@@ -939,6 +991,20 @@ export const SERVICE_PAGES: ServicePage[] = [
     intro:
       'Both of our providers are licensed in New Jersey and Pennsylvania, and both see patients by telehealth. For a lot of people it is the difference between keeping psychiatric care going and quietly letting it lapse.',
     modality: 'By telehealth across New Jersey and Pennsylvania.',
+    delivery: {
+      heading: 'Seen across two states',
+      card: {
+        /* NOT a telehealth card, on the telehealth page: the H1 and every
+           section already say that, and a card repeating it would be the
+           block restating its own page. The schedule is the confirmed fact
+           this page holds that the other two do not, and it is the one a
+           reader weighing video care actually wants. "by request" is the
+           practice's own qualifier — keep it. */
+        heading: 'An expanded schedule',
+        body: 'Appointments by video on an expanded schedule, including weekends, evenings, and holidays by request.',
+        cta: { label: 'Starting as a new patient', href: '/new-patients' },
+      },
+    },
     sections: [
       {
         heading: 'An expanded schedule',
@@ -1223,6 +1289,20 @@ export const FEATURED_SERVICES: FeaturedService[] = [
  */
 export function cardPosterFor(href: string): string | undefined {
   return FEATURED_SERVICES.find((service) => service.href === href)?.poster;
+}
+
+/**
+ * Both halves of a route's card media, for the one place that wants the loop
+ * rather than the frame: the delivery block, where the video is the panel and
+ * the poster is what a reduced-motion visitor sees instead.
+ *
+ * Separate from `cardPosterFor` rather than replacing it. That one is used by
+ * three heroes which genuinely only want the still, and widening its return
+ * would hand every caller a video path it has no business rendering.
+ */
+export function cardMediaFor(href: string): { video: string; poster: string } | undefined {
+  const service = FEATURED_SERVICES.find((s) => s.href === href);
+  return service && { video: service.video, poster: service.poster };
 }
 
 export const FAQ = {

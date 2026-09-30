@@ -172,6 +172,49 @@ export function ServiceVideo({
   );
 }
 
+/**
+ * A video that fills its positioned parent as a background, with none of the
+ * card furniture above.
+ *
+ * SAME PLAYBACK CONTRACT AS ServiceVideo, and for the same reason: no
+ * `autoPlay` attribute in the server HTML, so the poster is what a reduced-
+ * motion visitor ever sees. It is registered with the provider, so the section
+ * pause control and the offscreen IntersectionObserver drive it too. That is
+ * the whole reason this lives here rather than as a loose <video> in the
+ * consuming section — WCAG 2.2.2 needs one control over every loop on the
+ * page, and a second playback implementation is how that stops being true.
+ *
+ * It takes no hover furniture because nothing here is a link: the copy sits on
+ * top of it and carries its own CTA.
+ */
+export function AmbientVideo({
+  video,
+  poster,
+  className = '',
+}: {
+  video: string;
+  poster: string;
+  className?: string;
+}) {
+  const { register } = useServicesMedia();
+
+  return (
+    <video
+      ref={register}
+      loop
+      muted
+      playsInline
+      poster={poster}
+      preload="metadata"
+      aria-hidden="true"
+      tabIndex={-1}
+      className={`absolute inset-0 h-full w-full object-cover ${className}`}
+    >
+      <source src={video} type="video/mp4" />
+    </video>
+  );
+}
+
 /** Section-level pause/play for all four videos. */
 export function ServicesPlayToggle() {
   const { playing, toggle } = useServicesMedia();

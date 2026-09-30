@@ -4,11 +4,12 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { ServiceDelivery } from '@/components/sections/ServiceDelivery';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { SERVICE_PAGES, PROVIDERS, cardPosterFor } from '@/lib/content';
+import { SERVICE_PAGES, PROVIDERS, cardMediaFor, cardPosterFor } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, faqSchemaFlat, organizationRef, serviceSchemaFor } from '@/lib/schema';
 
@@ -48,6 +49,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   const siblings = SERVICE_PAGES.filter((s) => s.slug !== service.slug);
   const poster = cardPosterFor(`/services/${service.slug}`);
+  /* All three service routes have a homepage card, so this resolves for all
+     three today. Guarded anyway: a fourth service page added without one
+     should lose the block, not render an empty panel. */
+  const deliveryMedia = cardMediaFor(`/services/${service.slug}`);
 
   /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [
@@ -132,21 +137,14 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                     </ul>
                   </nav>
 
-                  {/* How care is delivered, in the same words the service's own
-                    homepage card uses, so the two cannot disagree. The body
-                    sections describe what the service IS; none of them stated
-                    the modality outright, which left it on the card and in the
-                    FAQ but nowhere on the page itself. Outside the <nav>
-                    because it is page content, not navigation. */}
-                  <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
-                    {/* h3, not h2: "On this page" above it is already an h2, and
-                        two sidebar labels ahead of the first topical heading
-                        pushes UI chrome to the front of the heading outline. */}
-                    <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                      How it is delivered
-                    </h3>
-                    <p className="text-body text-np-ink mt-2">{service.modality}</p>
-                  </div>
+                  {/* THE "How it is delivered" CARD USED TO SIT HERE and now
+                      renders as ServiceDelivery below the body sections. The
+                      modality sentence is the one statement on the page of
+                      where care actually happens, and this was the narrowest
+                      column on the page to say it in — above the fold, for a
+                      reader who reaches it already scrolled past. It is said
+                      once, downpage, at size. Restoring it here would put the
+                      same sentence on the page twice. */}
                 </div>
               </div>
 
@@ -185,6 +183,18 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             </div>
           </Container>
         </div>
+
+        {/* Below the body and above the FAQ, deliberately. By here the reader
+            knows what the service is, which is when "and how do I actually
+            get it" becomes the live question; the FAQ then answers the
+            narrower ones. */}
+        {deliveryMedia && (
+          <ServiceDelivery
+            delivery={service.delivery}
+            modality={service.modality}
+            media={deliveryMedia}
+          />
+        )}
 
         <PageFaq items={service.faqs} />
 
