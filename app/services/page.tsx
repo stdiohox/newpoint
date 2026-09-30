@@ -5,6 +5,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageCta } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
+import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 import { SERVICE_PAGES, WHAT_WE_TREAT, PROVIDERS, cardPosterFor } from '@/lib/content';
@@ -409,13 +410,37 @@ export default function ServicesIndex() {
                       href={`/providers/${p.slug}`}
                       className="rounded-card bg-np-surface ease-np-out group block h-full p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)]"
                     >
-                      <h3 className="text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]">
-                        {p.name}
-                      </h3>
-                      <p className="font-display text-small text-np-neutral-600 mt-1 font-medium">
-                        {p.credentials}
-                      </p>
-                      <p className="text-small text-np-neutral-600 mt-3">{p.licensed}</p>
+                      <div className="flex items-center gap-4">
+                        {/* The circle is the WRAPPER's, not the image's.
+                            ProviderPortrait hardcodes rounded-media on its own
+                            <img>, and adding rounded-full through className
+                            would leave two competing radius utilities whose
+                            winner is decided by stylesheet order rather than by
+                            anything in this file. Clipping from the outside is
+                            decided here and stays decided.
+
+                            alt="" because the h3 beside it already says the
+                            name: the portrait's own alt repeats the name AND
+                            the credentials, so a screen reader would hear both
+                            twice per card. */}
+                        <div className="size-14 shrink-0 overflow-hidden rounded-full">
+                          <ProviderPortrait
+                            provider={p}
+                            alt=""
+                            sizes="56px"
+                            className="h-full w-full"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]">
+                            {p.name}
+                          </h3>
+                          <p className="font-display text-small text-np-neutral-600 mt-1 font-medium">
+                            {p.credentials}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-small text-np-neutral-600 mt-4">{p.licensed}</p>
                     </Link>
                   </Reveal>
                 ))}

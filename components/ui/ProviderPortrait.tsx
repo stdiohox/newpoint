@@ -17,10 +17,18 @@ export function ProviderPortrait({
   className = '',
   sizes = '(min-width: 768px) 240px, 160px',
   loading = 'lazy',
+  alt,
 }: {
   provider: Provider;
   className?: string;
   sizes?: string;
+  /**
+   * Overrides the portrait's own descriptive alt. Pass "" where the provider's
+   * name already sits beside the image, as in the /services cards — otherwise a
+   * screen reader hears the name, then the credentials, then the same name and
+   * credentials again out of the alt.
+   */
+  alt?: string;
   /**
    * Lazy by default, which is right for the homepage grid well below the fold.
    * The provider page renders this as its first content and it is that route's
@@ -41,7 +49,7 @@ export function ProviderPortrait({
         src={image.jpg560}
         srcSet={`${image.jpg560} 560w, ${image.jpg1120} 1120w`}
         sizes={sizes}
-        alt={image.alt}
+        alt={alt ?? image.alt}
         width={560}
         height={560}
         loading={loading}
