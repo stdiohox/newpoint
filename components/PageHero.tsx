@@ -41,6 +41,7 @@ export function PageHero({
   copyMaxWidth,
   copyAlign = 'left',
   align = 'bottom',
+  showCta = true,
 }: {
   eyebrow?: string;
   title: string;
@@ -143,15 +144,31 @@ export function PageHero({
    * still guarantees clearance when the copy grows tall enough to fill.
    */
   align?: 'bottom' | 'center';
+  /**
+   * Whether the hero carries the appointment button.
+   *
+   * Defaults to true, so the five other routes that use this header are
+   * untouched. /services/psychiatric-evaluation passes false: the client asked
+   * for that button to come off that page on 2026-09-30.
+   *
+   * THE PAGE STILL HAS AN APPOINTMENT ROUTE, which is what makes this safe to
+   * honour rather than a conversion path quietly deleted. Three remain: the
+   * navbar button, which is sticky and therefore reachable from anywhere on the
+   * page; PageCta's "Request an appointment" and its phone button; and the
+   * footer's. What goes is the above-the-fold one, not the ability to book.
+   */
+  showCta?: boolean;
 }) {
   const centred = copyAlign === 'center';
 
   return (
     /* No `on-ink` here, unlike Footer, PageCta and Providers. That class only
        swaps the focus-ring colour, it was carried solely for the breadcrumb
-       links, and the CTA — now the one focusable thing in this header — fixes
-       its own ring inside ButtonWithIcon with a utility that beats the base
-       layer `on-ink` lives in anyway. */
+       links, and the CTA — the only focusable thing left in this header when it
+       renders at all — fixes its own ring inside ButtonWithIcon with a utility
+       that beats the base layer `on-ink` lives in anyway. With `showCta` false
+       the header has nothing focusable in it, so there is still nothing here
+       for `on-ink` to do. */
     <header className="bg-np-blue-900 relative -mt-[var(--nav-h)] flex min-h-[50dvh] flex-col text-white md:min-h-[60vh]">
       {image ? (
         <Image
@@ -395,11 +412,13 @@ export function PageHero({
               {intro}
             </p>
 
-            <div className={`mt-8 ${centred ? 'lg:flex lg:justify-center' : ''}`}>
-              <ButtonWithIcon href={CTA.href} variant="glass">
-                {CTA.label}
-              </ButtonWithIcon>
-            </div>
+            {showCta && (
+              <div className={`mt-8 ${centred ? 'lg:flex lg:justify-center' : ''}`}>
+                <ButtonWithIcon href={CTA.href} variant="glass">
+                  {CTA.label}
+                </ButtonWithIcon>
+              </div>
+            )}
           </div>
         </Container>
       </div>

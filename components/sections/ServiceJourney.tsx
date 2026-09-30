@@ -2,7 +2,6 @@ import { Check } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { ServiceJourneyNav } from './ServiceJourneyNav';
 
 export type JourneyStep = {
   id: string;
@@ -12,8 +11,27 @@ export type JourneyStep = {
 };
 
 /**
- * The service body as a numbered patient journey: a sticky tracking rail on the
- * left, the steps as a timeline on the right.
+ * The service body as a numbered patient journey: a single centred column of
+ * timeline steps.
+ *
+ * THE STICKY SIDEBAR IS GONE, AND WITH IT TWO THINGS. It held an "On this page"
+ * contents rail that tracked the active step, and the "How it is delivered"
+ * card that rendered `modality`. Both were removed at the client's request on
+ * 2026-09-30.
+ *
+ * REMOVING THE MODALITY CARD REMOVED A SURFACE, NOT A FACT, and that was
+ * checked rather than assumed. CLAUDE.md's care-modality rule makes where care
+ * happens a confirmed claim that the page should carry. It still does, in four
+ * places: this service's own "Can the assessment be done by telehealth?" FAQ,
+ * which states it with the full two-state scope and is the strongest of them;
+ * PageCta's "In person or by telehealth" badge; PageCta's "Telehealth in New
+ * Jersey and Pennsylvania" assurance; and the footer. If those ever go, the
+ * fact needs a home again before this stays deleted.
+ *
+ * The contents rail's component, ServiceJourneyNav, has no other caller and was
+ * deleted with it. The steps keep their anchor ids, so every in-page link that
+ * ever pointed here still resolves; nothing now generates those links on this
+ * route, but external and shared links to them do.
  *
  * WHY NUMBERS ARE LEGITIMATE HERE, given that numbered section markers are
  * otherwise a templated tell. The assessment page's five sections are a real
@@ -33,68 +51,32 @@ export type JourneyStep = {
  * its sections actually run in order.
  *
  * NO NEW COPY. Every string rendered here comes from the service's own
- * `sections` and `modality`. The component restructures; it does not write.
+ * `sections`. The component restructures; it does not write.
  *
- * Server component apart from the rail's active state, which is a client leaf.
- * The headings, the bodies and the anchors are all in the static HTML, which is
+ * Server component throughout now that the rail's active state is gone. The
+ * headings, the bodies and the anchors are all in the static HTML, which is
  * what CLAUDE.md's SEO brief requires of indexable content.
  */
-export function ServiceJourney({
-  steps,
-  modality,
-  toc,
-}: {
-  steps: JourneyStep[];
-  modality: string;
-  /**
-   * What "On this page" lists, when that is not the same as the steps.
-   *
-   * The assessment page moves its last two sections into ServiceFeature below
-   * the timeline. They are still headings on this page and still have anchors,
-   * so they stay in the contents; they are simply not steps. Defaults to the
-   * steps, which is the right answer for any service that keeps all of its
-   * sections in the timeline.
-   */
-  toc?: { id: string; heading: string }[];
-}) {
-  const contents = toc ?? steps.map(({ id, heading }) => ({ id, heading }));
-
+export function ServiceJourney({ steps }: { steps: JourneyStep[] }) {
   return (
     <div className="py-20 md:py-28">
       <Container>
-        <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-          <div className="md:col-span-4">
-            {/* top-28 is 112px against a --nav-h of 108px, matching what the
-                sidebar used before this rewrite. Sticky only from md: below
-                that the rail would pin over the content it indexes. */}
-            <div className="md:sticky md:top-28">
-              <ServiceJourneyNav steps={contents} />
+        {/* ONE CENTRED COLUMN, not the 8 of a 12-column grid. With the sidebar
+            gone the steps could simply have kept their old width and sat in a
+            third of the page with nothing beside them, which reads as a layout
+            that lost something rather than one that was designed.
 
-              {/* THE "How it is delivered" CARD STAYS IN THE SIDEBAR, unchanged.
-                  `modality` is the one sentence on the page that says where care
-                  actually happens, none of the body sections state it, and this
-                  is where it has always been said. Moving it is a separate
-                  decision from restructuring the body, and it is not this
-                  change's to make.
-
-                  h3, not h2: "On this page" above it is already an h2, and two
-                  sidebar labels ahead of the first step would push page
-                  furniture to the front of the heading outline. */}
-              <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
-                <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                  How it is delivered
-                </h3>
-                <p className="text-body text-np-ink mt-2">{modality}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* <ol> for the same reason the rail uses one, and role="list" for the
-              reason globals.css documents. It matters more here than usual
-              because the numerals are aria-hidden: without the list role a
-              VoiceOver reader would get neither "list, 5 items" nor the glyph,
-              and the sequence this layout exists to convey would vanish. */}
-          <ol role="list" className="md:col-span-8">
+            max-w-3xl is 768px. The rail column and its gap take 64px of that,
+            leaving the prose at roughly 62ch of text-body-l, which is the
+            measure the rest of the site holds its body copy to. Wider would
+            have been easy here and would have cost legibility. */}
+        <div className="mx-auto max-w-3xl">
+          {/* role="list" for the reason globals.css documents. It matters more
+              here than usual because the numerals are aria-hidden: without the
+              list role a VoiceOver reader would get neither "list, 3 items" nor
+              the glyph, and the sequence this layout exists to convey would
+              vanish. */}
+          <ol role="list">
             {steps.map((step, i) => {
               const isLast = i === steps.length - 1;
 
@@ -111,23 +93,28 @@ export function ServiceJourney({
 
                    Anything holding a long-lived reference to a node inside a
                    Reveal is therefore pointing at a detached element a few
-                   hundred milliseconds after load. ServiceJourneyNav does
-                   exactly that: it resolves these ids once and hands the nodes
-                   to an IntersectionObserver. With the section inside the
-                   Reveal, that observer fired once at observe time and then
-                   went permanently silent, because the elements it watched were
-                   no longer in the document. The rail never lit up.
+                   hundred milliseconds after load. The contents rail that used
+                   to sit beside these steps did exactly that — it resolved
+                   these ids once and handed the nodes to an
+                   IntersectionObserver — and with the section inside the
+                   Reveal that observer fired once at observe time and then went
+                   permanently silent, because the elements it watched were no
+                   longer in the document. The rail never lit up.
+
+                   THAT RAIL HAS SINCE BEEN REMOVED, and this nesting still
+                   stands, for two reasons. The ids are anchor targets that
+                   outside links and shared URLs still point at, and they should
+                   not be torn down and rebuilt on hydration. And the next thing
+                   that wants to observe a section will hit the same trap.
 
                    Kept out here, the <li> and the <section> are plain
                    server-rendered markup that hydration never replaces, and
                    Reveal only swaps its own wrapper below them.
 
-                   The ids themselves are unchanged, so the in-page anchors are
-                   the same strings this route has always served. tabIndex -1 so
-                   activating a jump link moves real focus into the step:
-                   without it the viewport scrolls but the screen-reader cursor
-                   and document.activeElement stay on the rail link that has
-                   just scrolled out of view. */
+                   tabIndex -1 so following a link to one of these anchors moves
+                   real focus into the step: without it the viewport scrolls but
+                   the screen-reader cursor and document.activeElement stay
+                   where they were. */
                 <li key={step.id}>
                   <section id={step.id} tabIndex={-1} className="focus:outline-none">
                     <Reveal delay={stagger(i, 0.05)}>

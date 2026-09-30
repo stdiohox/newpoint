@@ -127,6 +127,9 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           /* Matches /services: centred from lg, left-aligned below it, where
              the copy is a tall paragraph and centring costs more than it buys. */
           copyAlign="center"
+          /* Off on the assessment page only, per the flag's note in
+             lib/content.ts. The other two services keep theirs. */
+          showCta={!service.hideHeroCta}
         />
 
         {/* TWO BODY LAYOUTS, PICKED BY THE SERVICE, NOT BY THE SLUG.
@@ -151,12 +154,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 body: item.body,
                 list: item.list,
               }))}
-              modality={service.modality}
-              /* The contents still list all five headings. The last two are no
-                 longer steps, but they are still on the page and still have
-                 anchors, and dropping them would silently remove two in-page
-                 links this route has always served. */
-              toc={sectionItems.map(({ id, heading }) => ({ id, heading }))}
             />
 
             {featureItems && (

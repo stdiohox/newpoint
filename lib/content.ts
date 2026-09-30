@@ -784,6 +784,19 @@ export type ServicePage = {
    * so no in-page link this route used to serve has gone away.
    */
   featurePair?: boolean;
+  /**
+   * Drop the appointment button out of this service's hero.
+   *
+   * Client request, 2026-09-30, for the psychiatric assessment page only. It is
+   * a flag rather than a deletion in PageHero because that header is shared by
+   * six routes and the other five were not part of the request.
+   *
+   * The page keeps three other routes to an appointment — the sticky navbar
+   * button, PageCta's button and phone number, and the footer's — so this
+   * removes the above-the-fold prompt, not the ability to book. If it is ever
+   * extended to the other two services, check that is still true of them.
+   */
+  hideHeroCta?: boolean;
   sections: { heading: string; body: string; list?: string[] }[];
   faqs: { q: string; a: string }[];
 };
@@ -856,6 +869,8 @@ export const SERVICE_PAGES: ServicePage[] = [
        appointment itself and ends on the diagnosis, which is where the
        appointment ends. */
     featurePair: true,
+    /* Client asked for the hero's appointment button to come off this page. */
+    hideHeroCta: true,
     sections: [
       {
         heading: 'What the assessment covers',
