@@ -66,9 +66,35 @@ export default function ServicesIndex() {
             because the source names no modality. Who delivers it, in what form,
             and whether it warrants a page of its own are all open — see
             OPEN_CLIENT_ITEMS. */}
+        {/* THE PHOTOGRAPH REPLACES THE np-blue-900 → np-sky GRADIENT this hero
+            used to run. The gradient was the fallback for a page with no
+            picture of its own, and the hub page — the one that has to carry all
+            three services — was the last interior page still opening on it.
+
+            OBJECT-POSITION IS ONE VALUE BECAUSE ONLY ONE AXIS IS EVER LIVE.
+            The source is 16:9 (1.792). Where the hero is wider than that it
+            scales by width and crops vertically, so only the 25% matters; where
+            it is narrower it scales by height and crops horizontally, so only
+            the 70% does. The four target widths split cleanly across that line
+            — 1440 and 1024 crop vertically, 768 and 390 horizontally — so a
+            responsive value would set a number that does nothing at every step.
+
+            Both numbers are measured off the frame, not judged. She runs from
+            52% to 80% across it and her hair starts 15% down.
+            - 70% across: at 390 the visible window is 51.6% of the width and
+              lands on 34%-85%, which holds all of her and crops the blown
+              window at 5%-30% out of the picture altogether. At 768 the window
+              is 69.8% wide, on 21%-91%. Her face sits about two-thirds across
+              the crop at both.
+            - 25% down: at 1440 the visible window is 67.2% of the height, on
+              8%-76%, leaving 7% of headroom above her hair; at 1024 it is 81%,
+              on 5%-85%. It still holds at 1440x700, the shortest shape that
+              keeps her whole, with 3% to spare. */}
         <PageHero
           title="What we do, and how it works"
           intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
+          image={{ src: '/images/services/services-consult-2752.webp', objectPosition: '70% 25%' }}
+          scrim="hero"
         />
 
         <div className="py-20 md:py-28">
