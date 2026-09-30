@@ -17,9 +17,15 @@ import { CRISIS } from '@/lib/content';
  *
  * Each number is BOTH a tel: link and a labelled button. The number carries the
  * link because that is what it does everywhere else on this site — Footer,
- * not-found, new-patients and PageCta all make it tappable — and someone who
- * learned that there will try it here. The buttons carry the explicit actions
- * because "Text 988" has no other way to be reachable.
+ * not-found and new-patients all make it tappable — and someone who learned
+ * that there will try it here. The buttons carry the explicit actions because
+ * "Text 988" has no other way to be reachable.
+ *
+ * PageCta used to be in that list and is not any more: its inline crisis panel
+ * was removed at the client's request on 2026-09-30, on the grounds that the
+ * Footer's crisis strip renders on every route directly below it. The one place
+ * that costs something is app/services/[slug], where RelatedLinks sits between
+ * the two; see the note at that call site.
  */
 export function CrisisPanel({
   headingAs: Heading = 'h3',
@@ -59,7 +65,7 @@ export function CrisisPanel({
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               {/* aria-label, not bare "988": in a screen reader's links list the
                   number alone is indistinguishable from any other three digits
-                  on the page. Same wording as Footer and PageCta. */}
+                  on the page. Same wording as Footer. */}
               <a
                 href={item.href}
                 aria-label={`${item.label}, ${item.title}`}

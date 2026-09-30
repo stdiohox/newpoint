@@ -5,6 +5,7 @@ import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
+import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 import { SERVICE_PAGES, PROVIDERS, cardPosterFor } from '@/lib/content';
@@ -155,10 +156,36 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
         <PageFaq items={service.faqs} />
 
-        {/* PageCta carries the crisis panel, so it sits ABOVE RelatedLinks:
-            a reader who arrived on a page naming PTSD, psychosis and
-            schizophrenia should not have to scroll past a "keep reading" grid
-            to find 988. */}
+        {/* CRISIS GUIDANCE IS EXPLICIT ON THESE ROUTES AND NOWHERE ELSE AMONG
+            THE INTERIOR PAGES, and the asymmetry is deliberate.
+
+            PageCta used to carry an inline crisis panel, which is why it sits
+            above RelatedLinks. That panel was removed on 2026-09-30 at the
+            client's request. On the five other routes that is fine: PageCta is
+            the last thing before the footer, and the footer's crisis strip is
+            the next content a reader meets.
+
+            NOT HERE. RelatedLinks sits between the two and renders six cards,
+            and the footer's strip is itself below three stacked link columns.
+            On a phone that is roughly two thousand pixels from the CTA to the
+            nearest 988, on the pages that name PTSD, psychosis and
+            schizophrenia. /services/medication-management is the worst of them.
+
+            So the shared panel is rendered here, ABOVE the CTA rather than
+            below it, mirroring what /contact does with order-first. It is the
+            same component the homepage and /contact use, it introduces no new
+            copy, and it restores CRISIS.body — "not for emergencies and is not
+            monitored around the clock" — which otherwise appears on these
+            routes only as footer fine print.
+
+            h2, not the default h3: it is a top-level section here, and the
+            page's outline would skip a level otherwise. */}
+        <div className="pb-16 md:pb-20">
+          <Container>
+            <CrisisPanel headingAs="h2" className="mx-auto max-w-3xl" />
+          </Container>
+        </div>
+
         <PageCta />
 
         <RelatedLinks

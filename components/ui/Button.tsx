@@ -27,8 +27,28 @@ const arrowSizes = {
 const variants = {
   primary: 'bg-np-blue-600 text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
   onInk: 'bg-white text-np-ink hover:bg-np-neutral-100 focus-visible:outline-np-blue-900',
+  /**
+   * The secondary action on a light ground.
+   *
+   * THE RING WAS ink/12 AND DID NOT MEET SC 1.4.11. The fill is transparent, so
+   * the ring is the whole component boundary and it needs 3:1. Measured against
+   * np-blue-100, the ground PageCta now uses: ink/12 gives 1.27:1, ink/20 gives
+   * 1.51:1, ink/40 still only reaches 2.46:1. No alpha of ink clears it on a
+   * pale ground. np-blue-600 does, at 7.32:1, and it doubles as the label
+   * colour so the button reads as one object.
+   *
+   * Changed rather than added because `variant="quiet"` had no call sites in the
+   * repo when this was written, so nothing else moves.
+   *
+   * `border border-transparent` alongside the ring is for forced-colors mode.
+   * A Tailwind ring is a box-shadow, and Windows High Contrast drops shadows;
+   * with a transparent fill that would leave this button with no resting
+   * boundary at all. A zero-colour border survives, because forced-colors
+   * repaints border-color with a system colour rather than removing it. It costs
+   * nothing visually: border-box sizing means no layout shift.
+   */
   quiet:
-    'bg-transparent text-np-blue-600 ring-1 ring-[var(--np-alpha-ink-12)] hover:bg-[var(--np-alpha-ink-04)] focus-visible:outline-np-blue-900',
+    'bg-transparent text-np-blue-600 border border-transparent ring-1 ring-np-blue-600 hover:bg-np-blue-50 focus-visible:outline-np-blue-900',
   /**
    * The hero CTA's colour, so a page can carry that button without reaching for
    * <ButtonWithIcon />, which is a separate component with its own hover
@@ -40,23 +60,6 @@ const variants = {
    * documents for the same reason.
    */
   sky: 'bg-np-sky text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
-  /**
-   * The secondary action on an np-ink ground, where `quiet` cannot go: that
-   * variant's np-blue-600 label and ink-alpha ring are built for light grounds
-   * and both vanish on ink.
-   *
-   * THE RING IS white/40 AND THAT NUMBER IS LOAD-BEARING. The fill is
-   * transparent, so the ring is the whole component boundary and SC 1.4.11 wants
-   * 3:1 for it. Measured against np-ink: white/14 gives 1.53:1, white/24 gives
-   * 2.19:1, white/30 gives 2.70:1. Only white/40, at 3.78:1, clears it. The
-   * label itself is white at 17.03:1.
-   *
-   * Focus ring is white, not np-blue-900: outline-offset draws it onto the ink
-   * behind the button, where blue-900 is almost the ground colour. Same call
-   * ButtonWithIcon makes for its glass variant, for the same reason.
-   */
-  onInkQuiet:
-    'bg-transparent text-white ring-1 ring-white/40 hover:bg-[var(--np-alpha-white-14)] focus-visible:outline-white',
 };
 
 const discSizes = {

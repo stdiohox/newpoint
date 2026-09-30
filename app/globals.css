@@ -197,9 +197,13 @@
   /* Interactive elements sitting on the ink ground need a light ring instead.
      The default blue-600 outline measures 1.93:1 against --color-np-ink, well
      under the 3:1 WCAG 2.2 SC 1.4.11 asks of a focus indicator; white measures
-     17:1. Applied by adding `on-ink` to any dark section — the footer, the
-     provider section, and the interior-page closing block all carry it, which
-     is what makes the 988 and 911 links keyboard-visible.
+     17:1. Applied by adding `on-ink` to any dark section — the footer and the
+     provider section carry it, and the footer's is what makes its 988 and 911
+     links keyboard-visible.
+     The interior-page closing block USED TO carry it and no longer does:
+     PageCta moved from np-ink to an np-blue-100 band, so its buttons sit on a
+     light ground and set their own np-blue-900 focus outline, which measures
+     13.3:1 there.
      The navbar no longer needs it: Navbar1 sits on a white pill rather than
      on the hero image, so the default blue-600 outline applies there. */
   .on-ink :focus-visible {
