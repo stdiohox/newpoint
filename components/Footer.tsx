@@ -61,9 +61,11 @@ export function Footer() {
     <footer className="px-6 md:px-12 lg:px-16">
       <div className="bg-np-blue-900 on-ink rounded-t-[28px] px-6 py-14 text-white min-[960px]:rounded-t-[48px] min-[960px]:px-10 min-[960px]:py-16">
         {/* TOP ROW. Identity on the left, the site's single CTA on the right.
-            It is the same `glass` ButtonWithIcon the hero uses, which works
-            here for the same reason it works there: a translucent np-blue-900
-            fill with a white hairline, on an np-blue-900 ground. */}
+            The `on-ink` ButtonWithIcon, not the hero's `glass`: glass tints
+            with np-blue-900/35, which over this panel's own np-blue-900
+            composites back to np-blue-900 and leaves the pill with no body.
+            `on-ink` lightens instead, which is what a flat ground allows. See
+            the variant's note in ButtonWithIcon. */}
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
           <div className="max-w-[46ch]">
             <Link
@@ -86,7 +88,7 @@ export function Footer() {
           </div>
 
           <div className="lg:pt-2">
-            <ButtonWithIcon href={CTA.href} variant="glass">
+            <ButtonWithIcon href={CTA.href} variant="on-ink">
               {CTA.label}
             </ButtonWithIcon>
           </div>
