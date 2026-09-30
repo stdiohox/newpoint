@@ -67,7 +67,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHero
-          eyebrow="Services"
           title={service.title}
           intro={service.intro}
           /* The same frame the homepage card for this service shows at rest,
