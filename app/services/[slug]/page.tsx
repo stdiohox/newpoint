@@ -85,7 +85,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              is 1280x720 as well, so a frame grab does not help, and the only
              other asset in design-research is a different photograph (an empty
              consulting room). This needs a new export from the original shoot. */
-          image={poster ? { src: poster, quality: 90 } : undefined}
+          image={service.heroImage ?? (poster ? { src: poster, quality: 90 } : undefined)}
           /* Matches /services: centred from lg, left-aligned below it, where
              the copy is a tall paragraph and centring costs more than it buys. */
           copyAlign="center"

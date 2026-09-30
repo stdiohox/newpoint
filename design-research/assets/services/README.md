@@ -1,8 +1,23 @@
-# /services hero
+# Service hero source art
 
-Source art for the `/services` hub hero. The master is git-ignored by the
+Masters for the service heroes. They are git-ignored by the
 `design-research/assets/` rule in `.gitignore`; this README is the exception
 that keeps the folder explaining itself.
+
+Two so far:
+
+| Master | Used by |
+|---|---|
+| `services-hero.jpg` | `/services`, the hub |
+| `psychiatric-assessment.jpg` | `/services/psychiatric-evaluation` |
+
+`medication-management` and `telehealth` still borrow the 1280x720 video poster
+from their homepage card, which next/image cannot upscale, so they are soft on
+any retina screen. They need masters of their own on this pattern.
+
+---
+
+## /services hub hero
 
 | | |
 |---|---|
@@ -82,6 +97,69 @@ for (const w of [1536, 2048, 2752]) {
     .resize({ width: w, withoutEnlargement: true })
     .webp({ quality: 90, effort: 6 })
     .toFile('public/images/services/services-consult-' + w + '.webp');
+}
+"
+```
+
+
+---
+
+## Psychiatric assessment hero
+
+| | |
+|---|---|
+| **Master** | `psychiatric-assessment.jpg` — 2752 x 1536, JPEG baseline 8-bit RGB, 300 dpi, 2.77 MB |
+| **Aspect** | 1.792:1 (16:9), same as the hub master |
+| **Arrived as** | `psychiatric assessment.jpg` in the repo root, moved here untouched |
+| **Ships as** | `public/images/services/assessment-session-{1536,2048,2752}.webp` |
+
+### The frame
+
+A consultation in progress. The patient sits left with her back three-quarters
+to camera; the clinician sits right, pen in hand over an open notepad. The wall,
+window and side table between them are clear.
+
+That gap is the whole reason this image suits the page: the copy is centred from
+lg up, and a centred block needs somewhere to land that is not a face.
+
+| Feature | x | y |
+|---|---|---|
+| Patient | 0% – 48% | 0% – 100% |
+| Clear band, wall and window | 30% – 62% | — |
+| Clinician's hands, pen and notepad | 63% – 88% | 55% – 78% |
+| Clinician's body | 86% – 100% | 18% – 100% |
+| Framed picture on the wall | 33% – 46% | 0% – 20% |
+
+`object-position: 70% 30%`. The 70% only bites below about 1024, where the hero
+is taller than 16:9 and the crop starts working horizontally: at 390 it frames
+45%–81% of the width, holding the side table, the plant and the clinician
+writing. A centred 50% would have framed an empty corner of the room instead.
+Above 1024 the full width shows and only the 30% matters, which keeps the
+patient's head clear of the top edge while dropping the floor.
+
+### Derivatives
+
+| File | Width | Quality | Size |
+|---|---|---|---|
+| `assessment-session-1536.webp` | 1536 | 90 | 137 KB |
+| `assessment-session-2048.webp` | 2048 | 90 | 251 KB |
+| `assessment-session-2752.webp` | 2752 | **88** | 446 KB |
+
+**The 2752 is q88, not q90, and that is the 450 KB budget talking.** At q90 it
+came to 529 KB. This frame carries far more texture than the hub master — knit
+wool, sheer curtains, foliage — so it compresses harder for the same quality;
+the hub's 2752 is only 308 KB at q90. q88 is the highest setting that fits.
+
+To regenerate:
+
+```sh
+node -e "
+const sharp = require('sharp');
+for (const [w, q] of [[1536, 90], [2048, 90], [2752, 88]]) {
+  sharp('design-research/assets/services/psychiatric-assessment.jpg')
+    .resize({ width: w, withoutEnlargement: true })
+    .webp({ quality: q, effort: 6 })
+    .toFile('public/images/services/assessment-session-' + w + '.webp');
 }
 "
 ```

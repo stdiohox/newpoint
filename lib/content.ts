@@ -691,6 +691,23 @@ export type ServicePage = {
   slug: string;
   nav: string;
   /**
+   * A hero photograph of this service's own, replacing the video poster the
+   * page otherwise borrows from its homepage card.
+   *
+   * WHY THIS IS OPTIONAL AND NOT A DEFAULT. The card posters are 1280x720
+   * frames pulled from the section videos, and next/image never upscales, so a
+   * full-bleed hero stretches 1280px across 1440 CSS px and is soft on any
+   * retina screen. A page only escapes that once a real hero asset exists for
+   * it, so this is set per service as the artwork arrives rather than switched
+   * on for all three.
+   */
+  heroImage?: {
+    src: string;
+    objectPosition?: string;
+    sizes?: string;
+    quality?: number;
+  };
+  /**
    * schema.org type for this service. Not MedicalTherapy across the board: an
    * assessment is a diagnostic procedure, and telehealth is how care is
    * delivered rather than a treatment in itself.
@@ -749,6 +766,29 @@ export const SERVICE_PAGES: ServicePage[] = [
      */
     slug: 'psychiatric-evaluation',
     nav: 'Psychiatric assessment',
+    /**
+     * OBJECT-POSITION READS OFF THE FRAME, not off taste. Measured on the
+     * master: the patient occupies x 0-48%, the clinician's hands, pen and
+     * notepad sit at x 63-88%, and the wall between them is clear from 30% to
+     * 62%. That clear band is what the centred copy sits on.
+     *
+     * The 70% only bites below about 1024, where the hero is taller than the
+     * source's 16:9 and the crop starts working horizontally. At 390 it puts
+     * the window on 45%-81% of the width, which holds the side table, the plant
+     * and the clinician writing: the assessment itself, rather than an empty
+     * corner of the room, which is what a centred 50% would have framed.
+     * Above that the full width shows and only the 30% matters, which keeps
+     * the patient's head off the top edge while dropping the floor.
+     */
+    heroImage: {
+      src: '/images/services/assessment-session-2752.webp',
+      objectPosition: '70% 30%',
+      /* Same reasoning as /services: 100vw describes the box, and below lg
+         object-cover scales this by height and draws it wider than the
+         viewport. 1200px is the widest drawn width down there. */
+      sizes: '(min-width: 1024px) 100vw, 1200px',
+      quality: 90,
+    },
     schemaType: 'MedicalProcedure',
     title: 'Comprehensive psychiatric assessment',
     alternateName: 'Psychiatric evaluation',
