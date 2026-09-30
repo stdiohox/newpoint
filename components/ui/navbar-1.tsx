@@ -5,7 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X } from 'lucide-react';
 /* lib/nav.ts, NOT lib/content.ts. This is a client component, so whatever it
    imports is shipped to the browser — importing the copy module put every
    provider bio, FAQ answer and payer name into a public chunk. nav.ts holds
@@ -43,15 +43,71 @@ import { useHydrated } from '@/lib/useHydrated';
 /** Matches --nav-h in globals.css, which drives scroll-padding-top. */
 const DESKTOP = '(min-width: 70em)';
 
-export function Navbar1() {
+/** One entry of the Services submenu. Shape matches what layout.tsx passes. */
+export type NavChild = { label: string; href: string };
+
+export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const reduce = useReducedMotion();
   const hydrated = useHydrated();
   const pathname = usePathname();
   const panelId = useId();
+  const submenuId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The Services submenu.
+   *
+   * A DISCLOSURE, NOT role="menu". The ARIA Authoring Practices are explicit
+   * that menu/menuitem is for application menus, where arrow keys move a single
+   * roving tabstop and Tab leaves the whole widget. Site navigation is a list of
+   * links, and giving it menu semantics tells a screen-reader user to expect
+   * keys that do not work here and removes each link from the Tab order they do
+   * expect. So: a button with aria-expanded, controlling a plain list of links.
+   *
+   * THE LABEL STAYS A LINK. /services is a real page and the hub the three
+   * children are reached from, so it keeps its own tab stop and its own
+   * destination; the chevron beside it is a separate control that only opens
+   * the list. Folding both into one button would have cost the destination, and
+   * the usual workaround, a first child reading "All services", spends a row of
+   * the menu restating the thing the reader just pointed at.
+   */
+  const [servicesOpen, setServicesOpen] = useState(false);
+  /**
+   * Whether the pointer opened it. A click that opens should PIN the submenu,
+   * or moving the mouse away closes what the user just deliberately opened;
+   * a hover that opens should close on leave. Without this flag the two
+   * mechanisms fight and the panel flickers shut under the cursor.
+   */
+  const pinnedRef = useRef(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const servicesBtnRef = useRef<HTMLButtonElement>(null);
+  /**
+   * The open flag mirrored into a ref, so handlers read the live value.
+   *
+   * The click handler cannot read `servicesOpen` out of its render closure: the
+   * pointer has to cross the group to reach the chevron, so hover has already
+   * opened it, and the click then lands in whatever render existed when the
+   * listener was attached. That is the difference between pinning what hover
+   * opened and slamming it shut under the cursor. Not the state updater form
+   * either, because deciding `pinned` inside it would be a side effect and
+   * StrictMode invokes updaters twice.
+   */
+  const openRef = useRef(false);
+
+  const setServices = useCallback((next: boolean, pinned: boolean) => {
+    openRef.current = next;
+    pinnedRef.current = pinned;
+    setServicesOpen(next);
+  }, []);
+
+  const closeServices = useCallback(() => {
+    clearTimeout(hoverTimer.current ?? undefined);
+    setServices(false, false);
+  }, [setServices]);
 
   /**
    * State only. Focus restore happens in the effect cleanup, after inert comes
@@ -60,6 +116,92 @@ export function Navbar1() {
    */
   const close = useCallback(() => setIsOpen(false), []);
   const toggleMenu = () => setIsOpen((v) => !v);
+
+  /**
+   * Close the submenu on Escape, on a pointer press outside it, and when focus
+   * leaves the group entirely.
+   *
+   * FOCUS LEAVING MATTERS AS MUCH AS THE OTHER TWO. Tabbing off the last link
+   * has to shut it, or a keyboard user ends up with an open panel behind them
+   * that the mouse never opened and no visible way to dismiss. `focusin` on the
+   * document is what catches it: focusout on the container fires before the new
+   * element has focus, so relatedTarget is unreliable in some browsers.
+   *
+   * Escape returns focus to the chevron, but ONLY when focus is inside the
+   * group. A hover-opened panel can be dismissed with Escape while the caret is
+   * somewhere else entirely, and yanking focus to the navbar from wherever the
+   * user actually was is worse than the open panel.
+   */
+  useEffect(() => {
+    if (!servicesOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      const inside = servicesRef.current?.contains(document.activeElement);
+      closeServices();
+      if (inside) servicesBtnRef.current?.focus();
+    };
+    const outside = (e: Event) => {
+      if (!servicesRef.current?.contains(e.target as Node)) closeServices();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('focusin', outside);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('focusin', outside);
+    };
+  }, [servicesOpen, closeServices]);
+
+  /** A route change closes it; otherwise it survives the navigation it caused. */
+  useEffect(() => {
+    closeServices();
+  }, [pathname, closeServices]);
+
+  useEffect(() => () => clearTimeout(hoverTimer.current ?? undefined), []);
+
+  /**
+   * Hover opens only where hovering is real. A coarse pointer fires synthetic
+   * mouseenter on tap, which would open the panel on the same tap that follows
+   * the link. The guard keeps touch on click-to-toggle.
+   */
+  const canHover = () =>
+    typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
+
+  const hoverOpen = () => {
+    if (!canHover()) return;
+    clearTimeout(hoverTimer.current ?? undefined);
+    setServices(true, pinnedRef.current);
+  };
+  const hoverClose = () => {
+    if (!canHover() || pinnedRef.current) return;
+    /* Do not close what the keyboard is standing in. If hover opened the panel
+       and the user then tabbed into a child link, a mouse leave would hide the
+       element holding focus and drop it to the body. */
+    if (servicesRef.current?.contains(document.activeElement)) return;
+    clearTimeout(hoverTimer.current ?? undefined);
+    /* A gap between the label and the panel would otherwise close it while the
+       pointer crosses. 120ms covers the travel without feeling sticky. */
+    hoverTimer.current = setTimeout(() => setServices(false, false), 120);
+  };
+
+  /**
+   * Pointer toggle.
+   *
+   * THE FIRST BRANCH IS THE WHOLE POINT. Reaching the chevron means crossing the
+   * group, so on a hover device the panel is ALREADY open and unpinned by the
+   * time the click lands. Toggling from there would close it on the click the
+   * user made to keep it, which is what a plain `!open` did. Clicking an
+   * unpinned open panel pins it instead; everything else toggles.
+   */
+  const toggleServices = () => {
+    if (openRef.current && !pinnedRef.current) {
+      setServices(true, true);
+      return;
+    }
+    const next = !openRef.current;
+    setServices(next, next);
+  };
 
   /** An in-page anchor like /#faq is "current" only when we are on that page. */
   const isActive = (href: string) => {
@@ -205,30 +347,150 @@ export function Navbar1() {
         </div>
 
         <nav aria-label="Primary" className="hidden items-center space-x-8 min-[70em]:flex">
-          {NAV.map((item) => (
-            <motion.div
-              key={item.href}
-              /* The start state is CSS, never a server-rendered inline style:
+          {NAV.map((item) => {
+            const hasSubmenu = item.href === '/services' && services.length > 0;
+            return (
+              <motion.div
+                key={item.href}
+                /* The start state is CSS, never a server-rendered inline style:
                  the primary navigation must not need JS to be visible. Motion
                  writes nothing on the server because `initial` is false and
                  `animate` is undefined until hydration; once `animate` lands it
                  picks the hidden values up from the computed style that the
                  .js-gated [data-enter] rule applied before first paint. */
-              data-enter="down"
-              initial={false}
-              animate={hydrated && !reduce ? { opacity: 1, y: 0 } : undefined}
-              transition={{ duration: 0.3 }}
-              whileHover={reduce ? undefined : { scale: 1.05 }}
-            >
-              <Link
-                href={item.href}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-                className="text-np-ink hover:text-np-neutral-700 focus-visible:outline-np-blue-600 rounded text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 aria-[current=page]:underline aria-[current=page]:underline-offset-8 motion-reduce:transition-none"
+                data-enter="down"
+                initial={false}
+                animate={hydrated && !reduce ? { opacity: 1, y: 0 } : undefined}
+                transition={{ duration: 0.3 }}
+                /* NO HOVER SCALE ON THE ITEM THAT OWNS THE SUBMENU. The panel is
+                   absolutely positioned inside this element, so a 1.05 on the
+                   wrapper scales a 256px dropdown along with the 60px label and
+                   the panel visibly grows as the pointer enters it. Losing the
+                   flourish on one of six labels is the cheaper trade.
+
+                   IT IS `scale: 1`, NOT `undefined`, AND THAT IS NOT A STYLE
+                   CHOICE. Dropping the prop stopped Motion running this item's
+                   ENTRANCE: it sat at the [data-enter="down"] start state,
+                   opacity 0 and translateY(-10px), so "Services" was missing
+                   from the bar while the other five faded in. An explicit no-op
+                   keeps the animation wired and changes nothing on hover. */
+                whileHover={reduce ? undefined : { scale: hasSubmenu ? 1 : 1.05 }}
               >
-                {item.label}
-              </Link>
-            </motion.div>
-          ))}
+                {hasSubmenu ? (
+                  <div
+                    ref={servicesRef}
+                    className="relative"
+                    onMouseEnter={hoverOpen}
+                    onMouseLeave={hoverClose}
+                  >
+                    <div className="flex items-center gap-1">
+                      {/* aria-current="true", not "page", when only a CHILD is
+                          current. isActive matches by prefix, so on
+                          /services/telehealth both this and the child link
+                          claimed to be the page and a screen reader announced
+                          two current items in one nav. "true" says "in this
+                          branch" without claiming to be the destination.
+
+                          onClick closes it because pathname does not change
+                          when this is clicked from /services itself, so the
+                          route effect never fires and a hover-opened panel
+                          would sit there over the page it just re-entered. */}
+                      <Link
+                        href={item.href}
+                        aria-current={
+                          pathname === item.href ? 'page' : isActive(item.href) ? 'true' : undefined
+                        }
+                        onClick={closeServices}
+                        className="text-np-ink hover:text-np-neutral-700 focus-visible:outline-np-blue-600 rounded text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 aria-[current=page]:underline aria-[current=page]:underline-offset-8 motion-reduce:transition-none"
+                      >
+                        {item.label}
+                      </Link>
+                      {/* The name is on the link, so this control needs its own.
+                        "Services submenu" rather than a bare "Expand": in a
+                        screen reader's control list every nav would otherwise
+                        read the same.
+
+                        p-1.5 not p-1: at p-1 the hit area was exactly 24x24,
+                        which passes SC 2.5.8 with nothing to spare. */}
+                      <button
+                        ref={servicesBtnRef}
+                        type="button"
+                        aria-label={`${item.label} submenu`}
+                        aria-expanded={servicesOpen}
+                        aria-controls={submenuId}
+                        onClick={toggleServices}
+                        className="text-np-ink hover:text-np-neutral-700 focus-visible:outline-np-blue-600 -m-1.5 rounded p-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
+                      >
+                        <ChevronDown
+                          aria-hidden="true"
+                          size={16}
+                          strokeWidth={2}
+                          className={`transition-transform duration-[180ms] motion-reduce:transition-none ${
+                            servicesOpen ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* THE 12px OFFSET IS PADDING ON A WRAPPER, NOT A MARGIN ON
+                        THE PANEL, and that is a behaviour fix rather than a
+                        styling preference. As a margin it was dead space: the
+                        pointer left the group crossing it, fired mouseleave, and
+                        the panel only survived because the 120ms timer outran
+                        the trip. As padding the gap belongs to the hoverable
+                        element, so the pointer never leaves at all and the timer
+                        is back to being a safety net.
+
+                        The wrapper is absolute and the panel fills it, so the
+                        drop shadow still reads against the page. */}
+                    <AnimatePresence>
+                      {servicesOpen && (
+                        <motion.div
+                          className="absolute top-full left-0 z-20 pt-3"
+                          initial={reduce ? false : { opacity: 0, y: -6 }}
+                          animate={reduce ? undefined : { opacity: 1, y: 0 }}
+                          exit={reduce ? undefined : { opacity: 0, y: -6 }}
+                          transition={{ duration: 0.16 }}
+                        >
+                          <ul
+                            id={submenuId}
+                            role="list"
+                            aria-label={`${item.label} pages`}
+                            /* border-transparent alongside the ring: forced-colors
+                             drops box-shadows, which is what a Tailwind ring and
+                             this shadow both are, and the panel would lose its
+                             edge against the page entirely. */
+                            className="rounded-card ring-np-neutral-200 w-64 border border-transparent bg-white p-2 shadow-lg ring-1"
+                          >
+                            {services.map((child) => (
+                              <li key={child.href}>
+                                <Link
+                                  href={child.href}
+                                  aria-current={isActive(child.href) ? 'page' : undefined}
+                                  onClick={closeServices}
+                                  className="text-np-ink hover:bg-np-neutral-100 focus-visible:outline-np-blue-600 block rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 aria-[current=page]:underline aria-[current=page]:underline-offset-4 motion-reduce:transition-none"
+                                >
+                                  {child.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    className="text-np-ink hover:text-np-neutral-700 focus-visible:outline-np-blue-600 rounded text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 aria-[current=page]:underline aria-[current=page]:underline-offset-8 motion-reduce:transition-none"
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </motion.div>
+            );
+          })}
         </nav>
 
         <motion.div
@@ -272,7 +534,15 @@ export function Navbar1() {
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            className="fixed inset-0 z-50 bg-white px-6 pt-24 min-[70em]:hidden"
+            /* SCROLLABLE, AND IT HAD TO BECOME SO. This is fixed inset-0 with
+               the body scroll locked, so anything past the viewport was simply
+               unreachable. Six links, the CTA and the gaps already came to
+               about 450px under a 96px top padding; the three service children
+               add roughly 120px. That overflows a landscape phone and, more
+               sharply, a 400% zoom viewport of about 256px, which is SC 1.4.10
+               Reflow. overscroll-contain stops the scroll chaining to the
+               locked body behind it. */
+            className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-white px-6 pt-24 pb-10 min-[70em]:hidden"
             initial={reduce ? false : { opacity: 0, x: '100%' }}
             animate={reduce ? undefined : { opacity: 1, x: 0 }}
             exit={reduce ? undefined : { opacity: 0, x: '100%' }}
@@ -309,6 +579,34 @@ export function Navbar1() {
                   >
                     {item.label}
                   </Link>
+
+                  {/* OPEN, NOT A SECOND DISCLOSURE. The desktop submenu is
+                      collapsed because a nav bar has no room for it; this panel
+                      is a full-screen sheet with room to spare, and three extra
+                      links do not justify another control to press, another
+                      aria-expanded to get right, or another thing inside the
+                      dialog's focus trap. They are simply indented under their
+                      parent. */}
+                  {item.href === '/services' && services.length > 0 && (
+                    <ul
+                      role="list"
+                      aria-label={`${item.label} pages`}
+                      className="border-np-neutral-200 mt-4 space-y-4 border-l pl-4"
+                    >
+                      {services.map((child) => (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            aria-current={isActive(child.href) ? 'page' : undefined}
+                            className="text-np-neutral-600 focus-visible:outline-np-blue-600 rounded text-base focus-visible:outline-2 focus-visible:outline-offset-4 aria-[current=page]:underline aria-[current=page]:underline-offset-8"
+                            onClick={close}
+                          >
+                            {child.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </motion.div>
               ))}
 

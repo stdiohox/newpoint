@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { cabinetGrotesk, switzer } from './fonts';
-import { BUSINESS } from '@/lib/content';
+import { BUSINESS, SERVICE_PAGES } from '@/lib/content';
 import { Navbar1 } from '@/components/ui/navbar-1';
 import './globals.css';
 
@@ -137,7 +137,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             was nothing for a screen-reader user to jump to. Purely semantic;
             nothing about the layout or the sticky behaviour changes. */}
         <header className="sticky top-0 z-50">
-          <Navbar1 />
+          {/* The submenu is passed down, not imported by the navbar.
+              navbar-1.tsx is a client component, and lib/nav.ts's rule is that
+              anything larger than those few constants belongs in a server
+              component that hands down exactly what it needs. Importing
+              SERVICE_PAGES there would put every service page's sections, FAQs
+              and metaDescription into the browser bundle to render three links.
+              `nav` is the short label the footer already uses; `title` is the
+              H1 and runs to "Telehealth psychiatry in New Jersey and
+              Pennsylvania", which is not a menu row. */}
+          <Navbar1
+            services={SERVICE_PAGES.map((s) => ({
+              label: s.nav,
+              href: `/services/${s.slug}`,
+            }))}
+          />
         </header>
         {children}
       </body>
