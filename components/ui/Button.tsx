@@ -26,7 +26,21 @@ const arrowSizes = {
 
 const variants = {
   primary: 'bg-np-blue-600 text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
-  onInk: 'bg-white text-np-ink hover:bg-np-neutral-100 focus-visible:outline-np-blue-900',
+  /**
+   * The filled action on a dark ground.
+   *
+   * FOCUS RING IS WHITE, AND np-blue-900 WAS WRONG HERE. outline-offset draws
+   * the ring onto the ground behind the button, not onto the white fill, so it
+   * is measured against the section: np-blue-900 on PageCta's np-blue-600 band
+   * gives 1.82:1, under the 3:1 SC 1.4.11 asks of a focus indicator. White
+   * gives 8.84:1 there and 17.03:1 on np-ink.
+   *
+   * globals.css has an `.on-ink :focus-visible` rule meant to catch exactly
+   * this, but it sits in @layer base and Tailwind utilities land in a later
+   * layer, so the utility on this variant wins and the class cannot rescue it.
+   * A variant named onInk has to carry its own light ring.
+   */
+  onInk: 'bg-white text-np-ink hover:bg-np-neutral-100 focus-visible:outline-white',
   /**
    * The secondary action on a light ground.
    *
@@ -60,6 +74,29 @@ const variants = {
    * documents for the same reason.
    */
   sky: 'bg-np-sky text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
+  /**
+   * The secondary action on a dark ground, where `quiet` cannot go: its
+   * np-blue-600 label and ring are built for light grounds and both vanish.
+   *
+   * THE RING IS white/50 AND THE ALPHA IS GROUND-DEPENDENT, which is the part
+   * worth remembering. The fill is transparent, so the ring is the whole
+   * component boundary and SC 1.4.11 wants 3:1. On np-blue-600, the ground
+   * PageCta uses, white/40 reaches only 2.76:1 and white/50 gives 3.47:1. An
+   * earlier version of this variant used white/40 because it was measured
+   * against np-ink, where the same alpha gives 3.78:1. Re-measure before
+   * putting this on a third ground; do not assume the alpha travels.
+   *
+   * white/50 clears on np-ink too, by a wider margin, so one value covers both
+   * dark grounds in use.
+   *
+   * `border border-transparent` is for forced-colors, where a Tailwind ring is
+   * a box-shadow and gets dropped, leaving a transparent fill with no boundary.
+   *
+   * Focus ring is white, not np-blue-900: outline-offset draws it onto the
+   * ground behind the button, where a dark blue outline is nearly the ground.
+   */
+  onInkQuiet:
+    'bg-transparent text-white border border-transparent ring-1 ring-white/50 hover:bg-[var(--np-alpha-white-14)] focus-visible:outline-white',
 };
 
 const discSizes = {

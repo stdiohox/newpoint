@@ -49,13 +49,38 @@ const assurances = [
  * that call site. Putting <CrisisPanel /> on the service detail pages is the fix
  * if that matters.
  *
- * NO np-ink BAND. The deep navy was doing the work of separating this block from
- * the page, and it is a heavy device for a closing CTA that already sits above a
- * navy footer: the old sequence ran light page, navy CTA, navy footer, so the
- * CTA and the footer merged into one dark mass. np-blue-100 separates it by HUE
- * instead. Against the warm np-neutral-50 page it is only 1.16:1 in luminance,
- * which sounds like nothing and reads clearly, because the shift the eye
- * actually registers here is warm to cool, not light to dark.
+ * IT IS A CONTAINER, NOT A BAND, AND THAT IS WHAT MAKES THE NAVY WORK AGAIN.
+ * The objection to the first version was a deep navy strip running edge to
+ * edge. The colour was never really the problem: a full-bleed dark band butts
+ * straight into the navy footer, so the two merged into one dark mass and the
+ * page ended on a wall. Holding the same navy inside a rounded panel, with the
+ * page ground visible all the way around it, gives the block an edge and a
+ * shadow line instead of a horizon. The footer then reads as a separate thing
+ * below it.
+ *
+ * THE FILL IS A RADIAL, SMOOTHSTEPPED, AT 0.94 ALPHA. Three decisions there:
+ *
+ *   radial, not linear, and anchored at 50% 0%. The light pools at the top
+ *   centre, exactly where the medallion and the heading sit, and falls away to
+ *   the corners. A linear ramp would have put its lightest edge along one side
+ *   of a centred composition, which fights it.
+ *
+ *   np-blue-700 to np-blue-900 rather than one flat navy. Two stops of the same
+ *   family give the panel depth without introducing a second hue.
+ *
+ *   0.94, so the warm page ground lifts it very slightly instead of the panel
+ *   being an opaque slab. Measured, the lightest point composites to
+ *   rgb(40,65,126) and the darkest to rgb(30,44,80).
+ *
+ * The stops follow 3t^2-2t^3 for the same reason the hero scrim does: a linear
+ * interpolation between two stops has a slope discontinuity at each end, and on
+ * a large flat panel that shows as a ring. Regenerate them from the curve rather
+ * than hand-editing.
+ *
+ * Measured on the lightest point, which is the worst case: white heading
+ * 9.79:1, white/90 body 8.28:1, white/80 assurances 6.93:1, the white pill
+ * 9.79:1, and the secondary button's white/50 ring 3.74:1 against the 3:1
+ * SC 1.4.11 wants. The panel itself is 9.39:1 against the page.
  *
  * CENTRED COLUMN, NOT THE 7/5 SPLIT IT REPLACED. With the panel gone there is no
  * second column to balance, and the request reads as a single moment.
@@ -73,83 +98,92 @@ export function PageCta({
   body?: string;
 }) {
   return (
-    <section className="bg-np-blue-100 py-20 md:py-28">
+    <section className="py-20 md:py-28">
       <Container>
-        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-          <Reveal>
-            {/* Two nested plates rather than one filled tile, so the mark reads
-                as an object on the band rather than a sticker on it. The plates
-                are only 1.21:1 and 1.10:1 apart, which is the point: this is a
-                quiet raised tile, not a badge competing with the CTA below it.
-                Decorative, and the h2 below says what this is. */}
-            <div className="relative flex size-20 items-center justify-center">
-              <div
-                aria-hidden="true"
-                className="rounded-card bg-np-surface absolute inset-0 ring-1 ring-[var(--np-alpha-ink-08)]"
-              />
-              <div aria-hidden="true" className="bg-np-blue-50 absolute inset-1 rounded-[10px]" />
-              <CalendarCheck
-                aria-hidden="true"
-                size={30}
-                strokeWidth={1.75}
-                className="text-np-blue-600 relative"
-              />
-            </div>
-          </Reveal>
+        {/* rounded-3xl, which is a step up from the 14-16px the other cards
+            use. Deliberate: this panel is several times their area, and a 14px
+            radius on something 1136px wide reads as a square with the corners
+            filed off rather than as a rounded object. */}
+        <div className="rounded-3xl bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(27,53,118,0.94)_0%,rgba(26,52,115,0.94)_14.3%,rgba(25,49,108,0.94)_28.6%,rgba(23,44,99,0.94)_42.9%,rgba(20,40,88,0.94)_57.1%,rgba(18,35,79,0.94)_71.4%,rgba(17,32,72,0.94)_85.7%,rgba(16,31,69,0.94)_100%)] px-6 py-16 md:px-12 md:py-20">
+          <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+            <Reveal>
+              {/* Two nested plates rather than one filled tile, so the mark reads
+                as an object on the band rather than a sticker on it. Decorative,
+                and the h2 below says what this is. */}
+              <div className="relative flex size-20 items-center justify-center">
+                <div
+                  aria-hidden="true"
+                  className="rounded-card absolute inset-0 bg-white/10 ring-1 ring-white/25"
+                />
+                <div
+                  aria-hidden="true"
+                  className="bg-np-blue-600 absolute inset-1 rounded-[10px]"
+                />
+                <CalendarCheck
+                  aria-hidden="true"
+                  size={30}
+                  strokeWidth={1.75}
+                  className="relative text-white"
+                />
+              </div>
+            </Reveal>
 
-          {/* A fact, not a label. An eyebrow reading "Next step" above a heading
+            {/* A fact, not a label. An eyebrow reading "Next step" above a heading
               that already says "Ready when you are" would be the templated move;
               the modality is the thing a reader actually needs here and it is
               confirmed content.
 
-              Overridden off the `secondary` variant rather than using it: that
-              variant's np-neutral-200 fill measures 1.05:1 on this band and the
-              chip would have disappeared. A white chip is 1.21:1, still quiet,
-              and the np-blue-700 label carries it at 11.9:1. The chip is not an
-              interactive control, so the boundary is not held to 3:1 the way the
-              buttons below are. */}
-          <Reveal delay={0.06}>
-            <Badge className="bg-np-surface text-np-blue-700 mt-6 border-[var(--np-alpha-ink-08)]">
-              In person or by telehealth
-            </Badge>
-          </Reveal>
+              Kept as a white chip rather than made white-on-white with the rest
+              of the copy: it is the one element that should read as a separate
+              object, and a solid chip is 8.84:1 against this ground with an
+              np-blue-700 label at 11.55:1 inside it. */}
+            <Reveal delay={0.06}>
+              <Badge className="bg-np-surface text-np-blue-700 mt-6 border-transparent">
+                In person or by telehealth
+              </Badge>
+            </Reveal>
 
-          <Reveal delay={0.1}>
-            <h2 className="text-h2 text-np-ink mt-5">{heading}</h2>
-          </Reveal>
+            <Reveal delay={0.1}>
+              <h2 className="text-h2 mt-5 text-white">{heading}</h2>
+            </Reveal>
 
-          <Reveal delay={0.16}>
-            <p className="text-body-l text-np-neutral-600 mt-4">{body}</p>
-          </Reveal>
+            <Reveal delay={0.16}>
+              <p className="text-body-l mt-4 text-white/90">{body}</p>
+            </Reveal>
 
-          <Reveal delay={0.22}>
-            {/* Stacked below sm so neither label wraps on a phone: "Request an
+            <Reveal delay={0.22}>
+              {/* Stacked below sm so neither label wraps on a phone: "Request an
                 appointment" is 24 characters and does not survive a half-width
-                pill at 320. */}
-            <div className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
-              <Button href={CTA.href} variant="primary" size="lg">
-                {CTA.label}
-              </Button>
-              <Button href={`tel:${BUSINESS.phonePrimaryHref}`} variant="quiet" size="lg">
-                <Phone aria-hidden="true" size={18} strokeWidth={1.75} />
-                {BUSINESS.phonePrimary}
-              </Button>
-            </div>
-          </Reveal>
+                pill at 320.
 
-          <Reveal delay={0.28}>
-            <ul
-              role="list"
-              className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
-            >
-              {assurances.map(({ icon: Icon, label }) => (
-                <li key={label} className="text-small text-np-neutral-600 flex items-center gap-2">
-                  <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
-                  {label}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+                The pair swaps roles on this ground. `primary` is np-blue-600 and
+                would be invisible on an np-blue-600 band, so the filled button
+                is white and the outline one carries the white ring. */}
+              <div className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
+                <Button href={CTA.href} variant="onInk" size="lg">
+                  {CTA.label}
+                </Button>
+                <Button href={`tel:${BUSINESS.phonePrimaryHref}`} variant="onInkQuiet" size="lg">
+                  <Phone aria-hidden="true" size={18} strokeWidth={1.75} />
+                  {BUSINESS.phonePrimary}
+                </Button>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.28}>
+              <ul
+                role="list"
+                className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
+              >
+                {assurances.map(({ icon: Icon, label }) => (
+                  <li key={label} className="text-small flex items-center gap-2 text-white/80">
+                    <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          </div>
         </div>
       </Container>
     </section>
