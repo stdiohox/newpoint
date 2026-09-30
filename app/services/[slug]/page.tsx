@@ -71,8 +71,24 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           title={service.title}
           intro={service.intro}
           /* The same frame the homepage card for this service shows at rest,
-             so arriving here from that card is continuous. */
-          image={poster ? { src: poster } : undefined}
+             so arriving here from that card is continuous.
+
+             quality 90 STOPS A SECOND GENERATION OF LOSS; IT DOES NOT MAKE THIS
+             SHARP. These posters are 1280x720 video stills, and next/image never
+             upscales, so at 1440 the browser gets 1280px stretched across 1440
+             CSS px: 0.44 device pixels per CSS pixel on a 2x screen. That is the
+             softness, and no encoder setting reaches it. What quality does reach
+             is the re-encode on top: measured against the poster, q75 gives RMSE
+             1.61 at 39.7 KB and q90 gives 1.12 at 69.2 KB, so 30% less added
+             error for 30 KB. Worth it, and not a fix.
+             CLIENT: a genuinely sharp hero here needs a ~2800px still. The mp4
+             is 1280x720 as well, so a frame grab does not help, and the only
+             other asset in design-research is a different photograph (an empty
+             consulting room). This needs a new export from the original shoot. */
+          image={poster ? { src: poster, quality: 90 } : undefined}
+          /* Matches /services: centred from lg, left-aligned below it, where
+             the copy is a tall paragraph and centring costs more than it buys. */
+          copyAlign="center"
         />
 
         <div className="py-20 md:py-28">
