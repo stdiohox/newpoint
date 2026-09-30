@@ -104,7 +104,29 @@ export default function ServicesIndex() {
             to 828px for it: 0.53x to 0.75x of a device pixel per CSS pixel on a
             2x phone, which is soft. 1200px is the widest of those drawn widths
             and so covers every step below lg; at lg and up the box is the wider
-            edge again and 100vw is correct. See PageHero's `sizes` note. */}
+            edge again and 100vw is correct. See PageHero's `sizes` note.
+
+            MEASURED CONTRAST, worst pixel a glyph actually covers, on the
+            rendered page at 2x. It lives here rather than in PageHero because
+            it is a property of THIS crop under THAT scrim, and either one
+            moving invalidates it. Floors are 3:1 for the H1 (36-52px, large
+            text) and 4.5:1 for the intro and the CTA label.
+
+                          H1     intro   CTA
+              1440        7.33   6.85    14.09
+              1024        7.55   5.25    11.39
+              768         9.79   6.63    13.36
+              430         7.53   6.04    10.97
+              412         7.78   5.25     9.50
+              390         7.37   5.99    11.06
+              390 @200%   5.82   6.75    —
+              360         6.88   6.02    10.54
+              320         7.00   6.31    11.25
+
+            320 and 200% text are in the list on purpose: they are the two
+            shapes where the copy block is tallest relative to the frame, they
+            are SC 1.4.10 and 1.4.4 obligations, and an earlier revision of this
+            scrim passed the named breakpoints while failing both. */}
         <PageHero
           title="What we do, and how it works"
           intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
