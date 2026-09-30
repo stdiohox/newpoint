@@ -84,6 +84,32 @@ both have title-protection statutes. Treat the title as belonging in the list ab
 > "Dr. Anastasia Ofoegbu" — see [`research/content/contact.md`](research/content/contact.md).
 > `research/` is authoritative for **facts**, not for this. Do not port those titles forward.
 
+#### OVERRIDDEN IN ONE PLACE BY THE CLIENT, 2026-09-30
+
+**The client asked for "Dr." before both names on the `/services` "Providers you will
+see" cards, was shown the rule above and its reasoning, and reaffirmed.** It is applied
+there and is rendered as a display prefix in `app/services/page.tsx`, not written into
+`PROVIDERS[].name`.
+
+**That distinction is the whole of the override, so do not collapse it.** `name` feeds
+schema.org `Person`, the page metadata and the portrait `alt` text. What the client
+overturned was the visible copy on one section. Everything else in this section stands
+unchanged and is still binding:
+
+- no `Physician`, `IndividualPhysician` or `PhysiciansOffice` in schema, ever;
+- no `Dr.` in metadata, `alt` text or structured data;
+- `jobTitle` stays "Psychiatric-Mental Health Nurse Practitioner".
+
+So the site now says "Dr." in one visible place while its machine-readable markup
+continues to describe two advanced practice nurses. That is deliberate and is the
+narrowest way to honour the request.
+
+<!-- CLIENT: if "Dr." should appear beyond those cards, it needs a decision per
+     surface — visible copy is one question, and schema/metadata is a separate one
+     with the title-protection exposure attached. Confirm which, and whether the
+     practice has counsel's view on NJ/PA title protection for DNP-prepared APNs. -->
+
+
 ### Care modality — CONFIRMED BY CLIENT, 2026-09-23
 
 **The practice delivers care both in person and by telehealth.** Confirmed verbally by

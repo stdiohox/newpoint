@@ -432,8 +432,22 @@ export default function ServicesIndex() {
                           />
                         </div>
                         <div className="min-w-0">
+                          {/* "Dr." IS A DISPLAY PREFIX HERE AND NOWHERE ELSE.
+                              The client asked for it on 2026-09-30 after being
+                              shown CLAUDE.md's rule against it, and reaffirmed;
+                              CLAUDE.md now records that decision. It is written
+                              inline rather than into PROVIDERS[].name on
+                              purpose, because that field feeds schema.org
+                              Person, the page metadata and the portrait alt
+                              text, and the prohibition on implying `Physician`
+                              in structured data was NOT what was overturned.
+                              Putting it in the data would carry the title into
+                              all three silently.
+                              CLIENT: if this should be site-wide, it needs a
+                              decision per surface — visible copy is one
+                              question, schema and metadata are another. */}
                           <h3 className="text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]">
-                            {p.name}
+                            Dr. {p.name}
                           </h3>
                           <p className="font-display text-small text-np-neutral-600 mt-1 font-medium">
                             {p.credentials}
