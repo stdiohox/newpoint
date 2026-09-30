@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { ServiceJourney } from '@/components/sections/ServiceJourney';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -107,84 +108,129 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           copyAlign="center"
         />
 
-        <div className="py-20 md:py-28">
-          <Container>
-            <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-              {/* Sticky in-page contents. On a long page reached from search, this
-                  is what tells a reader the page answers their question. */}
-              <div className="md:col-span-4">
-                <div className="md:sticky md:top-28">
-                  <nav aria-label="On this page">
-                    <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                      On this page
-                    </h2>
-                    <ul role="list" className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4">
-                      {service.sections.map((section) => (
-                        <li key={section.heading}>
-                          <a
-                            href={`#${slugify(section.heading)}`}
-                            className="text-small text-np-neutral-600 hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]"
-                          >
-                            {section.heading}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </nav>
+        {/* TWO BODY LAYOUTS, PICKED BY THE SERVICE, NOT BY THE SLUG.
+            `journey` renders the sections as a numbered patient journey with a
+            tracking rail; everything else keeps the prose layout below. The
+            flag's own comment in lib/content.ts carries the reasoning — the
+            short version is that numbering claims the sections run in order,
+            which is true of the assessment and false of the other two.
 
-                  {/* How care is delivered, in the same words the service's own
-                    homepage card uses, so the two cannot disagree. The body
-                    sections describe what the service IS; none of them stated
-                    the modality outright, which left it on the card and in the
-                    FAQ but nowhere on the page itself. Outside the <nav>
-                    because it is page content, not navigation. */}
-                  <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
-                    {/* h3, not h2: "On this page" above it is already an h2, and
-                        two sidebar labels ahead of the first topical heading
-                        pushes UI chrome to the front of the heading outline. */}
-                    <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                      How it is delivered
-                    </h3>
-                    <p className="text-body text-np-ink mt-2">{service.modality}</p>
+            BOTH BRANCHES DERIVE THEIR ANCHOR IDS FROM THE SAME slugify CALL on
+            the same headings, so the in-page anchors are byte-identical to what
+            this route served before. */}
+        {service.journey ? (
+          <ServiceJourney
+            steps={service.sections.map((section) => ({
+              id: slugify(section.heading),
+              heading: section.heading,
+              body: section.body,
+              list: section.list,
+            }))}
+            modality={service.modality}
+          />
+        ) : (
+          <div className="py-20 md:py-28">
+            <Container>
+              <div className="grid gap-12 md:grid-cols-12 md:gap-16">
+                {/* Sticky in-page contents. On a long page reached from search,
+                    this is what tells a reader the page answers their question. */}
+                <div className="md:col-span-4">
+                  <div className="md:sticky md:top-28">
+                    <nav aria-label="On this page">
+                      <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                        On this page
+                      </h2>
+                      <ul
+                        role="list"
+                        className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4"
+                      >
+                        {service.sections.map((section) => (
+                          <li key={section.heading}>
+                            <a
+                              href={`#${slugify(section.heading)}`}
+                              className="text-small text-np-neutral-600 hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]"
+                            >
+                              {section.heading}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+
+                    {/* How care is delivered, in the same words the service's own
+                      homepage card uses, so the two cannot disagree. The body
+                      sections describe what the service IS; none of them stated
+                      the modality outright, which left it on the card and in the
+                      FAQ but nowhere on the page itself. Outside the <nav>
+                      because it is page content, not navigation. */}
+                    <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
+                      {/* h3, not h2: "On this page" above it is already an h2, and
+                          two sidebar labels ahead of the first topical heading
+                          pushes UI chrome to the front of the heading outline. */}
+                      <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                        How it is delivered
+                      </h3>
+                      <p className="text-body text-np-ink mt-2">{service.modality}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="md:col-span-8">
-                {service.sections.map((section, i) => (
-                  <Reveal key={section.heading} delay={stagger(i, 0.05)}>
-                    {/* tabIndex -1 so activating a jump link moves real focus
-                        into the section. Without it the viewport scrolls but the
-                        screen-reader cursor and document.activeElement stay on the
-                        sidebar link, which has just scrolled out of view. */}
-                    <section
-                      id={slugify(section.heading)}
-                      tabIndex={-1}
-                      className="border-np-neutral-200 border-b pb-10 last:border-b-0 last:pb-0 focus:outline-none [&:not(:first-child)]:pt-10"
-                    >
-                      <h2 className="text-h2">{section.heading}</h2>
-                      <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
-                        {section.body}
-                      </p>
-                      {section.list && (
-                        <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                          {section.list.map((item) => (
-                            <li
-                              key={item}
-                              className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
-                            >
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </section>
-                  </Reveal>
-                ))}
+                <div className="md:col-span-8">
+                  {service.sections.map((section, i) => {
+                    /* SPACING COMES FROM THE INDEX, NOT FROM :first-child /
+                       :last-child, and swapping it was a bug fix rather than a
+                       preference.
+
+                       Each <section> is the ONLY child of its own Reveal
+                       wrapper, so every one of them matched BOTH :first-child
+                       and :last-child. `[&:not(:first-child)]:pt-10` therefore
+                       never applied to anything and `last:border-b-0 last:pb-0`
+                       applied to everything: the sections rendered flush
+                       against each other with no divider anywhere, on all
+                       three service routes.
+
+                       Do not restore the structural selectors while Reveal
+                       wraps each item. */
+                    const isLast = i === service.sections.length - 1;
+
+                    return (
+                      <Reveal key={section.heading} delay={stagger(i, 0.05)}>
+                        {/* tabIndex -1 so activating a jump link moves real focus
+                            into the section. Without it the viewport scrolls but the
+                            screen-reader cursor and document.activeElement stay on the
+                            sidebar link, which has just scrolled out of view. */}
+                        <section
+                          id={slugify(section.heading)}
+                          tabIndex={-1}
+                          className={`focus:outline-none ${i === 0 ? '' : 'pt-10'} ${
+                            isLast ? '' : 'border-np-neutral-200 border-b pb-10'
+                          }`}
+                        >
+                          <h2 className="text-h2">{section.heading}</h2>
+                          <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                            {section.body}
+                          </p>
+                          {section.list && (
+                            <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
+                              {section.list.map((item) => (
+                                <li
+                                  key={item}
+                                  className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
+                                >
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </section>
+                      </Reveal>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </Container>
-        </div>
+            </Container>
+          </div>
+        )}
 
         <PageFaq items={service.faqs} />
 
@@ -220,8 +266,15 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
         <PageCta />
 
+        {/* featured=2 promotes the first two cards, which are always the other
+            two services — `siblings` is spread first below. The page ends on the
+            appointment CTA and then on the two places a reader who is not ready
+            to book should go next, and as six identical tiles those two were the
+            hardest to pick out of the cluster. Nothing is added or reordered;
+            see the prop's comment in PageCta.tsx. */}
         <RelatedLinks
           heading="Keep reading"
+          featured={2}
           links={[
             ...siblings.map((s) => ({
               label: s.title,

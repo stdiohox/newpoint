@@ -742,6 +742,27 @@ export type ServicePage = {
    * geography, because nothing in its own content scopes it.
    */
   modality: string;
+  /**
+   * Render `sections` as a numbered patient journey rather than as plain prose.
+   *
+   * A LAYOUT SWITCH, NOT A CONTENT FIELD, and it is opt-in because numbering
+   * asserts something: that the sections run in order and that the order is
+   * information the reader needs. That is true of exactly one service here.
+   *
+   * The assessment's five sections are a sequence — what the appointment
+   * covers, the instruments used inside it, the diagnosis that comes out of it,
+   * the plan built on that diagnosis, what happens after the plan — and a
+   * reader deciding whether to book wants to know where the appointment ends
+   * and ongoing care begins.
+   *
+   * The other two are categories. Medication management's sections are
+   * prescribing, measurement, adjustment, collaboration and conditions
+   * treated, which happen concurrently; telehealth's are the schedule, the
+   * licensure footprint, what video suits and what it does not. Numbering
+   * either would claim a first step and a last step that do not exist, so
+   * both stay on the prose layout. Check that before adding a third.
+   */
+  journey?: boolean;
   sections: { heading: string; body: string; list?: string[] }[];
   faqs: { q: string; a: string }[];
 };
@@ -806,6 +827,9 @@ export const SERVICE_PAGES: ServicePage[] = [
     intro:
       'Every patient at Newpoint starts here. A comprehensive psychiatric assessment is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
     modality: 'By telehealth across New Jersey and Pennsylvania, and in person.',
+    /* The one service whose sections genuinely run in order. See the field's
+       own comment on the type for why the other two are left out. */
+    journey: true,
     sections: [
       {
         heading: 'What the assessment covers',

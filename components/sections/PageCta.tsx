@@ -200,9 +200,26 @@ export function PageCta({
 export function RelatedLinks({
   heading = 'Keep reading',
   links,
+  featured = 0,
 }: {
   heading?: string;
   links: { label: string; description: string; href: string }[];
+  /**
+   * How many of the leading cards read as primary.
+   *
+   * Defaults to 0, so the five routes that were already using this component
+   * render exactly as before. app/services/[slug] passes 2: that page ends with
+   * six cards, of which the first two are the other two services, and as six
+   * identical tiles the sibling services were the least findable thing in the
+   * cluster despite being the most relevant.
+   *
+   * THE GRID IS UNCHANGED AND SO IS THE LINK SET. The promotion is a surface
+   * and a hover affordance, not a column span: at lg these are three per row,
+   * and giving two of them a wider span would leave a hole or an orphan in the
+   * remaining four. Nothing is added, removed or reordered here — the cards a
+   * page hands over are the cards it gets.
+   */
+  featured?: number;
 }) {
   if (links.length === 0) return null;
 
@@ -213,19 +230,38 @@ export function RelatedLinks({
           <h2 className="text-h3 text-np-neutral-600">{heading}</h2>
         </Reveal>
         <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {links.map((link, i) => (
-            <Reveal as="li" key={link.href} delay={i * 0.06}>
-              <Link
-                href={link.href}
-                className="rounded-card bg-np-surface ease-np-out group block h-full p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)]"
-              >
-                <h3 className="text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]">
-                  {link.label}
-                </h3>
-                <p className="text-small text-np-neutral-600 mt-2">{link.description}</p>
-              </Link>
-            </Reveal>
-          ))}
+          {links.map((link, i) => {
+            const isFeatured = i < featured;
+
+            return (
+              <Reveal as="li" key={link.href} delay={i * 0.06}>
+                <Link
+                  href={link.href}
+                  className={`rounded-card ease-np-out group block h-full p-6 ring-1 transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)] ${
+                    isFeatured
+                      ? /* blue-50 over the page's warm white, with a blue-100
+                           hairline instead of the ink ring. Both are already in
+                           the system — it is the wash the section-list chips use
+                           — so this promotes a card without introducing a
+                           surface the site does not already have. The heading
+                           starts blue rather than arriving there on hover,
+                           which is the whole of the visual difference at rest. */
+                        'bg-np-blue-50 ring-np-blue-100'
+                      : 'bg-np-surface ring-[var(--np-alpha-ink-08)]'
+                  }`}
+                >
+                  <h3
+                    className={`text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms] ${
+                      isFeatured ? 'text-np-blue-700' : ''
+                    }`}
+                  >
+                    {link.label}
+                  </h3>
+                  <p className="text-small text-np-neutral-600 mt-2">{link.description}</p>
+                </Link>
+              </Reveal>
+            );
+          })}
         </ul>
       </Container>
     </section>
