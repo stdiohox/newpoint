@@ -743,47 +743,30 @@ export type ServicePage = {
    */
   modality: string;
   /**
-   * Render `sections` as a numbered patient journey rather than as plain prose.
+   * Which body layout this service's `sections` render in.
    *
-   * A LAYOUT SWITCH, NOT A CONTENT FIELD, and it is opt-in because numbering
-   * asserts something: that the sections run in order and that the order is
-   * information the reader needs. That is true of exactly one service here.
+   * Absent (the default) is the shared prose layout: a sticky contents rail
+   * beside a single column of headings and paragraphs. Medication management
+   * and telehealth both use it.
    *
-   * The assessment's five sections are a sequence — what the appointment
-   * covers, the instruments used inside it, the diagnosis that comes out of it,
-   * the plan built on that diagnosis, what happens after the plan — and a
-   * reader deciding whether to book wants to know where the appointment ends
-   * and ongoing care begins.
+   * `'feature'` is the assessment page's bespoke layout, and it is opt-in
+   * because it makes claims the other two cannot support. It renders the first
+   * two sections as image-and-copy rows, the third as a tinted statement band,
+   * and hands the last two to ServiceFeature as a left column and an image
+   * card. That split assumes five sections in roughly that shape; a service
+   * with four, or with a list on the wrong one, will not read the way this
+   * does. Check the shape before switching a third service onto it.
    *
-   * The other two are categories. Medication management's sections are
-   * prescribing, measurement, adjustment, collaboration and conditions
-   * treated, which happen concurrently; telehealth's are the schedule, the
-   * licensure footprint, what video suits and what it does not. Numbering
-   * either would claim a first step and a last step that do not exist, so
-   * both stay on the prose layout. Check that before adding a third.
+   * IT ALSO CHANGES WHAT THE PAGE ENDS WITH. On this layout the shared crisis
+   * panel and the "Keep reading" link cluster are both dropped, at the
+   * client's request of 2026-09-30. See the note at the call site in
+   * app/services/[slug]/page.tsx for why that is safe here and would not
+   * automatically be safe elsewhere.
+   *
+   * Replaces the earlier `journey` and `featurePair` booleans, which were two
+   * flags describing one decision.
    */
-  journey?: boolean;
-  /**
-   * Render the FINAL TWO `sections` as an image-led feature block below the
-   * timeline instead of as two more timeline steps.
-   *
-   * THEY MOVE, THEY ARE NOT COPIED. The timeline renders `sections` minus these
-   * two, so each paragraph is still on the page exactly once. That is the whole
-   * point of the flag: the alternative was repeating a heading and a paragraph
-   * a few hundred pixels apart, which is the failure this codebase consolidates
-   * away from elsewhere.
-   *
-   * The pairing is positional because the layout needs exactly two blocks — the
-   * left column and the card — and the last two are the two that describe what
-   * the patient leaves with and what follows. Requires `journey`, and requires
-   * at least three sections left over so the timeline is still a sequence. If a
-   * sixth section is ever added to this service, check that the last two are
-   * still the right pair before assuming this still holds.
-   *
-   * Both keep their existing anchor ids and both stay listed in "On this page",
-   * so no in-page link this route used to serve has gone away.
-   */
-  featurePair?: boolean;
+  layout?: 'feature';
   /**
    * Drop the appointment button out of this service's hero.
    *
@@ -861,14 +844,9 @@ export const SERVICE_PAGES: ServicePage[] = [
     intro:
       'Every patient at Newpoint starts here. A comprehensive psychiatric assessment is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
     modality: 'By telehealth across New Jersey and Pennsylvania, and in person.',
-    /* The one service whose sections genuinely run in order. See the field's
-       own comment on the type for why the other two are left out. */
-    journey: true,
-    /* "Your treatment plan" and "What happens after" render as the feature
-       block. The timeline keeps the three sections that describe the
-       appointment itself and ends on the diagnosis, which is where the
-       appointment ends. */
-    featurePair: true,
+    /* The one service on the bespoke layout. See the field's own comment on
+       the type for the shape it assumes. */
+    layout: 'feature',
     /* Client asked for the hero's appointment button to come off this page. */
     hideHeroCta: true,
     sections: [

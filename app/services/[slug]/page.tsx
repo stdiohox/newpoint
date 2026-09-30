@@ -5,7 +5,7 @@ import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceFeature } from '@/components/sections/ServiceFeature';
-import { ServiceJourney } from '@/components/sections/ServiceJourney';
+import { ServiceBody } from '@/components/sections/ServiceBody';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -52,9 +52,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const poster = cardPosterFor(`/services/${service.slug}`);
 
   /* Anchor ids are derived once, here, and every consumer below reads them from
-     this array. The timeline, the feature block and the contents list all index
-     into the same objects, so the three cannot drift apart and the ids stay
-     byte-identical to what this route has always served. */
+     this array, so the body and the feature block cannot drift apart and the
+     ids stay byte-identical to what this route has always served. */
   const sectionItems = service.sections.map((section) => ({
     id: slugify(section.heading),
     heading: section.heading,
@@ -62,14 +61,37 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     list: section.list,
   }));
 
-  /* `featurePair` promotes the last two sections out of the timeline. The
-     guard is not decoration: the split only makes sense while at least three
-     sections are left to carry the sequence, and a service that turned the flag
-     on with four sections should lose the feature block rather than ship a
-     two-step "journey". */
-  const useFeaturePair = Boolean(service.featurePair) && sectionItems.length >= 5;
-  const journeyItems = useFeaturePair ? sectionItems.slice(0, -2) : sectionItems;
-  const featureItems = useFeaturePair ? sectionItems.slice(-2) : null;
+  /* The bespoke layout splits five sections three ways. The length guard is not
+     decoration: with fewer than five the split stops meaning anything, and a
+     service in that state should fall back to the prose layout rather than
+     render half a design. */
+  const useFeatureLayout = service.layout === 'feature' && sectionItems.length >= 5;
+  const bodyItems = sectionItems.slice(0, 3);
+  const featureItems = sectionItems.slice(-2);
+
+  /* WHAT THE FEATURE LAYOUT NEEDS A PHOTOGRAPH FOR, one slot per body row.
+     Only the first has an asset today. The second is a real gap rather than an
+     oversight — nothing in the library depicts questionnaires or rating
+     scales, and the nearest candidates are all the same empty consulting room
+     already used further down this page. */
+  const bodyMedia = [
+    {
+      src: '/images/services/services-consult-2752.webp',
+      /* Describes the photograph and stops there. It does not say these are
+         Newpoint's providers or Newpoint's room: the practice's in-person
+         locations are still unconfirmed under CLAUDE.md's care-modality rule,
+         and alt text is a place a claim gets made by accident. */
+      alt: 'A patient sitting in an armchair in conversation with a clinician, who is taking notes on a pad.',
+    },
+    {
+      /* CLIENT: a photograph for "The tools we use" — something showing the
+         written side of the assessment (a questionnaire on a clipboard, a
+         rating scale being completed) rather than another room interior.
+         Landscape, 2400px or wider on the long edge. */
+      placeholder:
+        'Something showing the written side of the assessment, landscape, 2400px or wider.',
+    },
+  ];
 
   /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [
@@ -133,47 +155,33 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         />
 
         {/* TWO BODY LAYOUTS, PICKED BY THE SERVICE, NOT BY THE SLUG.
-            `journey` renders the sections as a numbered patient journey with a
-            tracking rail; everything else keeps the prose layout below. The
-            flag's own comment in lib/content.ts carries the reasoning — the
-            short version is that numbering claims the sections run in order,
-            which is true of the assessment and false of the other two.
+            `layout: 'feature'` is the assessment page's bespoke treatment;
+            everything else keeps the shared prose layout below. The flag's own
+            comment in lib/content.ts carries the reasoning.
 
             BOTH BRANCHES DERIVE THEIR ANCHOR IDS FROM THE SAME slugify CALL on
             the same headings, so the in-page anchors are byte-identical to what
             this route served before. */}
-        {service.journey ? (
+        {useFeatureLayout ? (
           <>
-            <ServiceJourney
-              /* `featurePair` moves the last two sections into ServiceFeature
-                 below, so the timeline renders everything except them. The
-                 slice is what guarantees nothing is printed twice. */
-              steps={journeyItems.map((item) => ({
-                id: item.id,
-                heading: item.heading,
-                body: item.body,
-                list: item.list,
-              }))}
-            />
+            <ServiceBody sections={bodyItems} media={bodyMedia} />
 
-            {featureItems && (
-              <ServiceFeature
-                /* The service's own nav label. Not a string written for this
-                   block — see ServiceFeature's own note. */
-                eyebrow={service.nav}
-                left={featureItems[0]}
-                card={featureItems[1]}
-                image={{
-                  src: '/images/services/evaluation-card-2752.webp',
-                  /* Describes the photograph and nothing else. It deliberately
-                     does NOT say "our office": CLAUDE.md's care-modality rule
-                     turns on the fact that the practice's in-person locations
-                     are still unconfirmed, and alt text is copy like any other
-                     place a claim can be made by accident. */
-                  alt: 'A quiet consulting room with two armchairs turned towards each other, a small wooden side table between them holding a glass of water and a box of tissues, and a fiddle-leaf fig beside a curtained window.',
-                }}
-              />
-            )}
+            <ServiceFeature
+              /* The service's own nav label. Not a string written for this
+                 block — see ServiceFeature's own note. */
+              eyebrow={service.nav}
+              left={featureItems[0]}
+              card={featureItems[1]}
+              image={{
+                src: '/images/services/evaluation-card-2752.webp',
+                /* Describes the photograph and nothing else. It deliberately
+                   does NOT say "our office": CLAUDE.md's care-modality rule
+                   turns on the fact that the practice's in-person locations
+                   are still unconfirmed, and alt text is copy like any other
+                   place a claim can be made by accident. */
+                alt: 'A quiet consulting room with two armchairs turned towards each other, a small wooden side table between them holding a glass of water and a box of tissues, and a fiddle-leaf fig beside a curtained window.',
+              }}
+            />
           </>
         ) : (
           <div className="py-20 md:py-28">
@@ -281,8 +289,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
         <PageFaq items={service.faqs} />
 
-        {/* CRISIS GUIDANCE IS EXPLICIT ON THESE ROUTES AND NOWHERE ELSE AMONG
-            THE INTERIOR PAGES, and the asymmetry is deliberate.
+        {/* CRISIS GUIDANCE IS EXPLICIT ON THE PROSE ROUTES AND NOWHERE ELSE
+            AMONG THE INTERIOR PAGES, and the asymmetry is deliberate.
 
             PageCta used to carry an inline crisis panel, which is why it sits
             above RelatedLinks. That panel was removed on 2026-09-30 at the
@@ -290,62 +298,87 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             the last thing before the footer, and the footer's crisis strip is
             the next content a reader meets.
 
-            NOT HERE. RelatedLinks sits between the two and renders six cards,
-            and the footer's strip is itself below three stacked link columns.
-            On a phone that is roughly two thousand pixels from the CTA to the
-            nearest 988, on the pages that name PTSD, psychosis and
-            schizophrenia. /services/medication-management is the worst of them.
+            THE PROSE ROUTES STILL NEED IT. RelatedLinks sits between the two
+            and renders six cards, and the footer's strip is itself below three
+            stacked link columns. On a phone that is roughly two thousand pixels
+            from the CTA to the nearest 988, on pages that name PTSD, psychosis
+            and schizophrenia. /services/medication-management is the worst of
+            them.
 
-            So the shared panel is rendered here, ABOVE the CTA rather than
-            below it, mirroring what /contact does with order-first. It is the
-            same component the homepage and /contact use, it introduces no new
-            copy, and it restores CRISIS.body — "not for emergencies and is not
-            monitored around the clock" — which otherwise appears on these
-            routes only as footer fine print.
+            THE FEATURE LAYOUT DROPS BOTH THIS PANEL AND RelatedLinks, at the
+            client's request of 2026-09-30, and the two removals are what make
+            each other safe. The distance this panel existed to close was
+            created by the six-card grid below the CTA. Remove the grid and
+            PageCta becomes the last block before the footer, exactly as it is
+            on the five other routes, so the footer's "In a crisis, call or text
+            988. In an emergency, call 911." is the next content a reader meets.
+            Measured on this page it is now nearer the CTA than it has ever
+            been, not further.
+
+            WHAT IS GENUINELY LOST is CRISIS.body — "not for emergencies and is
+            not monitored around the clock" — which now appears on this route
+            only as footer fine print. CLAUDE.md asks for crisis guidance where
+            a distressed visitor would plausibly look, and the footer strip is
+            still that. If RelatedLinks ever comes back to this layout, this
+            panel has to come back with it.
 
             h2, not the default h3: it is a top-level section here, and the
             page's outline would skip a level otherwise. */}
-        <div className="pb-16 md:pb-20">
-          <Container>
-            <CrisisPanel headingAs="h2" className="mx-auto max-w-3xl" />
-          </Container>
-        </div>
+        {!useFeatureLayout && (
+          <div className="pb-16 md:pb-20">
+            <Container>
+              <CrisisPanel headingAs="h2" className="mx-auto max-w-3xl" />
+            </Container>
+          </div>
+        )}
 
         <PageCta />
 
-        {/* featured=2 promotes the first two cards, which are always the other
-            two services — `siblings` is spread first below. The page ends on the
-            appointment CTA and then on the two places a reader who is not ready
-            to book should go next, and as six identical tiles those two were the
-            hardest to pick out of the cluster. Nothing is added or reordered;
-            see the prop's comment in PageCta.tsx. */}
-        <RelatedLinks
-          heading="Keep reading"
-          featured={2}
-          links={[
-            ...siblings.map((s) => ({
-              label: s.title,
-              description: s.metaDescription,
-              href: `/services/${s.slug}`,
-            })),
-            {
-              label: 'Starting care',
-              description: 'The three steps from first contact to ongoing treatment.',
-              href: '/new-patients',
-            },
-            {
-              label: 'Insurance and payment',
-              description:
-                'The plans we accept, the sliding scale for self-pay patients, and how to check your coverage.',
-              href: '/insurance',
-            },
-            ...PROVIDERS.map((p) => ({
-              label: p.name,
-              description: `${p.credentials}. ${p.licensed}.`,
-              href: `/providers/${p.slug}`,
-            })),
-          ]}
-        />
+        {/* "Keep reading" IS DROPPED ON THE FEATURE LAYOUT, at the client's
+            request of 2026-09-30, on the grounds that every one of its six
+            destinations is reachable from the navbar: both sibling services sit
+            in the Services submenu, and New patients, Insurance and Providers
+            are all top-level items. Nothing here is orphaned by removing it.
+
+            WHAT IT COSTS IS INTERNAL LINKING, not reachability, and CLAUDE.md
+            makes SEO a deliverable rather than a finishing touch. This cluster
+            is how link equity flowed from a page that ranks to pages the
+            homepage does not link to directly, with anchor text richer than a
+            nav label. The nav still links them sitewide, so the loss is weight,
+            not indexation.
+
+            featured=2 is kept on the prose routes: there the first two cards
+            are always the other two services, and as six identical tiles those
+            two were the hardest to pick out of the cluster. */}
+        {!useFeatureLayout && (
+          <RelatedLinks
+            heading="Keep reading"
+            featured={2}
+            links={[
+              ...siblings.map((s) => ({
+                label: s.title,
+                description: s.metaDescription,
+                href: `/services/${s.slug}`,
+              })),
+              {
+                label: 'Starting care',
+                description: 'The three steps from first contact to ongoing treatment.',
+                href: '/new-patients',
+              },
+              {
+                label: 'Insurance and payment',
+                description:
+                  'The plans we accept, the sliding scale for self-pay patients, and how to check your coverage.',
+                href: '/insurance',
+              },
+              ...PROVIDERS.map((p) => ({
+                label: p.name,
+                description: `${p.credentials}. ${p.licensed}.`,
+                href: `/providers/${p.slug}`,
+              })),
+            ]}
+          />
+        )}
       </main>
       <Footer />
     </>
