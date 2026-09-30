@@ -109,6 +109,35 @@ narrowest way to honour the request.
      with the title-protection exposure attached. Confirm which, and whether the
      practice has counsel's view on NJ/PA title protection for DNP-prepared APNs. -->
 
+### Verified badge — CLIENT DECISION, 2026-09-30
+
+**A "Verified" tick renders on each provider's avatar on the `/services` cards.** The
+client asked for it, was told the site cannot currently substantiate a verification
+claim, and reaffirmed. Applied.
+
+**What it does not change.** The badge is presentational markup on one section. It adds
+nothing to structured data, and the schema rules above are untouched: `hasCredential`
+and `identifier` (NPI) **stay omitted** until the certifying body and numbers are
+supplied. A visible tick is not a machine-readable credential and must not become one.
+
+**What is still open, and what makes it open.** "Verified" does not say verified *by
+whom, of what*. The obvious readings — board certification, licensure, identity — are
+not equally supported:
+
+| Reading | Status |
+|---|---|
+| Licensed in NJ and PA | Confirmed by the client, 2026-09-29, and already stated on the card |
+| Board certified | The claim appears in source copy, but **the certifying body is still unknown** — the open item that keeps `hasCredential` omitted |
+| Identity / platform verification | Not a thing this site does |
+
+<!-- CLIENT: confirm what "Verified" is asserting. If it means licensure, the label
+     should say so ("Licensed in NJ and PA") and it is then a confirmed fact. If it
+     means board certification, supply the certifying body first — that unblocks
+     hasCredential in schema as well. If it is decorative, say so, and it should
+     probably lose the screen-reader label rather than assert something to one
+     audience only. -->
+
+
 
 ### Care modality — CONFIRMED BY CLIENT, 2026-09-23
 
