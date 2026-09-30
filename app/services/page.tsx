@@ -4,8 +4,8 @@ import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageCta } from '@/components/sections/PageCta';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Container } from '@/components/ui/Container';
-import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 import { SERVICE_PAGES, WHAT_WE_TREAT, PROVIDERS, cardPosterFor } from '@/lib/content';
@@ -28,6 +28,20 @@ export const metadata = pageMetadata({
     'Psychiatric assessment, medication management, and telehealth in New Jersey and Pennsylvania. What each involves and how to get started.',
   path: '/services',
 });
+
+/**
+ * Initials for the avatar's fallback, shown only if a portrait fails to load.
+ *
+ * First and LAST word, not the first two: "Anastasia O. Ofoegbu" has a middle
+ * initial, and taking the first two words would render "AO." — a stray full
+ * stop from a name particle rather than a surname.
+ */
+function initialsOf(name: string) {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? '';
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
+  return `${first}${last}`.toUpperCase();
+}
 
 export default function ServicesIndex() {
   return (
@@ -411,26 +425,39 @@ export default function ServicesIndex() {
                       className="rounded-card bg-np-surface ease-np-out group block h-full p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)]"
                     >
                       <div className="flex items-center gap-4">
-                        {/* The circle is the WRAPPER's, not the image's.
-                            ProviderPortrait hardcodes rounded-media on its own
-                            <img>, and adding rounded-full through className
-                            would leave two competing radius utilities whose
-                            winner is decided by stylesheet order rather than by
-                            anything in this file. Clipping from the outside is
-                            decided here and stays decided.
+                        {/* shadcn's Avatar rather than the hand-rolled circle
+                            this replaced. The circle itself is no different —
+                            what it buys is a real failure state: Radix tracks
+                            the image's load status and swaps in the initials if
+                            the portrait errors, where the previous
+                            overflow-hidden wrapper would have shown a
+                            broken-image glyph inside a neat circle.
+
+                            srcSet, not src alone. AvatarImage forwards every
+                            <img> prop, so the two pre-processed webp sizes
+                            survive the move; only ProviderPortrait's <picture>
+                            jpg fallback is lost, which webp has not needed for
+                            years. ProviderPortrait still renders the 240px
+                            portraits on the provider page and the homepage.
 
                             alt="" because the h3 beside it already says the
                             name: the portrait's own alt repeats the name AND
                             the credentials, so a screen reader would hear both
-                            twice per card. */}
-                        <div className="size-14 shrink-0 overflow-hidden rounded-full">
-                          <ProviderPortrait
-                            provider={p}
-                            alt=""
+                            twice per card. The fallback initials are
+                            aria-hidden for the same reason. */}
+                        <Avatar className="size-14">
+                          <AvatarImage
+                            src={p.image.webp560}
+                            srcSet={`${p.image.webp560} 560w, ${p.image.webp1120} 1120w`}
                             sizes="56px"
-                            className="h-full w-full"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
                           />
-                        </div>
+                          <AvatarFallback aria-hidden="true" className="font-display font-medium">
+                            {initialsOf(p.name)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="min-w-0">
                           {/* "Dr." IS A DISPLAY PREFIX HERE AND NOWHERE ELSE.
                               The client asked for it on 2026-09-30 after being
