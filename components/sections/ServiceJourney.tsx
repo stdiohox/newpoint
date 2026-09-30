@@ -39,7 +39,26 @@ export type JourneyStep = {
  * The headings, the bodies and the anchors are all in the static HTML, which is
  * what CLAUDE.md's SEO brief requires of indexable content.
  */
-export function ServiceJourney({ steps, modality }: { steps: JourneyStep[]; modality: string }) {
+export function ServiceJourney({
+  steps,
+  modality,
+  toc,
+}: {
+  steps: JourneyStep[];
+  modality: string;
+  /**
+   * What "On this page" lists, when that is not the same as the steps.
+   *
+   * The assessment page moves its last two sections into ServiceFeature below
+   * the timeline. They are still headings on this page and still have anchors,
+   * so they stay in the contents; they are simply not steps. Defaults to the
+   * steps, which is the right answer for any service that keeps all of its
+   * sections in the timeline.
+   */
+  toc?: { id: string; heading: string }[];
+}) {
+  const contents = toc ?? steps.map(({ id, heading }) => ({ id, heading }));
+
   return (
     <div className="py-20 md:py-28">
       <Container>
@@ -49,7 +68,7 @@ export function ServiceJourney({ steps, modality }: { steps: JourneyStep[]; moda
                 sidebar used before this rewrite. Sticky only from md: below
                 that the rail would pin over the content it indexes. */}
             <div className="md:sticky md:top-28">
-              <ServiceJourneyNav steps={steps.map(({ id, heading }) => ({ id, heading }))} />
+              <ServiceJourneyNav steps={contents} />
 
               {/* THE "How it is delivered" CARD STAYS IN THE SIDEBAR, unchanged.
                   `modality` is the one sentence on the page that says where care

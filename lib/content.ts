@@ -763,6 +763,27 @@ export type ServicePage = {
    * both stay on the prose layout. Check that before adding a third.
    */
   journey?: boolean;
+  /**
+   * Render the FINAL TWO `sections` as an image-led feature block below the
+   * timeline instead of as two more timeline steps.
+   *
+   * THEY MOVE, THEY ARE NOT COPIED. The timeline renders `sections` minus these
+   * two, so each paragraph is still on the page exactly once. That is the whole
+   * point of the flag: the alternative was repeating a heading and a paragraph
+   * a few hundred pixels apart, which is the failure this codebase consolidates
+   * away from elsewhere.
+   *
+   * The pairing is positional because the layout needs exactly two blocks — the
+   * left column and the card — and the last two are the two that describe what
+   * the patient leaves with and what follows. Requires `journey`, and requires
+   * at least three sections left over so the timeline is still a sequence. If a
+   * sixth section is ever added to this service, check that the last two are
+   * still the right pair before assuming this still holds.
+   *
+   * Both keep their existing anchor ids and both stay listed in "On this page",
+   * so no in-page link this route used to serve has gone away.
+   */
+  featurePair?: boolean;
   sections: { heading: string; body: string; list?: string[] }[];
   faqs: { q: string; a: string }[];
 };
@@ -830,6 +851,11 @@ export const SERVICE_PAGES: ServicePage[] = [
     /* The one service whose sections genuinely run in order. See the field's
        own comment on the type for why the other two are left out. */
     journey: true,
+    /* "Your treatment plan" and "What happens after" render as the feature
+       block. The timeline keeps the three sections that describe the
+       appointment itself and ends on the diagnosis, which is where the
+       appointment ends. */
+    featurePair: true,
     sections: [
       {
         heading: 'What the assessment covers',

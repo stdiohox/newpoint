@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { ServiceFeature } from '@/components/sections/ServiceFeature';
 import { ServiceJourney } from '@/components/sections/ServiceJourney';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
@@ -49,6 +50,26 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   const siblings = SERVICE_PAGES.filter((s) => s.slug !== service.slug);
   const poster = cardPosterFor(`/services/${service.slug}`);
+
+  /* Anchor ids are derived once, here, and every consumer below reads them from
+     this array. The timeline, the feature block and the contents list all index
+     into the same objects, so the three cannot drift apart and the ids stay
+     byte-identical to what this route has always served. */
+  const sectionItems = service.sections.map((section) => ({
+    id: slugify(section.heading),
+    heading: section.heading,
+    body: section.body,
+    list: section.list,
+  }));
+
+  /* `featurePair` promotes the last two sections out of the timeline. The
+     guard is not decoration: the split only makes sense while at least three
+     sections are left to carry the sequence, and a service that turned the flag
+     on with four sections should lose the feature block rather than ship a
+     two-step "journey". */
+  const useFeaturePair = Boolean(service.featurePair) && sectionItems.length >= 5;
+  const journeyItems = useFeaturePair ? sectionItems.slice(0, -2) : sectionItems;
+  const featureItems = useFeaturePair ? sectionItems.slice(-2) : null;
 
   /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [
@@ -119,15 +140,44 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             the same headings, so the in-page anchors are byte-identical to what
             this route served before. */}
         {service.journey ? (
-          <ServiceJourney
-            steps={service.sections.map((section) => ({
-              id: slugify(section.heading),
-              heading: section.heading,
-              body: section.body,
-              list: section.list,
-            }))}
-            modality={service.modality}
-          />
+          <>
+            <ServiceJourney
+              /* `featurePair` moves the last two sections into ServiceFeature
+                 below, so the timeline renders everything except them. The
+                 slice is what guarantees nothing is printed twice. */
+              steps={journeyItems.map((item) => ({
+                id: item.id,
+                heading: item.heading,
+                body: item.body,
+                list: item.list,
+              }))}
+              modality={service.modality}
+              /* The contents still list all five headings. The last two are no
+                 longer steps, but they are still on the page and still have
+                 anchors, and dropping them would silently remove two in-page
+                 links this route has always served. */
+              toc={sectionItems.map(({ id, heading }) => ({ id, heading }))}
+            />
+
+            {featureItems && (
+              <ServiceFeature
+                /* The service's own nav label. Not a string written for this
+                   block — see ServiceFeature's own note. */
+                eyebrow={service.nav}
+                left={featureItems[0]}
+                card={featureItems[1]}
+                image={{
+                  src: '/images/services/evaluation-card-2752.webp',
+                  /* Describes the photograph and nothing else. It deliberately
+                     does NOT say "our office": CLAUDE.md's care-modality rule
+                     turns on the fact that the practice's in-person locations
+                     are still unconfirmed, and alt text is copy like any other
+                     place a claim can be made by accident. */
+                  alt: 'A quiet consulting room with two armchairs turned towards each other, a small wooden side table between them holding a glass of water and a box of tissues, and a fiddle-leaf fig beside a curtained window.',
+                }}
+              />
+            )}
+          </>
         ) : (
           <div className="py-20 md:py-28">
             <Container>
