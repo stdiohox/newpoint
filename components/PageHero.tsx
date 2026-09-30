@@ -38,6 +38,7 @@ export function PageHero({
   intro,
   image,
   scrim = 'poster',
+  copyMaxWidth,
 }: {
   eyebrow?: string;
   title: string;
@@ -81,6 +82,19 @@ export function PageHero({
    * adding a second page to this branch.
    */
   scrim?: 'poster' | 'hero';
+  /**
+   * Hard caps on the copy's measure, in any CSS length. Omitted, the h1 keeps
+   * `max-w-[18ch]` and the intro `max-w-[56ch]`, which is what the other five
+   * callers get.
+   *
+   * It exists for the photographic case: a ch-based measure is set by the type
+   * size, and knows nothing about where the subject of the photograph behind it
+   * is standing. On /services the 56ch intro ran far enough right to close on
+   * her shoulder at 1440. These are applied as inline styles rather than
+   * classes because the values are per-page and arbitrary, and Tailwind's
+   * scanner only sees class strings it can read literally in the source.
+   */
+  copyMaxWidth?: { title?: string; intro?: string };
 }) {
   return (
     /* No `on-ink` here, unlike Footer, PageCta and Providers. That class only
@@ -292,11 +306,14 @@ export function PageHero({
             className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
               eyebrow ? 'mt-4' : ''
             }`}
+            style={{ maxWidth: copyMaxWidth?.title }}
           >
             {title}
           </h1>
 
-          <p className="text-body-l mt-5 max-w-[56ch] text-white/90">{intro}</p>
+          <p className="text-body-l mt-5 max-w-[56ch] text-white/90" style={{ maxWidth: copyMaxWidth?.intro }}>
+            {intro}
+          </p>
 
           <div className="mt-8">
             <ButtonWithIcon href={CTA.href} variant="glass">

@@ -126,7 +126,31 @@ export default function ServicesIndex() {
             320 and 200% text are in the list on purpose: they are the two
             shapes where the copy block is tallest relative to the frame, they
             are SC 1.4.10 and 1.4.4 obligations, and an earlier revision of this
-            scrim passed the named breakpoints while failing both. */}
+            scrim passed the named breakpoints while failing both.
+
+            COPY MEASURE: 620px heading, 540px intro, to keep the text clear of
+            her. Measured at 1440 with the silhouette found by scanning for a
+            sustained 150px dark run — the olive tree sits between the copy and
+            her at x 660-850 and a naive edge scan reports the foliage, not her
+            shoulder, which is 130px further right:
+
+              heading glyphs end   502px      intro glyphs end   688px
+              her silhouette       814px      (leftmost in the copy band)
+              clearance            126px worst-case, 268px row-for-row
+
+            The row-for-row figure is the honest one: it compares each line
+            against her edge at that line's own height. 126px pairs the widest
+            line with her nearest point even though they are 130px apart
+            vertically and never meet.
+
+            AT 1024 THIS CAP MAKES THINGS WORSE, AND IT IS THE BRIEF'S NUMBER,
+            SO IT STANDS UNTIL SOMEONE SAYS OTHERWISE. 620px is wider than the
+            max-w-[18ch] it overrides at that size, so the heading unwraps onto
+            one line, runs to 587px, and she starts at 610px — 23px of
+            clearance against the 96px the brief asks for at 1440. The fix is a
+            breakpoint the brief did not ask for: keep 18ch below xl and apply
+            620px from xl up, or write the cap as min(18ch, 620px). Neither
+            changes 1440, where 620px never binds. */}
         <PageHero
           title="What we do, and how it works"
           intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
@@ -136,6 +160,7 @@ export default function ServicesIndex() {
             sizes: '(min-width: 1024px) 100vw, 1200px',
           }}
           scrim="hero"
+          copyMaxWidth={{ title: '620px', intro: '540px' }}
         />
 
         <div className="py-20 md:py-28">
@@ -158,7 +183,23 @@ export default function ServicesIndex() {
 
                 return (
                   <Reveal as="li" key={service.slug} delay={stagger(i, 0.06)}>
-                    <div className="grid items-center gap-8 md:grid-cols-2 md:gap-14">
+                    {/* GAP LADDER: 32px stacked, 56px at md, 64px at lg, 112px
+                        at xl. The two ends are specified — 112px on desktop and
+                        64px at 1024 — and lg/xl are exactly those two
+                        breakpoints, so 1024-1279 gets 64 and 1280 up gets 112.
+                        md keeps its existing 56px: it is two columns but only
+                        768-1023 wide, where 64px would leave each column under
+                        350px, and nothing in the brief asked for it to move.
+
+                        items-start, NOT items-center. Centring made the image
+                        float against the text block, which is taller on every
+                        row; top alignment puts the image's top edge on the h2's.
+                        Note this is BOX alignment: the h2's line-height leaves a
+                        few px of leading above its cap-height, so the image edge
+                        sits marginally above the letterforms. Optical alignment
+                        would need a negative offset tuned per type size, which
+                        is a design call rather than the one asked for. */}
+                    <div className="grid items-start gap-8 md:grid-cols-2 md:gap-14 lg:gap-16 xl:gap-28">
                       {/* Alternates sides from md up and stacks below it. The
                           image takes md:order-2 on odd rows rather than the
                           text taking order-1, so the DOM order stays
