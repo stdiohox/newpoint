@@ -4,7 +4,10 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { ServiceFeature } from '@/components/sections/ServiceFeature';
+import { ServiceJourney } from '@/components/sections/ServiceJourney';
 import { Container } from '@/components/ui/Container';
+import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 import { SERVICE_PAGES, PROVIDERS, cardPosterFor } from '@/lib/content';
@@ -16,7 +19,7 @@ import { breadcrumbSchema, faqSchemaFlat, organizationRef, serviceSchemaFor } fr
  *
  * The homepage's services cards summarise each service in two sentences
  * each, which is the right density for an overview and far too thin to rank for
- * "psychiatric evaluation new jersey". These pages carry that weight instead,
+ * "psychiatric assessment new jersey". These pages carry that weight instead,
  * each targeting a single query cluster, each with its own title, description,
  * its own schema.org node, and FAQ block.
  *
@@ -48,7 +51,27 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const siblings = SERVICE_PAGES.filter((s) => s.slug !== service.slug);
   const poster = cardPosterFor(`/services/${service.slug}`);
 
-  /** One trail, used for both the visible breadcrumb and the schema, so the two cannot drift. */
+  /* Anchor ids are derived once, here, and every consumer below reads them from
+     this array. The timeline, the feature block and the contents list all index
+     into the same objects, so the three cannot drift apart and the ids stay
+     byte-identical to what this route has always served. */
+  const sectionItems = service.sections.map((section) => ({
+    id: slugify(section.heading),
+    heading: section.heading,
+    body: section.body,
+    list: section.list,
+  }));
+
+  /* `featurePair` promotes the last two sections out of the timeline. The
+     guard is not decoration: the split only makes sense while at least three
+     sections are left to carry the sequence, and a service that turned the flag
+     on with four sections should lose the feature block rather than ship a
+     two-step "journey". */
+  const useFeaturePair = Boolean(service.featurePair) && sectionItems.length >= 5;
+  const journeyItems = useFeaturePair ? sectionItems.slice(0, -2) : sectionItems;
+  const featureItems = useFeaturePair ? sectionItems.slice(-2) : null;
+
+  /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [
     { name: 'Services', path: '/services' },
     { name: service.nav, path: `/services/${service.slug}` },
@@ -66,104 +89,242 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         <PageHero
-          eyebrow="Services"
           title={service.title}
           intro={service.intro}
-          crumbs={crumbs}
           /* The same frame the homepage card for this service shows at rest,
-             so arriving here from that card is continuous. */
-          image={poster ? { src: poster } : undefined}
+             so arriving here from that card is continuous.
+
+             quality 90 STOPS A SECOND GENERATION OF LOSS; IT DOES NOT MAKE THIS
+             SHARP. These posters are 1280x720 video stills, and next/image never
+             upscales, so at 1440 the browser gets 1280px stretched across 1440
+             CSS px: 0.44 device pixels per CSS pixel on a 2x screen. That is the
+             softness, and no encoder setting reaches it. What quality does reach
+             is the re-encode on top: measured against the poster, q75 gives RMSE
+             1.61 at 39.7 KB and q90 gives 1.12 at 69.2 KB, so 30% less added
+             error for 30 KB. Worth it, and not a fix.
+             CLIENT: a genuinely sharp hero here needs a ~2800px still. The mp4
+             is 1280x720 as well, so a frame grab does not help, and the only
+             other asset in design-research is a different photograph (an empty
+             consulting room). This needs a new export from the original shoot. */
+          image={service.heroImage ?? (poster ? { src: poster, quality: 90 } : undefined)}
+          /* THE SCRIM FOLLOWS THE ASSET, NOT THE ROUTE.
+             `poster` never drops below 0.62 alpha anywhere in the frame. That
+             floor exists for the video posters: they are bright edge to edge
+             with a blown window behind the copy, and nothing lighter carries
+             white text on them. The cost is that it mutes the whole photograph
+             evenly, because a flat floor cannot tell the copy's corner from the
+             rest of the frame.
+
+             `hero` is the /services treatment: a 0.10 tint over the whole frame
+             plus a radial that does the heavy work only behind the copy. Behind
+             the text it reaches about 66%, which is denser than the poster
+             floor; away from it, about 12%, so the photograph reads as a
+             photograph rather than a darkened rectangle.
+
+             A page earns it by having a real master. The posters cannot use it,
+             so this switches on heroImage rather than on the slug. */
+          scrim={service.heroImage ? 'hero' : 'poster'}
+          /* Matches /services: centred from lg, left-aligned below it, where
+             the copy is a tall paragraph and centring costs more than it buys. */
+          copyAlign="center"
         />
 
-        <div className="py-20 md:py-28">
-          <Container>
-            <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-              {/* Sticky in-page contents. On a long page reached from search, this
-                  is what tells a reader the page answers their question. */}
-              <div className="md:col-span-4">
-                <div className="md:sticky md:top-28">
-                  <nav aria-label="On this page">
-                    <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                      On this page
-                    </h2>
-                    <ul role="list" className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4">
-                      {service.sections.map((section) => (
-                        <li key={section.heading}>
-                          <a
-                            href={`#${slugify(section.heading)}`}
-                            className="text-small text-np-neutral-600 hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]"
-                          >
-                            {section.heading}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </nav>
+        {/* TWO BODY LAYOUTS, PICKED BY THE SERVICE, NOT BY THE SLUG.
+            `journey` renders the sections as a numbered patient journey with a
+            tracking rail; everything else keeps the prose layout below. The
+            flag's own comment in lib/content.ts carries the reasoning — the
+            short version is that numbering claims the sections run in order,
+            which is true of the assessment and false of the other two.
 
-                  {/* How care is delivered, in the same words the service's own
-                    homepage card uses, so the two cannot disagree. The body
-                    sections describe what the service IS; none of them stated
-                    the modality outright, which left it on the card and in the
-                    FAQ but nowhere on the page itself. Outside the <nav>
-                    because it is page content, not navigation. */}
-                  <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
-                    {/* h3, not h2: "On this page" above it is already an h2, and
-                        two sidebar labels ahead of the first topical heading
-                        pushes UI chrome to the front of the heading outline. */}
-                    <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                      How it is delivered
-                    </h3>
-                    <p className="text-body text-np-ink mt-2">{service.modality}</p>
+            BOTH BRANCHES DERIVE THEIR ANCHOR IDS FROM THE SAME slugify CALL on
+            the same headings, so the in-page anchors are byte-identical to what
+            this route served before. */}
+        {service.journey ? (
+          <>
+            <ServiceJourney
+              /* `featurePair` moves the last two sections into ServiceFeature
+                 below, so the timeline renders everything except them. The
+                 slice is what guarantees nothing is printed twice. */
+              steps={journeyItems.map((item) => ({
+                id: item.id,
+                heading: item.heading,
+                body: item.body,
+                list: item.list,
+              }))}
+              modality={service.modality}
+              /* The contents still list all five headings. The last two are no
+                 longer steps, but they are still on the page and still have
+                 anchors, and dropping them would silently remove two in-page
+                 links this route has always served. */
+              toc={sectionItems.map(({ id, heading }) => ({ id, heading }))}
+            />
+
+            {featureItems && (
+              <ServiceFeature
+                /* The service's own nav label. Not a string written for this
+                   block — see ServiceFeature's own note. */
+                eyebrow={service.nav}
+                left={featureItems[0]}
+                card={featureItems[1]}
+                image={{
+                  src: '/images/services/evaluation-card-2752.webp',
+                  /* Describes the photograph and nothing else. It deliberately
+                     does NOT say "our office": CLAUDE.md's care-modality rule
+                     turns on the fact that the practice's in-person locations
+                     are still unconfirmed, and alt text is copy like any other
+                     place a claim can be made by accident. */
+                  alt: 'A quiet consulting room with two armchairs turned towards each other, a small wooden side table between them holding a glass of water and a box of tissues, and a fiddle-leaf fig beside a curtained window.',
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <div className="py-20 md:py-28">
+            <Container>
+              <div className="grid gap-12 md:grid-cols-12 md:gap-16">
+                {/* Sticky in-page contents. On a long page reached from search,
+                    this is what tells a reader the page answers their question. */}
+                <div className="md:col-span-4">
+                  <div className="md:sticky md:top-28">
+                    <nav aria-label="On this page">
+                      <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                        On this page
+                      </h2>
+                      <ul
+                        role="list"
+                        className="border-np-neutral-200 mt-4 space-y-3 border-l pl-4"
+                      >
+                        {service.sections.map((section) => (
+                          <li key={section.heading}>
+                            <a
+                              href={`#${slugify(section.heading)}`}
+                              className="text-small text-np-neutral-600 hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]"
+                            >
+                              {section.heading}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+
+                    {/* How care is delivered, in the same words the service's own
+                      homepage card uses, so the two cannot disagree. The body
+                      sections describe what the service IS; none of them stated
+                      the modality outright, which left it on the card and in the
+                      FAQ but nowhere on the page itself. Outside the <nav>
+                      because it is page content, not navigation. */}
+                    <div className="bg-np-surface border-np-neutral-200 mt-8 rounded-2xl border p-5">
+                      {/* h3, not h2: "On this page" above it is already an h2, and
+                          two sidebar labels ahead of the first topical heading
+                          pushes UI chrome to the front of the heading outline. */}
+                      <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                        How it is delivered
+                      </h3>
+                      <p className="text-body text-np-ink mt-2">{service.modality}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="md:col-span-8">
-                {service.sections.map((section, i) => (
-                  <Reveal key={section.heading} delay={stagger(i, 0.05)}>
-                    {/* tabIndex -1 so activating a jump link moves real focus
-                        into the section. Without it the viewport scrolls but the
-                        screen-reader cursor and document.activeElement stay on the
-                        sidebar link, which has just scrolled out of view. */}
-                    <section
-                      id={slugify(section.heading)}
-                      tabIndex={-1}
-                      className="border-np-neutral-200 border-b pb-10 last:border-b-0 last:pb-0 focus:outline-none [&:not(:first-child)]:pt-10"
-                    >
-                      <h2 className="text-h2">{section.heading}</h2>
-                      <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
-                        {section.body}
-                      </p>
-                      {section.list && (
-                        <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                          {section.list.map((item) => (
-                            <li
-                              key={item}
-                              className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
-                            >
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </section>
-                  </Reveal>
-                ))}
+                <div className="md:col-span-8">
+                  {service.sections.map((section, i) => {
+                    /* SPACING COMES FROM THE INDEX, NOT FROM :first-child /
+                       :last-child, and swapping it was a bug fix rather than a
+                       preference.
+
+                       Each <section> is the ONLY child of its own Reveal
+                       wrapper, so every one of them matched BOTH :first-child
+                       and :last-child. `[&:not(:first-child)]:pt-10` therefore
+                       never applied to anything and `last:border-b-0 last:pb-0`
+                       applied to everything: the sections rendered flush
+                       against each other with no divider anywhere, on all
+                       three service routes.
+
+                       Do not restore the structural selectors while Reveal
+                       wraps each item. */
+                    const isLast = i === service.sections.length - 1;
+
+                    return (
+                      <Reveal key={section.heading} delay={stagger(i, 0.05)}>
+                        {/* tabIndex -1 so activating a jump link moves real focus
+                            into the section. Without it the viewport scrolls but the
+                            screen-reader cursor and document.activeElement stay on the
+                            sidebar link, which has just scrolled out of view. */}
+                        <section
+                          id={slugify(section.heading)}
+                          tabIndex={-1}
+                          className={`focus:outline-none ${i === 0 ? '' : 'pt-10'} ${
+                            isLast ? '' : 'border-np-neutral-200 border-b pb-10'
+                          }`}
+                        >
+                          <h2 className="text-h2">{section.heading}</h2>
+                          <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                            {section.body}
+                          </p>
+                          {section.list && (
+                            <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
+                              {section.list.map((item) => (
+                                <li
+                                  key={item}
+                                  className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
+                                >
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </section>
+                      </Reveal>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </Container>
-        </div>
+            </Container>
+          </div>
+        )}
 
         <PageFaq items={service.faqs} />
 
-        {/* PageCta carries the crisis panel, so it sits ABOVE RelatedLinks:
-            a reader who arrived on a page naming PTSD, psychosis and
-            schizophrenia should not have to scroll past a "keep reading" grid
-            to find 988. */}
+        {/* CRISIS GUIDANCE IS EXPLICIT ON THESE ROUTES AND NOWHERE ELSE AMONG
+            THE INTERIOR PAGES, and the asymmetry is deliberate.
+
+            PageCta used to carry an inline crisis panel, which is why it sits
+            above RelatedLinks. That panel was removed on 2026-09-30 at the
+            client's request. On the five other routes that is fine: PageCta is
+            the last thing before the footer, and the footer's crisis strip is
+            the next content a reader meets.
+
+            NOT HERE. RelatedLinks sits between the two and renders six cards,
+            and the footer's strip is itself below three stacked link columns.
+            On a phone that is roughly two thousand pixels from the CTA to the
+            nearest 988, on the pages that name PTSD, psychosis and
+            schizophrenia. /services/medication-management is the worst of them.
+
+            So the shared panel is rendered here, ABOVE the CTA rather than
+            below it, mirroring what /contact does with order-first. It is the
+            same component the homepage and /contact use, it introduces no new
+            copy, and it restores CRISIS.body — "not for emergencies and is not
+            monitored around the clock" — which otherwise appears on these
+            routes only as footer fine print.
+
+            h2, not the default h3: it is a top-level section here, and the
+            page's outline would skip a level otherwise. */}
+        <div className="pb-16 md:pb-20">
+          <Container>
+            <CrisisPanel headingAs="h2" className="mx-auto max-w-3xl" />
+          </Container>
+        </div>
+
         <PageCta />
 
+        {/* featured=2 promotes the first two cards, which are always the other
+            two services — `siblings` is spread first below. The page ends on the
+            appointment CTA and then on the two places a reader who is not ready
+            to book should go next, and as six identical tiles those two were the
+            hardest to pick out of the cluster. Nothing is added or reordered;
+            see the prop's comment in PageCta.tsx. */}
         <RelatedLinks
           heading="Keep reading"
+          featured={2}
           links={[
             ...siblings.map((s) => ({
               label: s.title,

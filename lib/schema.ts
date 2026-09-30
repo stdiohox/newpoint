@@ -55,7 +55,7 @@ export function medicalClinicSchema() {
     url: BUSINESS.domain,
     slogan: BUSINESS.tagline,
     description:
-      'Outpatient psychiatric and behavioral health nurse practitioner practice. Telehealth across New Jersey and Pennsylvania, and in-person care. Psychiatric evaluation and medication management.',
+      'Outpatient psychiatric and behavioral health nurse practitioner practice. Telehealth across New Jersey and Pennsylvania, and in-person care. Psychiatric assessment and medication management.',
     medicalSpecialty: 'Psychiatric',
     telephone: BUSINESS.phonePrimary,
     faxNumber: BUSINESS.fax,
@@ -180,7 +180,11 @@ export function personSchemaFor(p: Provider) {
        */
       occupationalLocation: BUSINESS.serviceArea.map((s) => ({ '@type': 'State', name: s })),
     },
-    description: p.bio,
+    /* The whole bio, paragraphs rejoined. `bio` became an array when the
+       providers' own multi-paragraph Headway text replaced the third-person
+       summary; schema.org wants one string, and truncating to the first
+       paragraph would drop half of what each provider says about herself. */
+    description: p.bio.join(' '),
     image: `${BUSINESS.domain}${p.image.jpg1120}`,
     email: p.email,
     telephone: BUSINESS.phonePrimary,
@@ -203,7 +207,7 @@ export function providersSchema() {
  * One service page, as a service offered by the practice.
  *
  * The type varies per service rather than being MedicalTherapy across the
- * board: an evaluation is diagnostic, not therapeutic, and telehealth is a
+ * board: an assessment is diagnostic, not therapeutic, and telehealth is a
  * delivery modality rather than a treatment. See `schemaType` in content.ts.
  */
 export function serviceSchemaFor(s: ServicePage) {
@@ -213,6 +217,12 @@ export function serviceSchemaFor(s: ServicePage) {
     '@id': serviceId(s.slug),
     url: `${BUSINESS.domain}/services/${s.slug}`,
     name: s.title,
+    /* Only where the service has a second name that the page itself uses in
+       visible copy. `alternateName` is valid on any schema.org Thing, and it is
+       how the assessment page tells an engine that "psychiatric evaluation"
+       names the same procedure without the H1 having to say it. Omitted rather
+       than emitted empty when a service has no synonym. */
+    ...(s.alternateName ? { alternateName: s.alternateName } : {}),
     description: s.intro,
     provider: { '@id': ORG_ID },
     availableIn: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
@@ -307,6 +317,18 @@ export function breadcrumbSchema(trail: { name: string; path: string }[]) {
   };
 }
 
+/**
+ * The payer names, for any structured-data consumer that wants them.
+ *
+ * `INSURANCE.payers` is already filtered to `confirmed` plans, so the candidates
+ * from the directory capture cannot reach a JSON-LD block through here. The gate
+ * lives on the data rather than in this function on purpose: a second emitter
+ * added later inherits it instead of having to remember it.
+ *
+ * NOTE this is currently unreferenced — no page emits payer names today. It is
+ * kept because it is the obvious place to wire them up, and it is correct now if
+ * something does.
+ */
 export function insuranceNote() {
   return INSURANCE.payers;
 }

@@ -1,120 +1,204 @@
+import Image from 'next/image';
 import Link from 'next/link';
-import { Container } from '@/components/ui/Container';
-import { BUSINESS, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
+import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
+import { BUSINESS, CTA, FOOTER, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
 
 /**
+ * Site footer, on every route.
+ *
+ * AN INSET PANEL, NOT A FULL-BLEED BAND. It takes the Providers section's
+ * geometry deliberately: the same px-6 / md:px-12 / lg:px-16 gutters and the
+ * same 28px-to-48px radius at the same min-[960px] breakpoint. Those two are
+ * now the only np-blue-900 panels on the site, so matching them makes the
+ * footer read as the closing bookend to that section rather than as a third,
+ * slightly-different dark treatment. Only the top corners are rounded; the
+ * panel runs to the bottom of the document.
+ *
+ * ONE COLUMN SOURCE OF TRUTH PER LIST. Services is SERVICE_PAGES, Practice is
+ * NAV with the Services entry filtered out (it has its own column), Contact is
+ * BUSINESS and PROVIDERS. Nothing is hand-listed, so a new service page or a
+ * nav change appears here without anyone remembering to update the footer, and
+ * the footer cannot list a route that does not exist.
+ *
+ * CONTRAST, measured against np-blue-900 (#101f45): white/80 body and links
+ * are 10.7:1, white headings 15.6:1, and white/60 on the bottom row 6.3:1.
+ * All clear of 4.5:1, so this passes AA at every size rather than relying on
+ * the large-text allowance.
+ *
+ * `on-ink` swaps the global blue-600 focus ring for white, which globals.css
+ * measures at 1.93:1 against this ground. Every link here is keyboard-visible
+ * because of it.
+ *
+ * NO ENTRANCE ANIMATION, deliberately. The footer is the one part of the page
+ * a visitor scrolls to on purpose, usually to find a phone number, and motion
+ * there delays the thing they came for. It also keeps the footer off the
+ * .js-gated entrance path, so it renders identically with JavaScript disabled.
+ *
  * CLIENT: no street address is published or confirmed, so no address block
  * exists here by design. Geography is stated as service area only. Add a
  * PostalAddress here and in lib/schema.ts together, once confirmed.
  * CLIENT: hours of operation are not published, so no hours block is shown.
+ * CLIENT: there are no privacy, terms or accessibility routes to link to. The
+ * bottom row carries the disclaimer only. Add the links here once those pages
+ * exist.
  */
+
+/** Practice column: everything in the primary nav except Services, which has
+    its own column beside it. Derived rather than retyped. */
+const PRACTICE_LINKS = NAV.filter((item) => item.href !== '/services');
+
+/** Shared link treatment. white/80 to white, with the hairline underline on
+    hover rather than on rest so six stacked links do not read as a ruled list. */
+const linkClass =
+  'text-small text-white/80 underline-offset-4 transition-colors duration-[180ms] hover:text-white hover:underline focus-visible:text-white focus-visible:underline motion-reduce:transition-none';
+
+const headingClass = 'text-caption tracking-[0.08em] text-white uppercase';
+
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-np-ink on-ink py-16 text-white/70">
-      <Container>
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <p className="font-display text-body-l font-semibold text-white">
-              {BUSINESS.legalName}
-            </p>
-            <p className="text-small mt-2 max-w-[38ch]">
-              Outpatient psychiatric and behavioral health care by telehealth across{' '}
-              {BUSINESS.serviceArea.join(' and ')}, and in person.
-            </p>
-            {/* The town, stated as service area rather than as an address. The
-                live site names Lawrence Township on every page and it is the
-                practice's only place-level signal; dropping it along with the
-                unconfirmed street address would give up local relevance it
-                already holds.
-                CLIENT: replace with a full address once one is confirmed. */}
-            <p className="text-small mt-2 text-white/50">Based in {BUSINESS.serviceAreaNote}.</p>
-            <p className="text-small mt-4">
-              <a
-                href={`tel:${BUSINESS.phonePrimaryHref}`}
-                className="text-np-blue-300 underline-offset-4 hover:underline"
-              >
-                {BUSINESS.phonePrimary}
-              </a>
-              <span className="mx-2 text-white/30">/</span>
-              <span>Fax {BUSINESS.fax}</span>
-            </p>
-            <p className="text-small mt-2">
-              <Link href="/contact" className="text-np-blue-300 underline-offset-4 hover:underline">
-                All the ways to reach us
-              </Link>
-            </p>
+    <footer className="px-6 md:px-12 lg:px-16">
+      <div className="bg-np-blue-900 on-ink rounded-t-[28px] px-6 py-14 text-white min-[960px]:rounded-t-[48px] min-[960px]:px-10 min-[960px]:py-16">
+        {/* TOP ROW. Identity on the left, the site's single CTA on the right.
+            The `on-ink` ButtonWithIcon, not the hero's `glass`: glass tints
+            with np-blue-900/35, which over this panel's own np-blue-900
+            composites back to np-blue-900 and leaves the pill with no body.
+            `on-ink` lightens instead, which is what a flat ground allows. See
+            the variant's note in ButtonWithIcon. */}
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
+          <div className="max-w-[46ch]">
+            <Link
+              href="/"
+              className="flex w-fit items-center gap-2.5 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              <Image
+                src="/brand/newpoint-mark-white.svg"
+                alt=""
+                width={36}
+                height={36}
+                className="h-9 w-auto"
+              />
+              <span className="font-display text-xl font-semibold tracking-tight text-white">
+                {BUSINESS.shortName}
+                <span className="sr-only"> {BUSINESS.legalName}, home</span>
+              </span>
+            </Link>
+            <p className="text-body mt-5 text-white/80">{FOOTER.description}</p>
           </div>
 
-          {/* Sitewide link surface. Every indexable page is reachable from every
-              other page through this block, which is how the service pages get
-              crawled from anywhere on the site and not only from /services. */}
-          <nav aria-label="Footer" className="md:col-span-3">
-            <h2 className="text-caption text-white/50">Explore</h2>
-            <ul role="list" className="mt-3 space-y-2">
-              {NAV.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className="text-small hover:text-white">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="lg:pt-2">
+            <ButtonWithIcon href={CTA.href} variant="on-ink">
+              {CTA.label}
+            </ButtonWithIcon>
+          </div>
+        </div>
 
-            <h2 className="text-caption mt-8 text-white/50">Services</h2>
-            <ul role="list" className="mt-3 space-y-2">
+        {/* CRISIS STRIP, AND IT IS ABOVE THE LINK COLUMNS ON PURPOSE.
+            It used to sit between the columns and the bottom row, with a
+            comment saying it was placed so that "someone in crisis scanning a
+            footer should not have to read past a services list to find it".
+            The stacking order did not deliver that. The columns are
+            sm:grid-cols-2 md:grid-cols-3, so on a phone they are one column of
+            three stacked groups — 3 services, 5 practice links, a phone number
+            and two provider inboxes — and the strip landed below all of it.
+            Measured on /services/medication-management at 390, moving it here
+            brings 988 704px closer.
+
+            This is the only crisis guidance on /insurance, /providers/[slug]
+            and /services, so its position is the whole of the coverage there.
+
+            The hairline is not decoration: np-blue-800 measures 1.22:1 against
+            this ground, enough to read as a raised surface but not enough to
+            draw its own edge. */}
+        <div className="bg-np-blue-800 mt-14 rounded-xl px-5 py-4 ring-1 ring-white/15">
+          <p className="text-small text-white">
+            {FOOTER.crisis.before}{' '}
+            <a
+              href="tel:988"
+              aria-label="988, Suicide and Crisis Lifeline"
+              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors duration-[180ms] hover:decoration-white motion-reduce:transition-none"
+            >
+              988
+            </a>
+            {FOOTER.crisis.between}{' '}
+            <a
+              href="tel:911"
+              aria-label="911, medical emergency"
+              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors duration-[180ms] hover:decoration-white motion-reduce:transition-none"
+            >
+              911
+            </a>
+            {FOOTER.crisis.after}
+          </p>
+        </div>
+
+        {/* LINK COLUMNS. Three at md and up, stacked at mobile. Every href is a
+            route that exists; see the note above about derivation. */}
+        <nav
+          aria-label="Footer"
+          className="mt-14 grid gap-10 sm:grid-cols-2 md:grid-cols-3 md:gap-8"
+        >
+          <div>
+            <h2 className={headingClass}>{FOOTER.columns.services}</h2>
+            <ul role="list" className="mt-4 space-y-3">
               {SERVICE_PAGES.map((service) => (
                 <li key={service.slug}>
-                  <Link href={`/services/${service.slug}`} className="text-small hover:text-white">
+                  <Link href={`/services/${service.slug}`} className={linkClass}>
                     {service.nav}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
+          </div>
 
-          <div className="md:col-span-4">
-            <h2 className="text-caption text-white/50">Providers</h2>
-            <ul role="list" className="mt-3 space-y-2">
-              {PROVIDERS.map((p) => (
-                <li key={p.slug} className="text-small">
-                  <Link href={`/providers/${p.slug}`} className="text-white hover:underline">
-                    {p.name}
+          <div>
+            <h2 className={headingClass}>{FOOTER.columns.practice}</h2>
+            <ul role="list" className="mt-4 space-y-3">
+              {PRACTICE_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={linkClass}>
+                    {item.label}
                   </Link>
-                  <span className="text-white/50">, {p.credentials}</span>
                 </li>
               ))}
             </ul>
-            <p className="text-small mt-5">
-              In a crisis, call or text{' '}
-              <a
-                href="tel:988"
-                aria-label="988, Suicide and Crisis Lifeline"
-                className="text-np-blue-300 underline-offset-4 hover:underline"
-              >
-                988
-              </a>
-              . In an emergency, call{' '}
-              <a
-                href="tel:911"
-                aria-label="911, medical emergency"
-                className="text-np-blue-300 underline-offset-4 hover:underline"
-              >
-                911
-              </a>
-              .
+          </div>
+
+          <div>
+            <h2 className={headingClass}>{FOOTER.columns.contact}</h2>
+            <ul role="list" className="mt-4 space-y-3">
+              <li>
+                <a href={`tel:${BUSINESS.phonePrimaryHref}`} className={linkClass}>
+                  {BUSINESS.phonePrimary}
+                </a>
+              </li>
+              {/* The two provider inboxes, because there is no practice-wide
+                  one. Each is labelled with the provider's name: an address on
+                  its own tells a patient nothing about who reads it. */}
+              {PROVIDERS.map((p) => (
+                <li key={p.email}>
+                  <a href={`mailto:${p.email}`} className={linkClass}>
+                    {p.email}
+                  </a>
+                  <span className="text-small block text-white/60">{p.name}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-small mt-5 max-w-[30ch] text-white/80">{FOOTER.modality}</p>
+          </div>
+        </nav>
+
+        {/* BOTTOM ROW. */}
+        <div className="mt-10 border-t border-white/15 pt-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
+            <p className="text-caption text-white/60">
+              &copy; {year} {BUSINESS.legalName}
             </p>
+            <p className="text-caption max-w-[62ch] text-white/60">{FOOTER.legalNote}</p>
           </div>
         </div>
-
-        <div className="mt-14 border-t border-[var(--np-alpha-white-14)] pt-6">
-          <p className="text-caption text-white/50">
-            {year} {BUSINESS.legalName}. This website is for general information and is not medical
-            advice, and it is not monitored around the clock.
-          </p>
-        </div>
-      </Container>
+      </div>
     </footer>
   );
 }

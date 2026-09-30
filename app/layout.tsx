@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { cabinetGrotesk, switzer } from './fonts';
-import { BUSINESS } from '@/lib/content';
+import { BUSINESS, SERVICE_PAGES } from '@/lib/content';
 import { Navbar1 } from '@/components/ui/navbar-1';
 import './globals.css';
 
@@ -11,13 +11,26 @@ export const metadata: Metadata = {
     template: `%s | ${BUSINESS.shortName}`,
   },
   description:
-    'Psychiatric evaluation, medication management, and telehealth for New Jersey and Pennsylvania, from two doctorate-prepared nurse practitioners.',
+    'Psychiatric assessment, medication management, and telehealth for New Jersey and Pennsylvania, from two doctorate-prepared nurse practitioners.',
   applicationName: BUSINESS.legalName,
   authors: [{ name: BUSINESS.legalName }],
+  /**
+   * Both names for the first appointment, and both names for the category.
+   *
+   * DO NOT COUNT THIS AS SEARCH COVERAGE. Google has ignored meta keywords for
+   * years and Bing gives it no useful weight; it is kept because it is free and
+   * because it documents the vocabulary, not because it ranks for anything. The
+   * real carriers of "psychiatric evaluation" are the /services slug, the
+   * assessment page's meta description, and the one sentence of body copy that
+   * names the synonym. See the slug note in lib/content.ts.
+   */
   keywords: [
     'psychiatric nurse practitioner',
     'medication management',
+    'psychiatric assessment',
     'psychiatric evaluation',
+    'behavioral health',
+    'mental health care',
     'telehealth psychiatry',
     'New Jersey',
     'Pennsylvania',
@@ -28,7 +41,7 @@ export const metadata: Metadata = {
     url: BUSINESS.domain,
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric evaluation, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners serving New Jersey and Pennsylvania.',
+      'Psychiatric assessment, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners serving New Jersey and Pennsylvania.',
     locale: 'en_US',
     // The 1200x630 card is generated at app/opengraph-image.tsx and applies to
     // every route. CLIENT: replace it with a supplied asset if one exists.
@@ -37,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric evaluation, medication management, and telehealth for New Jersey and Pennsylvania.',
+      'Psychiatric assessment, medication management, and telehealth for New Jersey and Pennsylvania.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: BUSINESS.domain },
@@ -124,7 +137,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             was nothing for a screen-reader user to jump to. Purely semantic;
             nothing about the layout or the sticky behaviour changes. */}
         <header className="sticky top-0 z-50">
-          <Navbar1 />
+          {/* The submenu is passed down, not imported by the navbar.
+              navbar-1.tsx is a client component, and lib/nav.ts's rule is that
+              anything larger than those few constants belongs in a server
+              component that hands down exactly what it needs. Importing
+              SERVICE_PAGES there would put every service page's sections, FAQs
+              and metaDescription into the browser bundle to render three links.
+              `nav` is the short label the footer already uses; `title` is the
+              H1 and runs to "Telehealth psychiatry in New Jersey and
+              Pennsylvania", which is not a menu row. */}
+          <Navbar1
+            services={SERVICE_PAGES.map((s) => ({
+              label: s.nav,
+              href: `/services/${s.slug}`,
+            }))}
+          />
         </header>
         {children}
       </body>

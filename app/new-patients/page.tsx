@@ -38,7 +38,6 @@ export default function NewPatientsPage() {
         <PageHero
           title={NEW_PATIENTS_PAGE.title}
           intro={NEW_PATIENTS_PAGE.intro}
-          crumbs={[{ name: 'New patients', path: '/new-patients' }]}
           image={poster ? { src: poster } : undefined}
         />
 
@@ -161,7 +160,7 @@ export default function NewPatientsPage() {
         <RelatedLinks
           links={[
             {
-              label: 'Psychiatric evaluation',
+              label: 'Psychiatric assessment',
               description: 'Your first appointment, described step by step.',
               href: '/services/psychiatric-evaluation',
             },

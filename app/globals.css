@@ -21,6 +21,11 @@
 @theme {
   /* Brand blue. #234598 is preserved brand equity, do not alter. */
   --color-np-blue-900: #101f45;
+  /* Sits between 900 and 700, for a raised panel ON a 900 ground: the footer's
+     crisis strip. It measures only 1.22:1 against 900, which is deliberate for
+     a surface rather than a component, so anything using it carries a
+     white/15 hairline to define its edge. White on it measures 13.2:1. */
+  --color-np-blue-800: #172d63;
   --color-np-blue-700: #1b3576;
   --color-np-blue-600: #234598;
   --color-np-blue-500: #3d62b8;
@@ -192,9 +197,16 @@
   /* Interactive elements sitting on the ink ground need a light ring instead.
      The default blue-600 outline measures 1.93:1 against --color-np-ink, well
      under the 3:1 WCAG 2.2 SC 1.4.11 asks of a focus indicator; white measures
-     17:1. Applied by adding `on-ink` to any dark section — the footer, the
-     provider section, and the interior-page closing block all carry it, which
-     is what makes the 988 and 911 links keyboard-visible.
+     17:1. Applied by adding `on-ink` to any dark section — the footer and the
+     provider section carry it, and the footer's is what makes its 988 and 911
+     links keyboard-visible.
+     The interior-page closing block does NOT carry it, and could not use it if
+     it did. PageCta is a navy panel, so it does need light focus rings, but
+     this rule sits in @layer base and Tailwind utilities land in a later layer,
+     so a variant's own focus-visible:outline-* always wins. Its buttons set
+     white themselves, through Button's onInk and onInkQuiet variants. If a
+     third dark section ever needs this, check whether its controls already set
+     an outline colour before reaching for the class.
      The navbar no longer needs it: Navbar1 sits on a white pill rather than
      on the hero image, so the default blue-600 outline applies there. */
   .on-ink :focus-visible {

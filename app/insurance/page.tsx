@@ -35,11 +35,7 @@ export default function InsurancePage() {
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHero
-          title={INSURANCE_PAGE.title}
-          intro={INSURANCE_PAGE.intro}
-          crumbs={[{ name: 'Insurance', path: '/insurance' }]}
-        />
+        <PageHero title={INSURANCE_PAGE.title} intro={INSURANCE_PAGE.intro} />
 
         <div className="py-20 md:py-28">
           <Container>
@@ -49,15 +45,56 @@ export default function InsurancePage() {
             <Reveal>
               <h2 className="text-h2 max-w-[20ch]">{INSURANCE_PAGE.sections[0].heading}</h2>
             </Reveal>
-            <ul role="list" className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
-              {INSURANCE.payers.map((payer, i) => (
-                <Reveal as="li" key={payer} delay={stagger(i, 0.05)}>
-                  <p className="font-display text-body-l text-np-ink border-np-neutral-200 border-b pb-4 font-medium tracking-[-0.01em]">
-                    {payer}
-                  </p>
-                </Reveal>
-              ))}
-            </ul>
+            {/* GROUPED BY STATE, not one flat wall. The wall carried no
+                Pennsylvania plan at all, so a PA visitor scanning it could not
+                tell "your plan is not listed" from "we do not cover your
+                state". The scope label above each run answers that before they
+                start reading names.
+
+                ONLY `confirmed` PAYERS ARE RENDERED. The unconfirmed candidates
+                from the directory capture stay in PAYER_GROUPS with their
+                sourcing notes and never reach the page. See lib/content.ts.
+
+                A group with no confirmed plan keeps its heading and shows the
+                coverage-check invitation instead of a list — which is the state
+                Pennsylvania is in. An empty <ul> under a state heading reads as
+                "we cover nothing here", which is both wrong and worse than
+                saying nothing; the invitation turns the gap into the next
+                step. */}
+            {INSURANCE.groups.map((group, gi) => {
+              const shown = group.payers.filter((p) => p.confirmed);
+
+              return (
+                <div key={group.scope} className={gi === 0 ? 'mt-10' : 'mt-14'}>
+                  <Reveal>
+                    <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                      {group.scope}
+                    </h3>
+                  </Reveal>
+
+                  {shown.length > 0 ? (
+                    <ul
+                      role="list"
+                      className="mt-5 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3"
+                    >
+                      {shown.map((payer, i) => (
+                        <Reveal as="li" key={payer.name} delay={stagger(i, 0.05)}>
+                          <p className="font-display text-body-l text-np-ink border-np-neutral-200 border-b pb-4 font-medium tracking-[-0.01em]">
+                            {payer.name}
+                          </p>
+                        </Reveal>
+                      ))}
+                    </ul>
+                  ) : (
+                    <Reveal>
+                      <p className="text-body-l text-np-neutral-600 mt-5 max-w-[52ch]">
+                        {INSURANCE.unconfirmedScopeNote}
+                      </p>
+                    </Reveal>
+                  )}
+                </div>
+              );
+            })}
             <Reveal delay={0.2}>
               <p className="text-body-l text-np-neutral-600 mt-10 max-w-[62ch]">
                 {INSURANCE_PAGE.sections[0].body}
@@ -87,7 +124,7 @@ export default function InsurancePage() {
               href: '/new-patients',
             },
             {
-              label: 'Psychiatric evaluation',
+              label: 'Psychiatric assessment',
               description: 'The appointment every new patient starts with, described in full.',
               href: '/services/psychiatric-evaluation',
             },

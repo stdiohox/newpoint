@@ -43,30 +43,42 @@ import { PROVIDERS } from '@/lib/content';
  */
 const CARD_SENTENCE: Record<string, string> = {
   'funmilayo-whitaker':
-    'Funmilayo is dual board-certified as a psychiatric mental health nurse practitioner and a family nurse practitioner.',
+    'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over ten years of direct patient care experience.',
   'anastasia-ofoegbu':
-    'She provides psychiatric evaluations, medication management, and supportive counseling.',
+    'I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction.',
 };
 
 /**
- * Claims the cards must never carry. Age range and substance-use treatment are
- * both unconfirmed (see OPEN_CLIENT_ITEMS), so a sentence asserting either is a
- * regulated-fact leak regardless of how it got here.
+ * Claims the cards must never carry.
+ *
+ * AGE TERMS ONLY, since 2026-09-29. Substance use and addiction used to be on
+ * this list beside them because neither was a confirmed service line. That has
+ * changed: both providers publish it on their own directory profiles, Headway
+ * lists it FIRST for Ofoegbu, and it now appears in PROVIDERS[].treats and in
+ * WHAT_WE_TREAT.conditions. A card sentence naming it no longer asserts
+ * anything the rest of the site does not.
+ *
+ * The age terms stay, and stay for a stronger reason than before. The capture
+ * did not settle the age range — it produced two platforms flatly contradicting
+ * each other about the same clinician, one saying no children and the other
+ * saying children. See OPEN_CLIENT_ITEMS.
  */
-const BANNED = /lifespan|child|adolescent|p(a?)ediatric|geriatric|substance|addiction/i;
+const BANNED = /lifespan|child|adolescent|p(a?)ediatric|geriatric/i;
 
 /**
  * Fails the build rather than the compliance review. These are server
  * components rendered at build time, so a throw here stops `next build`.
  */
-function assertSourced(slug: string, bio: string): string {
+function assertSourced(slug: string, bio: string[]): string {
   const sentence = CARD_SENTENCE[slug];
   if (!sentence) {
     throw new Error(
       `Providers: no approved card sentence for "${slug}". Add one to CARD_SENTENCE.`
     );
   }
-  if (!bio.includes(sentence)) {
+  /* Joined, because `bio` is now one entry per paragraph and an approved
+     sentence may live in any of them. */
+  if (!bio.join(' ').includes(sentence)) {
     throw new Error(
       `Providers: the approved card sentence for "${slug}" is no longer present verbatim in that provider's content.ts bio. Re-approve it against the bio before shipping.`
     );
@@ -231,7 +243,7 @@ export function Providers() {
                 textWrap: 'balance',
               }}
             >
-              You will see one of two providers. Here they are.
+              You will see the providers
             </h2>
           </Reveal>
 

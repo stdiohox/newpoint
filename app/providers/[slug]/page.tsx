@@ -56,35 +56,51 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
 
   const colleague = PROVIDERS.find((p) => p.slug !== provider.slug);
 
-  /** One trail, used for both the visible breadcrumb and the schema, so the two cannot drift. */
+  /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [{ name: provider.name, path: `/providers/${provider.slug}` }];
 
   const facts = [
     { label: 'Credentials', value: provider.credentials },
     { label: 'Role', value: provider.role },
     { label: 'Licensure', value: provider.licensed },
-    // CLIENT: one provider's experience line names addiction nursing. That is
-    // her own bio and is sourced, but substance-use treatment is NOT a confirmed
-    // service line, and a credentials row reading "addiction" next to a booking
-    // CTA can read as an offer. Confirm whether the practice treats substance
-    // use before this page implies it.
+    { label: 'Education', value: provider.education },
+    // No 'Approach' row any more. It carried a clipped third-person paraphrase
+    // of the same sentence the page now prints in the provider's own words,
+    // under "My approach" below, so the two read as a stutter side by side.
+    // PROVIDERS[].approach is kept as the short form for anywhere that needs a
+    // scannable version.
+    // The addiction-nursing caveat that used to sit here is resolved. It asked
+    // for confirmation that substance use is a real service line before the
+    // experience row implied one; both providers now publish it as a specialty
+    // on their own directory profiles (Headway lists it FIRST for Ofoegbu), and
+    // it appears in `treats` below, so the row no longer implies more than the
+    // rest of the page states. See research/provider-directories.md.
     { label: 'Experience', value: provider.experience },
-    { label: 'Approach', value: provider.approach },
-    // CLIENT: add { label: 'NPI', value: '…' } and a state licence number row
-    // here once supplied, or confirm the practice prefers not to publish them.
-    // CLIENT: state licence numbers and NPI numbers are not published anywhere.
-    // Add them as a fourth <div> here, or confirm the practice prefers not to.
+    // Languages last: it is the row a patient scans for rather than reads in
+    // order, and both providers speak more than English, which is a real reason
+    // someone picks this practice over another.
+    { label: 'Languages', value: provider.languages },
+    // CLIENT: licence numbers and NPI are still not published. Candidates now
+    // exist for Whitaker — NPI 1760719512, NJ 26NJ00646400 (APN), PA SP016195
+    // (CRNP) — from U.S. News, Grow Therapy and Headway respectively. Add them
+    // as rows here once the client confirms them and agrees to publish, noting
+    // that NJ and PA use different title strings (APN vs CRNP) for one role.
+    // Nothing was found for Ofoegbu.
   ];
 
   return (
     <>
       <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
+        {/* The standfirst is the FIRST paragraph of her bio, not the whole
+            thing. `bio` is the provider's own Headway introduction and runs to
+            two paragraphs for Whitaker; all of it in a hero would push the page
+            below the fold before anything is said. The remainder is printed as
+            body copy beside her portrait, in order, so nothing is lost. */}
         <PageHero
           eyebrow="Provider"
           title={`${provider.name}, ${provider.credentials}`}
-          intro={provider.bio}
-          crumbs={crumbs}
+          intro={provider.bio[0]}
         />
 
         <div className="py-20 md:py-28">
@@ -147,18 +163,67 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
               </div>
 
               <div className="md:col-span-7">
-                <Reveal>
-                  <h2 className="text-h2">What {provider.name.split(' ')[0]} treats</h2>
-                </Reveal>
-                <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                  {provider.treats.map((condition, i) => (
-                    <Reveal as="li" key={condition} delay={stagger(i, 0.04)}>
-                      <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
-                        {condition}
-                      </span>
-                    </Reveal>
-                  ))}
-                </ul>
+                {/* HER OWN WORDS, IN HER OWN ORDER, and the first prose this
+                    page has carried. Until now everything below the hero was a
+                    definition list and a chip cloud — facts about a clinician
+                    rather than a clinician talking. These three blocks are the
+                    provider's Headway profile: the rest of her introduction,
+                    then her approach, then what a patient can expect. The
+                    headings are hers too, lightly shortened.
+
+                    Rendered before "What she treats" deliberately: someone who
+                    has just read her name and credentials in the hero wants to
+                    know who she is, not to be handed a taxonomy. */}
+                {provider.bio.slice(1).map((para, i) => (
+                  <Reveal key={i} delay={stagger(i, 0.06)}>
+                    <p className="text-body-l text-np-neutral-600 max-w-[62ch] not-first:mt-4">
+                      {para}
+                    </p>
+                  </Reveal>
+                ))}
+
+                <div
+                  className={
+                    provider.bio.length > 1
+                      ? 'border-np-neutral-200 mt-12 border-t pt-10'
+                      : undefined
+                  }
+                >
+                  <Reveal>
+                    <h2 className="text-h2">My approach</h2>
+                  </Reveal>
+                  <Reveal delay={0.08}>
+                    <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                      {provider.approachFull}
+                    </p>
+                  </Reveal>
+                </div>
+
+                <div className="border-np-neutral-200 mt-12 border-t pt-10">
+                  <Reveal>
+                    <h2 className="text-h2">What you can expect</h2>
+                  </Reveal>
+                  <Reveal delay={0.08}>
+                    <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                      {provider.expect}
+                    </p>
+                  </Reveal>
+                </div>
+
+                <div className="border-np-neutral-200 mt-12 border-t pt-10">
+                  <Reveal>
+                    <h2 className="text-h2">What {provider.name.split(' ')[0]} treats</h2>
+                  </Reveal>
+                  <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
+                    {provider.treats.map((condition, i) => (
+                      <Reveal as="li" key={condition} delay={stagger(i, 0.04)}>
+                        <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 inline-block px-3 py-1.5">
+                          {condition}
+                        </span>
+                      </Reveal>
+                    ))}
+                  </ul>
+                </div>
 
                 <div className="border-np-neutral-200 mt-12 border-t pt-10">
                   <Reveal>
@@ -171,11 +236,23 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                         in /research is Lawrence Township, New Jersey, and there
                         is no Pennsylvania location signal at all. The street
                         address remains an open item — see OPEN_CLIENT_ITEMS. */}
+                    {/* "New patients at Newpoint start with", practice-voiced,
+                        NOT a second clause about this provider. Sitting under a
+                        named clinician's photograph, "New patients start with a
+                        comprehensive psychiatric assessment" reads as a claim
+                        that SHE performs it. That is sourced for Ofoegbu, whose
+                        bio names assessments, and not for Whitaker, whose names
+                        medication management only — which is exactly why
+                        app/services/page.tsx refuses to bind either provider to
+                        a named service and files the question under CLIENT.
+                        Naming the practice keeps the sentence true on both
+                        pages. */}
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
                       {provider.name.split(' ')[0]} sees patients across{' '}
                       {BUSINESS.serviceArea.join(' and ')} by telehealth, and in person. New
-                      patients start with a comprehensive psychiatric evaluation; care continues as
-                      medication management on a schedule agreed with you.
+                      patients at {BUSINESS.shortName} start with a comprehensive psychiatric
+                      assessment; care continues as medication management on a schedule agreed with
+                      you.
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>

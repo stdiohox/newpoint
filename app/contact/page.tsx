@@ -33,13 +33,14 @@ export const metadata = pageMetadata({
 });
 
 export default function ContactPage() {
+  /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [{ name: 'Contact', path: '/contact' }];
 
   return (
     <>
       <JsonLd schemas={[organizationRef(), contactPageSchema(), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHero title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} crumbs={crumbs} />
+        <PageHero title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} />
 
         <div className="py-20 md:py-28">
           <Container>
@@ -211,7 +212,7 @@ export default function ContactPage() {
             },
             {
               label: 'Our services',
-              description: 'Evaluation, medication management and telehealth, in detail.',
+              description: 'Assessment, medication management and telehealth, in detail.',
               href: '/services',
             },
           ]}

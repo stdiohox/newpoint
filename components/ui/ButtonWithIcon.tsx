@@ -76,6 +76,36 @@ const variants = {
     root: 'bg-np-blue-900/35 backdrop-blur-md ring-1 ring-white/40 hover:bg-np-blue-900/50 focus-visible:outline-white',
     disc: 'bg-white/90 text-np-blue-900',
   },
+  /**
+   * The footer's variant, for a FLAT np-blue-900 ground rather than a
+   * photograph. It exists because `glass` has nothing to do here: its fill is
+   * np-blue-900/35, and 35% of a colour over that same colour composites back
+   * to exactly that colour. Sampled from the rendered footer, the pill interior
+   * came out rgb(16,31,69) — identical to the panel — so the button was an
+   * outline and a disc with no body at all. Legible, but not the treatment.
+   *
+   * Lightening instead of tinting is what a flat ground allows. Measured over
+   * np-blue-900:
+   *   fill    white/10 composites to rgb(40,53,88)
+   *   label   white on that fill = 12.1:1
+   *   hover   white/20, rgb(64,76,106), label still 8.5:1
+   *   border  white/40, rgb(112,121,143) = 3.7:1 against the panel, which is
+   *           what carries the component boundary for SC 1.4.11. The fill only
+   *           reaches 1.3:1 on its own, so the border is load-bearing here in
+   *           the same way the white ring is on `sky`.
+   *   disc    solid white, arrow np-blue-900 on it at 16.1:1
+   *
+   * NO backdrop-blur, unlike `glass`. There is no photograph behind the footer
+   * panel, so a blur would buy nothing and still cost a compositing layer on
+   * every route.
+   *
+   * Focus ring is white for `glass`'s reason: outline-offset-2 draws it outside
+   * the pill, onto np-blue-900, where white measures about 16:1.
+   */
+  'on-ink': {
+    root: 'bg-white/10 ring-1 ring-white/40 hover:bg-white/20 focus-visible:outline-white',
+    disc: 'bg-white text-np-blue-900',
+  },
 } as const;
 
 export function ButtonWithIcon({
