@@ -200,11 +200,20 @@ export default function ServicesIndex() {
 
                 return (
                   <Reveal as="li" key={service.slug} delay={stagger(i, 0.06)}>
-                    {/* GAP LADDER: 32px stacked, 56px at md, 128px from lg up.
-                        One value from 1024 on, so 1210 — the screen this was
-                        reported from — gets the same 128px as 1440 rather than
-                        the 64px it was landing on. md keeps 56px: it is two
-                        columns but only 768-1023 wide.
+                    {/* GAP LADDER: 32px stacked, 56px at md, 160px from lg up.
+                        Still one value from 1024 on rather than a second
+                        breakpoint, so every desktop width gets the same figure.
+                        md keeps 56px: it is two columns but only 768-1023 wide.
+
+                        160 rather than the 128 it replaces, which was measured
+                        on screen and correct but read as tight next to how much
+                        air the rest of the page carries. At the container's
+                        1136px content box it leaves 976px to split, so the
+                        image column is 407px and the text 569px. At 1024, the
+                        narrowest width this applies to, the split is 333/467
+                        and the image is 250px tall — still the larger element
+                        in the row, which is the thing that would break first if
+                        this grew again.
 
                         THE COLUMN RATIO ALTERNATES WITH THE ROW, and it has to.
                         The image takes md:order-2 on odd rows, so on those rows
@@ -229,7 +238,7 @@ export default function ServicesIndex() {
                         would need a negative offset tuned per type size, which
                         is a design call rather than the one asked for. */}
                     <div
-                      className={`grid items-start gap-8 md:grid-cols-2 md:gap-14 lg:gap-32 ${
+                      className={`grid items-start gap-8 md:grid-cols-2 md:gap-14 lg:gap-40 ${
                         i % 2 === 1 ? 'lg:grid-cols-[7fr_5fr]' : 'lg:grid-cols-[5fr_7fr]'
                       }`}
                     >
