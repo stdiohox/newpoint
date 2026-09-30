@@ -86,6 +86,23 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              other asset in design-research is a different photograph (an empty
              consulting room). This needs a new export from the original shoot. */
           image={service.heroImage ?? (poster ? { src: poster, quality: 90 } : undefined)}
+          /* THE SCRIM FOLLOWS THE ASSET, NOT THE ROUTE.
+             `poster` never drops below 0.62 alpha anywhere in the frame. That
+             floor exists for the video posters: they are bright edge to edge
+             with a blown window behind the copy, and nothing lighter carries
+             white text on them. The cost is that it mutes the whole photograph
+             evenly, because a flat floor cannot tell the copy's corner from the
+             rest of the frame.
+
+             `hero` is the /services treatment: a 0.10 tint over the whole frame
+             plus a radial that does the heavy work only behind the copy. Behind
+             the text it reaches about 66%, which is denser than the poster
+             floor; away from it, about 12%, so the photograph reads as a
+             photograph rather than a darkened rectangle.
+
+             A page earns it by having a real master. The posters cannot use it,
+             so this switches on heroImage rather than on the slug. */
+          scrim={service.heroImage ? 'hero' : 'poster'}
           /* Matches /services: centred from lg, left-aligned below it, where
              the copy is a tall paragraph and centring costs more than it buys. */
           copyAlign="center"
