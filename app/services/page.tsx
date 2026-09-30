@@ -80,20 +80,39 @@ export default function ServicesIndex() {
             responsive value would set a number that does nothing at every step.
 
             Both numbers are measured off the frame, not judged. She runs from
-            52% to 80% across it and her hair starts 15% down.
-            - 70% across: at 390 the visible window is 51.6% of the width and
-              lands on 34%-85%, which holds all of her and crops the blown
-              window at 5%-30% out of the picture altogether. At 768 the window
-              is 69.8% wide, on 21%-91%. Her face sits about two-thirds across
-              the crop at both.
-            - 25% down: at 1440 the visible window is 67.2% of the height, on
-              8%-76%, leaving 7% of headroom above her hair; at 1024 it is 81%,
-              on 5%-85%. It still holds at 1440x700, the shortest shape that
-              keeps her whole, with 3% to spare. */}
+            52% to 80% across it and her hair starts 15% down. The windows below
+            are computed from the hero's RENDERED height, which is driven by this
+            page's copy and not by min-h-[50dvh] — the box is 611px tall at 390,
+            not the 422px the min-height alone would give, and using the
+            min-height would put every figure here out by a third.
+            - 70% across: at 390 the visible window is 35.5% of the width and
+              lands on 45%-81%, which holds all of her and crops the blown
+              window at 5%-30% out of the picture altogether. At 768 it is 69.7%
+              wide, on 21%-91%. At 320 it narrows to 26.6%, on 51%-78%, which
+              trims the outer edges of her but leaves her face, at 63%-74%, well
+              inside. Her face sits about two-thirds across the crop at each.
+            - 25% down: at 1440 the visible window is 71.4% of the height, on
+              7%-79%, leaving 8% of headroom above her hair. At 1024 the hero is
+              within 2% of the source's own aspect, so it crops almost nothing.
+
+            SIZES IS NOT 100vw, AND THAT IS WHAT MAKES THE 2x EXPORT REAL.
+            Below lg this hero is narrower than 16:9, so object-cover scales the
+            image by HEIGHT and draws it wider than the viewport. Measured, the
+            drawn width is 1201px at 320, 1098px at 390 and 1102px at 768 —
+            near-constant, because it follows the hero's height rather than the
+            viewport's width. 100vw described the box instead and fetched 640px
+            to 828px for it: 0.53x to 0.75x of a device pixel per CSS pixel on a
+            2x phone, which is soft. 1200px is the widest of those drawn widths
+            and so covers every step below lg; at lg and up the box is the wider
+            edge again and 100vw is correct. See PageHero's `sizes` note. */}
         <PageHero
           title="What we do, and how it works"
           intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
-          image={{ src: '/images/services/services-consult-2752.webp', objectPosition: '70% 25%' }}
+          image={{
+            src: '/images/services/services-consult-2752.webp',
+            objectPosition: '70% 25%',
+            sizes: '(min-width: 1024px) 100vw, 1200px',
+          }}
           scrim="hero"
         />
 

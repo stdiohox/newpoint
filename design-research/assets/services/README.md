@@ -40,17 +40,37 @@ narrow breakpoints `object-position: 70%` crops it out of the picture entirely.
 
 ## Derivatives
 
-| File | Width | Size | Covers |
-|---|---|---|---|
-| `services-consult-1536.webp` | 1536 | 95 KB | 390 (image renders 756 CSS px wide, 2x = 1512) |
-| `services-consult-2048.webp` | 2048 | 162 KB | 1024 (1024 CSS px, 2x = 2048) and 768 (1101 CSS px, 2x = 2202) |
-| `services-consult-2752.webp` | 2752 | 308 KB | 1440 (1440 CSS px, 2x would be 2880 — the master's 2752 is the ceiling) |
+**Only `services-consult-2752.webp` is served.** It is the `src` in
+`app/services/page.tsx`, and Next's image optimiser resizes it to the width the
+browser asks for, re-encoding at its own quality. Nothing references the other
+two, so the widths below are what the resize ladder was sized *against*, not
+files any visitor downloads.
 
-All three are under the 450 KB budget. `2752` is the one referenced in the page;
-`sizes="100vw"` is accurate because the hero is full-bleed, and Next's image
-optimiser generates the intermediate widths from it. The smaller two are
-committed for the same reason `public/images/hero/` carries its ladder — so the
-resize is reproducible without the master, which does not ship.
+| File | Width | On disk | Role |
+|---|---|---|---|
+| `services-consult-1536.webp` | 1536 | 95 KB | Not served. Reproducible derivative, kept so the ladder survives without the master |
+| `services-consult-2048.webp` | 2048 | 162 KB | Not served. Same |
+| `services-consult-2752.webp` | 2752 | 308 KB | **The one in use.** The optimiser's source for every width |
+
+All three are under the 450 KB budget, though only the 308 KB one is on any
+critical path — and even that is never sent whole at 2752 unless the browser
+asks for it.
+
+The widths that matter are set by the *drawn* image, not the viewport, because
+`object-cover` scales by height once the hero is narrower than 16:9. Measured on
+the rendered page:
+
+| Viewport | Hero box | Image drawn | Needed at 2x |
+|---|---|---|---|
+| 320 | 320 x 668 | 1201 px | 2402 |
+| 390 | 390 x 611 | 1098 px | 2196 |
+| 768 | 768 x 614 | 1102 px | 2204 |
+| 1024 | 1024 x 562 | 1024 px | 2048 |
+| 1440 | 1440 x 574 | 1440 px | 2880 (capped at the master's 2752) |
+
+which is why the page sets `sizes="(min-width: 1024px) 100vw, 1200px"` rather
+than a plain `100vw`. A plain `100vw` describes the hero box, and below lg the
+box is far narrower than the picture drawn into it.
 
 To regenerate:
 
