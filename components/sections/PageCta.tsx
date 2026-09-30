@@ -104,11 +104,11 @@ export function PageCta({
             use. Deliberate: this panel is several times their area, and a 14px
             radius on something 1136px wide reads as a square with the corners
             filed off rather than as a rounded object. */}
-        <div className="rounded-3xl bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(27,53,118,0.94)_0%,rgba(26,52,115,0.94)_14.3%,rgba(25,49,108,0.94)_28.6%,rgba(23,44,99,0.94)_42.9%,rgba(20,40,88,0.94)_57.1%,rgba(18,35,79,0.94)_71.4%,rgba(17,32,72,0.94)_85.7%,rgba(16,31,69,0.94)_100%)] px-6 py-16 md:px-12 md:py-20">
+        <div className="rounded-3xl border border-transparent bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(27,53,118,0.94)_0%,rgba(26,52,115,0.94)_14.3%,rgba(25,49,108,0.94)_28.6%,rgba(23,44,99,0.94)_42.9%,rgba(20,40,88,0.94)_57.1%,rgba(18,35,79,0.94)_71.4%,rgba(17,32,72,0.94)_85.7%,rgba(16,31,69,0.94)_100%)] px-6 py-16 md:px-12 md:py-20">
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
             <Reveal>
               {/* Two nested plates rather than one filled tile, so the mark reads
-                as an object on the band rather than a sticker on it. Decorative,
+                as an object on the panel rather than a sticker on it. Decorative,
                 and the h2 below says what this is. */}
               <div className="relative flex size-20 items-center justify-center">
                 <div
@@ -135,8 +135,10 @@ export function PageCta({
 
               Kept as a white chip rather than made white-on-white with the rest
               of the copy: it is the one element that should read as a separate
-              object, and a solid chip is 8.84:1 against this ground with an
-              np-blue-700 label at 11.55:1 inside it. */}
+              object. The chip is at least 9.79:1 against the panel and carries
+              its np-blue-700 label at 11.55:1 inside. It keeps Badge's own
+              border width with a transparent colour, so forced-colors repaints
+              an edge rather than dissolving the chip into the panel. */}
             <Reveal delay={0.06}>
               <Badge className="bg-np-surface text-np-blue-700 mt-6 border-transparent">
                 In person or by telehealth
@@ -156,9 +158,9 @@ export function PageCta({
                 appointment" is 24 characters and does not survive a half-width
                 pill at 320.
 
-                The pair swaps roles on this ground. `primary` is np-blue-600 and
-                would be invisible on an np-blue-600 band, so the filled button
-                is white and the outline one carries the white ring. */}
+                The pair swaps roles on a dark ground. `primary` is np-blue-600,
+                which would sink into this navy panel, so the filled button is
+                white and the outline one carries the white ring. */}
               <div className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
                 <Button href={CTA.href} variant="onInk" size="lg">
                   {CTA.label}
