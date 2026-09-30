@@ -40,6 +40,23 @@ const variants = {
    * documents for the same reason.
    */
   sky: 'bg-np-sky text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
+  /**
+   * The secondary action on an np-ink ground, where `quiet` cannot go: that
+   * variant's np-blue-600 label and ink-alpha ring are built for light grounds
+   * and both vanish on ink.
+   *
+   * THE RING IS white/40 AND THAT NUMBER IS LOAD-BEARING. The fill is
+   * transparent, so the ring is the whole component boundary and SC 1.4.11 wants
+   * 3:1 for it. Measured against np-ink: white/14 gives 1.53:1, white/24 gives
+   * 2.19:1, white/30 gives 2.70:1. Only white/40, at 3.78:1, clears it. The
+   * label itself is white at 17.03:1.
+   *
+   * Focus ring is white, not np-blue-900: outline-offset draws it onto the ink
+   * behind the button, where blue-900 is almost the ground colour. Same call
+   * ButtonWithIcon makes for its glass variant, for the same reason.
+   */
+  onInkQuiet:
+    'bg-transparent text-white ring-1 ring-white/40 hover:bg-[var(--np-alpha-white-14)] focus-visible:outline-white',
 };
 
 const discSizes = {

@@ -1,8 +1,26 @@
 import Link from 'next/link';
+import { CalendarCheck, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/badge';
 import { BUSINESS, CTA } from '@/lib/content';
+
+/**
+ * Two things a patient wants to know at the moment of deciding to make contact,
+ * and neither is a new claim. "No health details needed" restates the body copy
+ * directly above it, which already asks people to keep health information out of
+ * the form; saying it as a reassurance rather than an instruction is the point.
+ * The states are the confirmed telehealth footprint, per CLAUDE.md's
+ * care-modality note.
+ *
+ * Deliberately NOT here: response times, availability, "accepting new patients".
+ * All three are the kind of thing a reader would act on and none is sourced.
+ */
+const assurances = [
+  { icon: ShieldCheck, label: 'No health details needed' },
+  { icon: MapPin, label: 'New Jersey and Pennsylvania' },
+];
 
 /**
  * Closing block for interior pages.
@@ -11,6 +29,17 @@ import { BUSINESS, CTA } from '@/lib/content';
  * page rather than living only on the homepage: someone arriving on a service
  * page directly from a search result may never see the homepage at all, and
  * CLAUDE.md requires crisis guidance where a distressed visitor would look.
+ *
+ * CENTRED COLUMN, NOT THE 7/5 SPLIT IT REPLACED. The split put the crisis panel
+ * in a side column at roughly 40% width, which read as a footnote to the CTA. It
+ * is now full width under the copy, which is more prominent, not less, and it
+ * lets the request itself be a single centred moment instead of competing with
+ * a panel beside it.
+ *
+ * THE PHONE NUMBER IS A BUTTON NOW. It was a bare underlined link next to a
+ * filled button, so the two routes to the same practice looked like a primary
+ * action and an afterthought. Calling is the faster route for anyone in
+ * distress, and it should not be the quieter one.
  */
 export function PageCta({
   heading = 'Ready when you are',
@@ -22,57 +51,107 @@ export function PageCta({
   return (
     <section className="bg-np-ink on-ink py-20 md:py-28">
       <Container>
-        <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-          <div className="md:col-span-7">
-            <Reveal>
-              <h2 className="text-h2 max-w-[18ch] text-white">{heading}</h2>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <p className="text-body-l text-np-blue-300 mt-5 max-w-[52ch]">{body}</p>
-            </Reveal>
-            <Reveal delay={0.16}>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
-                <Button href={CTA.href} variant="onInk" size="lg">
-                  {CTA.label}
-                </Button>
-                <a
-                  href={`tel:${BUSINESS.phonePrimaryHref}`}
-                  className="text-body text-np-blue-300 font-medium underline-offset-4 hover:text-white hover:underline"
-                >
-                  {BUSINESS.phonePrimary}
-                </a>
-              </div>
-            </Reveal>
-          </div>
+        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+          <Reveal>
+            {/* Two nested plates rather than one filled tile, so the mark reads
+                as an object on the ink rather than a sticker on it. The inner
+                plate is np-ink, the section's own ground, which is what gives
+                the edge its depth. Decorative: the h2 below says what this is. */}
+            <div className="relative flex size-20 items-center justify-center">
+              <div
+                aria-hidden="true"
+                className="rounded-card absolute inset-0 bg-[var(--np-alpha-white-08)] ring-1 ring-white/15"
+              />
+              <div
+                aria-hidden="true"
+                className="bg-np-ink absolute inset-1 rounded-[10px] ring-1 ring-white/10"
+              />
+              <CalendarCheck
+                aria-hidden="true"
+                size={30}
+                strokeWidth={1.75}
+                className="relative text-white"
+              />
+            </div>
+          </Reveal>
 
-          <div className="md:col-span-5">
-            <Reveal delay={0.12}>
-              <div className="rounded-card border-np-blue-300 border-l-2 bg-[var(--np-alpha-white-08)] p-6 md:p-8">
-                <h3 className="text-h3 text-white">If you need help now</h3>
-                <p className="text-small mt-3 text-white/70">
-                  This website is not for emergencies and is not monitored around the clock.
-                </p>
-                <p className="text-small mt-4 text-white/85">
-                  Call or text{' '}
-                  <a
-                    href="tel:988"
-                    className="text-np-blue-300 font-medium underline-offset-4 hover:underline"
-                  >
-                    988
-                  </a>{' '}
-                  for the Suicide and Crisis Lifeline, any time. In an emergency, call{' '}
-                  <a
-                    href="tel:911"
-                    className="text-np-blue-300 font-medium underline-offset-4 hover:underline"
-                  >
-                    911
-                  </a>{' '}
-                  or go to your nearest emergency room.
-                </p>
-              </div>
-            </Reveal>
-          </div>
+          {/* A fact, not a label. An eyebrow reading "Next step" above a heading
+              that already says "Ready when you are" would be the templated move;
+              the modality is the thing a reader actually needs here and it is
+              confirmed content. White on this fill measures 12.73:1. */}
+          <Reveal delay={0.06}>
+            <Badge className="mt-6 border-white/20 bg-[var(--np-alpha-white-14)] text-white">
+              In person or by telehealth
+            </Badge>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <h2 className="text-h2 mt-5 text-white">{heading}</h2>
+          </Reveal>
+
+          <Reveal delay={0.16}>
+            <p className="text-body-l text-np-blue-300 mt-4">{body}</p>
+          </Reveal>
+
+          <Reveal delay={0.22}>
+            {/* Stacked below sm so neither label wraps on a phone: "Request an
+                appointment" is 24 characters and does not survive a half-width
+                pill at 320. */}
+            <div className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
+              <Button href={CTA.href} variant="onInk" size="lg">
+                {CTA.label}
+              </Button>
+              <Button href={`tel:${BUSINESS.phonePrimaryHref}`} variant="onInkQuiet" size="lg">
+                <Phone aria-hidden="true" size={18} strokeWidth={1.75} />
+                {BUSINESS.phonePrimary}
+              </Button>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.28}>
+            <ul
+              role="list"
+              className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
+            >
+              {assurances.map(({ icon: Icon, label }) => (
+                <li key={label} className="text-small flex items-center gap-2 text-white/70">
+                  <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
+
+        {/* Left rule kept, and it is the one thing that stays asymmetric in a
+            centred block. It is how this panel is marked as a different kind of
+            thing from the request above it, and it is the same treatment the
+            shared CrisisPanel carries. */}
+        <Reveal delay={0.34}>
+          <div className="rounded-card border-np-blue-300 mx-auto mt-14 max-w-2xl border-l-2 bg-[var(--np-alpha-white-08)] p-6 text-left md:mt-16 md:p-8">
+            <h3 className="text-h3 text-white">If you need help now</h3>
+            <p className="text-small mt-3 text-white/70">
+              This website is not for emergencies and is not monitored around the clock.
+            </p>
+            <p className="text-small mt-4 text-white/85">
+              Call or text{' '}
+              <a
+                href="tel:988"
+                className="text-np-blue-300 font-medium underline-offset-4 hover:underline"
+              >
+                988
+              </a>{' '}
+              for the Suicide and Crisis Lifeline, any time. In an emergency, call{' '}
+              <a
+                href="tel:911"
+                className="text-np-blue-300 font-medium underline-offset-4 hover:underline"
+              >
+                911
+              </a>{' '}
+              or go to your nearest emergency room.
+            </p>
+          </div>
+        </Reveal>
       </Container>
     </section>
   );
