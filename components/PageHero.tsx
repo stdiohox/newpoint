@@ -39,6 +39,7 @@ export function PageHero({
   image,
   scrim = 'poster',
   copyMaxWidth,
+  copyAlign = 'left',
   align = 'bottom',
 }: {
   eyebrow?: string;
@@ -69,6 +70,13 @@ export function PageHero({
      * are knowingly left on the default for now.
      */
     sizes?: string;
+    /**
+     * Passed straight to next/image. Omitted, the optimiser uses its default of
+     * 75, which on /services meant a q75 re-encode of an already-lossy q90
+     * webp master: two generations of loss for a hero that is the LCP element.
+     * The homepage sets 88 for the same reason.
+     */
+    quality?: number;
   };
   /**
    * Which of the two photographic scrims to use. Ignored without an `image`.
@@ -97,6 +105,16 @@ export function PageHero({
    */
   copyMaxWidth?: { title?: string; intro?: string };
   /**
+   * Horizontal alignment of the copy column. `left` is the default and what the
+   * other five callers get.
+   *
+   * `center` is not just text-align. The scrim below switches with it, because
+   * the `hero` scrim's shape is built around where the copy sits: a left ramp
+   * under a centred block would darken the empty side and leave the text on the
+   * bright middle.
+   */
+  copyAlign?: 'left' | 'center';
+  /**
    * Where the copy sits in the hero. `bottom` is the default and what the other
    * five callers get: a single column anchored to the foot of the frame, which
    * is what the scrim's bottom ramp is shaped around.
@@ -115,6 +133,8 @@ export function PageHero({
    */
   align?: 'bottom' | 'center';
 }) {
+  const centred = copyAlign === 'center';
+
   return (
     /* No `on-ink` here, unlike Footer, PageCta and Providers. That class only
        swaps the focus-ring colour, it was carried solely for the breadcrumb
@@ -129,6 +149,7 @@ export function PageHero({
           fill
           priority
           sizes={image.sizes ?? '100vw'}
+          quality={image.quality}
           className="object-cover"
           style={{ objectPosition: image.objectPosition ?? '50% 50%' }}
         />
@@ -245,7 +266,10 @@ export function PageHero({
           component has one, which is why the other two branches are unchanged
           plateau-and-fade ramps and look it. */}
       {image && scrim === 'hero' && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[rgba(16,31,69,0.1)]" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[rgba(16,31,69,0.1)]"
+        />
       )}
 
       {/* LAYER 2: the bottom gradient. The `hero` branch is the smoothstep
@@ -264,8 +288,15 @@ export function PageHero({
       {/* LAYER 3: the left gradient, one curve at every width. The final stop
           repeats 0.15 at 100% deliberately — that flat tail is what stops the
           gradient having an end, and it meets the curve where the curve's own
-          slope is already zero, so the join is invisible. */}
-      {image && scrim === 'hero' && (
+          slope is already zero, so the join is invisible.
+
+          LEFT-ALIGNED COPY ONLY. Under a centred block this layer works against
+          the composition: it puts its heaviest alpha on the empty left margin
+          and its lightest on the middle, which is exactly where the text now
+          is. The flat tint on layer 1 still guarantees the frame is never fully
+          transparent anywhere, which is the property this layer was originally
+          added to protect, so dropping it here costs nothing. */}
+      {image && scrim === 'hero' && copyAlign === 'left' && (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]"
@@ -299,7 +330,11 @@ export function PageHero({
       {image && scrim === 'hero' && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(16,31,69,0.48)_0%,rgba(16,31,69,0.48)_50%,rgba(16,31,69,0.453)_57.1%,rgba(16,31,69,0.385)_64.3%,rgba(16,31,69,0.291)_71.4%,rgba(16,31,69,0.189)_78.6%,rgba(16,31,69,0.095)_85.7%,rgba(16,31,69,0.027)_92.9%,rgba(16,31,69,0)_100%)] lg:bg-[radial-gradient(ellipse_62%_70%_at_28%_56%,rgba(16,31,69,0.48)_0%,rgba(16,31,69,0.48)_50%,rgba(16,31,69,0.453)_57.1%,rgba(16,31,69,0.385)_64.3%,rgba(16,31,69,0.291)_71.4%,rgba(16,31,69,0.189)_78.6%,rgba(16,31,69,0.095)_85.7%,rgba(16,31,69,0.027)_92.9%,rgba(16,31,69,0)_100%)]"
+          className={`pointer-events-none absolute inset-0 ${
+            copyAlign === 'center'
+              ? 'bg-[radial-gradient(ellipse_96%_72%_at_50%_58%,rgba(16,31,69,0.58)_0%,rgba(16,31,69,0.58)_50.0%,rgba(16,31,69,0.548)_57.1%,rgba(16,31,69,0.465)_64.3%,rgba(16,31,69,0.352)_71.4%,rgba(16,31,69,0.228)_78.6%,rgba(16,31,69,0.115)_85.7%,rgba(16,31,69,0.032)_92.9%,rgba(16,31,69,0)_100.0%)] lg:bg-[radial-gradient(ellipse_58%_64%_at_50%_58%,rgba(16,31,69,0.58)_0%,rgba(16,31,69,0.58)_50.0%,rgba(16,31,69,0.548)_57.1%,rgba(16,31,69,0.465)_64.3%,rgba(16,31,69,0.352)_71.4%,rgba(16,31,69,0.228)_78.6%,rgba(16,31,69,0.115)_85.7%,rgba(16,31,69,0.032)_92.9%,rgba(16,31,69,0)_100.0%)]'
+              : 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(16,31,69,0.48)_0%,rgba(16,31,69,0.48)_50%,rgba(16,31,69,0.453)_57.1%,rgba(16,31,69,0.385)_64.3%,rgba(16,31,69,0.291)_71.4%,rgba(16,31,69,0.189)_78.6%,rgba(16,31,69,0.095)_85.7%,rgba(16,31,69,0.027)_92.9%,rgba(16,31,69,0)_100%)] lg:bg-[radial-gradient(ellipse_62%_70%_at_28%_56%,rgba(16,31,69,0.48)_0%,rgba(16,31,69,0.48)_50%,rgba(16,31,69,0.453)_57.1%,rgba(16,31,69,0.385)_64.3%,rgba(16,31,69,0.291)_71.4%,rgba(16,31,69,0.189)_78.6%,rgba(16,31,69,0.095)_85.7%,rgba(16,31,69,0.027)_92.9%,rgba(16,31,69,0)_100%)]'
+          }`}
         />
       )}
 
@@ -315,35 +350,45 @@ export function PageHero({
         }
       >
         <Container>
-          {/* Full white, not white/85. Measured against the brightest of these
-              posters (a blown window behind the psychiatric-evaluation frame)
-              85% white came out at 4.41:1, just under the floor for 13px. Full
-              white measures 5.37:1 there. */}
-          {eyebrow && (
-            <p className="text-caption tracking-[0.08em] text-white uppercase">{eyebrow}</p>
-          )}
+          {/* `mx-auto` on each block, not just text-center on the wrapper.
+              These carry max-widths, so centring the text inside a box that is
+              still pinned to the left edge would centre the words within a
+              column sitting off to one side, which looks like a mistake rather
+              than a centred composition. */}
+          <div className={centred ? 'text-center' : undefined}>
+            {/* Full white, not white/85. Measured against the brightest of these
+                posters (a blown window behind the psychiatric-evaluation frame)
+                85% white came out at 4.41:1, just under the floor for 13px. Full
+                white measures 5.37:1 there. */}
+            {eyebrow && (
+              <p className="text-caption tracking-[0.08em] text-white uppercase">{eyebrow}</p>
+            )}
 
-          {/* mt only under an eyebrow. With the breadcrumb removed the H1 is
-              the first thing in this column on the pages that have no eyebrow,
-              and a top margin there would only pad the block against the
-              navbar clearance above it. */}
-          <h1
-            className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
-              eyebrow ? 'mt-4' : ''
-            }`}
-            style={{ maxWidth: copyMaxWidth?.title }}
-          >
-            {title}
-          </h1>
+            {/* mt only under an eyebrow. With the breadcrumb removed the H1 is
+                the first thing in this column on the pages that have no eyebrow,
+                and a top margin there would only pad the block against the
+                navbar clearance above it. */}
+            <h1
+              className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
+                centred ? 'mx-auto' : ''
+              } ${eyebrow ? 'mt-4' : ''}`}
+              style={{ maxWidth: copyMaxWidth?.title }}
+            >
+              {title}
+            </h1>
 
-          <p className="text-body-l mt-5 max-w-[56ch] text-white/90" style={{ maxWidth: copyMaxWidth?.intro }}>
-            {intro}
-          </p>
+            <p
+              className={`text-body-l mt-5 max-w-[56ch] text-white/90 ${centred ? 'mx-auto' : ''}`}
+              style={{ maxWidth: copyMaxWidth?.intro }}
+            >
+              {intro}
+            </p>
 
-          <div className="mt-8">
-            <ButtonWithIcon href={CTA.href} variant="glass">
-              {CTA.label}
-            </ButtonWithIcon>
+            <div className={`mt-8 ${centred ? 'flex justify-center' : ''}`}>
+              <ButtonWithIcon href={CTA.href} variant="glass">
+                {CTA.label}
+              </ButtonWithIcon>
+            </div>
           </div>
         </Container>
       </div>

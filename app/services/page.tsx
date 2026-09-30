@@ -189,7 +189,9 @@ export default function ServicesIndex() {
             src: '/images/services/services-consult-2752.webp',
             objectPosition: '70% 25%',
             sizes: '(min-width: 1024px) 100vw, 1200px',
+            quality: 90,
           }}
+          copyAlign="center"
           scrim="hero"
           copyMaxWidth={{ title: 'min(18ch, 620px)', intro: '540px' }}
           align="center"
