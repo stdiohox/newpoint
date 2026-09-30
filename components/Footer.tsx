@@ -94,6 +94,45 @@ export function Footer() {
           </div>
         </div>
 
+        {/* CRISIS STRIP, AND IT IS ABOVE THE LINK COLUMNS ON PURPOSE.
+            It used to sit between the columns and the bottom row, with a
+            comment saying it was placed so that "someone in crisis scanning a
+            footer should not have to read past a services list to find it".
+            The stacking order did not deliver that. The columns are
+            sm:grid-cols-2 md:grid-cols-3, so on a phone they are one column of
+            three stacked groups — 3 services, 5 practice links, a phone number
+            and two provider inboxes — and the strip landed below all of it.
+            Measured on /services/medication-management at 390, moving it here
+            brings 988 704px closer.
+
+            This is the only crisis guidance on /insurance, /providers/[slug]
+            and /services, so its position is the whole of the coverage there.
+
+            The hairline is not decoration: np-blue-800 measures 1.22:1 against
+            this ground, enough to read as a raised surface but not enough to
+            draw its own edge. */}
+        <div className="bg-np-blue-800 mt-14 rounded-xl px-5 py-4 ring-1 ring-white/15">
+          <p className="text-small text-white">
+            {FOOTER.crisis.before}{' '}
+            <a
+              href="tel:988"
+              aria-label="988, Suicide and Crisis Lifeline"
+              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors duration-[180ms] hover:decoration-white motion-reduce:transition-none"
+            >
+              988
+            </a>
+            {FOOTER.crisis.between}{' '}
+            <a
+              href="tel:911"
+              aria-label="911, medical emergency"
+              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors duration-[180ms] hover:decoration-white motion-reduce:transition-none"
+            >
+              911
+            </a>
+            {FOOTER.crisis.after}
+          </p>
+        </div>
+
         {/* LINK COLUMNS. Three at md and up, stacked at mobile. Every href is a
             route that exists; see the note above about derivation. */}
         <nav
@@ -149,33 +188,6 @@ export function Footer() {
             <p className="text-small mt-5 max-w-[30ch] text-white/80">{FOOTER.modality}</p>
           </div>
         </nav>
-
-        {/* CRISIS STRIP. Above the bottom row rather than buried in a column,
-            because someone in crisis scanning a footer should not have to read
-            past a services list to find it. The hairline is not decoration:
-            np-blue-800 measures 1.22:1 against this ground, which is enough to
-            read as a raised surface but not enough to draw its own edge. */}
-        <div className="bg-np-blue-800 mt-14 rounded-xl px-5 py-4 ring-1 ring-white/15">
-          <p className="text-small text-white">
-            {FOOTER.crisis.before}{' '}
-            <a
-              href="tel:988"
-              aria-label="988, Suicide and Crisis Lifeline"
-              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors duration-[180ms] hover:decoration-white motion-reduce:transition-none"
-            >
-              988
-            </a>
-            {FOOTER.crisis.between}{' '}
-            <a
-              href="tel:911"
-              aria-label="911, medical emergency"
-              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors duration-[180ms] hover:decoration-white motion-reduce:transition-none"
-            >
-              911
-            </a>
-            {FOOTER.crisis.after}
-          </p>
-        </div>
 
         {/* BOTTOM ROW. */}
         <div className="mt-10 border-t border-white/15 pt-6">
