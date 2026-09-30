@@ -293,16 +293,16 @@ export default function ServicesIndex() {
                             </dd>
                           </div>
 
-                          {/* NO "Who you will see" HERE, deliberately.
+                          {/* NO "Providers you will see" HERE, deliberately.
                               Naming both providers under each service asserts
                               that both personally deliver it. That is sourced
                               for medication management and telehealth, and NOT
                               for the comprehensive psychiatric assessment:
                               Ofoegbu's bio names assessments, Whitaker's names
-                              medication management only. The page-wide "Who you
-                              will see" section below says what is actually
-                              sourced — these are the two clinicians — without
-                              binding either to a named service.
+                              medication management only. The page-wide
+                              "Providers you will see" section below says what is
+                              actually sourced — these are the two clinicians —
+                              without binding either to a named service.
                               CLIENT: confirm whether both providers perform
                               initial psychiatric assessments, and this becomes
                               a per-service field. */}
@@ -394,7 +394,13 @@ export default function ServicesIndex() {
 
             <div className="border-np-neutral-200 mt-20 border-t pt-12">
               <Reveal>
-                <h2 className="text-h2 max-w-[22ch]">Who you will see</h2>
+                {/* "Providers", not "clinicians" or "our team": it is the word
+                    the navbar, the /providers/[slug] route and the PROVIDERS
+                    constant all already use, so the heading names the same
+                    thing the reader clicks through to. It also stays inside the
+                    title rules — both are advanced practice nurses, so nothing
+                    here may read as physician, psychiatrist or Dr. */}
+                <h2 className="text-h2 max-w-[22ch]">Providers you will see</h2>
               </Reveal>
               <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8">
                 {PROVIDERS.map((p, i) => (
