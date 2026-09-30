@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { CircleCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 
@@ -6,6 +7,10 @@ export type FeatureBlock = {
   id: string;
   heading: string;
   body: string;
+  /** Optional second paragraph. See the field's note in lib/content.ts. */
+  detail?: string;
+  /** Optional rundown, rendered under the copy in the left column only. */
+  list?: string[];
 };
 
 /**
@@ -15,7 +20,7 @@ export type FeatureBlock = {
  *
  * NO NEW COPY, AND NOTHING SAID TWICE. Both blocks are the service's own
  * `sections` entries, moved here rather than copied here: the timeline above
- * renders only the sections this block does not take (see `featurePair` in
+ * renders only the sections this block does not take (see `layout` in
  * lib/content.ts). The eyebrow is the service's existing `nav` label. Nothing
  * on this page is a string that was written for this layout.
  *
@@ -52,14 +57,19 @@ export function ServiceFeature({
             object, and the empty lower left is the counterweight to the
             furniture in the lower right. */}
         <div className="grid items-start gap-10 md:grid-cols-2 md:gap-12 lg:gap-16">
-          {/* The <section> carrying the anchor id sits OUTSIDE <Reveal>, for the
-              reason spelled out at length in ServiceJourney.tsx: Reveal swaps
-              element type on hydration, React remounts the subtree, and any node
-              inside it is detached from under the rail's IntersectionObserver.
-              These two ids are still tracked by "On this page", so they must
-              survive hydration. */}
+          {/* The <section> carrying the anchor id sits OUTSIDE <Reveal>, and
+              stays there. Reveal renders a plain element before hydration and
+              the motion equivalent after; those are different React element
+              types, so React unmounts one and mounts the other and destroys
+              every DOM node beneath it.
+
+              NOTHING OBSERVES THESE IDS ANY MORE — the "On this page" rail that
+              did was removed with the sidebar. They are kept because they are
+              deep-link targets that external and shared URLs still point at,
+              and a target rebuilt on hydration is one a fragment navigation can
+              miss. */}
           <section id={left.id} tabIndex={-1} className="focus:outline-none">
-            <Reveal>
+            <Reveal amount="some">
               {/* md:pt-12 matches the card's own md:p-12, so the eyebrow and
                   the card's h3 start on the same line. Below md the card sits
                   under this column and there is nothing to align to. */}
@@ -73,12 +83,42 @@ export function ServiceFeature({
                 </p>
                 <h2 className="text-h2 mt-3">{left.heading}</h2>
                 <p className="text-body-l text-np-neutral-600 mt-5 max-w-[46ch]">{left.body}</p>
+                {left.detail && (
+                  <p className="text-body-l text-np-neutral-600 mt-4 max-w-[46ch]">{left.detail}</p>
+                )}
+
+                {/* THE RUNDOWN IS IN THE LEFT COLUMN AND NOT ON THE CARD. The
+                    card's copy sits on a photograph and is held to a measured
+                    contrast floor across eighteen viewport widths; every line
+                    added to it is another line that has to clear that floor and
+                    another chance for the crop to put one over the furniture.
+                    The left column is type on a flat ground with no such
+                    constraint, so that is where content grows.
+
+                    role="list" per the note at the top of app/globals.css:
+                    Preflight strips list-style and WebKit then drops the
+                    implicit role. */}
+                {left.list && (
+                  <ul role="list" className="mt-7 flex flex-col gap-3">
+                    {left.list.map((item) => (
+                      <li key={item} className="flex items-start gap-3">
+                        <CircleCheck
+                          aria-hidden="true"
+                          size={20}
+                          strokeWidth={1.75}
+                          className="text-np-blue-600 mt-[0.15em] shrink-0"
+                        />
+                        <span className="text-body text-np-neutral-700 max-w-[42ch]">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </Reveal>
           </section>
 
           <section id={card.id} tabIndex={-1} className="focus:outline-none">
-            <Reveal delay={0.08}>
+            <Reveal amount="some" delay={0.08}>
               {/* rounded-3xl as specified, which is also the radius PageCta's
                   panel uses. Both are large objects where the 14px card token
                   reads as a square with its corners filed off. */}
@@ -129,7 +169,7 @@ export function ServiceFeature({
                      1200px container above it. 45vw is the upper bound of that
                      half across the breakpoints, so the browser never picks a
                      candidate narrower than it needs. */
-                  sizes="(min-width: 768px) 45vw, 100vw"
+                  sizes="(min-width: 1280px) 600px, (min-width: 768px) 45vw, 100vw"
                 />
 
                 {/* THERE IS DELIBERATELY NO SCRIM HERE, and that is a measured
@@ -151,11 +191,20 @@ export function ServiceFeature({
                     has the thinner margin of the two. */}
 
                 <div className="relative z-10 p-8 sm:p-10 md:p-12">
-                  {/* h3 under the left column's h2. np-ink rather than the
-                      np-neutral-700 the body uses: it is the larger of the two
-                      and it should be the more certain of the two on a surface
-                      that is a photograph. */}
-                  <h3 className="text-h3 text-np-ink">{card.heading}</h3>
+                  {/* h2 STYLED AS text-h3, not an actual h3, and the
+                      distinction is the whole point. This card is its own
+                      <section> with its own anchor id, sitting beside the left
+                      column rather than inside it — the two are peers. An h3
+                      immediately after the left column's h2 told a screen
+                      reader the opposite, that this is a subsection of "Your
+                      treatment plan", which is a 1.3.1 mismatch between the
+                      structure and what the layout plainly shows. The class
+                      keeps the size it had.
+
+                      np-ink rather than the np-neutral-700 the body uses: it is
+                      the larger of the two and should be the more certain of
+                      the two on a surface that is a photograph. */}
+                  <h2 className="text-h3 text-np-ink">{card.heading}</h2>
                   <p className="text-body text-np-neutral-700 mt-3 max-w-[32ch]">{card.body}</p>
                 </div>
               </div>

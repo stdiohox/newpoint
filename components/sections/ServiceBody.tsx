@@ -7,6 +7,8 @@ export type BodySection = {
   id: string;
   heading: string;
   body: string;
+  /** Optional second paragraph. See the field's note in lib/content.ts. */
+  detail?: string;
   list?: string[];
 };
 
@@ -52,10 +54,18 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
           {sections.map((section, i) => {
             if (i > 1) return null;
 
-            /* The <section> carrying the id sits outside <Reveal>: Reveal swaps
-               element type on hydration and React rebuilds the subtree, which
-               would tear down and recreate these anchor targets. The long
-               version is in ServiceFeature.tsx. */
+            /* The <section> carrying the id sits outside <Reveal>, and stays
+               there. Reveal renders a plain element before hydration and the
+               motion equivalent after, which are different React element
+               types, so React unmounts the first and mounts the second and
+               destroys every DOM node beneath it.
+
+               WHY THAT MATTERS NOW THAT NOTHING OBSERVES THESE. The contents
+               rail that used to watch them is gone, so no observer holds a
+               stale reference any more. The ids remain because they are
+               deep-link targets that external and shared URLs still point at,
+               and a target that is torn down and rebuilt on hydration is a
+               target a fragment navigation can miss. */
             return (
               <section
                 key={section.id}
@@ -63,7 +73,7 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
                 tabIndex={-1}
                 className="focus:outline-none"
               >
-                <Reveal>
+                <Reveal amount="some">
                   {/* p-2 shell with a rounded-2xl core inside it, straight from
                       the source pattern: the inset makes the media read as a
                       plate sitting in a tray rather than a photograph with a
@@ -129,15 +139,25 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
           className="bg-np-blue-50 mt-20 py-16 focus:outline-none md:mt-28 md:py-20"
         >
           <Container>
-            <Reveal>
-              {/* The one centred block on the page. Centred because it is short
-                  and because everything around it is left aligned — a change of
-                  pace, not a default. 52ch holds it to four lines at
-                  text-body-l, which is as far as centred prose stays
-                  comfortable. */}
-              <div className="mx-auto max-w-[52ch] text-center">
+            <Reveal amount="some">
+              {/* Centred because it is short and because everything around it
+                  is left aligned — a change of pace, not a default.
+
+                  IT WIDENS FROM 52ch TO 58ch WHEN THERE IS A SECOND PARAGRAPH.
+                  52ch held the original single paragraph to four lines, which
+                  is about as far as centred prose stays comfortable; two
+                  paragraphs at that measure become a tall narrow column that
+                  reads like a poem. 58ch keeps each one to four lines. */}
+              <div
+                className={`mx-auto text-center ${
+                  sections[2].detail ? 'max-w-[58ch]' : 'max-w-[52ch]'
+                }`}
+              >
                 <h2 className="text-h2">{sections[2].heading}</h2>
                 <p className="text-body-l text-np-neutral-600 mt-5">{sections[2].body}</p>
+                {sections[2].detail && (
+                  <p className="text-body-l text-np-neutral-600 mt-4">{sections[2].detail}</p>
+                )}
               </div>
             </Reveal>
           </Container>
@@ -192,7 +212,7 @@ function RowMediaPanel({ media }: { media: RowMedia }) {
         alt={media.alt}
         fill
         className="object-cover"
-        sizes="(min-width: 768px) 46vw, 100vw"
+        sizes="(min-width: 1280px) 600px, (min-width: 768px) 46vw, 100vw"
       />
     </div>
   );

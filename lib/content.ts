@@ -780,7 +780,21 @@ export type ServicePage = {
    * extended to the other two services, check that is still true of them.
    */
   hideHeroCta?: boolean;
-  sections: { heading: string; body: string; list?: string[] }[];
+  /**
+   * `detail` is a SECOND PARAGRAPH, rendered under `body` where the layout
+   * supports it. Added 2026-09-30 when the client asked for the diagnosis and
+   * treatment-plan sections to carry more than a single paragraph.
+   *
+   * EVERY SENTENCE IN ONE IS GENERATED FROM research/, per CLAUDE.md's
+   * instruction to write marketing and service copy from that source, and
+   * nothing in one is a verifiable regulated fact. Specifically absent, and
+   * deliberately: appointment durations, named therapy modalities, who
+   * delivers psychotherapy, the age range served, and whether the plan is
+   * handed over in writing. All five are open client items, several with
+   * directory evidence that actively disagrees with itself, and none of them
+   * is a gap prose can close.
+   */
+  sections: { heading: string; body: string; detail?: string; list?: string[] }[];
   faqs: { q: string; a: string }[];
 };
 
@@ -873,6 +887,33 @@ export const SERVICE_PAGES: ServicePage[] = [
       {
         heading: 'Reaching a diagnosis',
         body: 'A diagnosis is determined through assessment, not assumption. We tell you what we have found and what it means, in plain language. If the picture is not yet clear, we say that too rather than reaching for a label that might not fit.',
+        /* ONE SENTENCE, AND IT IS THE ONLY ONE THIS SECTION HAD LEFT TO SAY.
+           Sourced from research/content/services.md: "diagnoses of mental
+           illness are made based on assessments, and then an effective plan of
+           care is determined". Nothing else on this page states that the
+           diagnosis is what the plan is built on.
+
+           TWO EARLIER SENTENCES WERE CUT HERE, both on review.
+
+           One claimed the diagnosis "is revisited as your response to
+           treatment makes the picture clearer". Nothing in research/ says a
+           diagnosis is ever reviewed or revised. The two lines that looked
+           like support do not carry it: "we will continue to provide support
+           and education" commits to support, not to re-examining a diagnosis,
+           and rating scales that "monitor progress or decompensation" track
+           severity, not the label. Do not restore it without the practice
+           confirming that diagnoses are formally reviewed.
+
+           The other explained that screening rules conditions out as well as
+           in. True and sourced, but it is already a bullet two blocks above
+           under "The tools we use", and the same page saying it twice is the
+           thing this layout exists to avoid.
+
+           It does not say how long any of this takes, or that a diagnosis is
+           guaranteed: "where a diagnosis can be established" is the same hedge
+           the FAQ uses. */
+        detail:
+          'Where a diagnosis can be established, it becomes the thing the rest of your care is built on.',
       },
       {
         heading: 'Your treatment plan',
@@ -880,6 +921,55 @@ export const SERVICE_PAGES: ServicePage[] = [
         // the source says a plan of care is determined, not that it is written
         // down or countersigned. CLIENT: confirm if patients receive it in writing.
         body: 'The plan that comes out of the assessment combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your circumstances. Where other clinicians are already involved in your care, we collaborate with them to establish the therapy regimen and the medication protocol together rather than in parallel.',
+        /* Both halves are research/content/services.md's "as we evaluate
+           progress, we will continue to provide support and education as
+           needed". AS NEEDED IS LOAD-BEARING AND IS NOT A SOFTENER: it is the
+           source's own clinical-judgement qualifier. This sentence previously
+           ended "for as long as you are with us", which turned a qualified
+           statement into an open-ended commitment a patient could hold the
+           practice to. Do not drop it again.
+
+           A first sentence was cut here as well. It opened "No two plans are
+           the same" and contrasted the plan with "a standard protocol". The
+           individualisation is sourced, but the absolute is a stronger and
+           unfalsifiable version of it, "standard protocol" is an unsourced
+           differentiator, and the section's own body copy two lines up already
+           says the plan is matched to your diagnosis and your circumstances.
+
+           No modality is named anywhere here, because which ones the practice
+           offers is still open and the four candidates in the directories
+           contradict each other. */
+        detail:
+          'The plan is reviewed as your response to treatment becomes clear, and support and education continue alongside it as needed.',
+        /* THE PRACTICE'S OWN PUBLISHED LIST of treatment options, from
+           research/content/services.md, and none of it has appeared on this
+           page before. Three of the six are taken.
+
+           LEFT OUT ON PURPOSE: "skill building groups" and "support groups".
+           research/services-analysis.md flags both as named on the live site
+           and never described anywhere — no cadence, no format, no topics — so
+           putting them on a service page would advertise something the site
+           cannot explain and the practice may no longer run. "Psychiatric
+           consultation" is left out as well: on this page it would describe
+           the appointment the reader is already on.
+
+           CLIENT: confirm whether skill-building groups and support groups are
+           still offered. If they are, they are a fourth item here and
+           plausibly a section of their own, and we need format and cadence to
+           describe them. */
+        list: [
+          'Medication treatment, where it is indicated',
+          /* "Individual counseling" is the practice's own name for this option
+             and it stands alone here on purpose. It previously read
+             "alongside your medication care", which did two things the source
+             does not: it implied Newpoint delivers the counselling, when who
+             delivers psychotherapy is an open client item, and it made a
+             standalone option conditional on being on medication. The live
+             site's own framing is that it will "work with you to find" an
+             option, which is weaker than providing it. */
+          'Individual counseling',
+          'Referral to follow-up services where something falls outside what we provide',
+        ],
       },
       {
         heading: 'What happens after',

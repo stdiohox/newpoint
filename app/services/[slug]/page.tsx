@@ -5,7 +5,7 @@ import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceFeature } from '@/components/sections/ServiceFeature';
-import { ServiceBody } from '@/components/sections/ServiceBody';
+import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -58,14 +58,24 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     id: slugify(section.heading),
     heading: section.heading,
     body: section.body,
+    detail: section.detail,
     list: section.list,
   }));
 
-  /* The bespoke layout splits five sections three ways. The length guard is not
-     decoration: with fewer than five the split stops meaning anything, and a
-     service in that state should fall back to the prose layout rather than
-     render half a design. */
-  const useFeatureLayout = service.layout === 'feature' && sectionItems.length >= 5;
+  /* EXACTLY FIVE, NOT "AT LEAST FIVE". The split is slice(0,3) plus slice(-2),
+     so at six or more every section in the middle would be dropped from the
+     page silently: no error, no gap, just missing copy on a service page. The
+     guard is what makes that impossible rather than merely unlikely, and a
+     service that grows a sixth section falls back to the prose layout, which
+     renders all of them, until someone decides where the sixth belongs.
+
+     Two fields are deliberately not rendered on this layout and are worth
+     knowing about before authoring: `list` on the third section (the tinted
+     band is a centred statement and has nowhere to put one) and `detail` or
+     `list` on the fifth (the card's copy sits on a photograph and is held to a
+     measured contrast floor, so it does not grow). Both are rendered on the
+     sections that do support them. */
+  const useFeatureLayout = service.layout === 'feature' && sectionItems.length === 5;
   const bodyItems = sectionItems.slice(0, 3);
   const featureItems = sectionItems.slice(-2);
 
@@ -74,7 +84,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      oversight — nothing in the library depicts questionnaires or rating
      scales, and the nearest candidates are all the same empty consulting room
      already used further down this page. */
-  const bodyMedia = [
+  const bodyMedia: RowMedia[] = [
     {
       src: '/images/services/services-consult-2752.webp',
       /* Describes the photograph and stops there. It does not say these are
@@ -88,8 +98,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
          written side of the assessment (a questionnaire on a clipboard, a
          rating scale being completed) rather than another room interior.
          Landscape, 2400px or wider on the long edge. */
-      placeholder:
-        'Something showing the written side of the assessment, landscape, 2400px or wider.',
+      /* The VISIBLE string is deliberately short and patient-facing. It used
+         to print the pixel spec on the page, which is a note to the client
+         rendered to patients. The spec belongs in the comment above. */
+      placeholder: 'A photograph for this section is on the way.',
     },
   ];
 
@@ -179,7 +191,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                    turns on the fact that the practice's in-person locations
                    are still unconfirmed, and alt text is copy like any other
                    place a claim can be made by accident. */
-                alt: 'A quiet consulting room with two armchairs turned towards each other, a small wooden side table between them holding a glass of water and a box of tissues, and a fiddle-leaf fig beside a curtained window.',
+                alt: 'A quiet consulting room with two armchairs turned towards each other across a small wooden side table, beside a curtained window.',
               }}
             />
           </>
