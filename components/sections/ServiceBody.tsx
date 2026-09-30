@@ -16,153 +16,110 @@ export type BodySection = {
 export type RowMedia = { src: string; alt: string } | { placeholder: string };
 
 /**
- * The assessment page's body, above ServiceFeature.
+ * The assessment page's body: every section as an image-and-copy row.
  *
- * ADAPTED FROM THE `feature-24` PATTERN: a padded rounded-3xl shell holding a
- * rounded-2xl media panel on one side and the copy on the other, with the
- * section's list rendered as a check-marked rundown inside it.
+ * ONE TREATMENT, APPLIED TO ALL OF THEM, at the client's request on
+ * 2026-09-30. Earlier revisions gave the middle section a tinted centred band
+ * and handed the last two to a separate component that set its copy on top of
+ * a photograph. That was three different looks down one page. The client asked
+ * for the row treatment throughout and this is it.
  *
- * IT IS AN ADAPTATION, NOT A PORT, and the reason is the same one written up
- * in components/ui/badge.tsx. That source is built on shadcn's semantic
- * palette — `bg-muted`, `text-foreground`, `text-muted-foreground` — none of
- * which this repo defines. Tailwind v4 emits nothing for an unknown utility,
- * so pasting it would have shipped a component that looks styled in the source
- * and renders unstyled in the page. Every token is mapped to a real one:
+ * Adapted from the `feature-24` pattern: a padded rounded-3xl shell holding a
+ * rounded-2xl media panel on one side and the copy on the other. An adaptation
+ * rather than a port, for the reason components/ui/badge.tsx already documents
+ * — that source is built on shadcn's semantic palette, which this repo does
+ * not define, and Tailwind v4 emits nothing for an unknown utility, so pasting
+ * it would have shipped a component that renders unstyled. bg-muted maps to
+ * np-neutral-100, text-foreground to np-ink, text-muted-foreground to
+ * np-neutral-600.
  *
- *   bg-muted              -> bg-np-neutral-100  the ramp's alternate ground
- *   text-foreground       -> text-np-ink
- *   text-muted-foreground -> text-np-neutral-600
+ * THE COPY IS BESIDE THE PHOTOGRAPH, NOT ON IT, and that is worth knowing
+ * before anyone changes it back. The version this replaced set the last
+ * section's copy over the image, which put it under a contrast floor that had
+ * to be measured across eighteen viewport widths and held the crop, the aspect
+ * ratio and the padding hostage to it. Copy on a flat ground makes all of that
+ * go away: np-neutral-600 on np-neutral-100 is 6.33:1 at every size, and the
+ * image can now be cropped for composition alone.
  *
- * Dropped from the source on purpose: the marquee of tag chips and the mocked
- * chat UI. Both carry invented labels, and on a page about a psychiatric
- * assessment every visible string has to come from the practice. Neither
- * brought a dependency with it, so this adds no packages.
- *
- * THE RHYTHM BREAKS ON PURPOSE AT THE THIRD SECTION. Two alternating
- * image-and-text rows is a pattern; three is the zigzag every template ships.
- * The third section renders as a tinted statement band with no media, which
- * also gives the page its one colour moment, and the last two are handed to
- * ServiceFeature. Four layout families across five sections.
- *
- * NO NEW COPY. Every string is the service's own.
+ * NO NEW COPY HERE. Every string is the service's own.
  */
 export function ServiceBody({ sections, media }: { sections: BodySection[]; media: RowMedia[] }) {
   return (
-    <div className="pt-20 md:pt-28">
+    <div className="py-20 md:py-28">
       <Container>
+        {/* gap-5 between rows, from the source pattern: tight enough that they
+            read as one stack rather than as separate sections. */}
         <div className="flex flex-col gap-5">
-          {sections.map((section, i) => {
-            if (i > 1) return null;
-
+          {sections.map((section, i) => (
             /* The <section> carrying the id sits outside <Reveal>, and stays
                there. Reveal renders a plain element before hydration and the
-               motion equivalent after, which are different React element
-               types, so React unmounts the first and mounts the second and
-               destroys every DOM node beneath it.
+               motion equivalent after; those are different React element
+               types, so React unmounts one and mounts the other and destroys
+               every DOM node beneath it. Nothing observes these ids any more,
+               but they are deep-link targets that external and shared URLs
+               still point at, and a target rebuilt on hydration is one a
+               fragment navigation can miss. */
+            <section key={section.id} id={section.id} tabIndex={-1} className="focus:outline-none">
+              {/* amount="some" rather than Reveal's 0.3 default. These rows run
+                  to roughly 900px, and a threshold of 0.3 cannot be met by
+                  anything taller than about 3.3 viewports: at 400% zoom the
+                  observer never fires and the row stays at opacity 0 for good.
+                  Measured at 320x200 before this was added. See the prop's own
+                  note in components/ui/Reveal.tsx. */}
+              <Reveal amount="some">
+                <div className="bg-np-neutral-100 rounded-3xl p-2">
+                  <div
+                    className={`flex flex-col md:flex-row ${
+                      /* Alternating sides, so the eye has somewhere new to go
+                         on each row instead of running down one gutter. */
+                      i % 2 === 1 ? 'md:flex-row-reverse' : ''
+                    }`}
+                  >
+                    <RowMediaPanel media={media[i]} />
 
-               WHY THAT MATTERS NOW THAT NOTHING OBSERVES THESE. The contents
-               rail that used to watch them is gone, so no observer holds a
-               stale reference any more. The ids remain because they are
-               deep-link targets that external and shared URLs still point at,
-               and a target that is torn down and rebuilt on hydration is a
-               target a fragment navigation can miss. */
-            return (
-              <section
-                key={section.id}
-                id={section.id}
-                tabIndex={-1}
-                className="focus:outline-none"
-              >
-                <Reveal amount="some">
-                  {/* p-2 shell with a rounded-2xl core inside it, straight from
-                      the source pattern: the inset makes the media read as a
-                      plate sitting in a tray rather than a photograph with a
-                      corner radius. rounded-3xl matches PageCta, which is the
-                      other object on the page at this size. */}
-                  <div className="bg-np-neutral-100 rounded-3xl p-2">
-                    <div
-                      className={`flex flex-col gap-0 md:flex-row ${
-                        /* Alternating sides. Two rows, so this runs left then
-                           right exactly once and never becomes a zigzag. */
-                        i % 2 === 1 ? 'md:flex-row-reverse' : ''
-                      }`}
-                    >
-                      <RowMediaPanel media={media[i]} />
-
-                      <div className="flex flex-1 flex-col justify-center gap-6 p-6 sm:p-8 md:p-10">
-                        <div className="flex flex-col gap-3">
-                          {/* h2: these are the page's top-level sections and
-                              the heading level they have always had. */}
-                          <h2 className="text-h2">{section.heading}</h2>
-                          <p className="text-body-l text-np-neutral-600 max-w-[52ch]">
-                            {section.body}
+                    <div className="flex flex-1 flex-col justify-center gap-6 p-6 sm:p-8 md:p-10">
+                      <div className="flex flex-col gap-3">
+                        {/* h2 throughout: these are the page's top-level
+                            sections and they are peers of one another. The last
+                            one was briefly an h3, which told a screen reader it
+                            was a subsection of the one above it. */}
+                        <h2 className="text-h2">{section.heading}</h2>
+                        <p className="text-body-l text-np-neutral-600 max-w-[52ch]">
+                          {section.body}
+                        </p>
+                        {section.detail && (
+                          <p className="text-body-l text-np-neutral-600 mt-1 max-w-[52ch]">
+                            {section.detail}
                           </p>
-                        </div>
-
-                        {section.list && (
-                          /* role="list" per the note at the top of
-                             app/globals.css: Preflight strips list-style and
-                             WebKit then drops the implicit role. */
-                          <ul role="list" className="flex flex-col gap-3">
-                            {section.list.map((item) => (
-                              <li key={item} className="flex items-start gap-3">
-                                <CircleCheck
-                                  aria-hidden="true"
-                                  size={20}
-                                  strokeWidth={1.75}
-                                  className="text-np-blue-600 mt-[0.15em] shrink-0"
-                                />
-                                <span className="text-body text-np-neutral-700">{item}</span>
-                              </li>
-                            ))}
-                          </ul>
                         )}
                       </div>
+
+                      {section.list && (
+                        /* role="list" per the note at the top of
+                           app/globals.css: Preflight strips list-style and
+                           WebKit then drops the implicit role. */
+                        <ul role="list" className="flex flex-col gap-3">
+                          {section.list.map((item) => (
+                            <li key={item} className="flex items-start gap-3">
+                              <CircleCheck
+                                aria-hidden="true"
+                                size={20}
+                                strokeWidth={1.75}
+                                className="text-np-blue-600 mt-[0.15em] shrink-0"
+                              />
+                              <span className="text-body text-np-neutral-700">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   </div>
-                </Reveal>
-              </section>
-            );
-          })}
+                </div>
+              </Reveal>
+            </section>
+          ))}
         </div>
       </Container>
-
-      {/* The third section, and the break in the rhythm. */}
-      {sections[2] && (
-        <section
-          id={sections[2].id}
-          tabIndex={-1}
-          /* Full-bleed tint, contained copy. np-blue-50 is the faintest wash in
-             the ramp and is the page's only colour moment. It is deliberately
-             not a dark panel: design-tokens.md § 7 allows exactly one dark
-             block on the site and PageCta already spends it. */
-          className="bg-np-blue-50 mt-20 py-16 focus:outline-none md:mt-28 md:py-20"
-        >
-          <Container>
-            <Reveal amount="some">
-              {/* Centred because it is short and because everything around it
-                  is left aligned — a change of pace, not a default.
-
-                  IT WIDENS FROM 52ch TO 58ch WHEN THERE IS A SECOND PARAGRAPH.
-                  52ch held the original single paragraph to four lines, which
-                  is about as far as centred prose stays comfortable; two
-                  paragraphs at that measure become a tall narrow column that
-                  reads like a poem. 58ch keeps each one to four lines. */}
-              <div
-                className={`mx-auto text-center ${
-                  sections[2].detail ? 'max-w-[58ch]' : 'max-w-[52ch]'
-                }`}
-              >
-                <h2 className="text-h2">{sections[2].heading}</h2>
-                <p className="text-body-l text-np-neutral-600 mt-5">{sections[2].body}</p>
-                {sections[2].detail && (
-                  <p className="text-body-l text-np-neutral-600 mt-4">{sections[2].detail}</p>
-                )}
-              </div>
-            </Reveal>
-          </Container>
-        </section>
-      )}
     </div>
   );
 }
@@ -171,17 +128,25 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
  * The media half of a row: a photograph, or a labelled slot where one is still
  * owed.
  *
- * THE PLACEHOLDER IS MEANT TO LOOK UNFINISHED. It names what the section needs
- * and it does not pretend to be a design decision, because a slot that blends
- * in is a slot that ships. It carries no alt text and is aria-hidden: there is
- * nothing here for a screen reader yet, and describing an absent photograph to
- * one would be worse than saying nothing.
+ * THE PLACEHOLDER IS MEANT TO LOOK UNFINISHED. It says a photograph is coming
+ * and nothing more. What the photograph should show lives in the comment
+ * beside the slot in app/services/[slug]/page.tsx, because a note to the
+ * client is not something to render at patients. A slot that blends in is a
+ * slot that ships.
+ *
+ * It is aria-hidden and carries no alt text: there is nothing here yet, and
+ * describing an absent photograph to a screen reader is worse than saying
+ * nothing. The caption is np-neutral-600 rather than 500 because aria-hidden
+ * does nothing for a sighted low-vision reader, and 500 measures 4.27:1 on
+ * this ground, under the 4.5:1 SC 1.4.3 asks for.
  */
-function RowMediaPanel({ media }: { media: RowMedia }) {
+function RowMediaPanel({ media }: { media: RowMedia | undefined }) {
   const shell =
-    'relative shrink-0 overflow-hidden rounded-2xl h-64 md:h-auto md:w-1/2 md:min-h-[360px]';
+    'relative shrink-0 overflow-hidden rounded-2xl h-64 md:h-auto md:w-1/2 md:min-h-[380px]';
 
-  if ('placeholder' in media) {
+  /* A row with no media entry at all falls back to the slot rather than
+     rendering a half-width hole or throwing on a missing src. */
+  if (!media || 'placeholder' in media) {
     return (
       <div
         aria-hidden="true"
@@ -189,17 +154,12 @@ function RowMediaPanel({ media }: { media: RowMedia }) {
       >
         <div className="flex max-w-[26ch] flex-col items-center gap-2 px-6 text-center">
           <ImageIcon size={22} strokeWidth={1.5} className="text-np-neutral-400" />
-          {/* np-neutral-600, not the 500 this started on. 500 measures 4.27:1
-              on the np-neutral-50 ground and fails SC 1.4.3, and aria-hidden is
-              not a defence for that — it stops a screen reader announcing an
-              absent photograph, it does nothing for a sighted low-vision reader
-              who still has to read the slot. 600 measures 6.79:1. The icon
-              above stays at 400: it is decorative and the text says the same
-              thing. */}
           <p className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
             Image to come
           </p>
-          <p className="text-small text-np-neutral-600">{media.placeholder}</p>
+          <p className="text-small text-np-neutral-600">
+            {media?.placeholder ?? 'A photograph for this section is on the way.'}
+          </p>
         </div>
       </div>
     );

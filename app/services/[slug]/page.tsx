@@ -4,7 +4,6 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
-import { ServiceFeature } from '@/components/sections/ServiceFeature';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
@@ -62,28 +61,19 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     list: section.list,
   }));
 
-  /* EXACTLY FIVE, NOT "AT LEAST FIVE". The split is slice(0,3) plus slice(-2),
-     so at six or more every section in the middle would be dropped from the
-     page silently: no error, no gap, just missing copy on a service page. The
-     guard is what makes that impossible rather than merely unlikely, and a
-     service that grows a sixth section falls back to the prose layout, which
-     renders all of them, until someone decides where the sixth belongs.
+  /* Every section renders as a row, so there is no split to guard any more.
+     `layout: 'feature'` simply selects the row treatment over the shared prose
+     layout; a service with four sections or six gets four or six rows. */
+  const useFeatureLayout = service.layout === 'feature';
 
-     Two fields are deliberately not rendered on this layout and are worth
-     knowing about before authoring: `list` on the third section (the tinted
-     band is a centred statement and has nowhere to put one) and `detail` or
-     `list` on the fifth (the card's copy sits on a photograph and is held to a
-     measured contrast floor, so it does not grow). Both are rendered on the
-     sections that do support them. */
-  const useFeatureLayout = service.layout === 'feature' && sectionItems.length === 5;
-  const bodyItems = sectionItems.slice(0, 3);
-  const featureItems = sectionItems.slice(-2);
+  /* ONE PHOTOGRAPH PER ROW, in section order. Four of the five are real assets
+     already in this repo; the fifth is an honest gap.
 
-  /* WHAT THE FEATURE LAYOUT NEEDS A PHOTOGRAPH FOR, one slot per body row.
-     Only the first has an asset today. The second is a real gap rather than an
-     oversight — nothing in the library depicts questionnaires or rating
-     scales, and the nearest candidates are all the same empty consulting room
-     already used further down this page. */
+     The pairings are by what the photograph shows, not by its filename.
+     `treatment-plan.webp` is a notebook and pen on a desk, which is why it
+     sits with the plan; `follow-up.webp` is a man on a porch with a coffee,
+     which is the only image in the library that shows life after an
+     appointment rather than an appointment. */
   const bodyMedia: RowMedia[] = [
     {
       src: '/images/services/services-consult-2752.webp',
@@ -94,14 +84,24 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       alt: 'A patient sitting in an armchair in conversation with a clinician, who is taking notes on a pad.',
     },
     {
-      /* CLIENT: a photograph for "The tools we use" — something showing the
-         written side of the assessment (a questionnaire on a clipboard, a
-         rating scale being completed) rather than another room interior.
+      /* CLIENT: the one photograph still missing. "The tools we use" wants
+         the written side of the assessment — a questionnaire on a clipboard,
+         a rating scale part-completed — rather than another room interior.
          Landscape, 2400px or wider on the long edge. */
-      /* The VISIBLE string is deliberately short and patient-facing. It used
-         to print the pixel spec on the page, which is a note to the client
-         rendered to patients. The spec belongs in the comment above. */
       placeholder: 'A photograph for this section is on the way.',
+    },
+    {
+      src: '/images/services/evaluation-card-2752.webp',
+      alt: 'A quiet consulting room with two armchairs turned towards each other across a small wooden side table, beside a curtained window.',
+    },
+    {
+      src: '/images/what-to-expect/treatment-plan.webp',
+      alt: 'An open notebook and a pen on a desk, beside a cup of tea, a pair of glasses and a small plant.',
+    },
+    {
+      src: '/images/what-to-expect/follow-up.webp',
+      /* No claim that this is a patient of the practice. */
+      alt: 'A man sitting on a front porch in the sun with a mug of coffee, looking out at the street.',
     },
   ];
 
@@ -175,26 +175,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             the same headings, so the in-page anchors are byte-identical to what
             this route served before. */}
         {useFeatureLayout ? (
-          <>
-            <ServiceBody sections={bodyItems} media={bodyMedia} />
-
-            <ServiceFeature
-              /* The service's own nav label. Not a string written for this
-                 block — see ServiceFeature's own note. */
-              eyebrow={service.nav}
-              left={featureItems[0]}
-              card={featureItems[1]}
-              image={{
-                src: '/images/services/evaluation-card-2752.webp',
-                /* Describes the photograph and nothing else. It deliberately
-                   does NOT say "our office": CLAUDE.md's care-modality rule
-                   turns on the fact that the practice's in-person locations
-                   are still unconfirmed, and alt text is copy like any other
-                   place a claim can be made by accident. */
-                alt: 'A quiet consulting room with two armchairs turned towards each other across a small wooden side table, beside a curtained window.',
-              }}
-            />
-          </>
+          <ServiceBody sections={sectionItems} media={bodyMedia} />
         ) : (
           <div className="py-20 md:py-28">
             <Container>
