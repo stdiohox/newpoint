@@ -95,6 +95,14 @@ export default function ServicesIndex() {
               7%-79%, leaving 8% of headroom above her hair. At 1024 the hero is
               within 2% of the source's own aspect, so it crops almost nothing.
 
+            VERTICAL PLACEMENT is align="center", which centres the copy in the
+            area below the nav rather than in the header — the header runs up
+            behind the sticky bar, so its own centre is about 54px higher than
+            the centre of what is actually visible. Measured, pill bottom to h1
+            box top: 88px at 1440, 1210 and 1024, and 103px to the cap-height,
+            against the 80px asked for. The block's centre lands on 349px at
+            1440 where the centre of the visible area is 349.5px.
+
             SIZES IS NOT 100vw, AND THAT IS WHAT MAKES THE 2x EXPORT REAL.
             Below lg this hero is narrower than 16:9, so object-cover scales the
             image by HEIGHT and draws it wider than the viewport. Measured, the
@@ -128,29 +136,37 @@ export default function ServicesIndex() {
             are SC 1.4.10 and 1.4.4 obligations, and an earlier revision of this
             scrim passed the named breakpoints while failing both.
 
-            COPY MEASURE: 620px heading, 540px intro, to keep the text clear of
-            her. Measured at 1440 with the silhouette found by scanning for a
-            sustained 150px dark run — the olive tree sits between the copy and
-            her at x 660-850 and a naive edge scan reports the foliage, not her
-            shoulder, which is 130px further right:
+            COPY MEASURE: min(18ch, 620px) heading, 540px intro, to keep the
+            text clear of her.
 
-              heading glyphs end   502px      intro glyphs end   688px
-              her silhouette       814px      (leftmost in the copy band)
-              clearance            126px worst-case, 268px row-for-row
+            min() RATHER THAN A PLAIN 620px, AND THE DIFFERENCE IS THE WHOLE
+            POINT. A bare 620px is WIDER than the max-w-[18ch] it overrides at
+            1024, so it un-wrapped the heading onto one line that ran to 587px
+            while she began at 610px — 23px. A cap is supposed to be an upper
+            bound, and min() makes it one: 18ch wins wherever it is narrower, so
+            1024 keeps its two lines and 620px only ever binds where the type is
+            large enough for 18ch to exceed it. Measured h1 box: 599px at 1440,
+            530px at 1024, two lines at both.
 
-            The row-for-row figure is the honest one: it compares each line
-            against her edge at that line's own height. 126px pairs the widest
-            line with her nearest point even though they are 130px apart
-            vertically and never meet.
+            MEASURING HER IS NOT THE SAME AS MEASURING THE NEAREST DARK THING.
+            Two props sit between the copy and her, and each fooled an earlier
+            version of the probe: the olive tree at x 660-850, and the armchair,
+            which a plain darkness test locks onto at the rows the intro
+            occupies and which reported a 45px OVERLAP that does not exist. She
+            is isolated instead by colour — her shirt is blue (B-R > 14) and her
+            hair is dark (L < 115), where the chair and table are warm grey with
+            B <= R. Row-for-row clearance, each line against her edge at that
+            line's own height:
 
-            AT 1024 THIS CAP MAKES THINGS WORSE, AND IT IS THE BRIEF'S NUMBER,
-            SO IT STANDS UNTIL SOMEONE SAYS OTHERWISE. 620px is wider than the
-            max-w-[18ch] it overrides at that size, so the heading unwraps onto
-            one line, runs to 587px, and she starts at 610px — 23px of
-            clearance against the 96px the brief asks for at 1440. The fix is a
-            breakpoint the brief did not ask for: keep 18ch below xl and apply
-            620px from xl up, or write the cap as min(18ch, 620px). Neither
-            changes 1440, where 620px never binds. */}
+              1440   261px        1210   294px
+              1280   302px        1024    54px
+
+            1024 is the tight one and it is geometry, not the cap: at that width
+            the hero is 578px tall, so its 1.772 aspect falls just BELOW the
+            source's 16:9 and the image starts scaling by height instead of
+            width. object-position's 70% becomes live and slides her left in the
+            frame. Nothing overlaps, but this is the width to re-measure if the
+            copy or the hero's height ever changes again. */}
         <PageHero
           title="What we do, and how it works"
           intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
@@ -160,7 +176,8 @@ export default function ServicesIndex() {
             sizes: '(min-width: 1024px) 100vw, 1200px',
           }}
           scrim="hero"
-          copyMaxWidth={{ title: '620px', intro: '540px' }}
+          copyMaxWidth={{ title: 'min(18ch, 620px)', intro: '540px' }}
+          align="center"
         />
 
         <div className="py-20 md:py-28">
@@ -183,13 +200,25 @@ export default function ServicesIndex() {
 
                 return (
                   <Reveal as="li" key={service.slug} delay={stagger(i, 0.06)}>
-                    {/* GAP LADDER: 32px stacked, 56px at md, 64px at lg, 112px
-                        at xl. The two ends are specified — 112px on desktop and
-                        64px at 1024 — and lg/xl are exactly those two
-                        breakpoints, so 1024-1279 gets 64 and 1280 up gets 112.
-                        md keeps its existing 56px: it is two columns but only
-                        768-1023 wide, where 64px would leave each column under
-                        350px, and nothing in the brief asked for it to move.
+                    {/* GAP LADDER: 32px stacked, 56px at md, 128px from lg up.
+                        One value from 1024 on, so 1210 — the screen this was
+                        reported from — gets the same 128px as 1440 rather than
+                        the 64px it was landing on. md keeps 56px: it is two
+                        columns but only 768-1023 wide.
+
+                        THE COLUMN RATIO ALTERNATES WITH THE ROW, and it has to.
+                        The image takes md:order-2 on odd rows, so on those rows
+                        it renders in grid column TWO. A fixed [5fr_7fr] would
+                        therefore give the image 5/12 on even rows and 7/12 on
+                        odd ones — the ratio would flip with the alternation
+                        instead of staying with the image. Flipping the template
+                        to match keeps the image on 5 and the text on 7 in both
+                        directions.
+
+                        fr, not a 12-column grid. grid-cols-12 with a 128px gap
+                        would put that gap between all twelve tracks, eleven of
+                        them, which overflows the 1136px container before any
+                        content is placed. Two fr tracks produce exactly one gap.
 
                         items-start, NOT items-center. Centring made the image
                         float against the text block, which is taller on every
@@ -199,7 +228,11 @@ export default function ServicesIndex() {
                         sits marginally above the letterforms. Optical alignment
                         would need a negative offset tuned per type size, which
                         is a design call rather than the one asked for. */}
-                    <div className="grid items-start gap-8 md:grid-cols-2 md:gap-14 lg:gap-16 xl:gap-28">
+                    <div
+                      className={`grid items-start gap-8 md:grid-cols-2 md:gap-14 lg:gap-32 ${
+                        i % 2 === 1 ? 'lg:grid-cols-[7fr_5fr]' : 'lg:grid-cols-[5fr_7fr]'
+                      }`}
+                    >
                       {/* Alternates sides from md up and stacks below it. The
                           image takes md:order-2 on odd rows rather than the
                           text taking order-1, so the DOM order stays

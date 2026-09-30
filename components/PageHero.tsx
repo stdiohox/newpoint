@@ -39,6 +39,7 @@ export function PageHero({
   image,
   scrim = 'poster',
   copyMaxWidth,
+  align = 'bottom',
 }: {
   eyebrow?: string;
   title: string;
@@ -95,6 +96,24 @@ export function PageHero({
    * scanner only sees class strings it can read literally in the source.
    */
   copyMaxWidth?: { title?: string; intro?: string };
+  /**
+   * Where the copy sits in the hero. `bottom` is the default and what the other
+   * five callers get: a single column anchored to the foot of the frame, which
+   * is what the scrim's bottom ramp is shaped around.
+   *
+   * `center` puts it in the middle of the area BELOW THE NAV, not the middle of
+   * the header. The header pulls itself up by --nav-h so the photograph runs
+   * behind the sticky bar, so its own centre is about 54px higher than the
+   * centre of what a reader can actually see. Centring on the header would
+   * tuck the heading under the pill, which is the complaint this fixes.
+   *
+   * The padding is asymmetric for that reason: `--nav-h + 4rem` on top against
+   * `4rem` underneath. A centring box of [nav-h + X, height - X] has its centre
+   * at (height + nav-h) / 2, which is exactly the centre of [nav-h, height] —
+   * so the block is genuinely centred below the nav while the extra top padding
+   * still guarantees clearance when the copy grows tall enough to fill.
+   */
+  align?: 'bottom' | 'center';
 }) {
   return (
     /* No `on-ink` here, unlike Footer, PageCta and Providers. That class only
@@ -288,7 +307,13 @@ export function PageHero({
           Deliberately NOT wrapped in <Reveal />: this is above the fold at
           load, so there is nothing to reveal, and it keeps the LCP element off
           the JavaScript critical path. */}
-      <div className="relative flex flex-1 flex-col justify-end pt-[calc(var(--nav-h)+3rem)] pb-12 md:pb-16">
+      <div
+        className={
+          align === 'center'
+            ? 'relative flex flex-1 flex-col justify-center pt-[calc(var(--nav-h)+4rem)] pb-16'
+            : 'relative flex flex-1 flex-col justify-end pt-[calc(var(--nav-h)+3rem)] pb-12 md:pb-16'
+        }
+      >
         <Container>
           {/* Full white, not white/85. Measured against the brightest of these
               posters (a blown window behind the psychiatric-evaluation frame)
