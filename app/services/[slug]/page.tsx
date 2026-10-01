@@ -66,29 +66,59 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      layout; a service with four sections or six gets four or six rows. */
   const useFeatureLayout = service.layout === 'feature';
 
-  /* ONE PHOTOGRAPH PER ROW, in section order. Four of the five are real assets
-     already in this repo; the fifth is an honest gap.
+  /* ONE PHOTOGRAPH PER ROW, in section order. All five are now real assets —
+     the gap on "The tools we use" is closed.
 
      The pairings are by what the photograph shows, not by its filename.
      `treatment-plan.webp` is a notebook and pen on a desk, which is why it
-     sits with the plan; `follow-up.webp` is a man on a porch with a coffee,
-     which is the only image in the library that shows life after an
-     appointment rather than an appointment. */
+     sits with the plan.
+
+     THREE OF THESE ARE COMMISSIONED FOR THIS PAGE and are the only images in
+     the library shot against its sections rather than borrowed from elsewhere:
+     `eval-covers`, `eval-tools` and `eval-after`. Masters are 2752x1536; the
+     served derivative is a single 1600px-wide webp at encoder quality 90, which
+     is the widest next/image is ever asked for here — `sizes` in
+     components/sections/ServiceBody.tsx tops out at 600 CSS px, so 1600 covers
+     a 2x screen with room spare and a second width would never be fetched.
+
+     THE TWO IMAGES THIS DISPLACED ARE STILL IN USE ELSEWHERE and were not
+     orphaned: `services-consult-2752.webp` is the /services hub hero, and
+     `what-to-expect/follow-up.webp` is in the homepage bento grid. Neither
+     should be deleted on the strength of this page no longer pointing at it. */
   const bodyMedia: RowMedia[] = [
     {
-      src: '/images/services/services-consult-2752.webp',
+      src: '/images/services/eval-covers-1600.webp',
       /* Describes the photograph and stops there. It does not say these are
-         Newpoint's providers or Newpoint's room: the practice's in-person
-         locations are still unconfirmed under CLAUDE.md's care-modality rule,
-         and alt text is a place a claim gets made by accident. */
-      alt: 'A patient sitting in an armchair in conversation with a clinician, who is taking notes on a pad.',
+         Newpoint's providers or Newpoint's room — alt text is a place a claim
+         gets made by accident.
+
+         THE SECOND FIGURE IS "a person", NOT "a clinician", AND THE BINDING
+         REASON IS THE PER-SERVICE SOURCING CONSTRAINT, not the care-modality
+         rule. Whether both providers perform the comprehensive psychiatric
+         assessment is an open client item — see app/services/page.tsx:313-325,
+         which carries the sourcing breakdown. Naming a clinician in the alt of
+         the photograph heading "What the assessment covers" is a quiet way of
+         asserting it.
+
+         Citing the right rule matters here because the care-modality
+         restriction is written to be LIFTED once the client confirms the PA
+         office (CLAUDE.md, "Care modality"). If that were the stated reason,
+         this guardrail would expire while the constraint it protects is still
+         open, and the next editor would reasonably put "clinician" back. */
+      alt: 'A woman in an armchair beside a window, speaking and gesturing with one hand, with a second person in the foreground, seen from behind, holding a closed folder.',
     },
     {
-      /* CLIENT: the one photograph still missing. "The tools we use" wants
-         the written side of the assessment — a questionnaire on a clipboard,
-         a rating scale part-completed — rather than another room interior.
-         Landscape, 2400px or wider on the long edge. */
-      placeholder: 'A photograph for this section is on the way.',
+      /* THE SLOT THE CLIENT COMMENT ASKED FOR, now filled. It wanted "the
+         written side of the assessment — a questionnaire on a clipboard, a
+         rating scale part-completed — rather than another room interior",
+         and this is a printed questionnaire being filled in. */
+      src: '/images/services/eval-tools-1600.webp',
+      /* "a printed questionnaire", not a named instrument. The sheet in the
+         frame carries no legible title or letterhead, and the section's list
+         names a questionnaire and rating scales generically for the same
+         reason the copy does — which instruments the practice uses is not
+         something this repo can substantiate. */
+      alt: 'A woman filling in a printed questionnaire with a pen at a wooden table.',
     },
     {
       src: '/images/services/evaluation-card-2752.webp',
@@ -99,9 +129,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       alt: 'An open notebook and a pen on a desk, beside a cup of tea, a pair of glasses and a small plant.',
     },
     {
-      src: '/images/what-to-expect/follow-up.webp',
-      /* No claim that this is a patient of the practice. */
-      alt: 'A man sitting on a front porch in the sun with a mug of coffee, looking out at the street.',
+      src: '/images/services/eval-after-1600.webp',
+      /* No claim that this is a patient of the practice, and none that it is a
+         Newpoint telehealth appointment — it is a woman at a laptop, and the
+         lid faces away, so there is no call on screen to describe. The
+         section's own copy carries the modality. */
+      alt: 'A woman smiling at an open laptop at a kitchen table, a mug beside her.',
     },
   ];
 
