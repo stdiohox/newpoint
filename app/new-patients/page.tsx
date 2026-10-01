@@ -1,4 +1,4 @@
-import { ShieldCheck } from 'lucide-react';
+import { LockKeyhole } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
@@ -128,17 +128,17 @@ export default function NewPatientsPage() {
               intro={GETTING_STARTED.body}
               steps={GETTING_STARTED.steps}
               /* The photograph that fills the tall first card.
-                 DESCRIBED, NOT DECORATIVE, because that is what was asked for
-                 — and kept to one clause. a11y-architect argued for alt="",
-                 on the grounds that the heading and body already say what step
-                 1 is and the picture is mood: its alt is announced between the
-                 body of step 1 and step 2, in the middle of a list, so every
-                 word of it is noise a reader did not ask for. The frame's mug,
-                 plant and window are gone for that reason; what is left is the
-                 part that shows the step. */
+                 DECORATIVE, alt="", by client decision on 2026-10-01 — which
+                 is what a11y-architect recommended when this shipped
+                 described. The heading and body already say what step 1 is,
+                 the picture is mood rather than information, and its alt was
+                 announced between the body of step 1 and step 2, in the middle
+                 of a list, where every word of it was noise a reader did not
+                 ask for. SC 1.1.1 asks for exactly this on a decorative image.
+                 Do not write a description back in without being asked. */
               media={{
                 src: '/images/new-patients/step-reach-out-2000.webp',
-                alt: 'Hands holding a phone above an open notebook on a wooden table.',
+                alt: '',
               }}
             />
 
@@ -198,10 +198,18 @@ export default function NewPatientsPage() {
                   </div>
 
                   {/* DECORATION, AND NOTHING BUT. aria-hidden on the circle, so
-                      the shield adds no announcement to a region whose whole
+                      the glyph adds no announcement to a region whose whole
                       content is the warning beside it — and it must not read
                       as a reassurance badge to assistive tech when it is a
                       graphic on a panel about what NOT to send.
+
+                      A LOCK, NOT A CHECKED SHIELD, since 2026-10-01. The
+                      shield's tick was the problem the point above describes
+                      in the other direction: a check mark beside "What not to
+                      send us" reads as approval of the thing the panel is
+                      warning about. A keyhole says "this channel is not
+                      secure" without affirming anything. Same size, same
+                      circle, same responsive behaviour.
 
                       shrink-0 so the circle keeps its diameter when the copy
                       is long, and order-first only below md. */}
@@ -209,7 +217,7 @@ export default function NewPatientsPage() {
                     aria-hidden="true"
                     className="bg-np-blue-50 order-first flex h-20 w-20 shrink-0 items-center justify-center rounded-full md:order-none md:h-32 md:w-32"
                   >
-                    <ShieldCheck
+                    <LockKeyhole
                       strokeWidth={1.5}
                       className="text-np-blue-600 h-10 w-10 md:h-16 md:w-16"
                     />
