@@ -255,6 +255,13 @@ This is a standing rule, not a preference, and it outranks a reviewer's advice.
 An a11y, SEO or internal-linking argument for bringing either one back is not new
 information — it is the argument that was already weighed and declined.
 
+**The same applies to three more blocks on `/services/medication-management`,
+removed by client decision on 2026-10-01:** the "On this page" rail, the "How it
+is delivered" card, and the "Keep reading" related-links grid — along with the
+crisis panel, covered under Compliance above. That page's modality is still
+stated on its homepage card and on `/services`, so the fact is not lost from the
+site, only from that page.
+
 **"Service pages" here means the single-service routes, `/services/[slug]`.**
 Read it no wider than that, because two things that look like exceptions are not:
 
@@ -297,6 +304,7 @@ in-code version of this is `app/services/[slug]/page.tsx:108`.
 - Do not add a patient portal, intake questionnaire, or appointment form that captures PHI without an explicit decision and a BAA-covered processor.
 - Reason-for-contact should be a short constrained set (e.g. "New patient inquiry", "Existing patient", "Billing/insurance", "Other") — not an open clinical prompt.
 - Include crisis guidance (988 / 911) where a distressed visitor would plausibly look. This is expected on a behavioral-health site and is currently absent.
+  - **The in-page "If you need help now" panel was removed from the assessment and medication-management pages by client decision (2026-09-30 and 2026-10-01). The footer's 988 / 911 strip is the crisis guidance on those routes, and it renders sitewide.** Both pages also drop the "Keep reading" grid, and the two removals are what make each other safe: with no card grid between the CTA and the footer, the strip is the next content a reader meets. What is lost on them is `CRISIS.body` — "not for emergencies and is not monitored around the clock" — which survives only as footer fine print. **If "Keep reading" ever returns to either layout, the crisis panel has to return with it.** `/services/telehealth` is the only service page still rendering both.
 
 ## Working rule
 

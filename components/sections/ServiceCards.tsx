@@ -106,11 +106,9 @@ function CardCopy({ section }: { section: CardSection }) {
 }
 
 export function ServiceCards({
-  modality,
   sections,
   media,
 }: {
-  modality: string;
   /** Exactly the service's sections, in order. The last is rendered as its own
       block below the grid rather than as a card. */
   sections: CardSection[];
@@ -133,25 +131,17 @@ export function ServiceCards({
   return (
     <div className="py-20 md:py-28">
       <Container>
-        {/* HOW IT IS DELIVERED, PROMOTED OUT OF THE OLD SIDEBAR and set at the
-            head of the section. It is the one fact none of the body sections
-            states outright, so it led the sidebar; with the sidebar gone it
-            leads the section instead.
+        {/* NO "How it is delivered" CARD. It was promoted out of the old
+            sidebar to the head of this section when the layout was rebuilt, and
+            then removed from the page entirely at the client's request.
 
-            h2 now, not h3. In the sidebar it sat under an "On this page" h2 and
-            was deliberately demoted so two chrome labels did not open the
-            outline. That h2 is gone, so this is a top-level section heading
-            like every card below it, and an h3 here would skip a level upward. */}
-        <Reveal>
-          <div className={`${CARD} max-w-[52ch] p-5`}>
-            <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-              How it is delivered
-            </h2>
-            <p className="text-body text-np-ink mt-2">{modality}</p>
-          </div>
-        </Reveal>
-
-        <div className="mt-10 flex flex-col gap-5 md:mt-12">
+            WHAT IS LOST IS THE MODALITY STATEMENT ON THIS PAGE. None of the
+            body sections says outright that care is delivered by telehealth and
+            in person, which is why the sidebar carried it. It is still on this
+            service's homepage card and on /services, so the fact is not gone
+            from the site — only from this page. `modality` stays on the type
+            for those two callers. */}
+        <div className="flex flex-col gap-5">
           {/* WIDE CARD, image left and copy right from md. Stacks below it, with
               the media first in DOM order so the phone reads picture-then-copy
               the way the desktop row does. */}

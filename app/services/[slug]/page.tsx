@@ -72,6 +72,16 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const useFeatureLayout = service.layout === 'feature';
   const useCardLayout = service.layout === 'cards';
 
+  /* THE SHARED PROSE LAYOUT, which is now the only one of the three that still
+     ends with the crisis panel and "Keep reading".
+
+     Both tail blocks used to be gated on `!useFeatureLayout`, which was the
+     same thing while there were only two layouts. Adding the card layout split
+     those apart: medication-management had both removed at the client's
+     request, so the gate has to name the prose layout rather than "not the
+     feature one". Telehealth is the only service left on it and keeps both. */
+  const useProseLayout = !useFeatureLayout && !useCardLayout;
+
   /* MEDICATION MANAGEMENT'S CARD PHOTOGRAPHS, keyed by section id rather than
      by position, so reordering a section cannot hand it another section's
      picture.
@@ -334,14 +344,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         {useFeatureLayout ? (
           <ServiceBody sections={sectionItems} media={bodyMedia} />
         ) : useCardLayout ? (
-          /* The Feature73 card grid. The modality callout moves to the head of
-             the section and the "On this page" rail is gone; the section ids
-             travel with the cards, so deep links into this page still land. */
-          <ServiceCards
-            modality={service.modality}
-            sections={sectionItems}
-            media={cardMedia}
-          />
+          /* The Feature73 card grid. No "On this page" rail and no "How it is
+             delivered" card — both removed at the client's request. The section
+             ids travel with the cards, so deep links into this page still
+             land. */
+          <ServiceCards sections={sectionItems} media={cardMedia} />
         ) : (
           <div className="py-20 md:py-28">
             <Container>
@@ -482,8 +489,22 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             panel has to come back with it.
 
             h2, not the default h3: it is a top-level section here, and the
-            page's outline would skip a level otherwise. */}
-        {!useFeatureLayout && (
+            page's outline would skip a level otherwise.
+
+            THE CARD LAYOUT DROPS IT TOO, at the client's request, and for the
+            same structural reason the feature layout can: it drops RelatedLinks
+            as well, so PageCta is the last block before the footer and the
+            footer's "In a crisis, call or text 988. In an emergency, call 911."
+            is the next content a reader meets. The distance this panel existed
+            to close was created by the six-card grid; remove the grid and the
+            distance goes with it.
+
+            WHAT IS GENUINELY LOST on that route is CRISIS.body — "not for
+            emergencies and is not monitored around the clock" — which now
+            appears there only as footer fine print. Same trade the feature
+            layout already makes, recorded in CLAUDE.md. If RelatedLinks ever
+            returns to the card layout, this panel has to return with it. */}
+        {useProseLayout && (
           <div className="pb-16 md:pb-20">
             <Container>
               <CrisisPanel headingAs="h2" className="mx-auto max-w-3xl" />
@@ -508,8 +529,14 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
             featured=2 is kept on the prose routes: there the first two cards
             are always the other two services, and as six identical tiles those
-            two were the hardest to pick out of the cluster. */}
-        {!useFeatureLayout && (
+            two were the hardest to pick out of the cluster.
+
+            THE CARD LAYOUT DROPS IT TOO, at the client's request of
+            2026-10-01, on the same grounds: every one of the six destinations
+            is reachable from the navbar, so nothing is orphaned, and the cost
+            is internal linking weight rather than indexation. Telehealth is now
+            the only service page that still renders it. */}
+        {useProseLayout && (
           <RelatedLinks
             heading="Keep reading"
             featured={2}
