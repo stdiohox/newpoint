@@ -1386,7 +1386,10 @@ export const SERVICE_PAGES: ServicePage[] = [
       /* Describes the photograph and stops there: no claim that this is a
          patient of the practice, and none that this is a Newpoint appointment
          — the screen is not in frame, so there is no call to describe. */
-      alt: 'A woman sitting at a dining table at home, smiling at an open laptop, with a mug and a notebook beside her and a window behind.',
+      /* Checked against the frame, 2026-10-01, and tightened: "dining table"
+         was an assumption about the room, and there is a stack of books on it
+         as well as the pad. The rest held. */
+      alt: 'A woman sitting at a wooden table at home, smiling at an open laptop, with a mug, a notepad and a stack of books beside her and a curtained window behind.',
       objectPosition: '70% 30%',
     },
     /* The homepage's overlay verbatim, as on medication-management.

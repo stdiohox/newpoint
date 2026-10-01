@@ -32,8 +32,13 @@ yarn-error.log*
 /*.mp4
 /*.mov
 
-# Stray source art dropped in the repo root
+# Stray source art dropped in the repo root. The masters live outside the repo
+# and only their webp derivatives under public/images/ are committed, so a JPEG
+# or PNG at the root is always a copy that slipped in — twice it has been one
+# `git add -A` away from being committed.
 /*.png
+/*.jpg
+/*.jpeg
 
 # Pre-encode masters. The web-sized derivatives under public/video/ are what
 # ship; these stay local so the repo never carries two copies of every clip.

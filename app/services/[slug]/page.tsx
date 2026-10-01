@@ -81,26 +81,43 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      ahead of the artwork: ServiceGrid checks it on disk and draws a neutral
      block at the same shape where the file is not there yet, so the layout can
      be reviewed without a broken image and nothing moves when it lands. */
+  /* THE ALTS DESCRIBE THE DELIVERED FRAMES. All four were first written
+     against the commissioning note, before the artwork existed, and all four
+     described a different photograph once it landed — a desk that is a sofa, a
+     kitchen worktop with keys that is a dining table with wildflowers, an
+     armchair and tablet that are a desk and a laptop, and a phone on a table
+     that is an empty two-chair room. They were rewritten from the images. An
+     alt that describes the wrong picture is a 1.1.1 failure no automated check
+     catches. */
   const gridMedia = {
     'an-expanded-schedule': {
       src: '/images/services/tele-schedule.webp',
-      alt: 'A person sitting at a desk at home in the evening, talking to a clinician on a laptop screen.',
+      /* Dusk outside and a lit lamp are the only things carrying "expanded
+         schedule" here, so they stay in. No claim that the screen shows an
+         appointment — it faces away. */
+      alt: 'A woman sitting on a sofa with a laptop on her lap, smiling at the screen, a lit lamp and a mug on the side table and dusk outside the window.',
     },
     'both-states-both-providers': {
       src: '/images/services/tele-states.webp',
-      alt: 'A laptop open on a kitchen worktop beside a set of keys and a travel mug.',
+      alt: 'An open laptop on a wooden table beside a notebook and pen, a mug and a jar of wildflowers, with a window onto open fields behind.',
     },
     'what-telehealth-is-good-for': {
       src: '/images/services/tele-goodfor.webp',
-      alt: 'A person sitting in an armchair with a tablet propped on a side table, a notebook open on their lap.',
+      alt: 'A man sitting at a desk looking at an open laptop with his hand to his chin, a glass of water and a notebook beside him.',
     },
     'when-telehealth-is-not-the-right-call': {
-      /* NO DISTRESS DEPICTED. This card carries the 988 / 911 guidance, and a
-         photograph of someone in crisis beside it would be both unverifiable
-         and the wrong register. A phone on a table is the object the copy is
-         actually about. */
+      /* NO DISTRESS DEPICTED, and none should be. This card carries the
+         988 / 911 guidance, and a photograph of someone in crisis beside it
+         would be unverifiable and the wrong register.
+
+         WHAT THE FRAME ACTUALLY SHOWS is an empty consulting room — which is
+         apt for a section about the limits of video, because the room is the
+         alternative the copy is pointing at. The alt says "consulting room"
+         and nothing more: not whose room it is, and not that it is Newpoint's,
+         because the practice's in-person locations are still unconfirmed under
+         CLAUDE.md's care-modality rule. */
       src: '/images/services/tele-inperson.webp',
-      alt: 'A mobile phone resting on a table beside a lamp in a quiet room.',
+      alt: 'An empty consulting room with two armchairs turned towards each other across a small wooden side table holding a tissue box and a glass of water.',
     },
   } as const;
 
