@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { cabinetGrotesk, switzer } from './fonts';
-import { BUSINESS, SERVICE_PAGES } from '@/lib/content';
+import { BUSINESS, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
 import { Navbar1 } from '@/components/ui/navbar-1';
 import './globals.css';
 
@@ -146,11 +146,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               `nav` is the short label the footer already uses; `title` is the
               H1 and runs to "Telehealth psychiatry in New Jersey and
               Pennsylvania", which is not a menu row. */}
+          {/* BOTH DROPDOWNS ARE DERIVED, keyed by the parent item's own href.
+              A service added to SERVICE_PAGES or a provider added to PROVIDERS
+              appears in the navbar with no change here, in lib/nav.ts or in the
+              navbar component.
+
+              The mapping happens in this server component on purpose: the
+              navbar is 'use client', and importing lib/content.ts from it would
+              ship every string on the site to the browser. lib/nav.ts carries
+              the NavChild shape and SUBMENU_PARENTS; the data walks down as
+              props. See the note at the top of lib/nav.ts. */}
           <Navbar1
-            services={SERVICE_PAGES.map((s) => ({
-              label: s.nav,
-              href: `/services/${s.slug}`,
-            }))}
+            submenus={{
+              '/services': SERVICE_PAGES.map((s) => ({
+                label: s.nav,
+                href: `/services/${s.slug}`,
+              })),
+              /* `credentials`, not `role`: it is the shorter line and the one
+                 that tells the two apart. No "Dr." — CLAUDE.md scopes that to
+                 the /services provider cards, and `name` is used verbatim
+                 everywhere else. */
+              '/providers': PROVIDERS.map((p) => ({
+                label: p.name,
+                href: `/providers/${p.slug}`,
+                detail: p.credentials,
+              })),
+            }}
           />
         </header>
         {children}

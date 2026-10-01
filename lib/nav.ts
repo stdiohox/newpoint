@@ -32,6 +32,33 @@
  * on interior routes as well as the homepage. A bare `#providers` on /insurance
  * would resolve against /insurance and go nowhere.
  */
+/**
+ * One row of a navbar dropdown.
+ *
+ * `detail` is an optional second line under the label — the Providers menu
+ * shows each provider's credentials there. Services passes none, so its rows
+ * are unchanged.
+ *
+ * THE ROWS ARE PASSED IN, NOT IMPORTED HERE, and that is the one rule this file
+ * exists to enforce. Both menus are built from `lib/content.ts` — SERVICE_PAGES
+ * and PROVIDERS — and content.ts already imports FROM this file, so importing
+ * it back would be circular AND would pull every string on the site into the
+ * client bundle, which is the leak the note at the top of this file describes.
+ * app/layout.tsx is a server component: it maps the content data down to this
+ * shape and hands it to <Navbar1 />. A provider added to PROVIDERS therefore
+ * appears in the menu with no change here or in the navbar.
+ */
+export type NavChild = { label: string; href: string; detail?: string };
+
+/**
+ * Which primary items open a dropdown, keyed by the parent's own href.
+ *
+ * Declared here rather than compared inline in the navbar, which used to test
+ * `item.href === '/services'` in two places. A second hardcoded href would have
+ * made that four.
+ */
+export const SUBMENU_PARENTS = ['/services', '/providers'] as const;
+
 export const NAV = [
   { label: 'Services', href: '/services' },
   /* A PAGE, NOT THE HOMEPAGE SECTION. This was `/#providers`, which scrolled
