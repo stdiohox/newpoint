@@ -58,15 +58,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
  * NEITHER FRAME CONTAINS A PERSON, so the alts describe the rooms and claim
  * nothing about whose they are — the practice's in-person locations are still
  * unconfirmed under CLAUDE.md's care-modality rule.
+ *
+ * NO objectPosition HERE, AND X WOULD BE INERT IF THERE WERE. At the desktop
+ * widths this hero box is WIDER than the image's 1.79:1 aspect — 1440x540 is
+ * 2.67, 1024x540 is 1.90 — so object-cover scales by WIDTH, the full image
+ * width is always shown, and the horizontal overflow is 0px. With nothing to
+ * slide, the X component of objectPosition changes nothing at all there; it
+ * only bites below lg, where the box is taller than the image and cover scales
+ * by height instead (491px of overflow at 390).
+ *
+ * That is why a framing problem in the middle of one of these photographs
+ * cannot be cropped out in CSS at 1440 or 1024, and has to be fixed in the
+ * asset. It cost a pass to discover; it is written down so it does not cost
+ * another.
  */
 const HERO_IMAGE: Record<string, { src: string; alt: string }> = {
   'anastasia-ofoegbu': {
     src: '/images/providers/provider-anastasia-hero-2400.webp',
-    alt: 'An empty sitting room with two armchairs, a side table holding flowers and books, three framed landscape prints, and a doorway through to a dining table beyond.',
+    alt: 'An empty sitting room with a green armchair and a cream armchair at either side, a side table holding a glass of water and an open notebook, and a potted fig tree against a plain wall.',
   },
   'funmilayo-whitaker': {
     src: '/images/providers/provider-funmilayo-hero-2400.webp',
-    alt: 'An empty sitting room with two blue armchairs either side of a small round table, beside shelves of books and a trailing plant, with a curtained window behind.',
+    alt: 'An empty sitting room with a blue armchair at either side, a side table of white flowers on the left and a trailing plant on a cabinet on the right, against a plain wall between curtained windows.',
   },
 };
 
