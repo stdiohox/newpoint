@@ -176,6 +176,11 @@ export function PageHero({
           alt=""
           fill
           priority
+          /* priority preloads it; fetchPriority tells the browser it is the
+             LCP element rather than leaving it to infer that after layout.
+             It is competing with four font preloads and a blocking
+             cross-origin stylesheet, so being explicit is worth the attribute. */
+          fetchPriority="high"
           sizes={image.sizes ?? '100vw'}
           quality={image.quality}
           className="object-cover"
@@ -327,7 +332,24 @@ export function PageHero({
       {image && scrim === 'hero' && (
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''}bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]`}
+          /* THE SPACE AFTER THE TERNARY IS OUTSIDE THE STRING ON PURPOSE, and
+             it has to stay there.
+
+             This read `${centred ? 'lg:hidden' : ''}bg-[...]`, with no
+             separator, so on a centred hero the emitted class was the single
+             token `lg:hiddenbg-[linear-gradient(...)]`. Tailwind generated
+             neither utility: verified in the built output as two occurrences
+             in the HTML and zero matches in the CSS bundle. The left ramp was
+             therefore absent at every width on every centred hero, including
+             this page and /services, and the contrast figures in the comment
+             below assume it is present.
+
+             Putting the space INSIDE the ternary does not survive: this repo
+             runs prettier-plugin-tailwindcss, which treats the string as a
+             class list and trims the trailing space, which is almost certainly
+             how the bug arrived in the first place. Outside the braces it is
+             literal template text and the plugin leaves it alone. */
+          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''} bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]`}
         />
       )}
 

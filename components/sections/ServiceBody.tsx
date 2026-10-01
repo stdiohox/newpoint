@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { CircleCheck, ImageIcon } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
@@ -10,9 +11,17 @@ export type BodySection = {
   /** Optional second paragraph. See the field's note in lib/content.ts. */
   detail?: string;
   list?: string[];
+  /** Phrases already present in `body` that should link out. */
+  bodyLinks?: { phrase: string; href: string }[];
 };
 
-/** A real asset, or a slot the client still owes us a photograph for. */
+/**
+ * A real asset, or a slot the client still owes us a photograph for.
+ *
+ * `placeholder` is NOT RENDERED. It is a note to whoever is sourcing the
+ * photograph, kept next to the slot it describes so the two cannot drift
+ * apart. Anything written there stays out of the page.
+ */
 export type RowMedia = { src: string; alt: string } | { placeholder: string };
 
 /**
@@ -85,7 +94,7 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
                             was a subsection of the one above it. */}
                         <h2 className="text-h2">{section.heading}</h2>
                         <p className="text-body-l text-np-neutral-600 max-w-[52ch]">
-                          {section.body}
+                          {linkify(section.body, section.bodyLinks)}
                         </p>
                         {section.detail && (
                           <p className="text-body-l text-np-neutral-600 mt-1 max-w-[52ch]">
@@ -152,15 +161,18 @@ function RowMediaPanel({ media }: { media: RowMedia | undefined }) {
         aria-hidden="true"
         className={`${shell} border-np-neutral-300 bg-np-neutral-50 flex items-center justify-center border border-dashed`}
       >
-        <div className="flex max-w-[26ch] flex-col items-center gap-2 px-6 text-center">
-          <ImageIcon size={22} strokeWidth={1.5} className="text-np-neutral-400" />
-          <p className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-            Image to come
-          </p>
-          <p className="text-small text-np-neutral-600">
-            {media?.placeholder ?? 'A photograph for this section is on the way.'}
-          </p>
-        </div>
+        {/* THE SLOT IS A MARK, NOT A MESSAGE. It used to print "Image to come"
+            and a sentence describing the photograph it wanted. aria-hidden
+            does nothing for a crawler, so both strings sat in the indexable
+            HTML and both were legible to patients: a note to the client,
+            rendered on a service page.
+
+            The dashed box and the icon still show a designer exactly where a
+            photograph is missing, which is what the slot is for, and neither
+            is text. What the photograph should show now lives only in the
+            comment beside the slot in app/services/[slug]/page.tsx, which is
+            where a note to the client belongs. */}
+        <ImageIcon size={26} strokeWidth={1.5} className="text-np-neutral-400" />
       </div>
     );
   }
@@ -176,4 +188,51 @@ function RowMediaPanel({ media }: { media: RowMedia | undefined }) {
       />
     </div>
   );
+}
+
+/**
+ * Splits a body string around the phrases named in `bodyLinks` and returns the
+ * pieces with those phrases wrapped in a link.
+ *
+ * IT ADDS NO WORDS AND CHANGES NONE. Every phrase has to already be in the
+ * string; one that is not is skipped rather than appended, so a typo degrades
+ * to plain prose instead of quietly editing patient-facing copy. Matching is
+ * literal and first-occurrence only, which is enough for the handful of links
+ * this page wants and avoids linking the same term three times in a paragraph.
+ */
+function linkify(body: string, links?: { phrase: string; href: string }[]) {
+  if (!links || links.length === 0) return body;
+
+  /* Longest phrase first, so a phrase that contains another one is matched
+     before its substring can claim the text. */
+  const ordered = [...links].sort((a, b) => b.phrase.length - a.phrase.length);
+
+  let parts: (string | { phrase: string; href: string })[] = [body];
+
+  for (const link of ordered) {
+    let matched = false;
+    parts = parts.flatMap((part) => {
+      if (typeof part !== 'string' || matched) return [part];
+      const at = part.indexOf(link.phrase);
+      if (at === -1) return [part];
+      matched = true;
+      return [part.slice(0, at), link, part.slice(at + link.phrase.length)];
+    });
+  }
+
+  return parts
+    .filter((part) => part !== '')
+    .map((part, i) =>
+      typeof part === 'string' ? (
+        part
+      ) : (
+        <Link
+          key={`${part.href}-${i}`}
+          href={part.href}
+          className="text-np-blue-700 ease-np-out underline decoration-[var(--np-alpha-ink-12)] underline-offset-4 transition-colors duration-[180ms] hover:decoration-current"
+        >
+          {part.phrase}
+        </Link>
+      )
+    );
 }

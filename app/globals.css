@@ -270,6 +270,25 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   FAQ panels.
+
+   components/ui/Accordion.tsx renders every answer into the server HTML so the
+   text is indexable and so a reader without scripting can still read it. This
+   is what keeps it from flashing open for anyone who does have scripting: the
+   `js` class is set by the inline script in app/layout.tsx before first paint,
+   so the collapsed panels are hidden from the very first frame. React swaps in
+   the animated panel at hydration, and that one carries no data-faq-panel, so
+   this rule stops applying to it.
+
+   Scripting off means no `js` class, which means every answer renders open.
+   That is deliberate, and it is the same bargain the [data-enter] block above
+   makes.
+   --------------------------------------------------------------------------- */
+.js [data-faq-panel] {
+  display: none;
+}
+
 /* MOTION_INTENSITY 4. Reduced motion is mandatory at this level. */
 @media (prefers-reduced-motion: reduce) {
   *,

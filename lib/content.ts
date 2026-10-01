@@ -794,7 +794,30 @@ export type ServicePage = {
    * directory evidence that actively disagrees with itself, and none of them
    * is a gap prose can close.
    */
-  sections: { heading: string; body: string; detail?: string; list?: string[] }[];
+  /**
+   * `bodyLinks` turns phrases that ALREADY EXIST in `body` into internal links.
+   * It adds no words: each entry names a phrase and where it should point, and
+   * the renderer splits the string around it.
+   *
+   * WHY IT EXISTS. The "Keep reading" cluster was removed from this route at
+   * the client's request, on the understanding that its six destinations were
+   * all reachable from the navbar. Checked against the built HTML, that is not
+   * true: the Services submenu is not in the static markup at all, so a
+   * crawler sees one link to /services, and the sibling services survive only
+   * through the footer. This puts contextual links back into sentences that
+   * were already written, with richer anchor text than a nav label, without
+   * restoring the grid the client asked to remove.
+   *
+   * `body` stays a plain string, so nothing downstream changes: the schema
+   * derives from `intro` and the FAQ answers, never from this.
+   */
+  sections: {
+    heading: string;
+    body: string;
+    detail?: string;
+    list?: string[];
+    bodyLinks?: { phrase: string; href: string }[];
+  }[];
   faqs: { q: string; a: string }[];
 };
 
@@ -838,8 +861,26 @@ export const SERVICE_PAGES: ServicePage[] = [
       /* Same reasoning as /services: 100vw describes the box, and below lg
          object-cover scales this by height and draws it wider than the
          viewport. 1200px is the widest drawn width down there. */
-      sizes: '(min-width: 1024px) 100vw, 1200px',
-      quality: 90,
+      /* MEASURED, NOT ESTIMATED. Below lg the hero box is taller than it is
+         wide and object-cover scales by height, so the image draws wider than
+         the viewport. Measured drawn width across 320 to 1023: 806px at 600,
+         899px at 390, 967px at 768, and a maximum of 1070px at 320, where the
+         box is tallest.
+
+         1024px covers that maximum with a small margin AND lands a DPR 2
+         device on the 2048 candidate instead of 3840. The old 1200px asked for
+         2400 device pixels, which is past the 2048 step, so every 2x phone
+         downloaded the 3840 variant: 434 KB, for a frame whose visible portion
+         is under half its width. At 1024 the same phone gets 2048.
+
+         quality 82, not 90. The q90 reasoning in app/services/[slug]/page.tsx
+         is about the 1280x720 VIDEO POSTERS, where a re-encode sits on top of
+         an already-soft upscale. This is a 2752px master being downscaled, so
+         the resampling dominates and the encoder setting is not the binding
+         constraint. Measured on this asset: 3840w costs 434 KB at q90 and
+         271 KB at q82, and 2048w costs 234 KB at q90 and 135 KB at q82. */
+      sizes: '(min-width: 1024px) 100vw, 1024px',
+      quality: 82,
     },
     schemaType: 'MedicalProcedure',
     title: 'Comprehensive psychiatric assessment',
@@ -974,6 +1015,14 @@ export const SERVICE_PAGES: ServicePage[] = [
       {
         heading: 'What happens after',
         body: 'The plan is not the end of it. We evaluate your progress on an ongoing basis, and provide support and education as you go. Follow-up care is usually medication management, in person or by telehealth.',
+        /* Both phrases are already in the sentence above and both name a page
+           of their own, so these are links this copy was asking for rather
+           than links added to it. The anchor text is the service's own name,
+           which is what the removed cards used to supply. */
+        bodyLinks: [
+          { phrase: 'medication management', href: '/services/medication-management' },
+          { phrase: 'telehealth', href: '/services/telehealth' },
+        ],
       },
     ],
     faqs: [

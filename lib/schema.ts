@@ -224,8 +224,22 @@ export function serviceSchemaFor(s: ServicePage) {
        than emitted empty when a service has no synonym. */
     ...(s.alternateName ? { alternateName: s.alternateName } : {}),
     description: s.intro,
-    provider: { '@id': ORG_ID },
-    availableIn: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
+    /* `provider` AND `availableIn` WERE REMOVED HERE, and they were not doing
+       what they looked like they were doing.
+
+       Two of the three service nodes are MedicalProcedure and the third is
+       MedicalTherapy. Neither is a subtype of Service, and `provider` is a
+       property of Service, not of MedicalEntity — so it was invalid on every
+       node this function emits. `availableIn` is not a schema.org property at
+       all; the intended spelling for a Service would have been `areaServed`,
+       and this is not a Service.
+
+       The relationship they were reaching for is expressed in the valid
+       direction instead: the clinic node that every one of these pages also
+       emits is what ties the practice to its services, and the geography is
+       already on the clinic. If a page ever needs the link stated explicitly,
+       `MedicalClinic.availableService` is the valid property and it belongs on
+       the clinic, not here. */
   };
 }
 
