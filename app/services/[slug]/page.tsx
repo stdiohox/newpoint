@@ -7,6 +7,7 @@ import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
 import { ServiceCards } from '@/components/sections/ServiceCards';
 import { ServiceGrid } from '@/components/sections/ServiceGrid';
+import { SectionList } from '@/components/sections/SectionList';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -488,18 +489,17 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                           <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
                             {section.body}
                           </p>
-                          {section.list && (
-                            <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                              {section.list.map((item) => (
-                                <li
-                                  key={item}
-                                  className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
-                                >
-                                  {item}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
+                          {/* THE PROSE FALLBACK IS THE REASON SectionList
+                              EXISTS. This branch renders `list` and ignores
+                              `bullets`, so while the prescribing hedge lived in
+                              bullets, moving that service onto this layout
+                              would have published the diagnoses unqualified.
+                              Now the chips and the line come from one call. */}
+                          <SectionList
+                            heading={section.heading}
+                            list={section.list}
+                            note={section.listNote}
+                          />
                         </section>
                       </Reveal>
                     );

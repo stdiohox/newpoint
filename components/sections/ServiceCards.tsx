@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { CircleCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
+import { SectionList } from '@/components/sections/SectionList';
 import { stagger } from '@/lib/motion';
 
 /**
@@ -34,6 +35,7 @@ export type CardSection = {
   heading: string;
   body: string;
   list?: string[];
+  listNote?: string;
   bullets?: string[];
   highlight?: string;
 };
@@ -271,21 +273,13 @@ export function ServiceCards({
             >
               <h2 className="text-h2">{section.heading}</h2>
               <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">{section.body}</p>
-              {section.list && (
-                /* role="list" per the note at the top of app/globals.css:
-                   Preflight strips list-style and WebKit then drops the
-                   implicit role. */
-                <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                  {section.list.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {/* Chips AND the line that qualifies them, from one component in
+                  every layout. See components/sections/SectionList.tsx. */}
+              <SectionList
+                heading={section.heading}
+                list={section.list}
+                note={section.listNote}
+              />
 
               {/* BULLETS RENDER HERE TOO, AND AFTER THE CHIPS ON PURPOSE.
                   This branch used to render heading, body and list only, so a

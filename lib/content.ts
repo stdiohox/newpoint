@@ -483,16 +483,18 @@ export type Provider = {
    * structured rather than as a sentence: `knowsLanguage` in the Person
    * JSON-LD and the Languages line on the /providers card.
    *
-   * OPTIONAL, AND SET ON ONE PROVIDER. The client asked on 2026-10-01 for
-   * Dr. Whitaker's languages specifically, sourced to her Headway profile, and
-   * asked explicitly that no language be added for Dr. Ofoegbu. So the two
-   * surfaces that read this field show it for Whitaker and show nothing for
-   * Ofoegbu — not because her prose `languages` is in doubt, but because the
-   * instruction named one provider. Her own page's Languages row is unchanged
-   * and still reads the prose field, as it always has.
+   * OPTIONAL, AND NOW SET ON BOTH PROVIDERS. It arrived on 2026-10-01 for
+   * Dr. Whitaker alone, because the client's instruction that day named her;
+   * Dr. Ofoegbu's was added later the same day, once it was clear that the
+   * asymmetry published nothing new about her either way — her three
+   * languages were already on her own page, from the same single Headway
+   * source and with the same confidence, so the only thing the gap achieved
+   * was two cards that disagreed.
    *
-   * Set this for Ofoegbu when the client confirms hers, and both surfaces
-   * pick her up with no further change.
+   * NEITHER IS CONFIRMED BY THE PRACTICE, and both carry a CLIENT-REVIEW note
+   * saying so. The prose `languages` field stays the source for the fact rows
+   * on the provider pages; this is the same fact structured, so the JSON-LD
+   * and the card do not have to parse a sentence.
    */
   knowsLanguage?: readonly string[];
   /**
@@ -717,6 +719,21 @@ export const PROVIDERS: Provider[] = [
        rather than guessed at. CLIENT: which degree, and in what? */
     education: 'DNP, University of North Florida',
     languages: 'English, Igbo, and Yoruba',
+    /**
+     * CLIENT-REVIEW: the three languages this page has published all along,
+     * structured, in the order the prose field already prints them.
+     *
+     * NOTHING NEW IS CLAIMED. The source is her own Headway profile —
+     * research/directories/headway-ofoegbu.txt, "Igbo, Yoruba, English",
+     * recorded in research/provider-directories.md as Headway-only and graded
+     * weak — which is the same single source, with the same confidence, as the
+     * prose line above it and as Dr. Whitaker's. Confirm with the practice
+     * that she sees patients in Igbo and Yoruba; a marketplace profile is the
+     * provider's own statement rather than the practice's.
+     *
+     * The two fields must stay in step: edit both or neither.
+     */
+    knowsLanguage: ['English', 'Igbo', 'Yoruba'],
     /**
      * Verbatim from Headway, as one paragraph, with two typo fixes and one
      * spelling change: her "My name is Anastasia. Ofoegbu" loses its stray full
@@ -1023,6 +1040,25 @@ export type ServicePage = {
     body: string;
     detail?: string;
     list?: string[];
+    /**
+     * One line that renders IMMEDIATELY AFTER `list`, in every layout.
+     *
+     * It exists because a bare list of diagnoses under a heading like
+     * "Conditions we prescribe for" reads as a promise about all of them, and
+     * the line that stops it doing so has to be impossible to separate from
+     * it. <SectionList /> renders the two together and is the only thing any
+     * layout uses to render `list`, so a layout change cannot drop one and
+     * keep the other — which is exactly what could happen while the hedge
+     * lived in `bullets`.
+     *
+     * REQUIRED ON A PRESCRIBING LIST, optional elsewhere:
+     * assertPrescribingHedged() at the foot of this file fails the build if a
+     * section whose heading says "prescribe" carries a `list` without one. The
+     * assessment page's two lists ("The tools we use", "Your treatment plan")
+     * name procedures rather than claims about every patient, so neither is
+     * required to carry a note and neither has one.
+     */
+    listNote?: string;
     bodyLinks?: { phrase: string; href: string }[];
     /**
      * "What this means for you" — short points under the section's own copy.
@@ -1446,11 +1482,11 @@ export const SERVICE_PAGES: ServicePage[] = [
              referral alongside each other — so medication is one option among
              several rather than the only one. */
           'Medication is one of the options the practice names, not the only one.',
-          /* CLIENT-REVIEW — GENERIC. A statement about clinical practice in
-             general, not about what Newpoint does in any given case. It is
-             also the hedge that keeps the list above from reading as "every
-             one of these is prescribed for". */
-          'Appearing on this list does not mean medication is the answer in every case.',
+          /* THE HEDGE USED TO BE THE SECOND BULLET HERE. It moved to
+             `listNote` on 2026-10-01 so that it travels with the list itself
+             rather than with a field two of the four layouts ignore. Same
+             string, same position on the page, one place it can no longer
+             fall out of. */
           /* REWRITTEN AFTER healthcare-reviewer, 2026-10-01. The line read
              "Which of these applies to you is settled at your assessment,
              before anything is prescribed." SETTLED was the problem: it
@@ -1485,20 +1521,23 @@ export const SERVICE_PAGES: ServicePage[] = [
          *
          * WHAT THIS LIST DOES NOT SAY, and must not be edited into saying: it
          * names no medication and no class of medication, here or anywhere on
-         * the page. The hedge in `bullets` — "Appearing on this list does not
-         * mean medication is the answer in every case" — is what keeps the
-         * heading from reading as "every one of these is prescribed for", and
-         * it is load-bearing for this entry in particular.
+         * the page. The hedge — "Appearing on this list does not mean
+         * medication is the answer in every case" — is what keeps the heading
+         * from reading as "every one of these is prescribed for", and it is
+         * load-bearing for this entry in particular.
          *
-         * THE HEDGE RENDERS AFTER THE CHIPS, NOT BEFORE THEM, and that is
-         * deliberate — see the note in components/sections/ServiceCards.tsx,
-         * which explains that the line has no referent until the chips are on
-         * screen. It is in `bullets`, so it reaches the page only on the
-         * layouts that render bullets: `cards` (this page's) and `grid`. The
-         * prose fallback at app/services/[slug]/page.tsx renders heading, body
-         * and list and NOT bullets, so flipping this service's `layout` would
-         * publish the chip list with no hedge at all. Do not flip it without
-         * moving the hedge into `body` first.
+         * THE HEDGE IS IN `listNote`, NOT IN `bullets`, SINCE 2026-10-01, and
+         * that is a structural fix rather than a tidy-up. In `bullets` it
+         * reached only the layouts that render bullets — `cards` and `grid` —
+         * so flipping this service's `layout` to the prose fallback would have
+         * published the chip list with no hedge at all. `listNote` is rendered
+         * by <SectionList />, which is the ONE component every layout now uses
+         * to render `list`, so the two cannot be separated by a layout change.
+         * assertPrescribingHedged() at the foot of this file fails the build if
+         * a prescribing list ever loses it.
+         *
+         * It still renders AFTER the chips, which is deliberate: the line says
+         * "this list" and has no referent until the chips are on screen.
          *
          * AND IT HEDGES MODALITY, NOT SCOPE. "Medication is not always the
          * answer" does not say which medications are in scope for ADHD, which
@@ -1517,6 +1556,10 @@ export const SERVICE_PAGES: ServicePage[] = [
           'Mood disorders',
           'Psychosis',
         ],
+        /* CLIENT-REVIEW — GENERIC. A statement about clinical practice in
+           general, not about what Newpoint does in any given case. Unchanged
+           wording; it was the second bullet until 2026-10-01. */
+        listNote: 'Appearing on this list does not mean medication is the answer in every case.',
       },
     ],
     faqs: [
@@ -2391,7 +2434,7 @@ export const OPEN_CLIENT_ITEMS = [
   'NPI numbers for both providers, or confirmation they prefer not to publish them. CANDIDATE for Whitaker: 1760719512, per U.S. News. Nothing found for Ofoegbu',
   'Certifying body for the "board-certified" claim (the post-nominals imply one, but it is not stated anywhere and must not be assumed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
-  'Confirmed age range served (adults only, or across the lifespan as a practice policy). STILL OPEN, AND THE EVIDENCE NOW CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
+  'PRE-LAUNCH — AGES SERVED. Confirmed age range (adults only, or across the lifespan as a practice policy). Headway lists CHILDREN AND ADOLESCENTS for Dr. Whitaker, which is the strongest paediatric signal in any Newpoint source and the reason this cannot wait: the site now names ADHD under "Conditions we prescribe for", and a parent reading that has nothing on the page telling them whether their child can be seen. STILL OPEN, AND THE EVIDENCE CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
   'Whether substance use and addiction treatment is an active service line. THE DIRECTORIES SAY YES: Grow lists addiction for Whitaker, and Headway lists "Substance use / addiction" as Ofoegbu\'s FIRST specialty. Her existing bio already says her last 11 years were in mental health and addiction. This also bears on the new "Mental and behavioral care" hero — in US payer language behavioral health includes SUD, so the headline already implies a door the conditions list does not open',
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   /* The ADHD item was REMOVED on 2026-10-01, closed rather than dropped. It
@@ -2405,6 +2448,8 @@ export const OPEN_CLIENT_ITEMS = [
   'Whether Dr. Whitaker sees patients in Yoruba, and whether Dr. Ofoegbu\'s "English, Igbo, and Yoruba" holds. Both come from the providers\' own Headway profiles and neither is confirmed by the practice — the repo grades both as weak single-source facts in research/provider-directories.md. IT IS NO LONGER ONLY PROSE: as of 2026-10-01 Whitaker\'s languages are structured in PROVIDERS[].knowsLanguage at the client\'s instruction and drive `knowsLanguage` on her Person JSON-LD, the Languages line on her /providers card, and her ContactPoint on /contact. Ofoegbu has no structured entry because the instruction named only Whitaker, so her card shows no Languages line while her own page still does — see the CLIENT question in components/ui/ProviderCard.tsx about whether that asymmetry should stand',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
   "CONFIRM THE NINE PLANS NOW PUBLISHED UNDER CLIENT-REVIEW, or cut them. THIS ITEM CHANGED ON 2026-10-01 AND IT IS NOW URGENT RATHER THAN HOUSEKEEPING. Until then these names sat in PAYER_GROUPS with `confirmed: false` and appeared nowhere a patient or a crawler could see them. The client asked for them to be published, so they now render on /insurance under a `review` note sourced to Dr. Whitaker's Headway profile (https://care.headway.co/providers/funmilayo-whitaker-2). They are: Oscar, Oxford, Carelon Behavioral Health, Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania, Independence Blue Cross Pennsylvania (Virtual National Network), Geisinger, Blue Cross Blue Shield of Massachusetts and The Health Plan. WHAT THE PRACTICE IS BEING ASKED TO CONFIRM, for each name: that NEWPOINT accepts it directly, not that a marketplace is contracted for it — a patient who books through Headway or Grow Therapy is billed by the marketplace — and that it holds for Dr. Ofoegbu as well as Dr. Whitaker. A patient who reads one of these names, books on that basis and is then billed out of network has been told something nobody at the practice has confirmed. FOUR OF THE NINE ARE BETTER EVIDENCED THAN THE NOTE SAYS, so do not spend equal attention on all of them: Oscar, Oxford, Carelon Behavioral Health and Blue Cross Blue Shield of Massachusetts are on DR. OFOEGBU'S Headway profile as well as Dr. Whitaker's, which answers the \"and for Dr. Ofoegbu\" half for those four. The dictated note is carried verbatim on all nine anyway, because the practice-wide half is open for every one of them. To confirm one, set `confirmed: true` and delete its `review` note; the homepage card, its \"and N more\" count and the JSON-LD then pick it up too, none of which the review note touches. TO CUT ONE, IT DEPENDS WHICH: for the six that arrived with this instruction, delete the entry; for Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania and Independence Blue Cross Pennsylvania, cutting means reverting to the repo's shorter name with `confirmed: false` and no `review`, because those three were corroborated candidates on Grow Therapy and Headway before the client's list existed and deleting them would throw that away. The seven payers from the practice's own site are unaffected",
+  'PRE-LAUNCH — INDEPENDENCE BLUE CROSS: ALL PLANS, OR THE VIRTUAL NATIONAL NETWORK ONLY? The page currently names "Independence Blue Cross Pennsylvania (Virtual National Network)", which is the spelling the client supplied from Dr. Whitaker\'s Headway profile. It is the one entry on the wall that names a NETWORK rather than a carrier, on a page whose copy policy is "accept, never in network", and it narrows badly in both directions: an Independence member on Keystone HMO or Personal Choice reads it as "my plan is not listed", while a reader who takes the parenthetical at face value has been told the practice participates in a specific network nobody has confirmed. Two answers close it — "all Independence plans", which makes the entry plain "Independence Blue Cross", or "that network only", which makes the parenthetical a claim the practice has to stand behind',
+  'PRE-LAUNCH — CONFIRM ALL NEWLY ADDED INSURANCE PLANS. The nine plans published under CLIENT-REVIEW on 2026-10-01 are listed name by name in the payer item above, with what has to be confirmed for each. This entry exists so the question appears in the pre-launch pass as well as in the payer section: no plan added on 2026-10-01 should still be carrying a `review` note on launch day. Either it is confirmed and `confirmed: true`, or it comes off the page',
   "The two plans in the 2026-10-01 list whose names do not place them: Blue Cross Blue Shield of Massachusetts and The Health Plan, both now under the \"Other plans\" heading on /insurance. Massachusetts is not a state this practice serves, and this repo previously excluded that name as a Headway national-network artifact; it is listed now because the client asked for it, and it is grouped apart because claiming it as a New Jersey or Pennsylvania plan would be wrong. \"The Health Plan\" states no state, carrier family or network at all — it matches a West Virginia and Ohio carrier of exactly that name, which nothing here assumes. THE RISK HERE IS LICENSURE, NOT ONLY BILLING: both providers are licensed in New Jersey and Pennsylvania only, and for telehealth the governing location is the PATIENT'S, so a Massachusetts resident who recognises their own plan on this page has been given a reason to enquire about care the practice cannot lawfully deliver to them where they are. Nothing beside the wall states the two-state limit; the only place on the page that does is the hero intro. Confirm what each plan actually is, whether either belongs on a two-state practice's list, and whether the list needs a visible scope line",
   "ONE DECISION THE CLIENT STILL OWES ON THE PUBLISHED PLANS: whether /insurance should say, visibly, that some of the plans listed are still being confirmed. As it stands all sixteen names render identically under \"We accept the plans below\", so a patient cannot tell the seven the practice confirmed from the nine it has not. Adding a hedge was NOT done unilaterally — it softens the client's own instruction to publish them, and that is their call to make. The page already owns a string for it if they want one: INSURANCE.unconfirmedScopeNote. This item closes either way, by confirming the nine or by adding the line",
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
@@ -2543,3 +2588,56 @@ function assertTitlesQualified() {
 }
 
 assertTitlesQualified();
+
+/* ------------------------------------------------------------------------- *
+ * BUILD-TIME ASSERTION: a prescribing list never ships without its hedge.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Fails the build if a section whose heading says "prescribe" carries a `list`
+ * with no `listNote`.
+ *
+ * WHY A BUILD CHECK AND NOT A COMMENT. A bare list of diagnoses under
+ * "Conditions we prescribe for" reads as a promise about every one of them,
+ * and the line that stops it doing so spent three weeks in `bullets` — a field
+ * two of the four layouts ignore. A comment saying "do not separate these" is
+ * exactly the kind of thing a later edit does not read.
+ *
+ * ITS TWIN LIVES IN components/sections/SectionList.tsx and fails on a
+ * different mistake: this one catches a section written without a note, that
+ * one catches a layout that renders the list and forgets the note. Both are
+ * needed; neither replaces the other.
+ *
+ * THE MATCH IS ON THE HEADING, deliberately — see `requiresNote()` in
+ * SectionList.tsx for why a flag in the data would be the weaker test. The two
+ * regexes are the same expression and must stay in step.
+ *
+ * The other two lists on the site — "The tools we use" and "Your treatment
+ * plan" on the assessment page — name procedures rather than claims about
+ * every patient, so they are not required to carry a note and do not.
+ */
+function assertPrescribingHedged() {
+  const offenders: string[] = [];
+
+  for (const service of SERVICE_PAGES) {
+    for (const section of service.sections) {
+      if (!section.list || section.list.length === 0) continue;
+      if (!/prescrib/i.test(section.heading)) continue;
+      if (section.listNote && section.listNote.trim().length > 0) continue;
+      offenders.push(`${service.slug} → "${section.heading}" (${section.list.length} items)`);
+    }
+  }
+
+  if (offenders.length > 0) {
+    throw new Error(
+      `content: ${offenders.length} prescribing list(s) render without a listNote.\n` +
+        `A list of diagnoses under a "we prescribe for" heading reads as a promise about ` +
+        `every item on it unless a qualifying line sits with it. Add listNote to the ` +
+        `section in lib/content.ts; do not move the line into bullets, which only the ` +
+        `card and grid layouts render.\n` +
+        offenders.map((o) => `  ${o}`).join('\n')
+    );
+  }
+}
+
+assertPrescribingHedged();

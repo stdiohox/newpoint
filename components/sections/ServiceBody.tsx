@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { CircleCheck, ImageIcon } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
+import { ListNote, assertHedged } from '@/components/sections/SectionList';
 
 export type BodySection = {
   id: string;
@@ -11,6 +12,8 @@ export type BodySection = {
   /** Optional second paragraph. See the field's note in lib/content.ts. */
   detail?: string;
   list?: string[];
+  /** The line that must render under `list`. See SectionList.tsx. */
+  listNote?: string;
   /** Phrases already present in `body` that should link out. */
   bodyLinks?: { phrase: string; href: string }[];
 };
@@ -103,24 +106,38 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
                         )}
                       </div>
 
-                      {section.list && (
-                        /* role="list" per the note at the top of
-                           app/globals.css: Preflight strips list-style and
-                           WebKit then drops the implicit role. */
-                        <ul role="list" className="flex flex-col gap-3">
-                          {section.list.map((item) => (
-                            <li key={item} className="flex items-start gap-3">
-                              <CircleCheck
-                                aria-hidden="true"
-                                size={20}
-                                strokeWidth={1.75}
-                                className="text-np-blue-600 mt-[0.15em] shrink-0"
-                              />
-                              <span className="text-body text-np-neutral-700">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {/* THIS LAYOUT KEEPS ITS OWN LIST MARKUP — a check-marked
+                          column, not the chips the card and grid layouts draw —
+                          because the assessment page's two lists are rendered
+                          this way and restyling them is not what this change is
+                          for. What it does NOT get to keep is the freedom to
+                          render a prescribing list with no qualifying line:
+                          assertHedged throws at render time, which on a static
+                          page is a build failure, and <ListNote /> puts the
+                          line under the list. See SectionList.tsx. */}
+                      {section.list &&
+                        (assertHedged(section.heading, section.list, section.listNote),
+                        (
+                          /* role="list" per the note at the top of
+                             app/globals.css: Preflight strips list-style and
+                             WebKit then drops the implicit role. */
+                          <div>
+                            <ul role="list" className="flex flex-col gap-3">
+                              {section.list.map((item) => (
+                                <li key={item} className="flex items-start gap-3">
+                                  <CircleCheck
+                                    aria-hidden="true"
+                                    size={20}
+                                    strokeWidth={1.75}
+                                    className="text-np-blue-600 mt-[0.15em] shrink-0"
+                                  />
+                                  <span className="text-body text-np-neutral-700">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                            <ListNote note={section.listNote} />
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>

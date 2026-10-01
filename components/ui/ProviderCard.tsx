@@ -59,9 +59,8 @@ export type ProviderCardData = {
   licensed: string;
   /**
    * Languages, one per entry. OPTIONAL: the card renders the line only for a
-   * provider who has them, which today is Dr. Whitaker alone — the client's
-   * 2026-10-01 instruction named her and asked that nothing be added for
-   * Dr. Ofoegbu. See Provider.knowsLanguage in lib/content.ts.
+   * provider who has them. Both do. See Provider.knowsLanguage in
+   * lib/content.ts for the sourcing and what is still unconfirmed.
    */
   knowsLanguage?: readonly string[];
   bio: string;
@@ -175,20 +174,16 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
               New Jersey and Pennsylvania" says what it is; "English and
               Yoruba" on its own does not, and an icon is not a label.
 
-              RENDERED ONLY WHERE THE DATA EXISTS, which is Dr. Whitaker today.
-              The other card simply has no such line — nothing is invented for
-              a provider the client's instruction did not cover.
-
-              CLIENT: THE ASYMMETRY IS WORTH A SECOND LOOK, and it is not being
-              changed here because the instruction was explicit. Dr. Ofoegbu's
-              languages are ALREADY published on this site — "English, Igbo,
-              and Yoruba", on her own page, from the same Headway source and
-              with the same confidence. So showing the line on one card does
-              not spare her an unconfirmed claim; it only makes the two cards
-              disagree, on the page built for choosing between them. A Yoruba-
-              or Igbo-speaking patient comparing them reads her as English
-              only. Rendering this line from the existing prose field for both
-              would add no new claim about her. Their call, not ours. */}
+              RENDERED ONLY WHERE THE DATA EXISTS, which since 2026-10-01 is
+              both providers. It was Dr. Whitaker alone for part of that day,
+              and the asymmetry was the problem rather than the safeguard: Dr.
+              Ofoegbu's languages were already published on her own page, from
+              the same single Headway source and with the same confidence, so
+              the gap spared her no unconfirmed claim and only made the two
+              cards disagree on the page built for choosing between them — a
+              Yoruba- or Igbo-speaking patient comparing them read her as
+              English only. The check stays because the field is optional, not
+              because either provider is a special case. */}
           {provider.knowsLanguage && provider.knowsLanguage.length > 0 && (
             <p className="text-small text-np-neutral-600 mt-2">
               <span className="text-np-ink font-medium">Languages: </span>

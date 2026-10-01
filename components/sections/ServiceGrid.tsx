@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { CircleCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
+import { SectionList } from '@/components/sections/SectionList';
 import { stagger } from '@/lib/motion';
 
 /**
@@ -43,6 +44,9 @@ export type GridSection = {
   id: string;
   heading: string;
   body: string;
+  list?: string[];
+  /** The line that must render under `list`. See SectionList.tsx. */
+  listNote?: string;
   bullets?: string[];
 };
 
@@ -183,6 +187,19 @@ export function ServiceGrid({
                 <section id={featured.id} tabIndex={-1} className="focus:outline-none">
                   <h2 className="text-h2">{featured.heading}</h2>
                   <p className="text-body text-np-neutral-600 mt-3 max-w-[58ch]">{featured.body}</p>
+                  {/* THIS LAYOUT RENDERED NO LIST AT ALL until 2026-10-01: a
+                      section with one lost it silently here, which is the same
+                      class of bug as the hedge that only two layouts rendered.
+                      Nothing in the current content reaches this path — only
+                      the assessment and medication pages carry lists, and
+                      neither uses this layout — so this adds no copy to any
+                      page today and stops the next move between layouts
+                      dropping some. */}
+                  <SectionList
+                    heading={featured.heading}
+                    list={featured.list}
+                    note={featured.listNote}
+                  />
                   <Bullets section={featured} />
                 </section>
               </div>
@@ -220,6 +237,11 @@ export function ServiceGrid({
                   >
                     <h2 className="text-h3">{section.heading}</h2>
                     <p className="text-body text-np-neutral-600 mt-3">{section.body}</p>
+                    <SectionList
+                      heading={section.heading}
+                      list={section.list}
+                      note={section.listNote}
+                    />
                     <Bullets section={section} />
                   </section>
                 </div>
