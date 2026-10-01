@@ -48,26 +48,55 @@ export default function ProvidersPage() {
         ]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        {/* The service pages' hero treatment: copy centred on the area below
-            the navbar, centred from lg, and no CTA.
+        {/* The service pages' hero treatment: the homepage's overlay, copy
+            centred on the area below the navbar, centred from lg, and no CTA.
 
-            NO scrim="home" HERE, AND THAT IS NOT AN OVERSIGHT. This page has no
-            hero master — there is none for /providers and the posters belong to
-            services — so it renders the np-blue-900 → np-sky gradient. All four
-            of PageHero's `home` layers are gated on `image`, so passing it over
-            a gradient emits NOTHING: it would silently drop even the ramp the
-            other gradient heroes get, which is strictly less overlay than
-            /insurance or /contact carry, not more. The default is what those
-            pages use and what the gradient was measured against.
+            THE SCRIM IS scrim="home" NOW, WHICH IT COULD NOT BE BEFORE. The
+            note that stood here said `home` was deliberately absent because all
+            four of PageHero's `home` layers are gated on `image`, and over the
+            np-blue-900 → np-sky gradient this page used to render they emit
+            nothing at all — strictly less overlay than /insurance or /contact
+            carry. That reasoning was correct and is now spent: the page has a
+            photograph, so the layers have something to sit on.
 
-            The service heroes' overlay is the homepage's ramps over a
-            photograph; with no photograph there is nothing for them to do. If a
-            master is ever shot for this page, add it and switch the scrim then
-            — and re-measure, because that is the combination that fails AA on
-            the two service pages already carrying it. */}
+            It is the same pair of gradients the homepage uses, through the same
+            branch the two service heroes go through.
+
+            CONTRAST DOES NOT MEET AA AT THE DESKTOP WIDTHS. Measured on the
+            rendered page at glyph core pixels only — a whole-box sample reads
+            the brightest pixel in the box rather than one a letter covers:
+
+              1440  h1 2.06:1 (floor 3)   intro 2.37:1 (floor 4.5)
+              1024  h1 2.18:1 (floor 3)   intro 1.69:1 (floor 4.5)
+               390  h1 3.10:1 PASS        intro 6.75:1 PASS
+
+            The worst backdrop under a glyph is the room's pale wall and the lit
+            doorway behind the copy, about rgb(181,180,184) at 1440. THIS IS THE
+            THIRD PAGE TO MEASURE THE SAME WAY and the cause is the one
+            PageHero's scrim note records: the homepage ramps are shaped for a
+            100vh section whose copy is short, bottom-anchored and in the left
+            column of a two-column grid, and this header is ~540-610px with
+            centred copy that fills it. At 390 the box is tall enough that the
+            bottom ramp still covers the copy, which is why only that width
+            passes.
+
+            The overlay was required to be the homepage's, copied, so this is
+            reported rather than fixed. The remedy is scrim="hero", whose radial
+            sits behind a centred block, or a master whose centre is not a lit
+            wall. */}
         <PageHero
           title={PROVIDERS_PAGE.title}
           intro={PROVIDERS_PAGE.intro}
+          image={{
+            src: '/images/providers/providers-hero-2400.webp',
+            /* Describes the room and stops there. NOT "our waiting room": the
+               practice's in-person locations are still unconfirmed under
+               CLAUDE.md's care-modality rule, and alt text is where that gets
+               claimed by accident. No people are in frame, so there is no
+               patient or provider to misattribute either. */
+            alt: 'An empty waiting room with upholstered armchairs around a jute rug, a side table holding flowers and books, a potted fig tree, and an open doorway to a desk beyond.',
+          }}
+          scrim="home"
           align="center"
           copyAlign="center"
           showCta={false}
