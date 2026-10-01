@@ -2231,3 +2231,109 @@ export const OPEN_CLIENT_ITEMS = [
   'Patient testimonials with documented consent, if the practice wants them later',
   'Reshoot of both provider portraits at 2000px or more with headroom, to unlock the deferred hero treatment',
 ] as const;
+
+/* ------------------------------------------------------------------------- *
+ * BUILD-TIME ASSERTION: every rendered "Dr." carries its qualifier.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * The qualifiers that satisfy CLAUDE.md's condition on the title.
+ *
+ * "nurse practitioner" matches its own plural, and the two role-identifying
+ * post-nominals are accepted because `credentials` is "DNP, FNP-BC, PMHNP-BC"
+ * and either of those two names the role.
+ *
+ * `DNP` AND "Doctor of Nursing Practice" ARE DELIBERATELY NOT HERE. A degree
+ * name is the very thing "Dr." is claiming, so it disambiguates nothing — put
+ * next to a bare honorific it reads more physician-like, not less. Two strings
+ * shipped on 2026-10-01 qualified only that way and were caught in review
+ * rather than by a check; accepting it here would have let them through.
+ */
+const TITLE_QUALIFIER = /nurse practitioner|PMHNP-BC|FNP-BC/i;
+
+/** The honorific, as a whole word followed by a name. */
+const TITLE_PREFIX = /\bDr\.\s/;
+
+/**
+ * Collects every string under a content root, remembering where it came from
+ * so a failure names the field rather than the value.
+ *
+ * `displayName` is SKIPPED, and it is the only exemption. It is "Dr. Funmilayo
+ * Whitaker" by design: the qualifier for it lives in the markup beside it — the
+ * credentials pill, the dropdown's detail line, the `, ${credentials}` on the
+ * provider page heading — not inside the string. Every other string is page
+ * copy that has to carry its own.
+ */
+function collectStrings(node: unknown, path: string, out: [string, string][]) {
+  if (typeof node === 'string') {
+    out.push([path, node]);
+  } else if (Array.isArray(node)) {
+    node.forEach((v, i) => collectStrings(v, `${path}[${i}]`, out));
+  } else if (node && typeof node === 'object') {
+    for (const [k, v] of Object.entries(node)) {
+      if (k === 'displayName') continue;
+      collectStrings(v, `${path}.${k}`, out);
+    }
+  }
+}
+
+/**
+ * Fails the build rather than the compliance review, the same way
+ * `assertSourced()` in components/sections/Providers.tsx does.
+ *
+ * WHAT IT COVERS AND WHAT IT CANNOT. It reads the content layer, which is where
+ * prose is edited and where both of the 2026-10-01 breaches were. It cannot
+ * know whether a COMPONENT renders `displayName` without a qualifier nearby —
+ * that is a layout question, not a string one, and the four surfaces that do
+ * render it are documented in CLAUDE.md. Adding a fifth still needs a human to
+ * check the markup; this stops the much likelier mistake of a copy edit.
+ *
+ * The roots are listed rather than swept, because OPEN_CLIENT_ITEMS and the
+ * sourcing notes are addressed to whoever is building the site, not to a
+ * patient, and a "Dr." inside one of those is not a claim on any page.
+ */
+function assertTitlesQualified() {
+  const RENDERED: [string, unknown][] = [
+    ['BUSINESS', BUSINESS],
+    ['HERO', HERO],
+    ['PRACTICE_FACTS', PRACTICE_FACTS],
+    ['INSURANCE', INSURANCE],
+    ['FOOTER', FOOTER],
+    ['PROVIDERS', PROVIDERS],
+    ['WHAT_WE_TREAT', WHAT_WE_TREAT],
+    ['SERVICE_PAGES', SERVICE_PAGES],
+    ['GETTING_STARTED', GETTING_STARTED],
+    ['WHAT_TO_EXPECT', WHAT_TO_EXPECT],
+    ['FEATURED_SERVICES', FEATURED_SERVICES],
+    ['FAQ', FAQ],
+    ['CONTACT', CONTACT],
+    ['CRISIS', CRISIS],
+    ['INSURANCE_PAGE', INSURANCE_PAGE],
+    ['NEW_PATIENTS_PAGE', NEW_PATIENTS_PAGE],
+    ['CONTACT_PAGE', CONTACT_PAGE],
+    ['FAQ_PAGE', FAQ_PAGE],
+    ['PROVIDERS_PAGE', PROVIDERS_PAGE],
+  ];
+
+  const strings: [string, string][] = [];
+  for (const [name, root] of RENDERED) collectStrings(root, name, strings);
+
+  const offenders = strings.filter(
+    ([, value]) => TITLE_PREFIX.test(value) && !TITLE_QUALIFIER.test(value)
+  );
+
+  if (offenders.length > 0) {
+    const detail = offenders
+      .map(([path, value]) => `  ${path}\n    "${value.slice(0, 120)}"`)
+      .join('\n');
+    throw new Error(
+      `content: ${offenders.length} string(s) use "Dr." without the qualifier CLAUDE.md requires.\n` +
+        `Every rendered "Dr." must have the credentials (PMHNP-BC or FNP-BC) or the words ` +
+        `"nurse practitioner" in the same string. A degree name — "DNP", "Doctor of Nursing ` +
+        `Practice" — does NOT qualify: it is what the title is claiming.\n` +
+        `Either add the qualifier to the copy or drop the prefix.\n${detail}`
+    );
+  }
+}
+
+assertTitlesQualified();
