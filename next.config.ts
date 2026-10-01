@@ -70,6 +70,35 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/webp'],
+    /**
+     * EVERY QUALITY THIS SITE ASKS FOR, AND NOTHING ELSE.
+     *
+     * `qualities` is an allow-list: once it is set, next/image serves only these
+     * values and any other `quality` prop is rejected rather than silently
+     * honoured. So this list is not a preference — it is a contract with the
+     * call sites, and adding a `quality` anywhere without adding it here breaks
+     * that image.
+     *
+     * Enumerated from the call sites, not guessed:
+     *   75  the optimiser's own default, which is what every <Image> with no
+     *       `quality` prop gets — components/Footer.tsx, ServiceBody.tsx,
+     *       faq-sections.tsx, onboarding-form.tsx,
+     *       feature-section-with-bento-grid.tsx, the /services cards, and
+     *       PageHero whenever its caller passes no `image.quality`. It is the
+     *       one that is easiest to leave out and the one that would break the
+     *       most images.
+     *   82  lib/content.ts, the psychiatric-evaluation hero master. Its note
+     *       there records the measurement: a 2752px master being downscaled, so
+     *       resampling dominates and q90 buys nothing for the extra 160 KB.
+     *   88  components/sections/Hero.tsx, the homepage LCP image.
+     *   90  app/services/page.tsx and the service-page video posters, where a
+     *       re-encode sits on top of an already-soft 1280x720 upscale. Both
+     *       notes explain why the number is higher there.
+     *
+     * Ascending order, so a new value is obvious to place and a duplicate is
+     * obvious to spot.
+     */
+    qualities: [75, 82, 88, 90],
   },
   async redirects() {
     return legacyRedirects;

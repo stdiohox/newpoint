@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
@@ -5,6 +6,7 @@ import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -105,7 +107,20 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     },
   ];
 
-  /** Schema only — the visible breadcrumb was removed from PageHero. */
+  /**
+   * ONE TRAIL, RENDERED TWICE — as the visible breadcrumb below the hero and as
+   * the BreadcrumbList in the page's JSON-LD. Both go through
+   * `breadcrumbTrail()`, which prepends Home, so the two cannot drift apart and
+   * the visible leaf is the schema's leaf.
+   *
+   * The leaf is `service.nav` — "Psychiatric assessment" on this route — not
+   * "Psychiatric evaluation". See the note on `<Breadcrumb>` for why the label
+   * and the slug are allowed to differ, and CLAUDE.md's terminology section for
+   * why the label is the one that has to say "assessment".
+   *
+   * The OTHER TWO SERVICES on this route are still schema-only: the visible
+   * trail is gated on the feature layout below, which is this page alone.
+   */
   const crumbs = [
     { name: 'Services', path: '/services' },
     { name: service.nav, path: `/services/${service.slug}` },
@@ -174,6 +189,13 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             BOTH BRANCHES DERIVE THEIR ANCHOR IDS FROM THE SAME slugify CALL on
             the same headings, so the in-page anchors are byte-identical to what
             this route served before. */}
+        {/* THE VISIBLE BREADCRUMB, on this page only.
+            Below the hero rather than over it, for the reason PageHero's note
+            gives: above the H1 it read as a second navbar under the real one.
+            Gated on the feature layout so the two prose services keep the
+            schema-only trail they have always served. */}
+        {useFeatureLayout && <Breadcrumb trail={crumbs} />}
+
         {useFeatureLayout ? (
           <ServiceBody sections={sectionItems} media={bodyMedia} />
         ) : (
@@ -275,6 +297,101 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                     );
                   })}
                 </div>
+              </div>
+            </Container>
+          </div>
+        )}
+
+        {/* LINKS TO THE TWO PROVIDER PAGES, on this page only.
+            Dropping RelatedLinks from this layout took the page's only links to
+            /providers/[slug] with it — the note below PageCta records that the
+            cost of that removal was internal linking, and this is the part of it
+            worth paying back, because these are the two destinations a reader
+            of an assessment page actually wants.
+
+            IT SITS ABOVE PageCta, NOT BELOW IT, and the placement is the whole
+            reason this is safe to add. The CrisisPanel note below explains that
+            the panel was only needed on this route because RelatedLinks put six
+            cards between the CTA and the footer's 988 strip. Nothing is inserted
+            there by this block, so PageCta remains the last thing before the
+            footer and that distance is unchanged. Do not move this below the CTA
+            without bringing CrisisPanel back with it.
+
+            THE COPY DOES NOT BIND EITHER PROVIDER TO THIS SERVICE, and that is
+            deliberate. app/services/page.tsx carries the full reasoning: whether
+            both providers perform initial psychiatric assessments is an open
+            client item — Ofoegbu's bio names assessments and Whitaker's names
+            medication management only — so nothing here may read as "these are
+            the two people who will conduct your assessment".
+
+            THAT CONSTRAINT IS CARRIED BY THE HEADING, NOT BY THE PARAGRAPH, and
+            the /services wording cannot simply be borrowed to satisfy it. See
+            the note on the h2 below: that page's "Providers you will see" is
+            page-wide because its scope is every service, and the same words on a
+            single-service page inherit that page's scope instead.
+
+            NO "Dr." HERE. CLAUDE.md's client override is scoped to the
+            /services "Providers you will see" cards and is rendered as a display
+            prefix there. Every name on this page is PROVIDERS[].name verbatim —
+            no new provider names, no titles added. */}
+        {useFeatureLayout && (
+          <div className="pb-4 md:pb-8">
+            <Container>
+              <div className="border-np-neutral-200 border-t pt-12">
+                <Reveal>
+                  {/* A NOUN PHRASE, NOT "Who you will be seeing", and the
+                      difference is the whole compliance argument rather than a
+                      matter of tone.
+
+                      On /services a second-person heading is page-wide because
+                      that page's scope is all three services and the section
+                      sits outside every per-service block. THIS page's scope IS
+                      the appointment — the H1 is "Comprehensive psychiatric
+                      assessment" and the intro opens "Every patient at Newpoint
+                      starts here" — so a second-person future heading inside it
+                      inherits that scope and reads as "these are the two people
+                      who will conduct my assessment". That is the claim
+                      app/services/page.tsx's note declines to make, because
+                      whether BOTH providers perform initial assessments is an
+                      open client item: Ofoegbu's bio names assessments and
+                      Whitaker's names medication management only.
+
+                      Putting the hedge in the paragraph does not fix a heading
+                      that asserts. Headings are what gets scanned, what a
+                      screen-reader user navigates by, and what Google lifts as a
+                      passage, so the heading has to be neutral on its own. */}
+                  <h2 className="text-h2 max-w-[22ch]">The providers at Newpoint</h2>
+                  {/* CLIENT: confirm whether both providers perform initial
+                      psychiatric assessments. If they do, this section can bind
+                      them to it outright and say so in the heading. */}
+                  {/* NO COUNT IN THIS SENTENCE. It previously read "There are
+                      two providers at Newpoint", which is sourced and true, but
+                      it is prose sitting above a PROVIDERS.map: a third provider
+                      would make the sentence false next to a three-card grid.
+                      Stating the credential without the number cannot drift. */}
+                  <p className="text-body-l text-np-neutral-600 mt-4 max-w-[52ch]">
+                    Newpoint&rsquo;s providers are doctorate-prepared
+                    psychiatric-mental health nurse practitioners.
+                  </p>
+                </Reveal>
+
+                <ul role="list" className="mt-8 grid gap-4 sm:grid-cols-2">
+                  {PROVIDERS.map((p, i) => (
+                    <Reveal as="li" key={p.slug} delay={stagger(i, 0.08)}>
+                      <Link
+                        href={`/providers/${p.slug}`}
+                        className="rounded-card bg-np-surface ease-np-out block h-full p-5 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)]"
+                      >
+                        {/* h3 under the h2 above, so the outline does not skip a
+                            level. The name is the link text, which is the anchor
+                            text a provider page wants to be found by. */}
+                        <h3 className="text-body text-np-ink font-medium">{p.name}</h3>
+                        <p className="text-small text-np-neutral-600 mt-1">{p.credentials}</p>
+                        <p className="text-small text-np-neutral-600 mt-1">{p.licensed}</p>
+                      </Link>
+                    </Reveal>
+                  ))}
+                </ul>
               </div>
             </Container>
           </div>
