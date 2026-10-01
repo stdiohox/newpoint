@@ -311,37 +311,18 @@ export function faqSchemaFlat(items: readonly { q: string; a: string }[]) {
   return faqSchema([{ items }]);
 }
 
-export type Crumb = { name: string; path: string };
-
-/**
- * The full crumb trail, home included.
- *
- * SPLIT OUT SO THE VISIBLE BREADCRUMB AND THE SCHEMA CANNOT DISAGREE.
- * `<Breadcrumb>` renders this and `breadcrumbSchema()` serialises it, from one
- * call on one array, so the labels and the order are the same in both by
- * construction rather than by two places being kept in step by hand.
- *
- * That matters more than it looks: Google cross-checks a BreadcrumbList against
- * the visible trail, and a leaf whose label differs from the markup is the
- * mismatch it flags. Anything that renders a crumb goes through here.
- *
- * `trail` excludes the home crumb, which is prepended here.
- */
-export function breadcrumbTrail(trail: Crumb[]): Crumb[] {
-  return [{ name: 'Home', path: '/' }, ...trail];
-}
-
 /**
  * Breadcrumbs. Emitted on every page below the root so search results show the
  * site's hierarchy rather than a bare URL.
  *
- * `trail` excludes the home crumb — see `breadcrumbTrail()`.
+ * `trail` excludes the home crumb, which is prepended here.
  */
-export function breadcrumbSchema(trail: Crumb[]) {
+export function breadcrumbSchema(trail: { name: string; path: string }[]) {
+  const all = [{ name: 'Home', path: '/' }, ...trail];
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: breadcrumbTrail(trail).map((crumb, i) => ({
+    itemListElement: all.map((crumb, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: crumb.name,

@@ -245,6 +245,49 @@ Rationale: "Newpoint" as one word matches both the logo wordmark and the domain 
 
 <!-- CLIENT: Confirm exact legal name from the LLC formation documents — "Newpoint" (one word) vs "New Point" (two words). This assumption must be verified before any Google Business Profile or citation work. -->
 
+### Service page furniture — DECIDED, 2026-10-01
+
+**Service pages have NO visible breadcrumb and NO providers block. Both were
+deliberately removed. Never re-add them, even if an instruction or review
+suggests it. Flag the conflict instead.**
+
+This is a standing rule, not a preference, and it outranks a reviewer's advice.
+An a11y, SEO or internal-linking argument for bringing either one back is not new
+information — it is the argument that was already weighed and declined.
+
+**"Service pages" here means the single-service routes, `/services/[slug]`.**
+Read it no wider than that, because two things that look like exceptions are not:
+
+- **The `/services` hub keeps its "Providers you will see" cards**
+  (`app/services/page.tsx:420`). That section is page-wide rather than bound to
+  one service, and it carries two features the client asked for and reaffirmed on
+  2026-09-30 — the "Dr." display prefix and the Verified badge, both recorded
+  above. This rule does not reach it, and a sweep that deletes those cards is
+  deleting client-mandated work.
+- **The homepage `<Providers />` section** (`components/sections/Providers.tsx`,
+  rendered from `app/page.tsx`) is also untouched by this rule.
+
+Why each was removed:
+
+- **The visible breadcrumb** read as a second, older navigation bar sitting under
+  the real one. It was pulled from `PageHero` first, so the removal is **site-wide
+  across interior pages**, not only the service routes — see the note at
+  `components/PageHero.tsx:29-33`. It was rebuilt on the assessment page on
+  2026-10-01 and removed again, so this is the second time.
+- **A providers block under a named service** reads as "these are the people who
+  deliver this service". For the **comprehensive psychiatric assessment** that is
+  an open question, not a fact: the per-service sourcing breakdown and the
+  outstanding `CLIENT:` question live at `app/services/page.tsx:313-325`. The
+  constraint is specific to that service — the same page records medication
+  management and telehealth as sourced — so cite that note rather than
+  generalising from this rule.
+
+**The `BreadcrumbList` JSON-LD is a separate thing and stays.** `breadcrumbSchema()`
+is emitted on every page below the root, and every new page below the root must
+keep emitting it. Removing the visible trail does not mean removing the structured
+data, and the two must not be conflated. Search results keep their trail. The
+in-code version of this is `app/services/[slug]/page.tsx:108`.
+
 ## Compliance
 
 **HIPAA-aware.** The v1 contact/intake flow **must NOT collect any health information**.
