@@ -51,10 +51,11 @@ export default function Home() {
     medicalClinicSchema(),
     ...providersSchema(),
     ...SERVICE_PAGES.map(serviceSchemaFor),
-    /* NO faqSchema HERE. The FAQPage node moved to /faq with the full set of
-       questions; this page now shows only a four-question preview, and two
-       documents emitting the same eight questions would compete for one rich
-       result. See components/sections/Faq.tsx. */
+    /* NO faqSchema HERE. The FAQPage node lives on /contact with the full set
+       of questions (it was /faq until that page was merged in, 2026-10-01);
+       this page shows only a four-question preview, and two documents emitting
+       the same eight questions would compete for one rich result. See
+       components/sections/Faq.tsx. */
   ];
 
   return (

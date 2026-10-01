@@ -33,14 +33,16 @@ import { FAQ } from '@/lib/content';
  * Server component. <FaqSections /> is the only client code, and it is a leaf.
  */
 /**
- * A PREVIEW NOW, NOT THE WHOLE SET. /faq carries all eight questions under
- * their group headings; this band shows the first four and links there.
+ * A PREVIEW NOW, NOT THE WHOLE SET. /contact#faq carries all eight questions
+ * under their group headings; this band shows the first four and links there.
+ * That was /faq until 2026-10-01, when the FAQ was merged into the contact
+ * page; only the destination changed.
  *
  * Four, not eight, because the full list on both URLs would be the same eight
  * questions and answers on two indexable pages, competing with each other —
  * which is the duplicate-content problem PageFaq's own note already describes.
- * The FAQPage JSON-LD moved to /faq with the full set for the same reason, so
- * app/page.tsx no longer emits faqSchema.
+ * The FAQPage JSON-LD moved with the full set for the same reason, so
+ * app/page.tsx no longer emits faqSchema and /contact does.
  *
  * The four are the first four in source order, so the preview is a prefix of
  * the page rather than a selection anyone has to maintain. All of them are
@@ -75,7 +77,11 @@ export function Faq() {
             context. */}
         <Reveal>
           <Link
-            href="/faq"
+            /* /contact#faq SINCE 2026-10-01. The full set moved there when
+               /faq was merged into the contact page; the old path still 301s,
+               but a link that resolves in one hop is better than one that
+               resolves in two. */
+            href="/contact#faq"
             className="text-body text-np-blue-600 ease-np-out mt-10 inline-flex items-center gap-1 font-medium underline-offset-4 transition-colors duration-[180ms] hover:underline focus-visible:underline motion-reduce:transition-none"
           >
             All frequently asked questions

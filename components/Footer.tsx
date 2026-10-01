@@ -1,7 +1,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
-import { BUSINESS, CRISIS, CTA, FOOTER, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
+import {
+  BUSINESS,
+  CONTACT_AND_FAQ,
+  CRISIS,
+  CTA,
+  FOOTER,
+  NAV,
+  PROVIDERS,
+  SERVICE_PAGES,
+} from '@/lib/content';
 
 /**
  * Site footer, on every route.
@@ -43,9 +52,21 @@ import { BUSINESS, CRISIS, CTA, FOOTER, NAV, PROVIDERS, SERVICE_PAGES } from '@/
  * exist.
  */
 
-/** Practice column: everything in the primary nav except Services, which has
-    its own column beside it. Derived rather than retyped. */
-const PRACTICE_LINKS = NAV.filter((item) => item.href !== '/services');
+/**
+ * Practice column: everything in the primary nav except Services, which has
+ * its own column beside it, plus the one link the navbar does not carry.
+ *
+ * CONTACT_AND_FAQ IS APPENDED, NOT IN NAV. The navbar lost its "FAQ" and
+ * "Contact" entries on 2026-10-01 — the FAQ was merged into /contact and the
+ * CTA button already points there — but a footer lists what a site has, and
+ * the CTA button is not in the footer. So one link, under the label the client
+ * asked for, and it is the last entry in the column because it is the one that
+ * is not a section of the practice.
+ */
+const PRACTICE_LINKS = [
+  ...NAV.filter((item) => item.href !== '/services'),
+  CONTACT_AND_FAQ,
+];
 
 /** Shared link treatment. white/80 to white, with the hairline underline on
     hover rather than on rest so six stacked links do not read as a ruled list. */

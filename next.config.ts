@@ -50,6 +50,26 @@ const legacyRedirects = [
     statusCode: 301,
   },
   {
+    /* NOT A LEGACY URL — A PAGE THIS REBUILD BUILT AND THEN RETIRED.
+       /faq shipped on 2026-09-30 with the full eight questions and was merged
+       into /contact on 2026-10-01 at the client's instruction. It was linked
+       from the navbar, the footer and the homepage preview for a day, so it
+       may already be bookmarked or crawled; the 301 is what keeps those
+       working and what passes any equity it gathered to its content's new
+       home.
+
+       THE FRAGMENT SURVIVES THE REDIRECT because Next emits it in the Location
+       header, and a browser keeps a fragment from the original request anyway
+       when the target has none. Either way the reader lands on the questions
+       rather than at the top of a page whose first section is a form.
+
+       The questions themselves are unchanged and live at
+       app/contact/page.tsx, under id="faq". */
+    source: '/faq',
+    destination: '/contact#faq',
+    statusCode: 301,
+  },
+  {
     // Unedited Duda blog template, dated Feb 2017, byline "Duda Owner IONOS".
     // No equivalent content exists and none should. FLAGGED: no clear match,
     // so this goes to the homepage.

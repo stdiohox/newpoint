@@ -2,14 +2,15 @@ import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { ContactCrisis } from '@/components/sections/ContactCrisis';
+import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
 import { stagger } from '@/lib/motion';
-import { BUSINESS, CONTACT_PAGE, PROVIDERS } from '@/lib/content';
+import { BUSINESS, CONTACT_PAGE, FAQ, PROVIDERS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
-import { breadcrumbSchema, contactPageSchema, organizationRef } from '@/lib/schema';
+import { breadcrumbSchema, contactPageSchema, faqSchema, organizationRef } from '@/lib/schema';
 
 /**
  * /contact.
@@ -38,7 +39,20 @@ export default function ContactPage() {
 
   return (
     <>
-      <JsonLd schemas={[organizationRef(), contactPageSchema(), breadcrumbSchema(crumbs)]} />
+      {/* THE FAQPage NODE MOVED HERE WITH THE QUESTIONS, and it still exists
+          exactly once on the site. It lived on /faq, which lived there because
+          two pages emitting the same eight questions are two documents
+          competing for one rich result. /faq is gone, so this is now the only
+          URL carrying the full set — the homepage keeps its four-question
+          preview and still emits no faqSchema. */}
+      <JsonLd
+        schemas={[
+          organizationRef(),
+          contactPageSchema(),
+          faqSchema(FAQ.groups),
+          breadcrumbSchema(crumbs),
+        ]}
+      />
       <main id="main" tabIndex={-1} className="focus:outline-none">
         {/* NO HERO CTA ON THIS PAGE, and it came off with the CTA retarget.
             CTA.href is `/contact` now, so the hero button linked to the page it
@@ -62,6 +76,37 @@ export default function ContactPage() {
             not redundancy. Putting the form first is what keeps the remaining
             one high — higher than the old placement, not lower. */}
         <ContactCrisis />
+
+        {/* THE FAQ, MERGED IN FROM /faq ON 2026-10-01 at the client's
+            instruction. That page is gone and 301s to this anchor; its content
+            is here unchanged — every group, every question, every answer,
+            verbatim and in source order, one block per group under its own h2,
+            exactly as it rendered there.
+
+            id="faq" IS A LINK TARGET WITH TRAFFIC BEHIND IT. The homepage
+            preview, the footer and the /faq redirect all land on it, so it has
+            to stay on an element that exists whatever the groups are.
+            globals.css's scroll-padding-top clears the sticky navbar.
+
+            BETWEEN THE FORM AND THE CONTACT METHODS, as asked. The order is
+            the page's argument: the form is what most people came to do, the
+            FAQ answers what stops them doing it, and the phone and email
+            details are for the people the first two did not finish.
+
+            EACH GROUP STILL GETS A DISTINCT idPrefix. Accordion builds element
+            ids from it, so two blocks sharing a prefix emit duplicate ids and
+            cross-wire their aria-controls — the reason /faq passed one per
+            group, and the reason this page cannot simply flatten them. */}
+        <div id="faq">
+          {FAQ.groups.map((group) => (
+            <PageFaq
+              key={group.title}
+              heading={group.title}
+              items={group.items}
+              idPrefix={`faq-${group.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+            />
+          ))}
+        </div>
 
         <div className="py-20 md:py-28">
           <Container>

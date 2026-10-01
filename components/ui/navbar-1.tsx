@@ -571,9 +571,19 @@ export function Navbar1({
           whileHover={reduce ? undefined : { scale: 1.05 }}
         >
           {/* Filled np-blue-900, not the hero's glass: glass over a white pill
-              shows nothing. White on np-blue-900 measures 16.10:1. */}
+              shows nothing. White on np-blue-900 measures 16.10:1.
+
+              aria-current SINCE 2026-10-01, when "Contact" came out of NAV.
+              The nav links get it from `isActive` above; this button was the
+              one link in the bar without it, which did not matter while a NAV
+              entry also pointed at /contact and announced the current page.
+              It is now the only one, so without this the navbar says nothing
+              about where you are on the page it leads to. No visual change —
+              the underline that `aria-[current=page]` draws on the nav links
+              is not in this button's class list. */}
           <Link
             href={CTA.href}
+            aria-current={isActive(CTA.href) ? 'page' : undefined}
             className="bg-np-blue-900 hover:bg-np-blue-700 focus-visible:outline-np-blue-900 inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
           >
             {CTA.label}
@@ -698,8 +708,13 @@ export function Navbar1({
                 exit={reduce ? undefined : { opacity: 0, y: 20 }}
                 className="pt-6"
               >
+                {/* aria-current for the same reason as the desktop CTA above:
+                    with "Contact" gone from NAV this is the mobile menu's only
+                    link to /contact, and it was the only one that never said
+                    so. */}
                 <Link
                   href={CTA.href}
+                  aria-current={isActive(CTA.href) ? 'page' : undefined}
                   className="bg-np-blue-900 hover:bg-np-blue-700 focus-visible:outline-np-blue-900 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-base font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
                   onClick={close}
                 >

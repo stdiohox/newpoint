@@ -24,7 +24,8 @@ export function PageFaq({
    * its ids as `${idPrefix}-trigger-${i}` and `${idPrefix}-panel-${i}`, so two
    * blocks sharing a prefix emit duplicate ids and every aria-controls and
    * aria-labelledby in the second block resolves to the first one's markup.
-   * /faq renders one block per FAQ group and passes a distinct prefix for each.
+   * /contact renders one block per FAQ group and passes a distinct prefix for
+   * each — it was /faq until the two pages were merged on 2026-10-01.
    * The default keeps every existing single-block caller unchanged.
    */
   idPrefix?: string;

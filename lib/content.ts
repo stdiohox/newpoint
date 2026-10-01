@@ -20,7 +20,7 @@ import { BRAND } from './nav';
  * Re-exported so the server components that already read these from here keep
  * working. `lib/nav.ts` is the definition; this is an alias, not a copy.
  */
-export { NAV, CTA } from './nav';
+export { NAV, CTA, CONTACT_AND_FAQ } from './nav';
 
 export const BUSINESS = {
   /**
@@ -2339,20 +2339,15 @@ export const CONTACT_PAGE = {
  * widened to { path: string; priority: number }. `as const` would only freeze
  * the one hand-written entry and read as a stronger guarantee than it gives.
  */
-/**
- * The /faq page.
- *
- * NO NEW BODY COPY. The questions, answers, group titles, heading and intro all
- * come from FAQ, verbatim and in source order. Only the two metadata strings
- * below are new, and metadata is where every page needs a unique pair.
- */
-export const FAQ_PAGE = {
-  /* CLIENT-REVIEW — metadata. Both describe what the page contains and assert
-     nothing about the practice that FAQ's own answers do not already say. */
-  metaTitle: 'Frequently Asked Questions',
-  metaDescription:
-    'Answers to common questions about starting psychiatric care at Newpoint: who you will see, how appointments work, insurance and costs.',
-} as const;
+/* FAQ_PAGE IS GONE, 2026-10-01, and it was deleted rather than left orphaned.
+   It held two strings: a metaTitle and a metaDescription for /faq. That route
+   was merged into /contact and deleted, so the only page that read them does
+   not exist, and /contact keeps CONTACT_PAGE's own pair — a page gets one
+   title and one description, not two. Nothing else referenced it.
+
+   The FAQ's actual content was never here: the questions, answers, group
+   titles, heading and intro are all in FAQ above, where they always were, and
+   they now render on /contact under id="faq". */
 
 /**
  * The /providers index.
@@ -2399,8 +2394,12 @@ export const ROUTES: { path: string; priority: number }[] = [
   ...SERVICE_PAGES.map((s) => ({ path: `/services/${s.slug}`, priority: 0.8 })),
   { path: '/insurance', priority: 0.8 },
   { path: '/new-patients', priority: 0.8 },
+  /* 0.9, and it now carries the FAQ as well. /faq was a route of its own with
+     priority 0.7 until 2026-10-01; its questions, its FAQPage schema and its
+     URL all moved here, and next.config.ts 301s the old path to /contact#faq.
+     Re-adding it to this list would put a redirecting URL in the sitemap,
+     which is the one thing a sitemap should never contain. */
   { path: '/contact', priority: 0.9 },
-  { path: '/faq', priority: 0.7 },
   /* The index sits above its own detail pages, same as /services does. */
   { path: '/providers', priority: 0.8 },
   ...PROVIDERS.map((p) => ({ path: `/providers/${p.slug}`, priority: 0.7 })),
@@ -2562,7 +2561,6 @@ function assertTitlesQualified() {
     ['INSURANCE_PAGE', INSURANCE_PAGE],
     ['NEW_PATIENTS_PAGE', NEW_PATIENTS_PAGE],
     ['CONTACT_PAGE', CONTACT_PAGE],
-    ['FAQ_PAGE', FAQ_PAGE],
     ['PROVIDERS_PAGE', PROVIDERS_PAGE],
   ];
 

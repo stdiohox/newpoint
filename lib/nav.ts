@@ -70,12 +70,33 @@ export const NAV = [
   { label: 'Providers', href: '/providers' },
   { label: 'Insurance', href: '/insurance' },
   { label: 'New patients', href: '/new-patients' },
-  /* A PAGE, NOT THE HOMEPAGE SECTION. This was `/#faq`, which scrolled to the
-     homepage's FAQ band. /faq now carries the full set and the homepage keeps
-     a short preview linking to it. */
-  { label: 'FAQ', href: '/faq' },
-  { label: 'Contact', href: '/contact' },
+  /* NO "FAQ" AND NO "Contact" ENTRY, as of 2026-10-01, and both were removed
+     by client decision rather than lost.
+
+     The FAQ no longer has a page: it was merged into /contact under id="faq",
+     and /faq 301s there. Contact has one too, and it is the CTA — the
+     "Request an appointment" button below is in the navbar at every width,
+     points at /contact, and is the single highest-intent destination on the
+     site. A second plain "Contact" link beside it offered the same route in a
+     quieter voice.
+
+     THIS ARRAY FEEDS THREE SURFACES, so removing an entry removes it from all
+     three at once: the desktop nav, the mobile menu and the footer's Practice
+     column. The footer adds "Contact & FAQ" back on its own — see
+     CONTACT_AND_FAQ below — because a footer is where a site lists what it
+     has, and the CTA button is not in it. */
 ] as const;
+
+/**
+ * The footer's single link to /contact, carrying the one label that is new
+ * copy: "Contact & FAQ".
+ *
+ * It is NOT in NAV. NAV is the navbar's list, and the navbar deliberately
+ * carries no Contact link any more; putting it there to get it into the footer
+ * would put it back in the bar the client asked to clear. One constant, used
+ * once, named for what it is.
+ */
+export const CONTACT_AND_FAQ = { label: 'Contact & FAQ', href: '/contact' } as const;
 
 /**
  * Single CTA intent across the entire site. Never a second label for this
