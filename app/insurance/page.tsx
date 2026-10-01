@@ -2,7 +2,8 @@ import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
-import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { PageCta } from '@/components/sections/PageCta';
+import { PlanCloud } from '@/components/sections/PlanCloud';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
@@ -149,40 +150,42 @@ export default function InsurancePage() {
                 state". The scope label above each run answers that before they
                 start reading names.
 
-                ONLY `confirmed` PAYERS ARE RENDERED. The unconfirmed candidates
-                from the directory capture stay in PAYER_GROUPS with their
-                sourcing notes and never reach the page. See lib/content.ts.
+                WHAT PUBLISHES A PAYER, AS OF 2026-10-01: `confirmed`, as
+                before, OR a `review` note. The second is the client's
+                instruction of that date — the nine plans from Dr. Whitaker's
+                Headway profile are published here while the practice confirms
+                them, each carrying a CLIENT-REVIEW note in lib/content.ts.
+                THIS PAGE IS THE ONLY SURFACE THAT HONOURS `review`: the
+                homepage card, its count and the JSON-LD still derive from
+                `INSURANCE.payers`, which is `confirmed`-only. The reasoning is
+                on the Payer type.
 
-                A group with no confirmed plan keeps its heading and shows the
-                coverage-check invitation instead of a list — which is the state
-                Pennsylvania is in. An empty <ul> under a state heading reads as
-                "we cover nothing here", which is both wrong and worse than
-                saying nothing; the invitation turns the gap into the next
-                step. */}
+                A group with nothing to show keeps its heading and shows the
+                coverage-check invitation instead of a list. No group is in
+                that state today — Pennsylvania was, until its four carriers
+                were published — but an empty <ul> under a state heading reads
+                as "we cover nothing here", which is both wrong and worse than
+                saying nothing, so the branch stays. */}
             {INSURANCE.groups.map((group, gi) => {
-              const shown = group.payers.filter((p) => p.confirmed);
+              const shown = group.payers.filter((p) => p.confirmed || p.review);
+              /* Index, not a slug of the label: the id only has to be unique
+                 and stable within this page, and deriving it from the scope
+                 text would mean a copy change silently renaming an id. */
+              const labelId = `plans-group-${gi}`;
 
               return (
                 <div key={group.scope} className={gi === 0 ? 'mt-10' : 'mt-14'}>
                   <Reveal>
-                    <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                    <h3
+                      id={labelId}
+                      className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase"
+                    >
                       {group.scope}
                     </h3>
                   </Reveal>
 
                   {shown.length > 0 ? (
-                    <ul
-                      role="list"
-                      className="mt-5 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3"
-                    >
-                      {shown.map((payer, i) => (
-                        <Reveal as="li" key={payer.name} delay={stagger(i, 0.05)}>
-                          <p className="font-display text-body-l text-np-ink border-np-neutral-200 border-b pb-4 font-medium tracking-[-0.01em]">
-                            {payer.name}
-                          </p>
-                        </Reveal>
-                      ))}
-                    </ul>
+                    <PlanCloud plans={shown.map((p) => p.name)} labelledBy={labelId} />
                   ) : (
                     <Reveal>
                       <p className="text-body-l text-np-neutral-600 mt-5 max-w-[52ch]">
@@ -214,32 +217,12 @@ export default function InsurancePage() {
 
         <PageFaq items={INSURANCE_PAGE.faqs} heading="Questions about cost" />
 
-        <RelatedLinks
-          links={[
-            {
-              label: 'Starting care',
-              description: 'What happens between getting in touch and your first appointment.',
-              href: '/new-patients',
-            },
-            {
-              label: 'Psychiatric assessment',
-              description: 'The appointment every new patient starts with, described in full.',
-              href: '/services/psychiatric-evaluation',
-            },
-            {
-              label: 'Telehealth',
-              description: 'Video appointments across New Jersey and Pennsylvania.',
-              href: '/services/telehealth',
-            },
-            {
-              label: 'Medication management',
-              description:
-                'Ongoing prescribing and review, tracked with standardized rating scales.',
-              href: '/services/medication-management',
-            },
-          ]}
-        />
-
+        {/* NO "Keep reading" HERE. The four-link cluster was removed at the
+            client's instruction on 2026-10-01, matching the service pages,
+            /providers, /faq and /contact, which have all had it taken off in
+            turn. The links it carried are all reachable from the navbar, and
+            PageCta below still carries the appointment route. Do not re-add
+            it; flag the conflict instead. */}
         <PageCta
           heading="Let us check your coverage"
           body="Send us your contact details and ask us to check your plan before you book. Please do not include insurance ID or member numbers in the form."

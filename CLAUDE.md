@@ -344,6 +344,38 @@ keep emitting it. Removing the visible trail does not mean removing the structur
 data, and the two must not be conflated. Search results keep their trail. The
 in-code version of this is `app/services/[slug]/page.tsx:108`.
 
+### Payer list — CLIENT INSTRUCTION, 2026-10-01
+
+**Nine insurance plans are published on `/insurance` that the practice has not
+confirmed. This is a deliberate client instruction, not an oversight, and it is a
+narrow exception to "never invent verifiable regulated facts" above — a payer
+contract is checkable against the payer's own directory, so it sits squarely
+inside that rule.**
+
+They are: Oscar, Oxford, Carelon Behavioral Health, Capital Blue Cross
+Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania, Independence Blue
+Cross Pennsylvania (Virtual National Network), Geisinger, Blue Cross Blue Shield
+of Massachusetts and The Health Plan. The source the client gave is Dr.
+Whitaker's Headway profile, `https://care.headway.co/providers/funmilayo-whitaker-2`.
+
+**The exception is bounded, and the boundary is enforced in code.** Each of the
+nine carries a `review` note in `PAYER_GROUPS` (`lib/content.ts`), and `review`
+publishes a name **on the insurance page only**. `INSURANCE.payers` — which feeds
+the homepage card, its "and N more" count and the JSON-LD — still derives from
+`confirmed` alone, so **no machine-readable claim asserts any of the nine**. Keep
+it that way: moving one to `confirmed: true` is what the practice confirming it
+looks like, and nothing else should do it.
+
+**Do not sweep these names out** on the strength of the rule above, and do not
+widen the `review` mechanism to any other regulated fact. Both are decisions that
+were already weighed. If a review flags the nine, that is the known state of them
+— `OPEN_CLIENT_ITEMS` carries what the practice has to confirm, name by name.
+
+**One thing is still open and is the client's to decide:** whether the page says
+visibly that some plans are being confirmed. It does not today — all sixteen
+names render identically under "We accept the plans below". That hedge was not
+added unilaterally because it softens the instruction itself.
+
 ## Compliance
 
 **HIPAA-aware.** The v1 contact/intake flow **must NOT collect any health information**.

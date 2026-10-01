@@ -144,34 +144,68 @@ export const PRACTICE_FACTS = [
  * one of them is flagged in OPEN_CLIENT_ITEMS for the practice to confirm
  * before launch.
  *
- * Deliberately excluded despite appearing in the capture:
- * - Blue Cross Blue Shield of Massachusetts. On both providers' Headway
- *   profiles and on neither Grow profile, and Massachusetts is not a state this
- *   practice serves. It is a Headway national-network artifact.
+ * Previously excluded, now listed at the client's instruction (2026-10-01):
+ * - Blue Cross Blue Shield of Massachusetts. The note here read "a Headway
+ *   national-network artifact", because Massachusetts is not a state this
+ *   practice serves. The client asked for it by name from Dr. Whitaker's
+ *   Headway profile, so it ships under `review` rather than being dropped, and
+ *   it sits under "Other plans" because its name states a state the practice
+ *   does not serve.
+ * Still excluded:
  * - UPMC, Amerihealth, Humana, Braven, Surest, Centivo, AvMed and the long tail
  *   of Aetna and UnitedHealthcare sub-plans. All Grow-only, i.e. one
- *   marketplace's network and nothing else.
+ *   marketplace's network and nothing else, and none of them was asked for.
  *
  * "Accept", never "in network", throughout — see `heading` below.
  *
  * ---
  *
- * `confirmed` IS THE GATE, AND IT IS THE ONLY THING THAT PUBLISHES A PAYER.
+ * TWO FIELDS GATE A PAYER, AND THEY GATE DIFFERENT SURFACES. This was one
+ * field until 2026-10-01; the second exists because the client asked for the
+ * gated candidates to be published while they are still being confirmed.
  *
- * true  = the practice's own, from research/business-nap.md. Rendered and
- *         emitted in schema.
- * false = from the 2026-09-29 directory capture and NOT yet confirmed by the
- *         practice. Kept here, deliberately, but filtered out of every surface:
- *         the insurance page, the homepage card and the JSON-LD. Nothing a
- *         patient or a crawler can see.
+ * `confirmed`
+ *   true  = the practice's own, from research/business-nap.md. Rendered on the
+ *           insurance page, on the homepage card and its "and N more" count,
+ *           and emitted in the JSON-LD.
+ *   false = not confirmed by the practice. Never reaches `INSURANCE.payers`,
+ *           so never reaches the homepage card or the schema.
  *
- * So a name sitting in this file is not a claim. Only `confirmed: true` is.
- * When the practice confirms one, flip its flag and it appears everywhere at
- * once — the page, the card and its count, and the schema all derive from here.
- * Deleting the entry instead throws away the sourcing notes and the reason it
- * was a candidate, so flip, do not delete.
+ * `review`
+ *   A CLIENT-REVIEW note. Set on a payer the CLIENT asked to publish before
+ *   the practice has confirmed it. It renders the name ON THE INSURANCE PAGE
+ *   ONLY — `INSURANCE.payers` still derives from `confirmed` alone, so the
+ *   homepage card, its count and the JSON-LD are untouched by it. The note
+ *   says where the name came from and what has to be confirmed.
+ *
+ * So the page may now show a name the schema does not assert. That asymmetry
+ * is deliberate and it is the narrowest way to honour the instruction: the
+ * page is where the plan list is read and where the "ask us and we will check
+ * your coverage" sentence sits beside it; the schema is a machine claim about
+ * the business that nobody has confirmed yet.
+ *
+ * A name with NEITHER flag is still invisible everywhere, which is what the
+ * original gate was for. When the practice confirms one, set `confirmed: true`
+ * and delete its `review` note: the card, the count and the schema pick it up
+ * at once. Deleting the entry instead throws away the sourcing notes and the
+ * reason it was a candidate, so flip, do not delete.
  */
-type Payer = { readonly name: string; readonly confirmed: boolean };
+type Payer = {
+  readonly name: string;
+  readonly confirmed: boolean;
+  /** CLIENT-REVIEW note. Publishes the name on /insurance only. See above. */
+  readonly review?: string;
+};
+
+/**
+ * The note every plan added on 2026-10-01 carries, dictated by the client.
+ *
+ * ONE CONSTANT, NOT NINE COPIES, so it cannot drift between entries and so a
+ * grep for it returns the whole set. The source is Dr. Whitaker's Headway
+ * profile: https://care.headway.co/providers/funmilayo-whitaker-2
+ */
+const HEADWAY_WHITAKER_REVIEW =
+  "CLIENT-REVIEW: Listed on Dr. Whitaker's Headway profile; confirm practice-wide and for Dr. Ofoegbu.";
 
 const PAYER_GROUPS: readonly { readonly scope: string; readonly payers: readonly Payer[] }[] = [
   {
@@ -189,9 +223,22 @@ const PAYER_GROUPS: readonly { readonly scope: string; readonly payers: readonly
       { name: 'Cigna Evernorth', confirmed: true },
       { name: 'United Healthcare', confirmed: true },
       { name: 'Optum', confirmed: true },
-      { name: 'Oscar', confirmed: false },
-      { name: 'Oxford', confirmed: false },
-      { name: 'Carelon Behavioral Health', confirmed: false },
+      /* The client's 2026-10-01 list names all three, so all three now
+         publish.
+
+         THE NOTE UNDERSTATES WHAT IS BEHIND THEM, AND THE "for Dr. Ofoegbu"
+         HALF IS ALREADY ANSWERED FOR ALL THREE: each appears on Ofoegbu's own
+         Headway profile as well as Whitaker's
+         (research/directories/headway-ofoegbu.txt). Oscar and Oxford are also
+         on Grow Therapy for Whitaker; Carelon is Headway-only — the earlier
+         note here claimed Grow for all three and was wrong, caught in review
+         2026-10-01. The note is still carried verbatim on all nine, because
+         the thing the practice has to confirm is the same for every one of
+         them: that NEWPOINT bills the plan directly, rather than a
+         marketplace billing it for a provider's work on that marketplace. */
+      { name: 'Oscar', confirmed: false, review: HEADWAY_WHITAKER_REVIEW },
+      { name: 'Oxford', confirmed: false, review: HEADWAY_WHITAKER_REVIEW },
+      { name: 'Carelon Behavioral Health', confirmed: false, review: HEADWAY_WHITAKER_REVIEW },
       { name: 'Medicare', confirmed: true },
     ],
   },
@@ -204,11 +251,20 @@ const PAYER_GROUPS: readonly { readonly scope: string; readonly payers: readonly
     ],
   },
   {
-    /* ALL FOUR UNCONFIRMED, so this group currently renders as the
-       coverage-check invitation instead of a list — see `unconfirmedScopeNote`
-       below and the insurance page. That is the honest state of it: the
-       practice has never published a Pennsylvania plan, and these four come
-       from the providers' marketplace profiles.
+    /* ALL FOUR WERE UNCONFIRMED AND INVISIBLE, so this group rendered the
+       coverage-check invitation instead of a list. On 2026-10-01 the client
+       asked for all four by name, so all four now carry `review` and the
+       group renders as a list. The practice has still never published a
+       Pennsylvania plan; these four come from the providers' marketplace
+       profiles.
+
+       THREE OF THE FOUR WERE RENAMED TO THE CLIENT'S SPELLING, not added
+       alongside the existing entries — "Capital Blue Cross Pennsylvania",
+       "Highmark Blue Cross Blue Shield Pennsylvania" and "Independence Blue
+       Cross Pennsylvania (Virtual National Network)" are the same carriers
+       this group already held under shorter names. Listing both spellings
+       would show one insurer twice and read as two different contracts.
+       Geisinger's name is identical in both lists.
 
        Each appears on BOTH Grow Therapy and Headway, and each is a major
        Pennsylvania carrier, which is the coverage a PA patient is actually
@@ -226,10 +282,50 @@ const PAYER_GROUPS: readonly { readonly scope: string; readonly payers: readonly
        gated. Confirm and flip, or cut. */
     scope: 'Pennsylvania',
     payers: [
-      { name: 'Capital Blue Cross', confirmed: false },
-      { name: 'Highmark Blue Cross Blue Shield', confirmed: false },
-      { name: 'Independence Blue Cross', confirmed: false },
-      { name: 'Geisinger', confirmed: false },
+      { name: 'Capital Blue Cross Pennsylvania', confirmed: false, review: HEADWAY_WHITAKER_REVIEW },
+      {
+        name: 'Highmark Blue Cross Blue Shield Pennsylvania',
+        confirmed: false,
+        review: HEADWAY_WHITAKER_REVIEW,
+      },
+      {
+        name: 'Independence Blue Cross Pennsylvania (Virtual National Network)',
+        confirmed: false,
+        review: HEADWAY_WHITAKER_REVIEW,
+      },
+      /* Grouped here because this group already held it, not because the name
+         states a state — "Geisinger" on its own does not. */
+      { name: 'Geisinger', confirmed: false, review: HEADWAY_WHITAKER_REVIEW },
+    ],
+  },
+  {
+    /* NEW GROUP, 2026-10-01, for the two plans in the client's list whose
+       names place them outside New Jersey and Pennsylvania or say nothing at
+       all about where they apply. The instruction was to group by what the
+       plan NAMES state and to put anything unclear here.
+
+       Blue Cross Blue Shield of Massachusetts names a state this practice
+       does not serve. It is not a mistake to list it — a patient can carry a
+       Massachusetts plan and be seen in New Jersey — but it is not a New
+       Jersey or a Pennsylvania plan, and claiming it as one would be wrong.
+
+       The Health Plan states nothing: no state, no carrier family, no
+       network. It is a West Virginia and Ohio carrier by that exact name, but
+       nothing in the string says so, so nothing here assumes it.
+
+       PROVENANCE, since it is the one name in the client's list that no
+       earlier research note ever discussed: it is on Dr. Whitaker's Headway
+       profile (research/directories/headway-whitaker.txt) and nowhere else in
+       the capture — not on Grow Therapy, and not on Ofoegbu's profile.
+       Massachusetts is on BOTH providers' Headway profiles. */
+    scope: 'Other plans',
+    payers: [
+      {
+        name: 'Blue Cross Blue Shield of Massachusetts',
+        confirmed: false,
+        review: HEADWAY_WHITAKER_REVIEW,
+      },
+      { name: 'The Health Plan', confirmed: false, review: HEADWAY_WHITAKER_REVIEW },
     ],
   },
 ];
@@ -251,15 +347,19 @@ export const INSURANCE = {
    * gating happens once, here, rather than at each call site where a future
    * consumer could forget it. The card's "and N more" count follows from it.
    *
-   * Anything needing the unconfirmed candidates too — which is nothing on the
-   * site today — reads `groups` directly and filters for itself.
+   * Anything needing the unconfirmed candidates too reads `groups` directly
+   * and filters for itself. Since 2026-10-01 one surface does: the insurance
+   * page renders a payer with `confirmed` OR a `review` note. This derived
+   * list stays `confirmed`-only, which is what keeps the review notes off the
+   * homepage card and out of the JSON-LD.
    *
    * KEEP THE @__PURE__ ANNOTATION. It is not decoration. `navbar-1.tsx` is a
    * client component and imports NAV, CTA and BUSINESS from this file, which
    * pulls the whole module into the browser bundle; tree-shaking then drops
    * whatever the client provably does not use. A bare `PAYER_GROUPS.flatMap(…)`
    * is a call expression the bundler cannot prove is side-effect free, so it
-   * kept PAYER_GROUPS alive and shipped all seven UNCONFIRMED payer names in
+   * kept PAYER_GROUPS alive and shipped every UNCONFIRMED payer name — seven at
+   * the time, nine now, each with its review note — in
    * static/chunks/app/layout-*.js — readable by anyone who opened devtools,
    * even though nothing rendered them. Measured before and after: with the
    * annotation the names are absent from the client bundle entirely.
@@ -271,7 +371,9 @@ export const INSURANCE = {
     g.payers.filter((p) => p.confirmed).map((p) => p.name)
   ),
   /**
-   * Shown in place of a group's list while that group has no confirmed plan.
+   * Shown in place of a group's list while that group has nothing to publish:
+   * no payer in it is `confirmed` and none carries a `review` note. No group
+   * is in that state today.
    *
    * Near-identical to `coverageCheckNote` and deliberately its own string: that
    * one sits on a card about a plan we DO accept, this one stands where a list
@@ -2219,7 +2321,9 @@ export const OPEN_CLIENT_ITEMS = [
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   'Whether ADHD is treated. It is one of the highest-volume queries for a psychiatric NP practice and appears nowhere in the source material, so it is not claimed — but it may be an omission rather than a deliberate exclusion. THE DIRECTORIES SAY IT IS AN OMISSION: Grow lists ADHD for Whitaker and Headway lists ADD/ADHD for BOTH providers. Highest-value content addition available from the 2026-09-29 capture. Insomnia/sleep is in the same position — Grow, Headway and U.S. News all carry it and WHAT_WE_TREAT.conditions does not',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
-  "CONFIRM THE SEVEN GATED PAYERS, or cut them. Oscar, Oxford and Carelon Behavioral Health, plus the four Pennsylvania carriers — Capital Blue Cross, Highmark Blue Cross Blue Shield, Independence Blue Cross and Geisinger. All seven sit in PAYER_GROUPS in this file with `confirmed: false`, which keeps them and their sourcing notes in the codebase while removing them from the insurance page, the homepage card and the JSON-LD. NOTHING A PATIENT OR A CRAWLER SEES ASSERTS THEM. To publish one, flip its flag: the page, the card, the card's \"and N more\" count and the schema all derive from that single field. Each comes from the providers' Grow Therapy and Headway profiles, which list the plans THOSE MARKETPLACES are contracted with for them — a patient who books through a marketplace is billed by the marketplace, so this is not automatically the same as Newpoint accepting the plan directly. Only names corroborated across both platforms were taken, and the Massachusetts and Grow-only entries were left out, but corroboration between two marketplaces is still not the practice's own billing. THE FOUR PENNSYLVANIA ONES MATTER MOST: they are the reason a PA patient would book, and with all four gated the Pennsylvania group currently shows a coverage-check invitation instead of a list. The original seven payers are unaffected and still render — those are from the practice's own site",
+  "CONFIRM THE NINE PLANS NOW PUBLISHED UNDER CLIENT-REVIEW, or cut them. THIS ITEM CHANGED ON 2026-10-01 AND IT IS NOW URGENT RATHER THAN HOUSEKEEPING. Until then these names sat in PAYER_GROUPS with `confirmed: false` and appeared nowhere a patient or a crawler could see them. The client asked for them to be published, so they now render on /insurance under a `review` note sourced to Dr. Whitaker's Headway profile (https://care.headway.co/providers/funmilayo-whitaker-2). They are: Oscar, Oxford, Carelon Behavioral Health, Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania, Independence Blue Cross Pennsylvania (Virtual National Network), Geisinger, Blue Cross Blue Shield of Massachusetts and The Health Plan. WHAT THE PRACTICE IS BEING ASKED TO CONFIRM, for each name: that NEWPOINT accepts it directly, not that a marketplace is contracted for it — a patient who books through Headway or Grow Therapy is billed by the marketplace — and that it holds for Dr. Ofoegbu as well as Dr. Whitaker. A patient who reads one of these names, books on that basis and is then billed out of network has been told something nobody at the practice has confirmed. FOUR OF THE NINE ARE BETTER EVIDENCED THAN THE NOTE SAYS, so do not spend equal attention on all of them: Oscar, Oxford, Carelon Behavioral Health and Blue Cross Blue Shield of Massachusetts are on DR. OFOEGBU'S Headway profile as well as Dr. Whitaker's, which answers the \"and for Dr. Ofoegbu\" half for those four. The dictated note is carried verbatim on all nine anyway, because the practice-wide half is open for every one of them. To confirm one, set `confirmed: true` and delete its `review` note; the homepage card, its \"and N more\" count and the JSON-LD then pick it up too, none of which the review note touches. TO CUT ONE, IT DEPENDS WHICH: for the six that arrived with this instruction, delete the entry; for Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania and Independence Blue Cross Pennsylvania, cutting means reverting to the repo's shorter name with `confirmed: false` and no `review`, because those three were corroborated candidates on Grow Therapy and Headway before the client's list existed and deleting them would throw that away. The seven payers from the practice's own site are unaffected",
+  "The two plans in the 2026-10-01 list whose names do not place them: Blue Cross Blue Shield of Massachusetts and The Health Plan, both now under the \"Other plans\" heading on /insurance. Massachusetts is not a state this practice serves, and this repo previously excluded that name as a Headway national-network artifact; it is listed now because the client asked for it, and it is grouped apart because claiming it as a New Jersey or Pennsylvania plan would be wrong. \"The Health Plan\" states no state, carrier family or network at all — it matches a West Virginia and Ohio carrier of exactly that name, which nothing here assumes. THE RISK HERE IS LICENSURE, NOT ONLY BILLING: both providers are licensed in New Jersey and Pennsylvania only, and for telehealth the governing location is the PATIENT'S, so a Massachusetts resident who recognises their own plan on this page has been given a reason to enquire about care the practice cannot lawfully deliver to them where they are. Nothing beside the wall states the two-state limit; the only place on the page that does is the hero intro. Confirm what each plan actually is, whether either belongs on a two-state practice's list, and whether the list needs a visible scope line",
+  "ONE DECISION THE CLIENT STILL OWES ON THE PUBLISHED PLANS: whether /insurance should say, visibly, that some of the plans listed are still being confirmed. As it stands all sixteen names render identically under \"We accept the plans below\", so a patient cannot tell the seven the practice confirmed from the nine it has not. Adding a hedge was NOT done unilaterally — it softens the client's own instruction to publish them, and that is their call to make. The page already owns a string for it if they want one: INSURANCE.unconfirmedScopeNote. This item closes either way, by confirming the nine or by adding the line",
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
   "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one",
@@ -2258,14 +2362,33 @@ const TITLE_PREFIX = /\bDr\.\s/;
  * Collects every string under a content root, remembering where it came from
  * so a failure names the field rather than the value.
  *
- * `displayName` is SKIPPED, and it is the only exemption. It is "Dr. Funmilayo
- * Whitaker" by design: the qualifier for it lives in the markup beside it — the
- * credentials pill, the dropdown's detail line, the `, ${credentials}` on the
- * provider page heading — not inside the string. Every other string is page
- * copy that has to carry its own.
+ * `displayName` is SKIPPED. It is "Dr. Funmilayo Whitaker" by design: the
+ * qualifier for it lives in the markup beside it — the credentials pill, the
+ * dropdown's detail line, the `, ${credentials}` on the provider page heading —
+ * not inside the string.
+ *
+ * A Payer's `review` note is SKIPPED TOO, for a different reason: it is not
+ * copy at all. It is a CLIENT-REVIEW note addressed to whoever is building the
+ * site, in the same category as OPEN_CLIENT_ITEMS and the sourcing comments,
+ * and the only thing any surface does with it is test whether it exists. The
+ * wording the client dictated names both providers without their credentials,
+ * which is right for a note to the practice and would be wrong on a page — so
+ * this exemption holds ONLY while nothing renders the string. If a surface
+ * ever prints a review note, delete the exemption and the build will tell you.
+ *
+ * IT IS MATCHED BY PATH, NOT BY KEY NAME, and that is the difference between
+ * an exemption and a hole. `displayName` is a bespoke key; "review" is an
+ * ordinary word this content layer already uses in prose about medication
+ * review, so a future object with a `review` field would have silently
+ * inherited an exemption written for one gated payer list.
+ *
+ * Every other string is page copy that has to carry its own qualifier.
  */
+const PAYER_REVIEW_PATH = /^INSURANCE\.groups\[\d+\]\.payers\[\d+\]\.review$/;
+
 function collectStrings(node: unknown, path: string, out: [string, string][]) {
   if (typeof node === 'string') {
+    if (PAYER_REVIEW_PATH.test(path)) return;
     out.push([path, node]);
   } else if (Array.isArray(node)) {
     node.forEach((v, i) => collectStrings(v, `${path}[${i}]`, out));
