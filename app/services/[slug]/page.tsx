@@ -50,6 +50,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const siblings = SERVICE_PAGES.filter((s) => s.slug !== service.slug);
   const poster = cardPosterFor(`/services/${service.slug}`);
 
+  /* Derived once, because both the scrim and the hero's vertical alignment
+     read it and they must not be able to disagree. */
+  const heroScrim = service.heroScrim ?? (service.heroImage ? 'hero' : 'poster');
+
   /* Anchor ids are derived once, here, and every consumer below reads them from
      this array, so the body and the feature block cannot drift apart and the
      ids stay byte-identical to what this route has always served. */
@@ -190,7 +194,48 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
              A page earns it by having a real master. The posters cannot use it,
              so this switches on heroImage rather than on the slug. */
-          scrim={service.heroImage ? 'hero' : 'poster'}
+          /* A SERVICE MAY NAME ITS SCRIM; OTHERWISE THE ASSET PICKS IT.
+             `heroScrim` exists for medication-management, which has a real
+             master but was asked to carry the HOMEPAGE's overlay verbatim
+             rather than the `hero` treatment a master would otherwise select.
+             The other two services set nothing and are unchanged: the
+             assessment has a master and gets `hero`, telehealth is still on a
+             video poster and gets `poster`.
+
+             MEASURED ON medication-hero-2400.webp, AND IT DOES NOT MEET AA.
+             Sampled on the rendered page at glyph core pixels only — the
+             method PageHero's scrim note describes, because a whole-box sample
+             reads the brightest pixel in the box rather than one a letter
+             covers. White text, worst backdrop pixel under a glyph:
+
+               1440  h1 2.04:1 (floor 3)    intro 2.20:1 (floor 4.5)
+               1024  h1 1.87:1 (floor 3)    intro 1.59:1 (floor 4.5)
+                768  h1 7.96:1 PASS         intro 5.01:1 PASS
+                390  h1 2.12:1 (floor 3)    intro 3.73:1 (floor 4.5)
+
+             THIS IS THE FAILURE PageHero's SCRIM NOTE ALREADY RECORDS. Those
+             same homepage stops were carried in this component once and were
+             replaced for it; the note logs 390 h1 at 2.10:1 and 1024 intro at
+             2.46:1 on a different photograph, which is the same result on the
+             same geometry. The cause is not this picture being unusually
+             bright. It is that the homepage ramps are shaped for a 100vh
+             section whose copy is short, bottom-anchored and in the left column
+             of a two-column grid. This header is ~540-610px with copy that
+             fills it, and `copyAlign="center"` puts that copy in the middle —
+             so from lg the left ramp lays its 0.72 on the empty left margin and
+             its fade under the text, and below lg the h1 sits above 80% of the
+             height, where the bottom ramp has already reached zero.
+
+             768 passes only because the crop happens to put the copy over the
+             dark cabinet rather than the window. It is luck, not shape.
+
+             KEPT BECAUSE IT WAS ASKED FOR EXPLICITLY — overlay identical to the
+             homepage, no new values — and the figures above were the requested
+             deliverable. The remedy is NOT to retune these stops: that is what
+             the `hero` branch already is. Either switch this page to
+             scrim="hero", or crop the master so the copy never crosses the
+             window. Both are changes to this one line or to the asset. */
+          scrim={heroScrim}
           /* VERTICAL POSITION FOLLOWS THE SCRIM, ON THE SAME DISCRIMINATOR, so
              the two cannot be set to a combination that fights itself.
 
@@ -211,8 +256,16 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              the midpoint of [--nav-h, height].
 
              The two poster routes keep `bottom`, which is what their flat 0.62
-             floor is shaped around and what the other five callers get. */
-          align={service.heroImage ? 'center' : 'bottom'}
+             floor is shaped around and what the other five callers get.
+
+             IT NOW KEYS OFF THE SCRIM RATHER THAN OFF heroImage, which keeps
+             that invariant intact once a third combination exists.
+             medication-management has a master but carries the homepage's
+             overlay, and those ramps are shaped for bottom-anchored copy — so
+             it stays `bottom`, exactly as it was before it had a photograph.
+             Only the `hero` scrim, whose radial sits behind a centred block,
+             selects `center`. */
+          align={heroScrim === 'hero' ? 'center' : 'bottom'}
           /* Matches /services: centred from lg, left-aligned below it, where
              the copy is a tall paragraph and centring costs more than it buys. */
           copyAlign="center"

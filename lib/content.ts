@@ -703,10 +703,25 @@ export type ServicePage = {
    */
   heroImage?: {
     src: string;
+    alt?: string;
     objectPosition?: string;
     sizes?: string;
     quality?: number;
   };
+  /**
+   * Overrides the scrim that would otherwise be derived from `heroImage`.
+   *
+   * The derivation in app/services/[slug]/page.tsx is: a page with a real hero
+   * master gets `hero`, a page on a video poster gets `poster`. That covers two
+   * of the three. `medication-management` is the third case — it has a master
+   * but was asked to carry the HOMEPAGE's overlay verbatim instead, so it names
+   * its scrim here rather than inheriting one.
+   *
+   * The hero's vertical alignment follows the scrim, not this field — see the
+   * note beside the derivation — so setting this also keeps that page's copy
+   * bottom-anchored, which is what `home`'s ramps are shaped for.
+   */
+  heroScrim?: 'poster' | 'hero' | 'home';
   /**
    * schema.org type for this service. Not MedicalTherapy across the board: an
    * assessment is a diagnostic procedure, and telehealth is how care is
@@ -1043,6 +1058,29 @@ export const SERVICE_PAGES: ServicePage[] = [
   {
     slug: 'medication-management',
     nav: 'Medication management',
+    /**
+     * This page's own hero master, replacing the 1280x720 video poster it used
+     * to borrow from its homepage card. 2400px wide, which is the cap the
+     * artwork was supplied against; next/image resizes down from it.
+     *
+     * NO MEDICATION IS DEPICTED, and that is worth keeping. The frame is a man
+     * at a kitchen window with a glass of water — it illustrates the ongoing,
+     * at-home half of medication management without picturing pills, a bottle
+     * or a label, none of which this repo could caption accurately.
+     */
+    heroImage: {
+      src: '/images/services/medication-hero-2400.webp',
+      /* Describes the photograph and stops there: no claim that this is a
+         patient of the practice, and none about where he is. */
+      alt: 'A man standing at a kitchen window with a glass of water, looking out, with potted herbs on the sill beside him.',
+    },
+    /* The homepage's overlay verbatim, rather than the `hero` treatment a
+       master would otherwise select. See the field's note on the type. */
+    heroScrim: 'home',
+    /* No appointment button in this hero. The page keeps the navbar's,
+       PageCta's and the footer's, so the booking route is intact — the same
+       reasoning the assessment page's `hideHeroCta` note records. */
+    hideHeroCta: true,
     schemaType: 'MedicalTherapy',
     title: 'Medication management',
     metaTitle: 'Medication Management in NJ and PA',

@@ -53,6 +53,12 @@ export function PageHero({
    */
   image?: {
     src: string;
+    /**
+     * Alt text. Omitted, the photograph renders decorative with `alt=""`,
+     * which is what the H1 beside it makes correct for a page hero. Supply one
+     * only where the picture is meant to be described as well as seen.
+     */
+    alt?: string;
     objectPosition?: string;
     /**
      * `sizes` for the srcset, defaulting to the full-bleed 100vw.
@@ -90,8 +96,21 @@ export function PageHero({
    * only safe where the photograph has been cropped so the copy never sits over
    * a blown highlight. /services is cropped exactly that way; measure before
    * adding a second page to this branch.
+   *
+   * `home` IS THE HOMEPAGE'S OVERLAY VERBATIM — the two gradient layers from
+   * components/sections/Hero.tsx, copied stop for stop with nothing added and
+   * nothing retuned. Requested for /services/medication-management so that hero
+   * matches the homepage exactly.
+   *
+   * READ THE LONG NOTE ON THE SCRIM LAYERS BELOW BEFORE REUSING IT. Those exact
+   * ramps were already carried in this component once and were replaced,
+   * because they are shaped for a 100vh section whose copy is short and
+   * bottom-left, and this header is ~560-670px with copy that fills it. The
+   * measured failures are recorded there. This branch exists because it was
+   * asked for on one page; it is not a safe default, and any page added to it
+   * needs its own glyph-level measurement first.
    */
-  scrim?: 'poster' | 'hero';
+  scrim?: 'poster' | 'hero' | 'home';
   /**
    * Hard caps on the copy's measure, in any CSS length. Omitted, the h1 keeps
    * `max-w-[18ch]` and the intro `max-w-[56ch]`, which is what the other five
@@ -173,7 +192,11 @@ export function PageHero({
       {image ? (
         <Image
           src={image.src}
-          alt=""
+          /* DECORATIVE BY DEFAULT, DESCRIBED ONLY IF A CALLER ASKS.
+             The H1 beside it already names the page, so an empty alt is the
+             right answer for the five callers that pass none and they are
+             unchanged. A caller that supplies one gets it. */
+          alt={image.alt ?? ''}
           fill
           priority
           /* priority preloads it; fetchPriority tells the browser it is the
@@ -305,8 +328,42 @@ export function PageHero({
         />
       )}
 
+      {/* THE `home` SCRIM: components/sections/Hero.tsx's overlay, verbatim.
+          Two layers, which is all the homepage has — no flat tint and no
+          radial, so the `hero` branch's layers 1, 3 and 4 stay switched off and
+          layer 2 below is skipped for this branch rather than added to.
+
+          BOTH className STRINGS ARE COPIED CHARACTER FOR CHARACTER from
+          Hero.tsx, as are aria-hidden and pointer-events-none. No stop, colour,
+          position or breakpoint has been changed, and nothing has been added.
+          If the homepage overlay is ever retuned, these are a copy and will not
+          follow it — update both or neither.
+
+          WHAT THE SECOND LAYER ASSUMES. The left ramp is `hidden lg:block`, and
+          on the homepage it exists because at lg that layout turns two-column
+          and the copy moves bottom-LEFT. This header centres its copy at lg
+          (copyAlign="center"), so from lg up the heaviest alpha sits on the
+          empty left margin and the lightest sits under the text. That is a
+          property of the copy, not of this overlay, and it is left exactly as
+          asked rather than adapted. The measured consequence is recorded in
+          app/services/[slug]/page.tsx beside the scrim choice. */}
+      {image && scrim === 'home' && (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(16,31,69,0.78)_0%,rgba(16,31,69,0.78)_52%,rgba(16,31,69,0.45)_64%,rgba(16,31,69,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(16,31,69,0.72)_0%,rgba(16,31,69,0.72)_18%,rgba(16,31,69,0)_42%)]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(16,31,69,0.72)_0%,rgba(16,31,69,0.72)_40%,rgba(16,31,69,0.45)_55%,rgba(16,31,69,0)_74%)]"
+          />
+        </>
+      )}
+
       {/* LAYER 2: the bottom gradient. The `hero` branch is the smoothstep
-          curve; the other two are the original ramps and are untouched. */}
+          curve; the other two are the original ramps and are untouched.
+          Skipped entirely under `home`, which brings its own pair above. */}
+      {scrim !== 'home' && (
       <div
         aria-hidden="true"
         className={
@@ -317,6 +374,7 @@ export function PageHero({
             : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(16,31,69,0.78)_0%,rgba(16,31,69,0.78)_52%,rgba(16,31,69,0.45)_64%,rgba(16,31,69,0)_80%)]'
         }
       />
+      )}
 
       {/* LAYER 3: the left gradient, one curve at every width. The final stop
           repeats 0.15 at 100% deliberately — that flat tail is what stops the
