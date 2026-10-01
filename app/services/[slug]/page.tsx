@@ -86,6 +86,22 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       src: '/images/services/tele-schedule.webp',
       alt: 'A person sitting at a desk at home in the evening, talking to a clinician on a laptop screen.',
     },
+    'both-states-both-providers': {
+      src: '/images/services/tele-states.webp',
+      alt: 'A laptop open on a kitchen worktop beside a set of keys and a travel mug.',
+    },
+    'what-telehealth-is-good-for': {
+      src: '/images/services/tele-goodfor.webp',
+      alt: 'A person sitting in an armchair with a tablet propped on a side table, a notebook open on their lap.',
+    },
+    'when-telehealth-is-not-the-right-call': {
+      /* NO DISTRESS DEPICTED. This card carries the 988 / 911 guidance, and a
+         photograph of someone in crisis beside it would be both unverifiable
+         and the wrong register. A phone on a table is the object the copy is
+         actually about. */
+      src: '/images/services/tele-inperson.webp',
+      alt: 'A mobile phone resting on a table beside a lamp in a quiet room.',
+    },
   } as const;
 
   /* THE SHARED PROSE LAYOUT, which is now the only one of the three that still

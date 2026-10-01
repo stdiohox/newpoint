@@ -197,6 +197,20 @@ export function ServiceGrid({
           {rest.map((section, i) => (
             <Reveal key={section.id} delay={stagger(i, 0.08)} className="h-full">
               <article className={`${CARD} flex h-full flex-col`}>
+                {/* MEDIA CAP. aspect-[16/9] fixes the shape, so the three caps
+                    sit on one line whatever the copy below them runs to, and
+                    the cards stay equal height through `items-stretch` on the
+                    grid plus h-full here.
+
+                    No rounding of its own: the card already has rounded-xl and
+                    overflow-hidden, so the panel's top corners are clipped to
+                    the card's radius and a second radius here would show as a
+                    lighter sliver inside the first. */}
+                <GridImage
+                  media={media[section.id]}
+                  sizes="(min-width: 1024px) 360px, (min-width: 768px) 46vw, 100vw"
+                  className="aspect-[16/9]"
+                />
                 <div className="flex flex-1 flex-col gap-3 p-6">
                   <TagPill n={i + 2} />
                   <section
