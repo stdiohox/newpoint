@@ -1,3 +1,4 @@
+import { ShieldCheck } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
@@ -126,6 +127,19 @@ export default function NewPatientsPage() {
               heading="The three steps"
               intro={GETTING_STARTED.body}
               steps={GETTING_STARTED.steps}
+              /* The photograph that fills the tall first card.
+                 DESCRIBED, NOT DECORATIVE, because that is what was asked for
+                 — and kept to one clause. a11y-architect argued for alt="",
+                 on the grounds that the heading and body already say what step
+                 1 is and the picture is mood: its alt is announced between the
+                 body of step 1 and step 2, in the middle of a list, so every
+                 word of it is noise a reader did not ask for. The frame's mug,
+                 plant and window are gone for that reason; what is left is the
+                 part that shows the step. */
+              media={{
+                src: '/images/new-patients/step-reach-out-2000.webp',
+                alt: 'Hands holding a phone above an open notebook on a wooden table.',
+              }}
             />
 
             <div className="mt-20">
@@ -146,29 +160,61 @@ export default function NewPatientsPage() {
                 aria-labelledby="privacy-heading"
                 className="bg-np-surface border-np-neutral-200 mt-20 rounded-2xl border p-7 md:p-9"
               >
-                <h2 id="privacy-heading" className="text-h3">
-                  {NEW_PATIENTS_PAGE.privacyHeading}
-                </h2>
-                <p className="text-body text-np-neutral-600 mt-3 max-w-[70ch]">
-                  {NEW_PATIENTS_PAGE.privacyBody}
-                </p>
-                <p className="text-body text-np-ink border-np-neutral-200 mt-5 max-w-[70ch] border-t pt-5">
-                  If you need help now, call or text{' '}
-                  <a
-                    href="tel:988"
-                    className="text-np-blue-600 font-medium underline underline-offset-4"
+                {/* TWO COLUMNS FROM md, ONE BELOW IT, and the order flips with
+                    the layout. At md the shield sits in the empty right half
+                    and centres against the text column; below md there is no
+                    empty half to fill, so it goes above the heading at half
+                    the size — `order-first` on the icon rather than moving it
+                    in the DOM, because the heading must stay the first thing a
+                    screen reader meets in a labelled region.
+
+                    items-center, so the shield centres on the text column
+                    whatever height the copy takes. */}
+                <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
+                  <div className="md:flex-1">
+                    <h2 id="privacy-heading" className="text-h3">
+                      {NEW_PATIENTS_PAGE.privacyHeading}
+                    </h2>
+                    <p className="text-body text-np-neutral-600 mt-3 max-w-[70ch]">
+                      {NEW_PATIENTS_PAGE.privacyBody}
+                    </p>
+                    <p className="text-body text-np-ink border-np-neutral-200 mt-5 max-w-[70ch] border-t pt-5">
+                      If you need help now, call or text{' '}
+                      <a
+                        href="tel:988"
+                        className="text-np-blue-600 font-medium underline underline-offset-4"
+                      >
+                        988
+                      </a>{' '}
+                      for the Suicide and Crisis Lifeline. In an emergency, call{' '}
+                      <a
+                        href="tel:911"
+                        className="text-np-blue-600 font-medium underline underline-offset-4"
+                      >
+                        911
+                      </a>{' '}
+                      or go to your nearest emergency room.
+                    </p>
+                  </div>
+
+                  {/* DECORATION, AND NOTHING BUT. aria-hidden on the circle, so
+                      the shield adds no announcement to a region whose whole
+                      content is the warning beside it — and it must not read
+                      as a reassurance badge to assistive tech when it is a
+                      graphic on a panel about what NOT to send.
+
+                      shrink-0 so the circle keeps its diameter when the copy
+                      is long, and order-first only below md. */}
+                  <span
+                    aria-hidden="true"
+                    className="bg-np-blue-50 order-first flex h-20 w-20 shrink-0 items-center justify-center rounded-full md:order-none md:h-32 md:w-32"
                   >
-                    988
-                  </a>{' '}
-                  for the Suicide and Crisis Lifeline. In an emergency, call{' '}
-                  <a
-                    href="tel:911"
-                    className="text-np-blue-600 font-medium underline underline-offset-4"
-                  >
-                    911
-                  </a>{' '}
-                  or go to your nearest emergency room.
-                </p>
+                    <ShieldCheck
+                      strokeWidth={1.5}
+                      className="text-np-blue-600 h-10 w-10 md:h-16 md:w-16"
+                    />
+                  </span>
+                </div>
               </aside>
             </Reveal>
           </Container>

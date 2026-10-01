@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import { CalendarCheck, ClipboardList, MessageCircle } from 'lucide-react';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 
@@ -45,15 +47,32 @@ const CORNERS = [
   'bottom-0 right-0 translate-x-1/2 translate-y-1/2',
 ] as const;
 
+/* ICONS BY POSITION, not by heading text. The headings are verbatim client
+   copy and matching on their wording would break the moment one is edited; a
+   fourth step would fall back to no icon rather than to the wrong one. The
+   same reasoning is written out in ExpectCards.tsx. */
+const STEP_ICONS = [MessageCircle, ClipboardList, CalendarCheck];
+
 export function StepsBento({
   heading,
   intro,
   steps,
+  media,
 }: {
   heading: string;
   intro: string;
   /** Verbatim copy. One card per entry. */
   steps: readonly { title: string; body: string }[];
+  /**
+   * A photograph for the first card, which is the tall one.
+   *
+   * ONLY THE FIRST CARD TAKES ONE, and that is deliberate rather than a
+   * limitation: step 1 spans both rows at lg, so it is the only card with
+   * leftover height to fill. Giving the two short cards pictures as well would
+   * make three equal cards out of a bento. Omit it and the card is simply
+   * text, which is what it was before 2026-10-01.
+   */
+  media?: { src: string; alt: string };
 }) {
   return (
     <section aria-labelledby="three-steps-heading">
@@ -74,7 +93,9 @@ export function StepsBento({
           right. Below lg the cards stack in document order, which is the order
           of the steps — the layout carries no meaning the <ol> does not. */}
       <ol role="list" className="mt-10 grid gap-5 lg:grid-cols-6 lg:grid-rows-2">
-        {steps.map((step, i) => (
+        {steps.map((step, i) => {
+          const Icon = STEP_ICONS[i];
+          return (
           <Reveal
             as="li"
             key={step.title}
@@ -119,21 +140,88 @@ export function StepsBento({
                 ))}
               </span>
 
-              <span
-                aria-hidden="true"
-                /* text-display-l, the largest step in this repo's scale below
-                   the hero size. There is no display-m; inventing one for a
-                   numeral would add a token the design system does not have. */
-                className="font-display text-display-l text-np-blue-600 leading-none tabular-nums"
-              >
-                {i + 1}
-              </span>
+              {/* NUMERAL AND ICON ON ONE LINE. The icon sits beside the number
+                  rather than above the heading so the card has one visual
+                  anchor instead of two stacked ones. Both are aria-hidden: the
+                  <ol> conveys the position and the heading names the step, so
+                  neither adds anything a screen reader has not already had. */}
+              <div className="flex items-center gap-4">
+                <span
+                  aria-hidden="true"
+                  /* text-display-l, the largest step in this repo's scale below
+                     the hero size. There is no display-m; inventing one for a
+                     numeral would add a token the design system does not have. */
+                  className="font-display text-display-l text-np-blue-600 leading-none tabular-nums"
+                >
+                  {i + 1}
+                </span>
+                {/* Decoration, matched to the copy rather than chosen for
+                    variety: a message bubble for reaching out, a clipboard for
+                    the assessment, a checked calendar for ongoing appointments.
+                    Nothing here is a control, so SC 1.4.11 does not reach the
+                    circle; the heading carries the meaning either way. */}
+                {Icon && (
+                  <span className="bg-np-blue-50 flex h-11 w-11 shrink-0 items-center justify-center rounded-full">
+                    <Icon
+                      aria-hidden="true"
+                      size={20}
+                      strokeWidth={1.75}
+                      className="text-np-blue-700"
+                    />
+                  </span>
+                )}
+              </div>
 
               <h3 className="text-h3 text-np-ink mt-6">{step.title}</h3>
               <p className="text-body text-np-neutral-600 mt-3 max-w-[52ch]">{step.body}</p>
+
+              {/* THE PHOTOGRAPH FILLS WHAT IS LEFT OF THE TALL CARD. Only the
+                  first step has one, and only the first step is two rows high,
+                  which is what left the empty area this closes.
+
+                  lg:mt-auto + lg:flex-1 is the trick: the auto margin pushes it
+                  to the foot of the flex column and flex-1 hands it whatever
+                  height the copy left over. A flex item will not go below its
+                  intrinsic size on its own, which is why the min-height is set
+                  explicitly rather than left at auto — see the floor below.
+
+                  Below lg there is no leftover height to take, so it falls back
+                  to a 16:9 band under the copy. */}
+              {media && i === 0 && (
+                /* lg:min-h-40 IS A FLOOR, NOT A HEIGHT. `min-h-0` alone lets
+                   the photograph shrink to nothing: its height is whatever the
+                   copy leaves over, so a longer step 1 body, a text-spacing
+                   override (SC 1.4.12) or simply the low end of lg could
+                   collapse it to a sliver and leave a gap above the card's
+                   padding. 10rem sits below every measured height — 280px at
+                   1440, 277px at 1100, 274px at 1024 — so it never binds in
+                   the layouts that work, and the
+                   grid rows are auto-sized, so a card that does hit the floor
+                   grows its row rather than overflowing. */
+                <div className="bg-np-blue-50 rounded-xl mt-6 aspect-video overflow-hidden lg:mt-auto lg:aspect-auto lg:min-h-40 lg:flex-1">
+                  <Image
+                    src={media.src}
+                    alt={media.alt}
+                    width={2000}
+                    height={1116}
+                    /* Below the fold on every viewport: the hero and the
+                       section header come first. */
+                    loading="lazy"
+                    /* 82, as on the other downscaled masters in this repo —
+                       the resampling dominates, not the encoder setting. It is
+                       in next.config's `qualities` allow-list. */
+                    quality={82}
+                    /* The card is half the grid at lg and full width below it.
+                       Measured drawn width at 1440: 494px. */
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </Reveal>
-        ))}
+          );
+        })}
       </ol>
     </section>
   );
