@@ -112,60 +112,78 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     <>
       <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        {/* The standfirst is the FIRST paragraph of her bio, not the whole
-            thing. `bio` is the provider's own Headway introduction and runs to
-            two paragraphs for Whitaker; all of it in a hero would push the page
-            below the fold before anything is said. The remainder is printed as
-            body copy beside her portrait, in order, so nothing is lost. */}
+        {/* THE HERO CARRIES THE LABEL, THE NAME AND ONE LINE. The standfirst
+            used to be bio[0], the provider's own first paragraph; it has moved
+            to the editorial card, which now holds the whole bio. What is left
+            is `role` and `licensed`, both verbatim from PROVIDERS — the two
+            facts a reader wants before anything else, and the shortest thing
+            that can sit under a two-line name without pushing the page down.
+
+            IT ALSO KEEPS THE TITLE RULE SATISFIED TWICE OVER: the credentials
+            are in the heading beside "Dr.", and `role` spells out "Psychiatric-
+            Mental Health Nurse Practitioner" directly beneath it. */}
         <PageHero
           eyebrow="Provider"
           title={`${provider.displayName}, ${provider.credentials}`}
-          intro={provider.bio[0]}
+          intro={`${provider.role}. ${provider.licensed}.`}
           image={HERO_IMAGE[provider.slug]}
-          /* Centred between the navbar and the hero's bottom edge. copyAlign is
-             left by default and stays that way, so this moves the block
-             vertically and nothing else. */
+          /* Centred between the navbar and the hero's bottom edge — `center`
+             centres on the area BELOW the nav, not on the header box, which
+             matters because the header pulls itself up by --nav-h so the
+             photograph runs behind the sticky bar. */
           align="center"
+          /* Centred horizontally from lg, matching the service pages — the
+             label, the heading and the line below it all centre together. */
+          copyAlign="center"
           /* No appointment button in this hero. The navbar's, PageCta's and the
              footer's all remain, so the booking route is intact. */
           showCta={false}
           /**
-           * scrim="edge", ONE GRADIENT ACROSS THE FULL-BLEED IMAGE.
+           * scrim="hero" WITH copyAlign="center" — the centred-copy overlay the
+           * service pages use, which is the one shaped for centred text.
            *
-           * The four-layer `hero` scrim put a visible vertical seam near the
-           * middle of the frame. Each of its layers is smooth on its own — a
-           * flat tint, a bottom ramp, a left ramp and a radial behind the copy
-           * — but their combined alpha is not monotonic across the width, and
-           * the eye reads the turn as an edge. On Whitaker's frame it fell
-           * almost exactly where the photograph has its own wall corner, which
-           * made it read as a hard join.
+           * WHAT THE "SEAM" ACTUALLY WAS. The image element was never the
+           * problem: it is `fill`, so position absolute, inset 0, 100% of the
+           * hero box, object-cover — measured at 1440x540 against a 1440x540
+           * header — and the only other children are the overlay div and the
+           * copy, both full width, neither with a background behind the left.
            *
-           * One left-to-right ramp, darkest at the left where the copy is,
-           * cannot produce that: alpha falls monotonically from one edge to the
-           * other. Stops are smoothstep-sampled; see the scrim note in
-           * components/PageHero.tsx.
+           * The edge is IN THE PHOTOGRAPHS. Sampling the raw frames with every
+           * overlay hidden, the largest luminance steps across the width are
+           * 0.48 at x 72% on Whitaker's and 0.47 at x 52% on Ofoegbu's: a wall
+           * corner and a doorway. A left-to-right ramp that is dark on one side
+           * and light on the other sits on top of that split and reads as one
+           * hard join rather than two separate things.
            *
-           * MEASURED ON BOTH FRAMES at 1440, 1024 and 390, sampling glyph core
-           * pixels only. Numbers are in the commit message.
+           * The centred overlay does not take sides. Its radial is centred on
+           * the copy — 46% 58% below lg, 50% 58% at lg — so the darkening is
+           * symmetric about the middle and the architectural edge is no longer
+           * reinforced by a gradient running the same way.
+           *
+           * MEASURED at 1440, 1024, 390 and 320 on both frames; numbers are in
+           * the commit message.
            */
-          scrim="edge"
+          scrim="hero"
         />
 
         {/* THE EDITORIAL CARD, replacing the portrait-beside-intro columns.
             `position` puts the portrait on the left for Whitaker and the right
             for Ofoegbu, as asked.
 
-            THE PARAGRAPHS ARE bio.slice(1), which is exactly what this section
-            rendered before — the hero's standfirst is bio[0] and is not
-            repeated. Ofoegbu's Headway bio is a single paragraph, so her card
-            carries the label, the name and the portrait and no body copy; that
-            is not a regression, it is what this page already showed, and her
-            voice picks up in "My approach" below. */}
+            THE CARD HOLDS THE WHOLE BIO, every paragraph, for both providers.
+            It used to take bio.slice(1), which left Ofoegbu's card with no body
+            copy at all — her Headway bio is a single paragraph and the hero had
+            it. The hero no longer carries any of it, so the full array lands
+            here and neither card is empty.
+
+            NOTHING IS PRINTED TWICE. bio[0] left the hero, and the body column
+            below stopped mapping bio when this card took over. Verified against
+            the rendered HTML: one occurrence of each paragraph per page. */}
         <div className="pt-20 md:pt-28">
           <Container>
             <TeamMemberCard
               provider={provider}
-              paragraphs={provider.bio.slice(1)}
+              paragraphs={provider.bio}
               position={provider.slug === 'funmilayo-whitaker' ? 'left' : 'right'}
             />
           </Container>
