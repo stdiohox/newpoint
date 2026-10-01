@@ -34,7 +34,13 @@
  */
 export const NAV = [
   { label: 'Services', href: '/services' },
-  { label: 'Providers', href: '/#providers' },
+  /* A PAGE, NOT THE HOMEPAGE SECTION. This was `/#providers`, which scrolled
+     to the homepage's provider band while /providers/[slug] served a page per
+     provider with nothing linking to them as a set. /providers is now that
+     set's index, and this one constant feeds all three surfaces — the desktop
+     nav, the mobile menu and the footer's Practice column, which derives from
+     NAV in components/Footer.tsx. */
+  { label: 'Providers', href: '/providers' },
   { label: 'Insurance', href: '/insurance' },
   { label: 'New patients', href: '/new-patients' },
   { label: 'FAQ', href: '/#faq' },

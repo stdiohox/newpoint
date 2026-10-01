@@ -2089,6 +2089,41 @@ export const CONTACT_PAGE = {
  * widened to { path: string; priority: number }. `as const` would only freeze
  * the one hand-written entry and read as a stronger guarantee than it gives.
  */
+/**
+ * The /providers index.
+ *
+ * It exists because the navbar's "Providers" link pointed at `/#providers`, a
+ * homepage anchor, while `/providers/[slug]` pages already existed with nothing
+ * linking to them as a set. The link now has a destination of its own.
+ *
+ * NO NEW CLAIMS. `title` is the heading app/services/page.tsx already uses for
+ * its provider section. `intro` is NEW_PATIENTS_PAGE's own sentence, reused
+ * verbatim rather than rewritten — the only edit is dropping its opening
+ * "There are two of us." which reads as a line in a numbered list of
+ * expectations rather than as a page introduction. Everything it asserts is
+ * confirmed: both providers' doctorate and dual certification are in their own
+ * bios, and the two-provider count is in PRACTICE_FACTS.
+ *
+ * The cards themselves render nothing but PROVIDERS fields, verbatim.
+ *
+ * NO "Dr." AND NO VERIFIED BADGE HERE. CLAUDE.md scopes both to the /services
+ * "Providers you will see" cards specifically; this is a different surface and
+ * inherits neither.
+ */
+export const PROVIDERS_PAGE = {
+  title: 'Providers you will see',
+  /* CLIENT-REVIEW — metadata, composed from confirmed facts only: the
+     two-provider count (PRACTICE_FACTS), the role string (CLAUDE.md's
+     canonical "Psychiatric-Mental Health Nurse Practitioner", here in its
+     plural common-noun form) and the licensure confirmed by the client on
+     2026-09-29. No credential is claimed that a bio does not already state. */
+  metaTitle: 'Our Providers',
+  metaDescription:
+    'The two psychiatric-mental health nurse practitioners at Newpoint, both licensed in New Jersey and Pennsylvania.',
+  intro:
+    'You will see Funmilayo Whitaker or Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified in psychiatric mental health and family practice.',
+} as const;
+
 export const ROUTES: { path: string; priority: number }[] = [
   { path: '/', priority: 1.0 },
   { path: '/services', priority: 0.9 },
@@ -2096,6 +2131,8 @@ export const ROUTES: { path: string; priority: number }[] = [
   { path: '/insurance', priority: 0.8 },
   { path: '/new-patients', priority: 0.8 },
   { path: '/contact', priority: 0.9 },
+  /* The index sits above its own detail pages, same as /services does. */
+  { path: '/providers', priority: 0.8 },
   ...PROVIDERS.map((p) => ({ path: `/providers/${p.slug}`, priority: 0.7 })),
 ];
 
