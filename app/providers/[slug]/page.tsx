@@ -49,6 +49,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
 }
 
+/**
+ * One hero photograph per provider, keyed by slug.
+ *
+ * Kept here rather than on the Provider type: it is a property of this route's
+ * presentation, not of the provider, and nothing else renders it.
+ *
+ * NEITHER FRAME CONTAINS A PERSON, so the alts describe the rooms and claim
+ * nothing about whose they are — the practice's in-person locations are still
+ * unconfirmed under CLAUDE.md's care-modality rule.
+ */
+const HERO_IMAGE: Record<string, { src: string; alt: string }> = {
+  'anastasia-ofoegbu': {
+    src: '/images/providers/provider-anastasia-hero-2400.webp',
+    alt: 'An empty sitting room with two armchairs, a side table holding flowers and books, three framed landscape prints, and a doorway through to a dining table beyond.',
+  },
+  'funmilayo-whitaker': {
+    src: '/images/providers/provider-funmilayo-hero-2400.webp',
+    alt: 'An empty sitting room with two blue armchairs either side of a small round table, beside shelves of books and a trailing plant, with a curtained window behind.',
+  },
+};
+
 export default async function ProviderPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const provider = PROVIDERS.find((p) => p.slug === slug);
@@ -101,6 +122,29 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           eyebrow="Provider"
           title={`${provider.displayName}, ${provider.credentials}`}
           intro={provider.bio[0]}
+          image={HERO_IMAGE[provider.slug]}
+          /**
+           * scrim="hero", CHOSEN ON MEASUREMENT, not on looks.
+           *
+           * Both existing photograph scrims clear AA here and both were
+           * measured on these two frames at 1440, 1024 and 390, sampling glyph
+           * core pixels only. Worst case of the twelve readings each:
+           *
+           *   hero    h1 4.40:1 (floor 3)   intro 5.34:1 (floor 4.5)
+           *   poster  h1 4.33:1 (floor 3)   intro 5.36:1 (floor 4.5)
+           *
+           * `hero` wins on the thing that matters for this route rather than on
+           * those numbers, which are a wash. Its layer 3 is a left ramp holding
+           * 0.70 at the far edge, and its own note says LEFT-ALIGNED COPY ONLY —
+           * which is what this hero is and what the three pages that currently
+           * fail AA are not. `poster` would also pass, by flattening the whole
+           * photograph under a 0.62 floor; it is the right answer for the video
+           * posters it was built for and a waste of a real master here.
+           *
+           * The left ramp is why Whitaker's frame works at all: its left half is
+           * a flat sunlit wall, directly under the copy.
+           */
+          scrim="hero"
         />
 
         <div className="py-20 md:py-28">
