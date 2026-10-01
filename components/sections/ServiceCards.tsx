@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Image from 'next/image';
+import { CircleCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
@@ -33,6 +34,8 @@ export type CardSection = {
   heading: string;
   body: string;
   list?: string[];
+  bullets?: string[];
+  highlight?: string;
 };
 
 export type CardMedia = { src: string; alt: string };
@@ -70,8 +73,30 @@ function hasAsset(src: string) {
  * aria-hidden does nothing for a crawler or a sighted reader — it would ship a
  * production note to patients. ServiceBody.tsx's slot records the same finding.
  */
-function CardImage({ media, sizes }: { media: CardMedia; sizes: string }) {
-  const shell = 'relative aspect-[16/9] w-full overflow-hidden rounded-lg';
+function CardImage({
+  media,
+  sizes,
+  stretch = false,
+}: {
+  media: CardMedia;
+  sizes: string;
+  /**
+   * TRUE ON THE TWO WIDE CARDS, where the photograph sits BESIDE the copy.
+   *
+   * With bullets and a highlight the copy column is taller than a 16/9 panel at
+   * half width — about 300px of picture against 400-500px of text at 1440 — so
+   * a fixed ratio left the image floating against a column it could not fill.
+   * Stretching the media to the row's height is what keeps the two halves
+   * level, and it is the same thing ServiceBody does with `md:h-auto`.
+   *
+   * The ratio still applies below md, where the card stacks and the picture is
+   * on its own line with nothing to match.
+   */
+  stretch?: boolean;
+}) {
+  const shell = stretch
+    ? 'relative aspect-[16/9] w-full overflow-hidden rounded-lg md:aspect-auto md:h-full md:min-h-[260px]'
+    : 'relative aspect-[16/9] w-full overflow-hidden rounded-lg';
 
   if (!hasAsset(media.src)) {
     return <div aria-hidden="true" className={`${shell} bg-np-neutral-100`} />;
@@ -101,6 +126,47 @@ function CardCopy({ section }: { section: CardSection }) {
     <div className="flex flex-col justify-center gap-3 p-2 sm:p-3">
       <h2 className="text-h3">{section.heading}</h2>
       <p className="text-body text-np-neutral-600 max-w-[58ch]">{section.body}</p>
+
+      {/* The heading is visually hidden rather than dropped: the list needs a
+          name for anyone arriving on it out of context, and a visible label on
+          every card would repeat four times down the page.
+
+          IT NAMES ITS SECTION RATHER THAN SAYING "What this means for you",
+          which is what it read before. Two reasons, both from the healthcare
+          review: most of these lines are general patient education, and that
+          label framed general education as individualised implication for the
+          reader's own care — which is the one thing this copy must not do. It
+          also repeated verbatim on all four cards, so heading-list navigation
+          showed four identical h3s with nothing to tell them apart. */}
+      {section.bullets && (
+        <>
+          <h3 className="sr-only">{section.heading}: key points</h3>
+          {/* role="list" per the note at the top of app/globals.css: Preflight
+              strips list-style and WebKit then drops the implicit role. */}
+          <ul role="list" className="mt-1 flex flex-col gap-2">
+            {section.bullets.map((item) => (
+              <li key={item} className="flex items-start gap-2.5">
+                <CircleCheck
+                  aria-hidden="true"
+                  size={17}
+                  strokeWidth={1.75}
+                  className="text-np-blue-600 mt-[0.2em] shrink-0"
+                />
+                <span className="text-small text-np-neutral-700">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* The closing line. np-blue-50 rather than another bordered box: it sits
+          INSIDE a card that already has a border, and a second one around it
+          reads as a card in a card. */}
+      {section.highlight && (
+        <p className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 mt-1 px-3 py-2">
+          {section.highlight}
+        </p>
+      )}
     </div>
   );
 }
@@ -147,8 +213,8 @@ export function ServiceCards({
               the way the desktop row does. */}
           <Reveal>
             <section id={wideTop.id} tabIndex={-1} className={`${CARD} focus:outline-none`}>
-              <div className="grid items-center gap-4 md:grid-cols-2 md:gap-6">
-                <CardImage media={media[wideTop.id]} sizes={half} />
+              <div className="grid items-stretch gap-4 md:grid-cols-2 md:gap-6">
+                <CardImage media={media[wideTop.id]} sizes={half} stretch />
                 <CardCopy section={wideTop} />
               </div>
             </section>
@@ -178,9 +244,12 @@ export function ServiceCards({
               in both directions. */}
           <Reveal>
             <section id={wideBottom.id} tabIndex={-1} className={`${CARD} focus:outline-none`}>
-              <div className="grid items-center gap-4 md:grid-cols-2 md:gap-6">
-                <div className="md:order-2">
-                  <CardImage media={media[wideBottom.id]} sizes={half} />
+              <div className="grid items-stretch gap-4 md:grid-cols-2 md:gap-6">
+                {/* md:h-full so the wrapper is as tall as the stretched grid
+                    cell; without it the media panel's md:h-full resolves
+                    against a shrink-wrapped parent and the stretch is lost. */}
+                <div className="md:order-2 md:h-full">
+                  <CardImage media={media[wideBottom.id]} sizes={half} stretch />
                 </div>
                 <CardCopy section={wideBottom} />
               </div>
@@ -216,6 +285,35 @@ export function ServiceCards({
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {/* BULLETS RENDER HERE TOO, AND AFTER THE CHIPS ON PURPOSE.
+                  This branch used to render heading, body and list only, so a
+                  section that fell through to it lost its bullets silently —
+                  which on "Conditions we prescribe for" meant the nine-diagnosis
+                  chip list shipped WITHOUT the line that stops it reading as
+                  "all nine are prescribed for in every case". That hedge is the
+                  reason the bullets exist on this section.
+
+                  After the chips, not before, because one of those lines says
+                  "this list" and has no referent until the chips are on screen. */}
+              {section.bullets && (
+                <>
+                  <h3 className="sr-only">{section.heading}: key points</h3>
+                  <ul role="list" className="mt-6 flex max-w-[62ch] flex-col gap-2">
+                    {section.bullets.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5">
+                        <CircleCheck
+                          aria-hidden="true"
+                          size={17}
+                          strokeWidth={1.75}
+                          className="text-np-blue-600 mt-[0.2em] shrink-0"
+                        />
+                        <span className="text-small text-np-neutral-700">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </section>
           </Reveal>

@@ -723,6 +723,16 @@ export type ServicePage = {
    */
   heroScrim?: 'poster' | 'hero' | 'home';
   /**
+   * Overrides the hero's vertical alignment, which otherwise follows the scrim.
+   *
+   * The derivation pairs `hero` with centred copy, because that scrim's radial
+   * sits behind a centred block, and leaves everything else bottom-anchored.
+   * medication-management is the exception: it carries the homepage's overlay
+   * but was asked for the centred treatment anyway, so it says so here rather
+   * than having the scrim imply it.
+   */
+  heroAlign?: 'bottom' | 'center';
+  /**
    * schema.org type for this service. Not MedicalTherapy across the board: an
    * assessment is a diagnostic procedure, and telehealth is how care is
    * delivered rather than a treatment in itself.
@@ -841,6 +851,23 @@ export type ServicePage = {
     detail?: string;
     list?: string[];
     bodyLinks?: { phrase: string; href: string }[];
+    /**
+     * "What this means for you" — short points under the section's own copy.
+     *
+     * RENDERED BY THE CARD LAYOUT ONLY. The prose and feature layouts ignore
+     * them, so adding them to a service on either of those changes nothing.
+     *
+     * EVERY LINE IS EITHER SOURCED OR GENERIC, and the comment above each one
+     * says which. A sourced line cites the research file it comes from. A
+     * generic line is ordinary patient-education wording that makes no claim
+     * about Newpoint at all — no duration, no frequency, no medication name,
+     * no named rating scale, no outcome and no credential. Anything that
+     * cannot be one of those two things does not go here; it goes to the
+     * client as a question.
+     */
+    bullets?: string[];
+    /** One short closing line under the bullets. Same sourcing rule. */
+    highlight?: string;
   }[];
   faqs: { q: string; a: string }[];
 };
@@ -1082,10 +1109,44 @@ export const SERVICE_PAGES: ServicePage[] = [
       /* Describes the photograph and stops there: no claim that this is a
          patient of the practice, and none about where he is. */
       alt: 'A man standing at a kitchen window with a glass of water, looking out, with potted herbs on the sill beside him.',
+      /**
+       * MEASURED OFF THE FRAME, not chosen by eye. On the master his hair
+       * starts at y 4%, his eyes sit at y 20% and his chin at y 36%; his face
+       * spans x 64-78%, centred on x 70%.
+       *
+       * THE DEFAULT 50% PUT HIS FACE UNDER THE NAVBAR. The source is 1.79:1
+       * and this header is wider than that at the two desktop widths, so cover
+       * scales by WIDTH and crops vertically. At 1440 the image draws 804px
+       * tall into a 540px box: at y-position 50% the crop starts 132px down,
+       * which lands his eyes at box y 29 — above the navbar pill's lower edge
+       * at about y 83. At 1024 it put them at y 59, also behind it.
+       *
+       * 10% starts the crop 26px down instead, which puts his eyes at box y 134
+       * at 1440 and y 103 at 1024, both clear of the bar. Below lg the box is
+       * TALLER than 1.79:1, so cover scales by height, there is no vertical
+       * crop at all, and his eyes fall where the frame puts them — y 123 at 768
+       * and y 113 at 390. The y value does nothing at those two widths.
+       *
+       * x 72% is for those same two widths, where the crop works horizontally
+       * instead: it holds his face at x 465-619 of 768, and x 200-341 of 390,
+       * rather than letting it run off the right edge. It does nothing at 1440
+       * or 1024, where the full width is shown.
+       *
+       * THE GLASS OF WATER IS CROPPED OUT AT 1440 and that is the trade. It
+       * sits at y 78% of the frame, below the 540px window any face-clearing
+       * y-position leaves. Keeping it needs a y near 50%, which is the value
+       * that hid his face.
+       */
+      objectPosition: '72% 10%',
     },
     /* The homepage's overlay verbatim, rather than the `hero` treatment a
        master would otherwise select. See the field's note on the type. */
     heroScrim: 'home',
+    /* Centred between the navbar and the hero's bottom edge, matching the fix
+       on the assessment page. PageHero's `center` branch centres on the area
+       BELOW THE NAV rather than on the header box, which matters because the
+       header pulls itself up by --nav-h so the photograph runs behind the bar. */
+    heroAlign: 'center',
     /* Feature73 card grid rather than the shared prose rail. Telehealth is
        deliberately left on the default: this layout assumes four sections that
        each want a photograph, plus a list-carrying section to close. */
@@ -1105,23 +1166,132 @@ export const SERVICE_PAGES: ServicePage[] = [
     sections: [
       {
         heading: 'Prescribing that follows the plan',
+        /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
         body: 'Medication is prescribed as part of the treatment plan established at your comprehensive psychiatric assessment, not in isolation from it. Psychopharmacology is combined with psychotherapy approaches where both are indicated.',
+        bullets: [
+          /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "Mental
+             illness diagnoses are made based on assessments, and then an
+             effective plan of care is determined using psychotherapy modalities
+             and psychopharmacology for the individual." */
+          'A diagnosis comes first, at your assessment, and the prescribing decision follows from it.',
+          /* CLIENT-REVIEW — SOURCED. Same sentence as above: the plan of care
+             names psychotherapy modalities AND psychopharmacology together. */
+          'Where therapy and medication are both indicated, they are planned as one approach rather than separately.',
+          /* CLIENT-REVIEW — GENERIC patient education. No claim about Newpoint,
+             no medication named, nothing about how long or how often. */
+          'Asking what a medicine is meant to do, and why it was chosen, is a reasonable part of the conversation.',
+          /* CLIENT-REVIEW — GENERIC patient education. Standard pre-appointment
+             advice; names nothing and promises nothing.
+             "To hand", not "bring": this service is delivered by telehealth as
+             well as in person, and "bring" quietly assumes the appointment is
+             the in-person one. Raised by healthcare-reviewer, 2026-10-01. */
+          'It helps to have a list of anything you already take to hand, including things bought without a prescription.',
+        ],
+        /* CLIENT-REVIEW — GENERIC. Restates the lead's own framing without
+           adding a claim. */
+        highlight: 'Medication is one part of a plan, not the whole of it.',
       },
       {
         heading: 'Measured, not guessed',
         body: 'We use standardized clinical rating scales to monitor your progress against the baseline taken at your assessment. The same measures also help catch decompensation early — a change in the wrong direction is easier to act on when it shows up as a number and not only as a feeling.',
+        bullets: [
+          /* CLIENT-REVIEW — SOURCED, across two places, and the split matters.
+             research/content/services.md:21 gives the baseline itself: "Use of
+             standardized clinical rating scales to establish individual
+             baseline and to monitor progress or decompensation over time." It
+             does NOT say when the baseline is taken. "At your assessment" comes
+             from this page's own pre-existing body and FAQ, which already place
+             it there — so the line adds no new claim, but services.md:21 alone
+             does not carry it. Noted by healthcare-reviewer, 2026-10-01. */
+          'A baseline is taken at your assessment, so later visits have something to compare against.',
+          /* CLIENT-REVIEW — SOURCED. Same line: the same measures are used to
+             monitor progress or decompensation over time. NO SCALE IS NAMED,
+             here or anywhere — which instruments the practice uses is still an
+             open client item. */
+          'The same measures are repeated later, so a change shows up rather than being argued about.',
+          /* CLIENT-REVIEW — SOURCED. research/content/services.md:21:
+             "Screening tests to aid in making a diagnosis and ruling out other
+             disorders". */
+          'Screening tests are also used to help rule other conditions in or out.',
+          /* CLIENT-REVIEW — GENERIC. Positions a score as a prompt rather than
+             a verdict; makes no claim about any instrument or any result. */
+          'A score is something to talk about, not a verdict on how you feel.',
+        ],
       },
       {
         heading: 'Adjusting as things change',
         body: 'Psychiatric medication rarely lands perfectly the first time. Follow-up appointments exist to review how you are responding, what side effects you are living with, and what needs to change. Your progress is evaluated on an ongoing basis, with support and education alongside it.',
+        bullets: [
+          /* CLIENT-REVIEW — GENERIC patient education. No frequency, no
+             duration, no medication named, no outcome promised. */
+          'Side effects are worth mentioning even when they seem small — they often shape what changes next.',
+          /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "As we
+             evaluate progress, we will continue to provide support and
+             education as needed." AS NEEDED IS LOAD-BEARING and is kept: it is
+             the source's own clinical-judgement qualifier, not a softener. */
+          'Support and education continue alongside treatment, as needed.',
+          /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was "Changing
+             one thing at a time is what keeps it clear which change did what."
+             Dressed as a general principle, but in a section about how THIS
+             practice adjusts treatment it asserts a one-variable-at-a-time
+             titration protocol that research/ nowhere states — and it sets an
+             expectation that ordinary practice (a cross-taper, two changes at
+             once) would contradict. Do not reinstate it without the client. */
+          /* CLIENT-REVIEW — SOURCED. research/content/home.md:28: "Together, we
+             can identify what works and what isn't working". */
+          'Working out what is helping, and what is not, is something you do together.',
+        ],
+        /* CLIENT-REVIEW — GENERIC. Reassurance, not an outcome claim: it says
+           adjustment is normal, not that treatment will succeed. */
+        highlight: 'Needing an adjustment is an ordinary part of treatment, not a setback.',
       },
       {
         heading: 'Working with your other clinicians',
         body: 'Where you are already working with a therapist, a primary care provider, or another specialist, we collaborate with them to establish medication protocols that fit the rest of your care rather than cutting across it. Referral to follow-up services is available where something falls outside what we provide.',
+        bullets: [
+          /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "The
+             treatment plan involves collaborating with other professionals to
+             set a regimen of therapy and prescription medication". */
+          'Collaborating with other professionals is part of how the treatment plan is set.',
+          /* CLIENT-REVIEW — GENERIC patient education. Says why telling us is
+             useful; claims nothing about what the practice then does. */
+          'Saying who else is treating you is what makes gaps and duplication easier to avoid.',
+          /* CLIENT-REVIEW — SOURCED. research/content/services.md:28-34 lists
+             the practice's own treatment options, which include "Referral to
+             follow-up services". */
+          'Referral to follow-up services is one of the options the practice names.',
+        ],
       },
       {
         heading: 'Conditions we prescribe for',
         body: 'Medication management is available across the diagnoses we treat.',
+        bullets: [
+          /* CLIENT-REVIEW — SOURCED. research/content/services.md:28-34, the
+             practice's own "We will work with you to find the best treatment
+             option available such as" list, which names psychiatric
+             consultation, medication treatment, individual counseling and
+             referral alongside each other — so medication is one option among
+             several rather than the only one. */
+          'Medication is one of the options the practice names, not the only one.',
+          /* CLIENT-REVIEW — GENERIC. A statement about clinical practice in
+             general, not about what Newpoint does in any given case. It is
+             also the hedge that keeps the list above from reading as "every
+             one of these is prescribed for". */
+          'Appearing on this list does not mean medication is the answer in every case.',
+          /* REWRITTEN AFTER healthcare-reviewer, 2026-10-01. The line read
+             "Which of these applies to you is settled at your assessment,
+             before anything is prescribed." SETTLED was the problem: it
+             asserts diagnostic finality at one appointment, which
+             services.md:18 does not say and which this repo's own assessment
+             copy explicitly hedges — see the assessment page's "A diagnosis
+             where one can be established". The "before anything is prescribed"
+             half was sound and is kept.
+
+             CLIENT-REVIEW — SOURCED. research/content/services.md:18 for the
+             diagnosis-then-plan order; the "where one can be established"
+             hedge is the one the assessment page already uses. */
+          'A diagnosis is made at your assessment, where one can be established, before anything is prescribed.',
+        ],
         /**
          * Deliberately NOT a spread of WHAT_WE_TREAT.conditions. That list also
          * carries "Irritability and anger" and "Stress and burnout", which the

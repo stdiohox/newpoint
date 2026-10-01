@@ -58,12 +58,14 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   /* Anchor ids are derived once, here, and every consumer below reads them from
      this array, so the body and the feature block cannot drift apart and the
      ids stay byte-identical to what this route has always served. */
+  /* SPREAD FIRST, THEN ADD THE ID. This used to name every field it forwarded,
+     which silently dropped anything added to the type afterwards — `bullets`
+     and `highlight` reached this map and never reached the card. A field that
+     a section defines is a field a layout may render; deciding that here, by
+     omission, is how the two drift apart. */
   const sectionItems = service.sections.map((section) => ({
+    ...section,
     id: slugify(section.heading),
-    heading: section.heading,
-    body: section.body,
-    detail: section.detail,
-    list: section.list,
   }));
 
   /* Every section renders as a row, so there is no split to guard any more.
@@ -317,14 +319,17 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              The two poster routes keep `bottom`, which is what their flat 0.62
              floor is shaped around and what the other five callers get.
 
-             IT NOW KEYS OFF THE SCRIM RATHER THAN OFF heroImage, which keeps
-             that invariant intact once a third combination exists.
-             medication-management has a master but carries the homepage's
-             overlay, and those ramps are shaped for bottom-anchored copy — so
-             it stays `bottom`, exactly as it was before it had a photograph.
-             Only the `hero` scrim, whose radial sits behind a centred block,
-             selects `center`. */
-          align={heroScrim === 'hero' ? 'center' : 'bottom'}
+             IT KEYS OFF THE SCRIM RATHER THAN OFF heroImage, which keeps that
+             invariant intact once a third combination exists. Only the `hero`
+             scrim, whose radial sits behind a centred block, selects `center`
+             on its own.
+
+             A SERVICE MAY STILL OVERRIDE IT. medication-management carries the
+             homepage's overlay — whose ramps are shaped for bottom-anchored
+             copy — and was asked for the centred treatment anyway, so it sets
+             `heroAlign` explicitly. The derivation is the default, not a
+             prohibition. */
+          align={service.heroAlign ?? (heroScrim === 'hero' ? 'center' : 'bottom')}
           /* Matches /services: centred from lg, left-aligned below it, where
              the copy is a tall paragraph and centring costs more than it buys. */
           copyAlign="center"
