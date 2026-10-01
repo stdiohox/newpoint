@@ -191,6 +191,28 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              A page earns it by having a real master. The posters cannot use it,
              so this switches on heroImage rather than on the slug. */
           scrim={service.heroImage ? 'hero' : 'poster'}
+          /* VERTICAL POSITION FOLLOWS THE SCRIM, ON THE SAME DISCRIMINATOR, so
+             the two cannot be set to a combination that fights itself.
+
+             This page had `scrim="hero"` with the default `align="bottom"`, and
+             that pairing was the bug. The hero scrim is not a bottom ramp — it
+             is a radial that does its heavy work BEHIND THE COPY and falls away
+             to about 12% elsewhere. Anchoring the copy to the foot of the frame
+             put the heading below where the radial is dense, so it read as
+             sitting too low and sat on a thinner scrim than it was designed for.
+             /services has always paired these two correctly; this route only
+             took half of the treatment.
+
+             `center` is centred on the area BELOW THE NAV rather than on the
+             header box, which matters because the header pulls itself up by
+             --nav-h so the photograph runs behind the sticky bar. PageHero's own
+             note on the prop carries the arithmetic: padding of [--nav-h + 4rem,
+             4rem] has its midpoint at (height + --nav-h) / 2, which is exactly
+             the midpoint of [--nav-h, height].
+
+             The two poster routes keep `bottom`, which is what their flat 0.62
+             floor is shaped around and what the other five callers get. */
+          align={service.heroImage ? 'center' : 'bottom'}
           /* Matches /services: centred from lg, left-aligned below it, where
              the copy is a tall paragraph and centring costs more than it buys. */
           copyAlign="center"
