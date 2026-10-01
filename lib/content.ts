@@ -1340,9 +1340,59 @@ export const SERVICE_PAGES: ServicePage[] = [
   {
     slug: 'telehealth',
     nav: 'Telehealth',
-    /* The homepage's overlay verbatim, as on medication-management. This page
-       still has no hero master of its own and runs on its 1280x720 video
-       poster, so the picture is unchanged — only the layers over it. */
+    /**
+     * This page's own hero master, replacing the 1280x720 video poster it
+     * borrowed from its homepage card — which next/image could not upscale, so
+     * it was soft on any retina screen. 2400px wide, the cap the artwork was
+     * supplied against; next/image resizes down from it.
+     *
+     * OBJECT-POSITION MEASURED OFF THE FRAME. Her hair starts at y 9%, her
+     * eyes sit at y 28% and her chin at y 44%; her face spans x 62-78%,
+     * centred on x 70%.
+     *
+     * The source is 1.79:1 and this header is wider than that at the desktop
+     * widths, so cover crops vertically there. y 30% starts the crop 79px down
+     * at 1440, which puts her eyes at box y 146, and 33px down at 1024, which
+     * puts them at y 127 — both clear of the navbar pill's lower edge at about
+     * y 83. At 390 the box is taller than 1.79:1, cover scales by height, there
+     * is no vertical crop at all and her eyes land at y 158 whatever y says.
+     *
+     * x 70% is for that narrow case, where the crop works horizontally
+     * instead: it holds her face at x 192-353 of 390 rather than letting it run
+     * off the right edge. It does nothing at 1440 or 1024, where the full width
+     * is shown.
+     *
+     * CONTRAST ON THIS MASTER DOES NOT MEET AA, and the overlay was required to
+     * stay unchanged, so it is recorded rather than fixed. Measured on the
+     * rendered page at glyph core pixels only — a whole-box sample reads the
+     * brightest pixel in the box rather than one a letter covers:
+     *
+     *   1440  h1 2.02:1 (floor 3)   intro 2.53:1 (floor 4.5)
+     *   1024  h1 2.03:1 (floor 3)   intro 3.43:1 (floor 4.5)
+     *    390  h1 2.53:1 (floor 3)   intro 6.47:1 PASS
+     *
+     * The worst backdrop under a glyph is the sunlit curtained window behind
+     * her, about rgb(177,183,194). THIS IS THE SAME FAILURE THE SCRIM NOTE IN
+     * components/PageHero.tsx ALREADY RECORDS against the homepage's stops, and
+     * medication-management measures the same way: those ramps are shaped for a
+     * 100vh section whose copy is short, bottom-anchored and in the left column
+     * of a two-column grid, and this header is ~540-610px with centred copy
+     * that fills it. The remedy is not retuning these stops — that is what the
+     * `hero` scrim already is — but scrim="hero", or a master whose copy area
+     * is not a blown window.
+     */
+    heroImage: {
+      src: '/images/services/tele-hero-2400.webp',
+      /* Describes the photograph and stops there: no claim that this is a
+         patient of the practice, and none that this is a Newpoint appointment
+         — the screen is not in frame, so there is no call to describe. */
+      alt: 'A woman sitting at a dining table at home, smiling at an open laptop, with a mug and a notebook beside her and a window behind.',
+      objectPosition: '70% 30%',
+    },
+    /* The homepage's overlay verbatim, as on medication-management.
+       UNCHANGED BY THE NEW MASTER: this is set explicitly rather than derived
+       from heroImage, so adding the photograph did not move the page onto the
+       `hero` scrim. Same for heroAlign below. */
     heroScrim: 'home',
     /* Centred between the navbar and the hero's bottom edge, matching
        medication-management and the assessment page. */
