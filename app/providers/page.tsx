@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
 import { PageCta } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
-import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
+import { ProviderCard } from '@/components/ui/ProviderCard';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 import { PROVIDERS, PROVIDERS_PAGE } from '@/lib/content';
@@ -76,31 +75,31 @@ export default function ProvidersPage() {
 
         <div className="py-20 md:py-28">
           <Container>
-            <ul role="list" className="grid gap-6 sm:grid-cols-2 md:gap-8">
+            {/* Two columns from md, one below it. items-stretch so the pair
+                are the same height whatever their bio and specialty list run
+                to — Ofoegbu's bio is twice Whitaker's and her list one item
+                longer. */}
+            <ul role="list" className="grid items-stretch gap-6 md:grid-cols-2 md:gap-8">
               {PROVIDERS.map((p, i) => (
                 <Reveal as="li" key={p.slug} delay={stagger(i, 0.08)} className="h-full">
-                  {/* THE WHOLE CARD IS THE LINK, and its accessible name is the
-                      concatenated content, which starts with the provider's
-                      name. The portrait carries alt="" because the h2 beside it
-                      already says who this is — ProviderPortrait's own alt
-                      repeats the name AND the credentials, which a screen
-                      reader would then hear twice per card. */}
-                  <Link
-                    href={`/providers/${p.slug}`}
-                    className="rounded-card bg-np-surface ease-np-out flex h-full flex-col items-start gap-5 p-6 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)] sm:flex-row sm:items-center"
-                  >
-                    <ProviderPortrait
-                      provider={p}
-                      alt=""
-                      sizes="112px"
-                      className="size-28 shrink-0 rounded-full"
-                    />
-                    <div className="min-w-0">
-                      <h2 className="text-h3 text-np-ink">{p.name}</h2>
-                      <p className="text-small text-np-neutral-600 mt-1">{p.credentials}</p>
-                      <p className="text-small text-np-neutral-600 mt-1">{p.licensed}</p>
-                    </div>
-                  </Link>
+                  {/* Plain props rather than the Provider object: ProviderCard
+                      is a client component, and handing it the whole record
+                      would put every field — both full bios, the approach and
+                      expect answers, the email — into the browser bundle to
+                      render a card that shows five of them. `bio[0]` is the
+                      provider's own opening paragraph, which is the short one
+                      by construction. */}
+                  <ProviderCard
+                    provider={{
+                      slug: p.slug,
+                      name: p.name,
+                      credentials: p.credentials,
+                      licensed: p.licensed,
+                      bio: p.bio[0],
+                      treats: p.treats,
+                      image: { webp1120: p.image.webp1120 },
+                    }}
+                  />
                 </Reveal>
               ))}
             </ul>
