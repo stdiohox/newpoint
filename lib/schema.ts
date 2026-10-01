@@ -148,6 +148,16 @@ export function personSchemaFor(p: Provider) {
     '@id': providerId(p.slug),
     url: `${BUSINESS.domain}/providers/${p.slug}`,
     name: p.name,
+    /**
+     * The title lives HERE and nowhere else in the markup.
+     *
+     * `name` stays the legal name, `jobTitle` stays the ANCC role string, and
+     * the type stays Person — never Physician. honorificPrefix is the property
+     * schema.org provides for exactly this, so a consumer reads "Dr." as a form
+     * of address rather than as a claim about the occupation, which the
+     * jobTitle and hasOccupation beside it describe correctly.
+     */
+    honorificPrefix: 'Dr.',
     givenName: p.name.split(' ')[0],
     familyName: p.name.split(' ').slice(-1)[0],
     // Verbatim from the research, split into the three distinct post-nominals
@@ -190,6 +200,18 @@ export function personSchemaFor(p: Provider) {
     telephone: BUSINESS.phonePrimary,
     worksFor: { '@id': ORG_ID },
     knowsAbout: p.treats,
+    /* Omitted entirely where the provider has no structured languages, rather
+       than emitted empty: an absent property says nothing, and `[]` says "no
+       languages", which is false for both of them. Only Dr. Whitaker carries
+       the field today — see the note on Provider.knowsLanguage.
+
+       PLAIN NAMES, AND SCHEMA.ORG WOULD RATHER HAVE BCP-47. Its definition of
+       `knowsLanguage` asks for a Language object or an IETF tag; consumers
+       accept bare names in practice, and the research records names rather
+       than tags. If this ever needs to be lossless, the upgrade is
+       { '@type': 'Language', name: 'Yoruba', alternateName: 'yo' } — not a
+       rewrite of the content field. */
+    ...(p.knowsLanguage ? { knowsLanguage: p.knowsLanguage } : {}),
     // CLIENT: `identifier` (NPI) and license numbers omitted, not published.
     // CLIENT: `hasCredential` omitted, the certifying body is not stated anywhere.
     // CLIENT: `sameAs` omitted. It is the strongest signal for tying this name
@@ -224,8 +246,22 @@ export function serviceSchemaFor(s: ServicePage) {
        than emitted empty when a service has no synonym. */
     ...(s.alternateName ? { alternateName: s.alternateName } : {}),
     description: s.intro,
-    provider: { '@id': ORG_ID },
-    availableIn: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
+    /* `provider` AND `availableIn` WERE REMOVED HERE, and they were not doing
+       what they looked like they were doing.
+
+       Two of the three service nodes are MedicalProcedure and the third is
+       MedicalTherapy. Neither is a subtype of Service, and `provider` is a
+       property of Service, not of MedicalEntity — so it was invalid on every
+       node this function emits. `availableIn` is not a schema.org property at
+       all; the intended spelling for a Service would have been `areaServed`,
+       and this is not a Service.
+
+       The relationship they were reaching for is expressed in the valid
+       direction instead: the clinic node that every one of these pages also
+       emits is what ties the practice to its services, and the geography is
+       already on the clinic. If a page ever needs the link stated explicitly,
+       `MedicalClinic.availableService` is the valid property and it belongs on
+       the clinic, not here. */
   };
 }
 
@@ -272,7 +308,14 @@ export function contactPageSchema() {
         name: `${p.name}, ${p.credentials}`,
         email: p.email,
         areaServed: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
-        availableLanguage: 'English',
+        /* DERIVED, NOT HARDCODED, since 2026-10-01. This read a flat 'English'
+           for every provider, which the moment `knowsLanguage` reached the
+           Person node meant two documents answering the same question
+           differently for the same person — /providers said English and
+           Yoruba, /contact said English. A provider without the structured
+           field falls back to English, which is what this said before and is
+           the one language both providers' prose `languages` records. */
+        availableLanguage: p.knowsLanguage ?? 'English',
       })),
     ],
   };

@@ -50,6 +50,26 @@ const legacyRedirects = [
     statusCode: 301,
   },
   {
+    /* NOT A LEGACY URL — A PAGE THIS REBUILD BUILT AND THEN RETIRED.
+       /faq shipped on 2026-09-30 with the full eight questions and was merged
+       into /contact on 2026-10-01 at the client's instruction. It was linked
+       from the navbar, the footer and the homepage preview for a day, so it
+       may already be bookmarked or crawled; the 301 is what keeps those
+       working and what passes any equity it gathered to its content's new
+       home.
+
+       THE FRAGMENT SURVIVES THE REDIRECT because Next emits it in the Location
+       header, and a browser keeps a fragment from the original request anyway
+       when the target has none. Either way the reader lands on the questions
+       rather than at the top of a page whose first section is a form.
+
+       The questions themselves are unchanged and live at
+       app/contact/page.tsx, under id="faq". */
+    source: '/faq',
+    destination: '/contact#faq',
+    statusCode: 301,
+  },
+  {
     // Unedited Duda blog template, dated Feb 2017, byline "Duda Owner IONOS".
     // No equivalent content exists and none should. FLAGGED: no clear match,
     // so this goes to the homepage.
@@ -70,6 +90,35 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/webp'],
+    /**
+     * EVERY QUALITY THIS SITE ASKS FOR, AND NOTHING ELSE.
+     *
+     * `qualities` is an allow-list: once it is set, next/image serves only these
+     * values and any other `quality` prop is rejected rather than silently
+     * honoured. So this list is not a preference — it is a contract with the
+     * call sites, and adding a `quality` anywhere without adding it here breaks
+     * that image.
+     *
+     * Enumerated from the call sites, not guessed:
+     *   75  the optimiser's own default, which is what every <Image> with no
+     *       `quality` prop gets — components/Footer.tsx, ServiceBody.tsx,
+     *       faq-sections.tsx, onboarding-form.tsx,
+     *       feature-section-with-bento-grid.tsx, the /services cards, and
+     *       PageHero whenever its caller passes no `image.quality`. It is the
+     *       one that is easiest to leave out and the one that would break the
+     *       most images.
+     *   82  lib/content.ts, the psychiatric-evaluation hero master. Its note
+     *       there records the measurement: a 2752px master being downscaled, so
+     *       resampling dominates and q90 buys nothing for the extra 160 KB.
+     *   88  components/sections/Hero.tsx, the homepage LCP image.
+     *   90  app/services/page.tsx and the service-page video posters, where a
+     *       re-encode sits on top of an already-soft 1280x720 upscale. Both
+     *       notes explain why the number is higher there.
+     *
+     * Ascending order, so a new value is obvious to place and a duplicate is
+     * obvious to spot.
+     */
+    qualities: [75, 82, 88, 90],
   },
   async redirects() {
     return legacyRedirects;

@@ -41,6 +41,7 @@ export function PageHero({
   copyMaxWidth,
   copyAlign = 'left',
   align = 'bottom',
+  showCta = true,
 }: {
   eyebrow?: string;
   title: string;
@@ -52,6 +53,12 @@ export function PageHero({
    */
   image?: {
     src: string;
+    /**
+     * Alt text. Omitted, the photograph renders decorative with `alt=""`,
+     * which is what the H1 beside it makes correct for a page hero. Supply one
+     * only where the picture is meant to be described as well as seen.
+     */
+    alt?: string;
     objectPosition?: string;
     /**
      * `sizes` for the srcset, defaulting to the full-bleed 100vw.
@@ -89,8 +96,33 @@ export function PageHero({
    * only safe where the photograph has been cropped so the copy never sits over
    * a blown highlight. /services is cropped exactly that way; measure before
    * adding a second page to this branch.
+   *
+   * `home` IS THE HOMEPAGE'S OVERLAY VERBATIM — the two gradient layers from
+   * components/sections/Hero.tsx, copied stop for stop with nothing added and
+   * nothing retuned. Requested for /services/medication-management so that hero
+   * matches the homepage exactly.
+   *
+   * `edge` IS ONE GRADIENT AND NOTHING ELSE: a single left-to-right ramp,
+   * darkest at the left edge where left-aligned copy sits, easing to a floor on
+   * the right so the photograph still reads as a photograph. It exists for the
+   * provider pages, where the four-layer `hero` scrim put a visible vertical
+   * seam near the middle of the frame — four overlapping shapes, each smooth on
+   * its own, whose combined alpha is not monotonic across the width. One ramp
+   * cannot do that.
+   *
+   * Its stops are smoothstep-sampled, 3t^2 - 2t^3 at nine points, for the
+   * reason the `hero` note gives: zero slope at both ends, so the eye has no
+   * change in RATE to catch. DO NOT HAND-EDIT THEM — regenerate from the curve.
+   *
+   * READ THE LONG NOTE ON THE SCRIM LAYERS BELOW BEFORE REUSING IT. Those exact
+   * ramps were already carried in this component once and were replaced,
+   * because they are shaped for a 100vh section whose copy is short and
+   * bottom-left, and this header is ~560-670px with copy that fills it. The
+   * measured failures are recorded there. This branch exists because it was
+   * asked for on one page; it is not a safe default, and any page added to it
+   * needs its own glyph-level measurement first.
    */
-  scrim?: 'poster' | 'hero';
+  scrim?: 'poster' | 'hero' | 'home' | 'edge';
   /**
    * Hard caps on the copy's measure, in any CSS length. Omitted, the h1 keeps
    * `max-w-[18ch]` and the intro `max-w-[56ch]`, which is what the other five
@@ -143,22 +175,49 @@ export function PageHero({
    * still guarantees clearance when the copy grows tall enough to fill.
    */
   align?: 'bottom' | 'center';
+  /**
+   * Whether the hero carries the appointment button.
+   *
+   * Defaults to true, so the routes that do not pass it are untouched. The
+   * callers that pass false are the three service pages (through
+   * `hideHeroCta`), both provider pages, /providers, /faq, /contact and
+   * /insurance: the client asked for that button to come off each of them
+   * in turn, starting with /services/psychiatric-evaluation on 2026-09-30.
+   *
+   * THE PAGE STILL HAS AN APPOINTMENT ROUTE, which is what makes this safe to
+   * honour rather than a conversion path quietly deleted. Three remain: the
+   * navbar button, which is sticky and therefore reachable from anywhere on the
+   * page; PageCta's "Request an appointment" and its phone button; and the
+   * footer's. What goes is the above-the-fold one, not the ability to book.
+   */
+  showCta?: boolean;
 }) {
   const centred = copyAlign === 'center';
 
   return (
     /* No `on-ink` here, unlike Footer, PageCta and Providers. That class only
        swaps the focus-ring colour, it was carried solely for the breadcrumb
-       links, and the CTA — now the one focusable thing in this header — fixes
-       its own ring inside ButtonWithIcon with a utility that beats the base
-       layer `on-ink` lives in anyway. */
+       links, and the CTA — the only focusable thing left in this header when it
+       renders at all — fixes its own ring inside ButtonWithIcon with a utility
+       that beats the base layer `on-ink` lives in anyway. With `showCta` false
+       the header has nothing focusable in it, so there is still nothing here
+       for `on-ink` to do. */
     <header className="bg-np-blue-900 relative -mt-[var(--nav-h)] flex min-h-[50dvh] flex-col text-white md:min-h-[60vh]">
       {image ? (
         <Image
           src={image.src}
-          alt=""
+          /* DECORATIVE BY DEFAULT, DESCRIBED ONLY IF A CALLER ASKS.
+             The H1 beside it already names the page, so an empty alt is the
+             right answer for the five callers that pass none and they are
+             unchanged. A caller that supplies one gets it. */
+          alt={image.alt ?? ''}
           fill
           priority
+          /* priority preloads it; fetchPriority tells the browser it is the
+             LCP element rather than leaving it to infer that after layout.
+             It is competing with four font preloads and a blocking
+             cross-origin stylesheet, so being explicit is worth the attribute. */
+          fetchPriority="high"
           sizes={image.sizes ?? '100vw'}
           quality={image.quality}
           className="object-cover"
@@ -283,8 +342,69 @@ export function PageHero({
         />
       )}
 
+      {/* THE `home` SCRIM: components/sections/Hero.tsx's overlay, verbatim.
+          Two layers, which is all the homepage has — no flat tint and no
+          radial, so the `hero` branch's layers 1, 3 and 4 stay switched off and
+          layer 2 below is skipped for this branch rather than added to.
+
+          BOTH className STRINGS ARE COPIED CHARACTER FOR CHARACTER from
+          Hero.tsx, as are aria-hidden and pointer-events-none. No stop, colour,
+          position or breakpoint has been changed, and nothing has been added.
+          If the homepage overlay is ever retuned, these are a copy and will not
+          follow it — update both or neither.
+
+          WHAT THE SECOND LAYER ASSUMES. The left ramp is `hidden lg:block`, and
+          on the homepage it exists because at lg that layout turns two-column
+          and the copy moves bottom-LEFT. This header centres its copy at lg
+          (copyAlign="center"), so from lg up the heaviest alpha sits on the
+          empty left margin and the lightest sits under the text. That is a
+          property of the copy, not of this overlay, and it is left exactly as
+          asked rather than adapted. The measured consequence is recorded in
+          app/services/[slug]/page.tsx beside the scrim choice. */}
+      {image && scrim === 'home' && (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(16,31,69,0.78)_0%,rgba(16,31,69,0.78)_52%,rgba(16,31,69,0.45)_64%,rgba(16,31,69,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(16,31,69,0.72)_0%,rgba(16,31,69,0.72)_18%,rgba(16,31,69,0)_42%)]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(16,31,69,0.72)_0%,rgba(16,31,69,0.72)_40%,rgba(16,31,69,0.45)_55%,rgba(16,31,69,0)_74%)]"
+          />
+        </>
+      )}
+
+      {/* THE `edge` SCRIM: one left-to-right gradient over the full-bleed
+          image, and the only layer this branch draws.
+
+          Two shapes, because the copy's width changes. From lg the text sits in
+          roughly the left half, so the ramp holds 0.80 to 46% and eases to a
+          0.18 floor — enough to carry white text on the left while the right of
+          the frame keeps its light. Below lg the copy fills the width, so the
+          ramp holds 0.84 to 40% and only eases to 0.66; a desktop-shaped ramp
+          would leave the end of every wrapped line on bare photograph.
+
+          THAT 0.66 FLOOR IS MEASURED, NOT CHOSEN. At 0.46 the intro on
+          Ofoegbu's frame came out at 3.27:1 against a 4.5:1 floor — her room is
+          bright to the right edge and at 390 the wrapped lines run into it.
+          0.66 puts the worst glyph on that page at 5.0:1. The two frames differ
+          enough that the shallower ramp passed on one and failed on the other,
+          which is the whole reason this is a measured value.
+
+          The floor is deliberately not zero at either width. A ramp that
+          reaches full transparency has an end, and an end is the seam this
+          replaces. */}
+      {image && scrim === 'edge' && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(16,31,69,0.84)_0%,rgba(16,31,69,0.84)_40%,rgba(16,31,69,0.832)_47.5%,rgba(16,31,69,0.812)_55%,rgba(16,31,69,0.783)_62.5%,rgba(16,31,69,0.75)_70%,rgba(16,31,69,0.717)_77.5%,rgba(16,31,69,0.688)_85%,rgba(16,31,69,0.668)_92.5%,rgba(16,31,69,0.66)_100%)] lg:bg-[linear-gradient(to_right,rgba(16,31,69,0.8)_0%,rgba(16,31,69,0.8)_46%,rgba(16,31,69,0.773)_52.25%,rgba(16,31,69,0.703)_58.5%,rgba(16,31,69,0.604)_64.75%,rgba(16,31,69,0.49)_71%,rgba(16,31,69,0.376)_77.25%,rgba(16,31,69,0.277)_83.5%,rgba(16,31,69,0.207)_89.75%,rgba(16,31,69,0.18)_96%)]"
+        />
+      )}
+
       {/* LAYER 2: the bottom gradient. The `hero` branch is the smoothstep
-          curve; the other two are the original ramps and are untouched. */}
+          curve; the other two are the original ramps and are untouched.
+          Skipped entirely under `home`, which brings its own pair above. */}
+      {scrim !== 'home' && scrim !== 'edge' && (
       <div
         aria-hidden="true"
         className={
@@ -295,6 +415,7 @@ export function PageHero({
             : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(16,31,69,0.78)_0%,rgba(16,31,69,0.78)_52%,rgba(16,31,69,0.45)_64%,rgba(16,31,69,0)_80%)]'
         }
       />
+      )}
 
       {/* LAYER 3: the left gradient, one curve at every width. The final stop
           repeats 0.15 at 100% deliberately — that flat tail is what stops the
@@ -310,7 +431,24 @@ export function PageHero({
       {image && scrim === 'hero' && (
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''}bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]`}
+          /* THE SPACE AFTER THE TERNARY IS OUTSIDE THE STRING ON PURPOSE, and
+             it has to stay there.
+
+             This read `${centred ? 'lg:hidden' : ''}bg-[...]`, with no
+             separator, so on a centred hero the emitted class was the single
+             token `lg:hiddenbg-[linear-gradient(...)]`. Tailwind generated
+             neither utility: verified in the built output as two occurrences
+             in the HTML and zero matches in the CSS bundle. The left ramp was
+             therefore absent at every width on every centred hero, including
+             this page and /services, and the contrast figures in the comment
+             below assume it is present.
+
+             Putting the space INSIDE the ternary does not survive: this repo
+             runs prettier-plugin-tailwindcss, which treats the string as a
+             class list and trims the trailing space, which is almost certainly
+             how the bug arrived in the first place. Outside the braces it is
+             literal template text and the plugin leaves it alone. */
+          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''} bg-[linear-gradient(to_right,rgba(16,31,69,0.7)_0%,rgba(16,31,69,0.676)_9.38%,rgba(16,31,69,0.614)_18.75%,rgba(16,31,69,0.526)_28.13%,rgba(16,31,69,0.425)_37.5%,rgba(16,31,69,0.324)_46.88%,rgba(16,31,69,0.236)_56.25%,rgba(16,31,69,0.174)_65.63%,rgba(16,31,69,0.15)_75%,rgba(16,31,69,0.15)_100%)]`}
         />
       )}
 
@@ -395,11 +533,13 @@ export function PageHero({
               {intro}
             </p>
 
-            <div className={`mt-8 ${centred ? 'lg:flex lg:justify-center' : ''}`}>
-              <ButtonWithIcon href={CTA.href} variant="glass">
-                {CTA.label}
-              </ButtonWithIcon>
-            </div>
+            {showCta && (
+              <div className={`mt-8 ${centred ? 'lg:flex lg:justify-center' : ''}`}>
+                <ButtonWithIcon href={CTA.href} variant="glass">
+                  {CTA.label}
+                </ButtonWithIcon>
+              </div>
+            )}
           </div>
         </Container>
       </div>

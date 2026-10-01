@@ -32,19 +32,88 @@
  * on interior routes as well as the homepage. A bare `#providers` on /insurance
  * would resolve against /insurance and go nowhere.
  */
+/**
+ * One row of a navbar dropdown.
+ *
+ * `detail` is an optional second line under the label — the Providers menu
+ * shows each provider's credentials there. Services passes none, so its rows
+ * are unchanged.
+ *
+ * THE ROWS ARE PASSED IN, NOT IMPORTED HERE, and that is the one rule this file
+ * exists to enforce. Both menus are built from `lib/content.ts` — SERVICE_PAGES
+ * and PROVIDERS — and content.ts already imports FROM this file, so importing
+ * it back would be circular AND would pull every string on the site into the
+ * client bundle, which is the leak the note at the top of this file describes.
+ * app/layout.tsx is a server component: it maps the content data down to this
+ * shape and hands it to <Navbar1 />. A provider added to PROVIDERS therefore
+ * appears in the menu with no change here or in the navbar.
+ */
+export type NavChild = { label: string; href: string; detail?: string };
+
+/**
+ * Which primary items open a dropdown, keyed by the parent's own href.
+ *
+ * Declared here rather than compared inline in the navbar, which used to test
+ * `item.href === '/services'` in two places. A second hardcoded href would have
+ * made that four.
+ */
+export const SUBMENU_PARENTS = ['/services', '/providers'] as const;
+
 export const NAV = [
   { label: 'Services', href: '/services' },
-  { label: 'Providers', href: '/#providers' },
+  /* A PAGE, NOT THE HOMEPAGE SECTION. This was `/#providers`, which scrolled
+     to the homepage's provider band while /providers/[slug] served a page per
+     provider with nothing linking to them as a set. /providers is now that
+     set's index, and this one constant feeds all three surfaces — the desktop
+     nav, the mobile menu and the footer's Practice column, which derives from
+     NAV in components/Footer.tsx. */
+  { label: 'Providers', href: '/providers' },
   { label: 'Insurance', href: '/insurance' },
   { label: 'New patients', href: '/new-patients' },
-  { label: 'FAQ', href: '/#faq' },
-  { label: 'Contact', href: '/contact' },
+  /* NO "FAQ" AND NO "Contact" ENTRY, as of 2026-10-01, and both were removed
+     by client decision rather than lost.
+
+     The FAQ no longer has a page: it was merged into /contact under id="faq",
+     and /faq 301s there. Contact has one too, and it is the CTA — the
+     "Request an appointment" button below is in the navbar at every width,
+     points at /contact, and is the single highest-intent destination on the
+     site. A second plain "Contact" link beside it offered the same route in a
+     quieter voice.
+
+     THIS ARRAY FEEDS THREE SURFACES, so removing an entry removes it from all
+     three at once: the desktop nav, the mobile menu and the footer's Practice
+     column. The footer adds "Contact & FAQ" back on its own — see
+     CONTACT_AND_FAQ below — because a footer is where a site lists what it
+     has, and the CTA button is not in it. */
 ] as const;
 
-/** Single CTA intent across the entire site. Never a second label for this action. */
+/**
+ * The footer's single link to /contact, carrying the one label that is new
+ * copy: "Contact & FAQ".
+ *
+ * It is NOT in NAV. NAV is the navbar's list, and the navbar deliberately
+ * carries no Contact link any more; putting it there to get it into the footer
+ * would put it back in the bar the client asked to clear. One constant, used
+ * once, named for what it is.
+ */
+export const CONTACT_AND_FAQ = { label: 'Contact & FAQ', href: '/contact' } as const;
+
+/**
+ * Single CTA intent across the entire site. Never a second label for this
+ * action.
+ *
+ * `/contact`, NOT `/#contact`. It pointed at the homepage form band, which was
+ * right while /contact had no form of its own — it had a "Request an
+ * appointment" heading whose own link sent you back to the homepage. /contact
+ * now renders the same <ContactCrisis /> the homepage does, so the CTA lands on
+ * a page that can actually take the request instead of scrolling another route.
+ *
+ * The homepage section keeps its `id="contact"` for on-page use; nothing links
+ * to `/#contact` any more.
+ */
 export const CTA = {
   label: 'Request an appointment',
-  href: '/#contact',
+  href: '/contact',
 } as const;
 
 /**

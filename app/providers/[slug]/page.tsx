@@ -3,10 +3,10 @@ import { notFound } from 'next/navigation';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
-import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { PageCta } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
-import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
+import { TeamMemberCard } from '@/components/ui/TeamMemberCard';
 import { stagger } from '@/lib/motion';
 import { PROVIDERS, SERVICE_PAGES, BUSINESS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
@@ -49,12 +49,45 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
 }
 
+/**
+ * One hero photograph per provider, keyed by slug.
+ *
+ * Kept here rather than on the Provider type: it is a property of this route's
+ * presentation, not of the provider, and nothing else renders it.
+ *
+ * NEITHER FRAME CONTAINS A PERSON, so the alts describe the rooms and claim
+ * nothing about whose they are — the practice's in-person locations are still
+ * unconfirmed under CLAUDE.md's care-modality rule.
+ *
+ * NO objectPosition HERE, AND X WOULD BE INERT IF THERE WERE. At the desktop
+ * widths this hero box is WIDER than the image's 1.79:1 aspect — 1440x540 is
+ * 2.67, 1024x540 is 1.90 — so object-cover scales by WIDTH, the full image
+ * width is always shown, and the horizontal overflow is 0px. With nothing to
+ * slide, the X component of objectPosition changes nothing at all there; it
+ * only bites below lg, where the box is taller than the image and cover scales
+ * by height instead (491px of overflow at 390).
+ *
+ * That is why a framing problem in the middle of one of these photographs
+ * cannot be cropped out in CSS at 1440 or 1024, and has to be fixed in the
+ * asset. It cost a pass to discover; it is written down so it does not cost
+ * another.
+ */
+const HERO_IMAGE: Record<string, { src: string; alt: string }> = {
+  'anastasia-ofoegbu': {
+    src: '/images/providers/provider-anastasia-hero-2400.webp',
+    alt: 'An empty sitting room with a green armchair and a cream armchair at either side, a side table holding a glass of water and an open notebook, and a potted fig tree against a plain wall.',
+  },
+  'funmilayo-whitaker': {
+    src: '/images/providers/provider-funmilayo-hero-2400.webp',
+    alt: 'An empty sitting room with a blue armchair at either side, a side table of white flowers on the left and a trailing plant on a cabinet on the right, against a plain wall between curtained windows.',
+  },
+};
+
 export default async function ProviderPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const provider = PROVIDERS.find((p) => p.slug === slug);
   if (!provider) notFound();
 
-  const colleague = PROVIDERS.find((p) => p.slug !== provider.slug);
 
   /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [{ name: provider.name, path: `/providers/${provider.slug}` }];
@@ -92,31 +125,89 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
     <>
       <JsonLd schemas={[organizationRef(), personSchemaFor(provider), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        {/* The standfirst is the FIRST paragraph of her bio, not the whole
-            thing. `bio` is the provider's own Headway introduction and runs to
-            two paragraphs for Whitaker; all of it in a hero would push the page
-            below the fold before anything is said. The remainder is printed as
-            body copy beside her portrait, in order, so nothing is lost. */}
+        {/* THE HERO CARRIES THE LABEL, THE NAME AND ONE LINE. The standfirst
+            used to be bio[0], the provider's own first paragraph; it has moved
+            to the editorial card, which now holds the whole bio. What is left
+            is `role` and `licensed`, both verbatim from PROVIDERS — the two
+            facts a reader wants before anything else, and the shortest thing
+            that can sit under a two-line name without pushing the page down.
+
+            IT ALSO KEEPS THE TITLE RULE SATISFIED TWICE OVER: the credentials
+            are in the heading beside "Dr.", and `role` spells out "Psychiatric-
+            Mental Health Nurse Practitioner" directly beneath it. */}
         <PageHero
           eyebrow="Provider"
-          title={`${provider.name}, ${provider.credentials}`}
-          intro={provider.bio[0]}
+          title={`${provider.displayName}, ${provider.credentials}`}
+          intro={`${provider.role}. ${provider.licensed}.`}
+          image={HERO_IMAGE[provider.slug]}
+          /* Centred between the navbar and the hero's bottom edge — `center`
+             centres on the area BELOW the nav, not on the header box, which
+             matters because the header pulls itself up by --nav-h so the
+             photograph runs behind the sticky bar. */
+          align="center"
+          /* Centred horizontally from lg, matching the service pages — the
+             label, the heading and the line below it all centre together. */
+          copyAlign="center"
+          /* No appointment button in this hero. The navbar's, PageCta's and the
+             footer's all remain, so the booking route is intact. */
+          showCta={false}
+          /**
+           * scrim="hero" WITH copyAlign="center" — the centred-copy overlay the
+           * service pages use, which is the one shaped for centred text.
+           *
+           * WHAT THE "SEAM" ACTUALLY WAS. The image element was never the
+           * problem: it is `fill`, so position absolute, inset 0, 100% of the
+           * hero box, object-cover — measured at 1440x540 against a 1440x540
+           * header — and the only other children are the overlay div and the
+           * copy, both full width, neither with a background behind the left.
+           *
+           * The edge is IN THE PHOTOGRAPHS. Sampling the raw frames with every
+           * overlay hidden, the largest luminance steps across the width are
+           * 0.48 at x 72% on Whitaker's and 0.47 at x 52% on Ofoegbu's: a wall
+           * corner and a doorway. A left-to-right ramp that is dark on one side
+           * and light on the other sits on top of that split and reads as one
+           * hard join rather than two separate things.
+           *
+           * The centred overlay does not take sides. Its radial is centred on
+           * the copy — 46% 58% below lg, 50% 58% at lg — so the darkening is
+           * symmetric about the middle and the architectural edge is no longer
+           * reinforced by a gradient running the same way.
+           *
+           * MEASURED at 1440, 1024, 390 and 320 on both frames; numbers are in
+           * the commit message.
+           */
+          scrim="hero"
         />
+
+        {/* THE EDITORIAL CARD, replacing the portrait-beside-intro columns.
+            `position` puts the portrait on the left for Whitaker and the right
+            for Ofoegbu, as asked.
+
+            THE CARD HOLDS THE WHOLE BIO, every paragraph, for both providers.
+            It used to take bio.slice(1), which left Ofoegbu's card with no body
+            copy at all — her Headway bio is a single paragraph and the hero had
+            it. The hero no longer carries any of it, so the full array lands
+            here and neither card is empty.
+
+            NOTHING IS PRINTED TWICE. bio[0] left the hero, and the body column
+            below stopped mapping bio when this card took over. Verified against
+            the rendered HTML: one occurrence of each paragraph per page. */}
+        <div className="pt-20 md:pt-28">
+          <Container>
+            <TeamMemberCard
+              provider={provider}
+              paragraphs={provider.bio}
+              position={provider.slug === 'funmilayo-whitaker' ? 'left' : 'right'}
+            />
+          </Container>
+        </div>
 
         <div className="py-20 md:py-28">
           <Container>
             <div className="grid gap-12 md:grid-cols-12 md:gap-16">
               <div className="md:col-span-5">
-                <Reveal>
-                  <ProviderPortrait
-                    provider={provider}
-                    sizes="(min-width: 768px) 440px, 100vw"
-                    className="w-full"
-                    loading="eager"
-                  />
-                </Reveal>
                 <Reveal delay={0.08}>
-                  <dl className="border-np-neutral-200 mt-8 border-t">
+                  <dl className="border-np-neutral-200 border-t">
                     {facts.map((fact) => (
                       <div
                         key={fact.label}
@@ -174,13 +265,12 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     Rendered before "What she treats" deliberately: someone who
                     has just read her name and credentials in the hero wants to
                     know who she is, not to be handed a taxonomy. */}
-                {provider.bio.slice(1).map((para, i) => (
-                  <Reveal key={i} delay={stagger(i, 0.06)}>
-                    <p className="text-body-l text-np-neutral-600 max-w-[62ch] not-first:mt-4">
-                      {para}
-                    </p>
-                  </Reveal>
-                ))}
+                {/* THE REMAINING BIO PARAGRAPHS MOVED TO THE CARD ABOVE and are
+                    not repeated here. They used to render in this column; with
+                    TeamMemberCard carrying them, printing them again put
+                    Whitaker's second paragraph on the page twice, about 600px
+                    apart. Ofoegbu has a single-paragraph bio and was
+                    unaffected, which is why it was easy to miss. */}
 
                 <div
                   className={
@@ -281,30 +371,14 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           </Container>
         </div>
 
-        <RelatedLinks
-          heading="Elsewhere on the site"
-          links={[
-            ...(colleague
-              ? [
-                  {
-                    label: colleague.name,
-                    description: `${colleague.credentials}. ${colleague.licensed}.`,
-                    href: `/providers/${colleague.slug}`,
-                  },
-                ]
-              : []),
-            {
-              label: 'Starting care',
-              description: 'The three steps from first contact to ongoing treatment.',
-              href: '/new-patients',
-            },
-            {
-              label: 'Insurance and payment',
-              description: 'The plans we accept and the sliding scale for self-pay patients.',
-              href: '/insurance',
-            },
-          ]}
-        />
+        {/* "Elsewhere on the site" REMOVED at the client's request.
+            PageCta is now the last block before the footer, so the footer's
+            988 / 911 strip is the next content a reader meets — the same shape
+            every other page on the site ends in. What is lost is internal
+            linking weight: this grid was the only link from one provider's page
+            to the other's, and to /new-patients and /insurance from here. All
+            three remain reachable from the navbar — the footer carries no
+            provider links — so the cost is weight rather than indexation. */}
 
         <PageCta heading={`Book with ${provider.name.split(' ')[0]}`} />
       </main>

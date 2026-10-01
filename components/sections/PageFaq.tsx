@@ -13,9 +13,22 @@ import { Accordion } from '@/components/ui/Accordion';
 export function PageFaq({
   items,
   heading = 'Common questions',
+  idPrefix = 'page-faq',
 }: {
   items: readonly { q: string; a: string }[];
   heading?: string;
+  /**
+   * Accordion element-id namespace.
+   *
+   * REQUIRED WHEN A PAGE RENDERS THIS BLOCK MORE THAN ONCE. Accordion builds
+   * its ids as `${idPrefix}-trigger-${i}` and `${idPrefix}-panel-${i}`, so two
+   * blocks sharing a prefix emit duplicate ids and every aria-controls and
+   * aria-labelledby in the second block resolves to the first one's markup.
+   * /contact renders one block per FAQ group and passes a distinct prefix for
+   * each — it was /faq until the two pages were merged on 2026-10-01.
+   * The default keeps every existing single-block caller unchanged.
+   */
+  idPrefix?: string;
 }) {
   return (
     <section className="border-np-neutral-200 border-t py-20 md:py-28">
@@ -28,7 +41,7 @@ export function PageFaq({
           </div>
           <div className="md:col-span-8">
             <Reveal delay={0.08}>
-              <Accordion items={items} headingLevel={3} idPrefix="page-faq" />
+              <Accordion items={items} headingLevel={3} idPrefix={idPrefix} />
             </Reveal>
           </div>
         </div>

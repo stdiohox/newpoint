@@ -73,7 +73,9 @@ Both providers are **advanced practice nurses**, not physicians. New Jersey and 
 both have title-protection statutes. Treat the title as belonging in the list above.
 
 - **Never** `physician`, `psychiatrist`, or `Dr.` for either provider — in copy, metadata,
-  `alt` text, or schema. In schema that also means never `Physician`, `IndividualPhysician`,
+  `alt` text, or schema. **(`Dr.` in VISIBLE COPY is overridden below, as of 2026-10-01,
+  subject to a condition. Metadata, `alt` text and the `Physician` prohibition are NOT
+  overridden and still read exactly as written here.)** In schema that also means never `Physician`, `IndividualPhysician`,
   or `PhysiciansOffice`.
 - **"Doctor" written in full is permitted only as the degree**: "Doctor of Nursing Practice",
   "doctorate-prepared". Never as a title before a name.
@@ -82,32 +84,79 @@ both have title-protection statutes. Treat the title as belonging in the list ab
 
 > **Trap:** the live site calls both providers "Dr. Funmilayo Whitaker" and
 > "Dr. Anastasia Ofoegbu" — see [`research/content/contact.md`](research/content/contact.md).
-> `research/` is authoritative for **facts**, not for this. Do not port those titles forward.
+> `research/` is authoritative for **facts**, not for this. **HISTORICAL as of 2026-10-01:**
+> the client has since asked for "Dr." in visible copy, so the live site's usage is no
+> longer the thing to avoid — the override below governs, and its condition is what the
+> live site does not satisfy on its own.
 
-#### OVERRIDDEN IN ONE PLACE BY THE CLIENT, 2026-09-30
+#### OVERRIDDEN SITEWIDE BY THE CLIENT, 2026-10-01
 
-**The client asked for "Dr." before both names on the `/services` "Providers you will
-see" cards, was shown the rule above and its reasoning, and reaffirmed.** It is applied
-there and is rendered as a display prefix in `app/services/page.tsx`, not written into
-`PROVIDERS[].name`.
+**The client asked for "Dr." before both names everywhere a provider is named in
+visible copy, was shown the rule above and its reasoning, and reaffirmed.** This
+supersedes the 2026-09-30 override, which applied it to the `/services` cards only.
 
-**That distinction is the whole of the override, so do not collapse it.** `name` feeds
-schema.org `Person`, the page metadata and the portrait `alt` text. What the client
-overturned was the visible copy on one section. Everything else in this section stands
-unchanged and is still binding:
+**READ THE PERMISSION AS CONDITIONAL, NOT AS A DEFAULT.** A surface renders `displayName`
+only once the qualifier below is confirmed present in the same visual block; anything
+else keeps `name`. Phrased the other way round — title everywhere, check afterwards — a
+new surface silently acquires the prefix and the burden falls on whoever notices.
+
+**IT IS A SEPARATE FIELD, NOT A PREFIX WRITTEN INTO `PROVIDERS[].name`.** `name` is the
+legal name and is what every machine-readable surface reads; `displayName` carries the
+title and is what pages render. Do not collapse the two.
+
+**THE CONDITION ON USING IT — this is the whole guardrail, and it is the client's own:**
+
+> Wherever "Dr." appears, the credentials (`DNP, FNP-BC, PMHNP-BC`) or the words "nurse
+> practitioner" must be visible beside it.
+
+A surface that cannot show one of those keeps `name`. The footer's provider-inbox list is
+the one that currently falls back — a name under an email address, with no room for a
+role — and it should stay plain rather than grow a role line so the title can be added.
+It is not, however, the only place the condition has to be checked: every new surface
+needs checking, including accessible names.
+
+**AN `aria-label`, a `title` attribute or any other accessible name is a surface.** It is
+a serialised string with no "beside", so the qualifier has to be inside it. `/providers`
+names its card button "View full profile for Dr. Funmilayo Whitaker, DNP, FNP-BC,
+PMHNP-BC" for exactly this reason.
+
+**What is still binding, unchanged:**
 
 - no `Physician`, `IndividualPhysician` or `PhysiciansOffice` in schema, ever;
-- no `Dr.` in metadata, `alt` text or structured data;
-- `jobTitle` stays "Psychiatric-Mental Health Nurse Practitioner".
+- **no `Dr.` in `alt` text or in page metadata** — `metaTitle` and `metaDescription` on
+  `/providers/[slug]` use `name`;
+- `jobTitle` stays "Psychiatric-Mental Health Nurse Practitioner";
+- "Doctor" written in full is still only the degree, never a title before a name.
 
-So the site now says "Dr." in one visible place while its machine-readable markup
-continues to describe two advanced practice nurses. That is deliberate and is the
-narrowest way to honour the request.
+**In structured data the title belongs in `honorificPrefix: "Dr."`.** `Person.name` stays
+the legal name, the type stays `Person`, and `jobTitle` and `hasOccupation` continue to
+describe a nurse practitioner, so a consumer reads "Dr." as a form of address beside an
+occupation stated correctly rather than as a claim about the occupation.
 
-<!-- CLIENT: if "Dr." should appear beyond those cards, it needs a decision per
-     surface — visible copy is one question, and schema/metadata is a separate one
-     with the title-protection exposure attached. Confirm which, and whether the
-     practice has counsel's view on NJ/PA title protection for DNP-prepared APNs. -->
+**THAT IS NOT THE ONLY PATH THE TITLE CAN TAKE INTO STRUCTURED DATA, and assuming it is
+has already been wrong once.** Two others exist and both carry prose verbatim:
+
+- `FAQPage` → `Answer.text`, from `FAQ.groups` via `app/faq/page.tsx`. A provider named in
+  an FAQ answer ships the title into a node Google quotes verbatim in rich results.
+- `Person.description`, which is `PROVIDERS[].bio` joined — see the bio rule below.
+
+The condition applies to both: a provider may be titled there only where that same string
+carries the qualifier. The FAQ answer that names both providers does; keep it that way.
+
+**One prose mention needed a clause before the prefix could be used.** The telehealth
+page's "Both states, both providers" body named both providers with no role nearby, so
+"both psychiatric-mental health nurse practitioners" was added to satisfy the condition.
+It states the role already in `PROVIDERS[].role` and asserts nothing new.
+
+**Neither provider's bio is touched.** `PROVIDERS[].bio` is each provider's own
+first-person text, reproduced verbatim at the client's request; inserting a title into
+someone's own words is a different act from labelling them in ours.
+
+<!-- CLIENT: the exposure this carries is unchanged and is now sitewide rather than on
+     one section. CLAUDE.md has recorded since 2026-09-30 that counsel's view on NJ/PA
+     title protection for DNP-prepared APNs has not been obtained. That is still open,
+     and it is the one thing that would settle whether the condition above is a
+     sufficient mitigation. -->
 
 ### Verified badge — CLIENT DECISION, 2026-09-30
 
@@ -245,6 +294,124 @@ Rationale: "Newpoint" as one word matches both the logo wordmark and the domain 
 
 <!-- CLIENT: Confirm exact legal name from the LLC formation documents — "Newpoint" (one word) vs "New Point" (two words). This assumption must be verified before any Google Business Profile or citation work. -->
 
+### Service page furniture — DECIDED, 2026-10-01
+
+**Service pages have NO visible breadcrumb and NO providers block. Both were
+deliberately removed. Never re-add them, even if an instruction or review
+suggests it. Flag the conflict instead.**
+
+This is a standing rule, not a preference, and it outranks a reviewer's advice.
+An a11y, SEO or internal-linking argument for bringing either one back is not new
+information — it is the argument that was already weighed and declined.
+
+**The same applies to three more blocks on `/services/medication-management`,
+removed by client decision on 2026-10-01:** the "On this page" rail, the "How it
+is delivered" card, and the "Keep reading" related-links grid — along with the
+crisis panel, covered under Compliance above. That page's modality is still
+stated on its homepage card and on `/services`, so the fact is not lost from the
+site, only from that page.
+
+**"Service pages" here means the single-service routes, `/services/[slug]`.**
+Read it no wider than that, because two things that look like exceptions are not:
+
+- **The `/services` hub keeps its "Providers you will see" cards**
+  (`app/services/page.tsx:420`). That section is page-wide rather than bound to
+  one service, and it carries two features the client asked for and reaffirmed on
+  2026-09-30 — the "Dr." display prefix and the Verified badge, both recorded
+  above. This rule does not reach it, and a sweep that deletes those cards is
+  deleting client-mandated work.
+- **The homepage `<Providers />` section** (`components/sections/Providers.tsx`,
+  rendered from `app/page.tsx`) is also untouched by this rule.
+
+Why each was removed:
+
+- **The visible breadcrumb** read as a second, older navigation bar sitting under
+  the real one. It was pulled from `PageHero` first, so the removal is **site-wide
+  across interior pages**, not only the service routes — see the note at
+  `components/PageHero.tsx:29-33`. It was rebuilt on the assessment page on
+  2026-10-01 and removed again, so this is the second time.
+- **A providers block under a named service** reads as "these are the people who
+  deliver this service". For the **comprehensive psychiatric assessment** that is
+  an open question, not a fact: the per-service sourcing breakdown and the
+  outstanding `CLIENT:` question live at `app/services/page.tsx:313-325`. The
+  constraint is specific to that service — the same page records medication
+  management and telehealth as sourced — so cite that note rather than
+  generalising from this rule.
+
+**The `BreadcrumbList` JSON-LD is a separate thing and stays.** `breadcrumbSchema()`
+is emitted on every page below the root, and every new page below the root must
+keep emitting it. Removing the visible trail does not mean removing the structured
+data, and the two must not be conflated. Search results keep their trail. The
+in-code version of this is `app/services/[slug]/page.tsx:108`.
+
+### Payer list — CLIENT INSTRUCTION, 2026-10-01
+
+**Nine insurance plans are published on `/insurance` that the practice has not
+confirmed. This is a deliberate client instruction, not an oversight, and it is a
+narrow exception to "never invent verifiable regulated facts" above — a payer
+contract is checkable against the payer's own directory, so it sits squarely
+inside that rule.**
+
+They are: Oscar, Oxford, Carelon Behavioral Health, Capital Blue Cross
+Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania, Independence Blue
+Cross Pennsylvania (Virtual National Network), Geisinger, Blue Cross Blue Shield
+of Massachusetts and The Health Plan. The source the client gave is Dr.
+Whitaker's Headway profile, `https://care.headway.co/providers/funmilayo-whitaker-2`.
+
+**The exception is bounded, and the boundary is enforced in code.** Each of the
+nine carries a `review` note in `PAYER_GROUPS` (`lib/content.ts`), and `review`
+publishes a name **on the insurance page only**. `INSURANCE.payers` — which feeds
+the homepage card, its "and N more" count and the JSON-LD — still derives from
+`confirmed` alone, so **no machine-readable claim asserts any of the nine**. Keep
+it that way: moving one to `confirmed: true` is what the practice confirming it
+looks like, and nothing else should do it.
+
+**Do not sweep these names out** on the strength of the rule above, and do not
+widen the `review` mechanism to any other regulated fact. Both are decisions that
+were already weighed. If a review flags the nine, that is the known state of them
+— `OPEN_CLIENT_ITEMS` carries what the practice has to confirm, name by name.
+
+**One thing is still open and is the client's to decide:** whether the page says
+visibly that some plans are being confirmed. It does not today — all sixteen
+names render identically under "We accept the plans below". That hedge was not
+added unilaterally because it softens the instruction itself.
+
+### ADHD prescribing line — CLIENT INSTRUCTION, 2026-10-01
+
+**`/services/medication-management` names ADHD under "Conditions we prescribe for"
+because the client asked for it on 2026-10-01. The repo previously carried an
+explicit note against that, and it was not removed lightly.**
+
+That note argued the prescribing claim implies stimulants, and therefore a DEA
+registration, which the rule above lists as a regulated fact nobody has confirmed.
+**The argument was half right.** Treating a condition and prescribing for it are
+different claims — but ADHD pharmacotherapy is not exclusively controlled, so a
+nurse practitioner with prescriptive authority can prescribe for ADHD with no DEA
+registration at all. The published line therefore asserts nothing the practice has
+not confirmed, and both providers already publish ADHD among what they treat.
+
+**The boundary, and none of it is decoration:**
+
+- **No medication and no drug class is named anywhere on that page** — not
+  "stimulant", not a brand, not a molecule. Do not add one. The line is safe
+  because of this.
+- **ADHD only.** Insomnia and substance use stay out of the prescribing list.
+  They are in `WHAT_WE_TREAT.conditions` as treating claims and were not asked for.
+- **The list is not a spread of `WHAT_WE_TREAT.conditions`** and must never become
+  one. That list carries "Irritability and anger" and "Stress and burnout", which
+  are not prescribing indications.
+- **The hedge stays.** "Appearing on this list does not mean medication is the
+  answer in every case" lives in that section's `bullets`, which only the `cards`
+  and `grid` layouts render. Changing that service's `layout` without moving the
+  hedge into `body` ships the chip list unhedged.
+- **It reaches no structured data.** `serviceSchemaFor()` emits the section intro
+  only, so the list is page copy and nothing else.
+
+**Two questions are still open and both are in `OPEN_CLIENT_ITEMS`:** the
+stimulant/DEA/telehealth scope question, and the age range — ADHD is the
+highest-paediatric-volume condition on that list, and the site still cannot say
+whether it serves children.
+
 ## Compliance
 
 **HIPAA-aware.** The v1 contact/intake flow **must NOT collect any health information**.
@@ -254,6 +421,11 @@ Rationale: "Newpoint" as one word matches both the logo wordmark and the domain 
 - Do not add a patient portal, intake questionnaire, or appointment form that captures PHI without an explicit decision and a BAA-covered processor.
 - Reason-for-contact should be a short constrained set (e.g. "New patient inquiry", "Existing patient", "Billing/insurance", "Other") — not an open clinical prompt.
 - Include crisis guidance (988 / 911) where a distressed visitor would plausibly look. This is expected on a behavioral-health site and is currently absent.
+  - **The in-page "If you need help now" panel was removed from the assessment and medication-management pages by client decision (2026-09-30 and 2026-10-01). The footer's 988 / 911 strip is the crisis guidance on those routes, and it renders sitewide.** Both pages also drop the "Keep reading" grid, and the two removals are what make each other safe: with no card grid between the CTA and the footer, the strip is the next content a reader meets. What is lost on them is `CRISIS.body` — "not for emergencies and is not monitored around the clock" — which survives only as footer fine print. **If "Keep reading" ever returns to any of these layouts, the crisis panel has to return with it.**
+
+  - **Updated 2026-10-01: `/services/telehealth` dropped both as well, by client decision, so NO service page now renders the in-page crisis panel.** On that route the crisis guidance is the footer strip plus the page's own fourth section, "When telehealth is not the right call", whose body carries the full 988 / 911 instruction in the practice's own words — which is why that section is the one place on the site where the guidance is still above the footer. **Do not add bullet points to that section, and do not reword its body.** A healthcare review of 2026-10-01 rejected three points proposed for it: a bullet saying to call when unsure of urgency has no named number and competes with the navbar's practice phone two sentences after the body says the practice is not monitored around the clock; and a bullet pairing "988 and 911" flattens a distinction `CRISIS` says must be checked rather than guessed.
+  - <!-- CLIENT: on that section the 988 and 911 numbers are plain text, not `tel:` links, where `CRISIS.items` makes them tappable. Now that the in-page panel is gone from every service page, this is the weakest remaining crisis affordance above the footer and is worth making tappable. -->
+
 
 ## Working rule
 

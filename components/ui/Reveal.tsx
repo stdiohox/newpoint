@@ -26,11 +26,34 @@ export function Reveal({
   delay = 0,
   className = '',
   as = 'div',
+  amount = 0.3,
 }: {
   children: ReactNode;
   delay?: number;
   className?: string;
   as?: 'div' | 'li' | 'section';
+  /**
+   * How much of the element must be in view before it reveals. Motion maps
+   * this onto an IntersectionObserver threshold.
+   *
+   * 0.3 IS THE DEFAULT AND IT HAS A HEIGHT LIMIT. A threshold of 0.3 means
+   * 30% of the element has to be visible at once, so an element taller than
+   * about 3.3 viewports can never satisfy it: the observer never fires, and
+   * the element keeps the hidden start state the .js-gated CSS gave it. It
+   * stays at opacity 0 forever.
+   *
+   * That is not hypothetical. Measured on /services/psychiatric-evaluation at
+   * 320x200, which is a 1280x800 screen at the 400% zoom WCAG SC 1.4.10 asks
+   * a page to survive, three blocks of up to 883px stayed invisible through a
+   * full scroll of the page — including the first section of the body.
+   *
+   * SO ANY WRAPPER THAT CAN GET TALL PASSES 'some', which is threshold 0 and
+   * fires as soon as a single pixel enters. The cost is that the reveal
+   * begins slightly earlier on a normal screen; the alternative is content
+   * that never appears. Reach for it whenever a Reveal wraps a whole section,
+   * row or column rather than a single heading or paragraph.
+   */
+  amount?: number | 'some' | 'all';
 }) {
   const reduce = useReducedMotion();
   const hydrated = useHydrated();
@@ -59,7 +82,7 @@ export function Reveal({
       className={className}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
+      viewport={{ once: true, amount }}
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}

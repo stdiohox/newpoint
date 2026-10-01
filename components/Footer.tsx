@@ -1,7 +1,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ButtonWithIcon } from '@/components/ui/ButtonWithIcon';
-import { BUSINESS, CTA, FOOTER, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/content';
+import {
+  BUSINESS,
+  CONTACT_AND_FAQ,
+  CRISIS,
+  CTA,
+  FOOTER,
+  NAV,
+  PROVIDERS,
+  SERVICE_PAGES,
+} from '@/lib/content';
 
 /**
  * Site footer, on every route.
@@ -43,9 +52,21 @@ import { BUSINESS, CTA, FOOTER, NAV, PROVIDERS, SERVICE_PAGES } from '@/lib/cont
  * exist.
  */
 
-/** Practice column: everything in the primary nav except Services, which has
-    its own column beside it. Derived rather than retyped. */
-const PRACTICE_LINKS = NAV.filter((item) => item.href !== '/services');
+/**
+ * Practice column: everything in the primary nav except Services, which has
+ * its own column beside it, plus the one link the navbar does not carry.
+ *
+ * CONTACT_AND_FAQ IS APPENDED, NOT IN NAV. The navbar lost its "FAQ" and
+ * "Contact" entries on 2026-10-01 — the FAQ was merged into /contact and the
+ * CTA button already points there — but a footer lists what a site has, and
+ * the CTA button is not in the footer. So one link, under the label the client
+ * asked for, and it is the last entry in the column because it is the one that
+ * is not a section of the practice.
+ */
+const PRACTICE_LINKS = [
+  ...NAV.filter((item) => item.href !== '/services'),
+  CONTACT_AND_FAQ,
+];
 
 /** Shared link treatment. white/80 to white, with the hairline underline on
     hover rather than on rest so six stacked links do not read as a ruled list. */
@@ -131,6 +152,46 @@ export function Footer() {
             </a>
             {FOOTER.crisis.after}
           </p>
+
+          {/* THE WARNING BELONGS BESIDE THE NUMBERS, and until now it was not
+              anywhere near them.
+
+              CRISIS.body used to reach a reader through CrisisPanel, which
+              renders on the homepage and /contact and used to render on the
+              service routes as well. It came off /services/psychiatric-
+              evaluation with the panel on 2026-09-30, and the only thing left
+              carrying "not monitored around the clock" on that route was
+              FOOTER.legalNote — which sits below three stacked link columns,
+              in the smallest type on the page, decoupled from the 988 and 911
+              it qualifies. A reader was being told to call 988 in one place
+              and that nobody is watching this site a long scroll later.
+
+              Pairing them is what makes the warning actionable, so it is said
+              here, in the same panel, in the practice's own existing words.
+              This is CRISIS.body verbatim; no new string.
+
+              IT REPEATS TWICE OVER, AND BOTH ARE ACCEPTED RATHER THAN
+              OVERLOOKED.
+
+              Against legalNote, on "not monitored around the clock": legalNote
+              is a general disclaimer about medical advice and belongs in the
+              legal row, while this is safety guidance and belongs with the
+              numbers. If one of the two has to go later, this is the one to
+              keep.
+
+              Against CrisisPanel, on the five routes that still render it:
+              those pages now carry this sentence twice, once mid-page beside
+              the panel's numbers and once here beside the footer's. That is
+              the right kind of repetition. Each instance qualifies its own set
+              of numbers, they are a full page apart, and a reader who meets
+              only one of them still gets the warning with the number it
+              applies to. The alternative was making a global footer depend on
+              which route it is rendering under.
+
+              white/80 measures 8.99:1 on the np-blue-800 strip, against the
+              13.19:1 of the line above it. Quieter than the numbers, which is
+              the intended order of reading, and far clear of AA. */}
+          <p className="text-small mt-2 text-white/80">{CRISIS.body}</p>
         </div>
 
         {/* LINK COLUMNS. Three at md and up, stacked at mobile. Every href is a
@@ -181,6 +242,12 @@ export function Footer() {
                   <a href={`mailto:${p.email}`} className={linkClass}>
                     {p.email}
                   </a>
+                  {/* `name`, NOT `displayName`, and that is the condition the
+                      client set rather than an oversight: "Dr." may only render
+                      where the credentials or the words "nurse practitioner"
+                      are visible beside it. This line is a name under an email
+                      address in a footer column with no room for a role, so it
+                      keeps the plain name. See CLAUDE.md, clinician titles. */}
                   <span className="text-small block text-white/60">{p.name}</span>
                 </li>
               ))}

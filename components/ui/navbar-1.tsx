@@ -10,7 +10,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
    imports is shipped to the browser — importing the copy module put every
    provider bio, FAQ answer and payer name into a public chunk. nav.ts holds
    only these three and imports nothing. See the note at the top of it. */
-import { NAV, CTA, BRAND } from '@/lib/nav';
+import { NAV, CTA, BRAND, type NavChild } from '@/lib/nav';
 import { useHydrated } from '@/lib/useHydrated';
 
 /**
@@ -43,10 +43,24 @@ import { useHydrated } from '@/lib/useHydrated';
 /** Matches --nav-h in globals.css, which drives scroll-padding-top. */
 const DESKTOP = '(min-width: 70em)';
 
-/** One entry of the Services submenu. Shape matches what layout.tsx passes. */
-export type NavChild = { label: string; href: string };
+/**
+ * One entry of a submenu. The shape lives in lib/nav.ts, which is also where
+ * SUBMENU_PARENTS declares which primary items open one.
+ */
+export type { NavChild };
 
-export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
+export function Navbar1({
+  submenus = {},
+}: {
+  /**
+   * Dropdown rows, keyed by the PARENT ITEM'S OWN href.
+   *
+   * Keyed rather than one prop per menu, so adding a third dropdown is a key
+   * here and an entry in SUBMENU_PARENTS, not another prop threaded through
+   * two render branches. app/layout.tsx builds both from lib/content.ts.
+   */
+  submenus?: Partial<Record<string, readonly NavChild[]>>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const reduce = useReducedMotion();
   const hydrated = useHydrated();
@@ -74,7 +88,7 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
    * the usual workaround, a first child reading "All services", spends a row of
    * the menu restating the thing the reader just pointed at.
    */
-  const [servicesOpen, setServicesOpen] = useState(false);
+  const [openKey, setOpenKey] = useState<string | null>(null);
   /**
    * Whether the pointer opened it. A click that opens should PIN the submenu,
    * or moving the mouse away closes what the user just deliberately opened;
@@ -83,12 +97,14 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
    */
   const pinnedRef = useRef(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const servicesRef = useRef<HTMLDivElement>(null);
-  const servicesBtnRef = useRef<HTMLButtonElement>(null);
+  /* One node per parent href, so the outside-click, focus-leave and Escape
+     handlers can ask about whichever menu is currently open. */
+  const groupRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const btnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   /**
    * The open flag mirrored into a ref, so handlers read the live value.
    *
-   * The click handler cannot read `servicesOpen` out of its render closure: the
+   * The click handler cannot read `openKey` out of its render closure: the
    * pointer has to cross the group to reach the chevron, so hover has already
    * opened it, and the click then lands in whatever render existed when the
    * listener was attached. That is the difference between pinning what hover
@@ -96,18 +112,23 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
    * either, because deciding `pinned` inside it would be a side effect and
    * StrictMode invokes updaters twice.
    */
-  const openRef = useRef(false);
+  const openRef = useRef<string | null>(null);
 
-  const setServices = useCallback((next: boolean, pinned: boolean) => {
+  const setSubmenu = useCallback((next: string | null, pinned: boolean) => {
+    /* Clear here rather than at each call site. A pending hover-close timer
+       belongs to whichever menu was open when it was armed; once the open menu
+       changes it would fire against the new one. Not reachable through the
+       current handlers, but it is one line to make it impossible. */
+    clearTimeout(hoverTimer.current ?? undefined);
     openRef.current = next;
     pinnedRef.current = pinned;
-    setServicesOpen(next);
+    setOpenKey(next);
   }, []);
 
-  const closeServices = useCallback(() => {
+  const closeSubmenu = useCallback(() => {
     clearTimeout(hoverTimer.current ?? undefined);
-    setServices(false, false);
-  }, [setServices]);
+    setSubmenu(null, false);
+  }, [setSubmenu]);
 
   /**
    * State only. Focus restore happens in the effect cleanup, after inert comes
@@ -133,15 +154,16 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
    * user actually was is worse than the open panel.
    */
   useEffect(() => {
-    if (!servicesOpen) return;
+    if (!openKey) return;
+    const group = () => groupRefs.current[openKey];
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      const inside = servicesRef.current?.contains(document.activeElement);
-      closeServices();
-      if (inside) servicesBtnRef.current?.focus();
+      const inside = group()?.contains(document.activeElement);
+      closeSubmenu();
+      if (inside) btnRefs.current[openKey]?.focus();
     };
     const outside = (e: Event) => {
-      if (!servicesRef.current?.contains(e.target as Node)) closeServices();
+      if (!group()?.contains(e.target as Node)) closeSubmenu();
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('pointerdown', outside);
@@ -151,12 +173,12 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
       document.removeEventListener('pointerdown', outside);
       document.removeEventListener('focusin', outside);
     };
-  }, [servicesOpen, closeServices]);
+  }, [openKey, closeSubmenu]);
 
   /** A route change closes it; otherwise it survives the navigation it caused. */
   useEffect(() => {
-    closeServices();
-  }, [pathname, closeServices]);
+    closeSubmenu();
+  }, [pathname, closeSubmenu]);
 
   useEffect(() => () => clearTimeout(hoverTimer.current ?? undefined), []);
 
@@ -168,21 +190,41 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
   const canHover = () =>
     typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
 
-  const hoverOpen = () => {
+  const hoverOpen = (key: string) => {
     if (!canHover()) return;
-    clearTimeout(hoverTimer.current ?? undefined);
-    setServices(true, pinnedRef.current);
+    const open = openRef.current;
+    /* DO NOT PULL A PANEL OUT FROM UNDER THE KEYBOARD. With two menus, a mouse
+       resting near the navbar can drift over the other trigger while focus sits
+       on a child link of the open one; swapping openKey would unmount the
+       focused element and drop focus to the body (SC 2.4.3). hoverClose has
+       always had this guard; with a second menu hoverOpen needs it too. */
+    const active = document.activeElement;
+    const openGroup = open ? groupRefs.current[open] : null;
+    /* Only when focus is inside the open PANEL, not merely inside the group.
+       Clicking a chevron leaves focus on that chevron, which is in the group —
+       guarding on the group would then block hover from ever switching menus
+       after a click, which is the ordinary way to move between two of them.
+       `closest('ul')` is the panel list; the trigger and the parent link are
+       not in one. */
+    if (open && open !== key && openGroup && active && openGroup.contains(active) && active.closest('ul'))
+      return;
+    /* PIN DOES NOT TRANSFER. `pinnedRef` is shared by both menus, so passing it
+       straight through handed a click-pinned state to a menu the pointer had
+       merely hovered: it then ignored mouseleave and stayed open as if it had
+       been clicked. Only carry the pin when this is the menu that already
+       holds it. */
+    setSubmenu(key, open === key ? pinnedRef.current : false);
   };
-  const hoverClose = () => {
+  const hoverClose = (key: string) => {
     if (!canHover() || pinnedRef.current) return;
     /* Do not close what the keyboard is standing in. If hover opened the panel
        and the user then tabbed into a child link, a mouse leave would hide the
        element holding focus and drop it to the body. */
-    if (servicesRef.current?.contains(document.activeElement)) return;
+    if (groupRefs.current[key]?.contains(document.activeElement)) return;
     clearTimeout(hoverTimer.current ?? undefined);
     /* A gap between the label and the panel would otherwise close it while the
        pointer crosses. 120ms covers the travel without feeling sticky. */
-    hoverTimer.current = setTimeout(() => setServices(false, false), 120);
+    hoverTimer.current = setTimeout(() => setSubmenu(null, false), 120);
   };
 
   /**
@@ -194,13 +236,13 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
    * user made to keep it, which is what a plain `!open` did. Clicking an
    * unpinned open panel pins it instead; everything else toggles.
    */
-  const toggleServices = () => {
-    if (openRef.current && !pinnedRef.current) {
-      setServices(true, true);
+  const toggleSubmenu = (key: string) => {
+    if (openRef.current === key && !pinnedRef.current) {
+      setSubmenu(key, true);
       return;
     }
-    const next = !openRef.current;
-    setServices(next, next);
+    const next = openRef.current === key ? null : key;
+    setSubmenu(next, next !== null);
   };
 
   /** An in-page anchor like /#faq is "current" only when we are on that page. */
@@ -348,7 +390,13 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
 
         <nav aria-label="Primary" className="hidden items-center space-x-8 min-[70em]:flex">
           {NAV.map((item) => {
-            const hasSubmenu = item.href === '/services' && services.length > 0;
+            /* Both the dropdown items and the plain ones come through here;
+               a parent with no rows supplied falls back to a plain link, which
+               is what kept /services a link before any service existed. */
+            const children = submenus[item.href] ?? [];
+            const hasSubmenu = children.length > 0;
+            const isSubmenuOpen = openKey === item.href;
+            const panelId = `${submenuId}-${item.href.replace(/\W+/g, '-')}`;
             return (
               <motion.div
                 key={item.href}
@@ -378,10 +426,12 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
               >
                 {hasSubmenu ? (
                   <div
-                    ref={servicesRef}
+                    ref={(node) => {
+                      groupRefs.current[item.href] = node;
+                    }}
                     className="relative"
-                    onMouseEnter={hoverOpen}
-                    onMouseLeave={hoverClose}
+                    onMouseEnter={() => hoverOpen(item.href)}
+                    onMouseLeave={() => hoverClose(item.href)}
                   >
                     <div className="flex items-center gap-1">
                       {/* aria-current="true", not "page", when only a CHILD is
@@ -400,7 +450,7 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                         aria-current={
                           pathname === item.href ? 'page' : isActive(item.href) ? 'true' : undefined
                         }
-                        onClick={closeServices}
+                        onClick={closeSubmenu}
                         className="text-np-ink hover:text-np-neutral-700 focus-visible:outline-np-blue-600 rounded text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 aria-[current=page]:underline aria-[current=page]:underline-offset-8 motion-reduce:transition-none"
                       >
                         {item.label}
@@ -413,12 +463,14 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                         p-1.5 not p-1: at p-1 the hit area was exactly 24x24,
                         which passes SC 2.5.8 with nothing to spare. */}
                       <button
-                        ref={servicesBtnRef}
+                        ref={(node) => {
+                          btnRefs.current[item.href] = node;
+                        }}
                         type="button"
                         aria-label={`${item.label} submenu`}
-                        aria-expanded={servicesOpen}
-                        aria-controls={submenuId}
-                        onClick={toggleServices}
+                        aria-expanded={isSubmenuOpen}
+                        aria-controls={panelId}
+                        onClick={() => toggleSubmenu(item.href)}
                         className="text-np-ink hover:text-np-neutral-700 focus-visible:outline-np-blue-600 -m-1.5 rounded p-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
                       >
                         <ChevronDown
@@ -426,7 +478,7 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                           size={16}
                           strokeWidth={2}
                           className={`transition-transform duration-[180ms] motion-reduce:transition-none ${
-                            servicesOpen ? 'rotate-180' : ''
+                            isSubmenuOpen ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
@@ -444,7 +496,7 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                         The wrapper is absolute and the panel fills it, so the
                         drop shadow still reads against the page. */}
                     <AnimatePresence>
-                      {servicesOpen && (
+                      {isSubmenuOpen && (
                         <motion.div
                           className="absolute top-full left-0 z-20 pt-3"
                           initial={reduce ? false : { opacity: 0, y: -6 }}
@@ -453,7 +505,7 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                           transition={{ duration: 0.16 }}
                         >
                           <ul
-                            id={submenuId}
+                            id={panelId}
                             role="list"
                             aria-label={`${item.label} pages`}
                             /* border-transparent alongside the ring: forced-colors
@@ -462,15 +514,31 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                              edge against the page entirely. */
                             className="rounded-card ring-np-neutral-200 w-64 border border-transparent bg-white p-2 shadow-lg ring-1"
                           >
-                            {services.map((child) => (
+                            {children.map((child) => (
                               <li key={child.href}>
                                 <Link
                                   href={child.href}
                                   aria-current={isActive(child.href) ? 'page' : undefined}
-                                  onClick={closeServices}
+                                  onClick={closeSubmenu}
                                   className="text-np-ink hover:bg-np-neutral-100 focus-visible:outline-np-blue-600 block rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 aria-[current=page]:underline aria-[current=page]:underline-offset-4 motion-reduce:transition-none"
                                 >
                                   {child.label}
+                                  {/* The secondary line sits INSIDE the link, so
+                                      it joins the accessible name: "Funmilayo
+                                      Whitaker DNP, FNP-BC, PMHNP-BC". That is
+                                      what tells the two rows apart when they are
+                                      read out of context in a links list.
+
+                                      font-normal because the row is font-medium;
+                                      without it the credentials inherit the
+                                      weight and compete with the name. Services
+                                      passes no detail, so its rows render
+                                      exactly as before. */}
+                                  {child.detail && (
+                                    <span className="text-np-neutral-600 mt-0.5 block text-xs font-normal">
+                                      {child.detail}
+                                    </span>
+                                  )}
                                 </Link>
                               </li>
                             ))}
@@ -503,9 +571,19 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
           whileHover={reduce ? undefined : { scale: 1.05 }}
         >
           {/* Filled np-blue-900, not the hero's glass: glass over a white pill
-              shows nothing. White on np-blue-900 measures 16.10:1. */}
+              shows nothing. White on np-blue-900 measures 16.10:1.
+
+              aria-current SINCE 2026-10-01, when "Contact" came out of NAV.
+              The nav links get it from `isActive` above; this button was the
+              one link in the bar without it, which did not matter while a NAV
+              entry also pointed at /contact and announced the current page.
+              It is now the only one, so without this the navbar says nothing
+              about where you are on the page it leads to. No visual change —
+              the underline that `aria-[current=page]` draws on the nav links
+              is not in this button's class list. */}
           <Link
             href={CTA.href}
+            aria-current={isActive(CTA.href) ? 'page' : undefined}
             className="bg-np-blue-900 hover:bg-np-blue-700 focus-visible:outline-np-blue-900 inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
           >
             {CTA.label}
@@ -587,13 +665,13 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                       aria-expanded to get right, or another thing inside the
                       dialog's focus trap. They are simply indented under their
                       parent. */}
-                  {item.href === '/services' && services.length > 0 && (
+                  {(submenus[item.href] ?? []).length > 0 && (
                     <ul
                       role="list"
                       aria-label={`${item.label} pages`}
                       className="border-np-neutral-200 mt-4 space-y-4 border-l pl-4"
                     >
-                      {services.map((child) => (
+                      {(submenus[item.href] ?? []).map((child) => (
                         <li key={child.href}>
                           <Link
                             href={child.href}
@@ -602,6 +680,19 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                             onClick={close}
                           >
                             {child.label}
+                            {/* Same secondary line as the desktop panel. */}
+                            {child.detail && (
+                              /* np-neutral-600, not 500. At 14px normal weight
+                                 this is not large text, so SC 1.4.3 wants
+                                 4.5:1 and neutral-500 (#7c776d) measures about
+                                 4.45:1 on white — a miss, and it also made the
+                                 secondary line lighter than the name above it.
+                                 neutral-600 is about 7.1:1 and matches the
+                                 desktop panel. */
+                              <span className="text-np-neutral-600 mt-0.5 block text-sm">
+                                {child.detail}
+                              </span>
+                            )}
                           </Link>
                         </li>
                       ))}
@@ -617,8 +708,13 @@ export function Navbar1({ services = [] }: { services?: readonly NavChild[] }) {
                 exit={reduce ? undefined : { opacity: 0, y: 20 }}
                 className="pt-6"
               >
+                {/* aria-current for the same reason as the desktop CTA above:
+                    with "Contact" gone from NAV this is the mobile menu's only
+                    link to /contact, and it was the only one that never said
+                    so. */}
                 <Link
                   href={CTA.href}
+                  aria-current={isActive(CTA.href) ? 'page' : undefined}
                   className="bg-np-blue-900 hover:bg-np-blue-700 focus-visible:outline-np-blue-900 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-base font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
                   onClick={close}
                 >
