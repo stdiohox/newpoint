@@ -290,9 +290,9 @@ export function ServiceCards({
               {/* BULLETS RENDER HERE TOO, AND AFTER THE CHIPS ON PURPOSE.
                   This branch used to render heading, body and list only, so a
                   section that fell through to it lost its bullets silently —
-                  which on "Conditions we prescribe for" meant the nine-diagnosis
+                  which on "Conditions we prescribe for" meant the ten-diagnosis
                   chip list shipped WITHOUT the line that stops it reading as
-                  "all nine are prescribed for in every case". That hedge is the
+                  "all ten are prescribed for in every case". That hedge is the
                   reason the bullets exist on this section.
 
                   After the chips, not before, because one of those lines says

@@ -376,6 +376,42 @@ visibly that some plans are being confirmed. It does not today — all sixteen
 names render identically under "We accept the plans below". That hedge was not
 added unilaterally because it softens the instruction itself.
 
+### ADHD prescribing line — CLIENT INSTRUCTION, 2026-10-01
+
+**`/services/medication-management` names ADHD under "Conditions we prescribe for"
+because the client asked for it on 2026-10-01. The repo previously carried an
+explicit note against that, and it was not removed lightly.**
+
+That note argued the prescribing claim implies stimulants, and therefore a DEA
+registration, which the rule above lists as a regulated fact nobody has confirmed.
+**The argument was half right.** Treating a condition and prescribing for it are
+different claims — but ADHD pharmacotherapy is not exclusively controlled, so a
+nurse practitioner with prescriptive authority can prescribe for ADHD with no DEA
+registration at all. The published line therefore asserts nothing the practice has
+not confirmed, and both providers already publish ADHD among what they treat.
+
+**The boundary, and none of it is decoration:**
+
+- **No medication and no drug class is named anywhere on that page** — not
+  "stimulant", not a brand, not a molecule. Do not add one. The line is safe
+  because of this.
+- **ADHD only.** Insomnia and substance use stay out of the prescribing list.
+  They are in `WHAT_WE_TREAT.conditions` as treating claims and were not asked for.
+- **The list is not a spread of `WHAT_WE_TREAT.conditions`** and must never become
+  one. That list carries "Irritability and anger" and "Stress and burnout", which
+  are not prescribing indications.
+- **The hedge stays.** "Appearing on this list does not mean medication is the
+  answer in every case" lives in that section's `bullets`, which only the `cards`
+  and `grid` layouts render. Changing that service's `layout` without moving the
+  hedge into `body` ships the chip list unhedged.
+- **It reaches no structured data.** `serviceSchemaFor()` emits the section intro
+  only, so the list is page copy and nothing else.
+
+**Two questions are still open and both are in `OPEN_CLIENT_ITEMS`:** the
+stimulant/DEA/telehealth scope question, and the age range — ADHD is the
+highest-paediatric-volume condition on that list, and the site still cannot say
+whether it serves children.
+
 ## Compliance
 
 **HIPAA-aware.** The v1 contact/intake flow **must NOT collect any health information**.

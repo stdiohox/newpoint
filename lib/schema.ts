@@ -200,6 +200,18 @@ export function personSchemaFor(p: Provider) {
     telephone: BUSINESS.phonePrimary,
     worksFor: { '@id': ORG_ID },
     knowsAbout: p.treats,
+    /* Omitted entirely where the provider has no structured languages, rather
+       than emitted empty: an absent property says nothing, and `[]` says "no
+       languages", which is false for both of them. Only Dr. Whitaker carries
+       the field today — see the note on Provider.knowsLanguage.
+
+       PLAIN NAMES, AND SCHEMA.ORG WOULD RATHER HAVE BCP-47. Its definition of
+       `knowsLanguage` asks for a Language object or an IETF tag; consumers
+       accept bare names in practice, and the research records names rather
+       than tags. If this ever needs to be lossless, the upgrade is
+       { '@type': 'Language', name: 'Yoruba', alternateName: 'yo' } — not a
+       rewrite of the content field. */
+    ...(p.knowsLanguage ? { knowsLanguage: p.knowsLanguage } : {}),
     // CLIENT: `identifier` (NPI) and license numbers omitted, not published.
     // CLIENT: `hasCredential` omitted, the certifying body is not stated anywhere.
     // CLIENT: `sameAs` omitted. It is the strongest signal for tying this name
@@ -296,7 +308,14 @@ export function contactPageSchema() {
         name: `${p.name}, ${p.credentials}`,
         email: p.email,
         areaServed: BUSINESS.serviceArea.map((state) => ({ '@type': 'State', name: state })),
-        availableLanguage: 'English',
+        /* DERIVED, NOT HARDCODED, since 2026-10-01. This read a flat 'English'
+           for every provider, which the moment `knowsLanguage` reached the
+           Person node meant two documents answering the same question
+           differently for the same person — /providers said English and
+           Yoruba, /contact said English. A provider without the structured
+           field falls back to English, which is what this said before and is
+           the one language both providers' prose `languages` records. */
+        availableLanguage: p.knowsLanguage ?? 'English',
       })),
     ],
   };

@@ -57,6 +57,13 @@ export type ProviderCardData = {
   displayName: string;
   credentials: string;
   licensed: string;
+  /**
+   * Languages, one per entry. OPTIONAL: the card renders the line only for a
+   * provider who has them, which today is Dr. Whitaker alone — the client's
+   * 2026-10-01 instruction named her and asked that nothing be added for
+   * Dr. Ofoegbu. See Provider.knowsLanguage in lib/content.ts.
+   */
+  knowsLanguage?: readonly string[];
   bio: string;
   treats: readonly string[];
   image: { webp1120: string };
@@ -159,6 +166,40 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
             <MapPin aria-hidden="true" size={15} strokeWidth={1.75} className="shrink-0" />
             {provider.licensed}
           </p>
+
+          {/* LANGUAGES, in the licence line's treatment and directly under it,
+              because both answer the same question: can this clinician see me.
+
+              THE LABEL IS VISIBLE TEXT, not a decorative icon with a title.
+              The licence line above can carry a MapPin because "Licensed in
+              New Jersey and Pennsylvania" says what it is; "English and
+              Yoruba" on its own does not, and an icon is not a label.
+
+              RENDERED ONLY WHERE THE DATA EXISTS, which is Dr. Whitaker today.
+              The other card simply has no such line — nothing is invented for
+              a provider the client's instruction did not cover.
+
+              CLIENT: THE ASYMMETRY IS WORTH A SECOND LOOK, and it is not being
+              changed here because the instruction was explicit. Dr. Ofoegbu's
+              languages are ALREADY published on this site — "English, Igbo,
+              and Yoruba", on her own page, from the same Headway source and
+              with the same confidence. So showing the line on one card does
+              not spare her an unconfirmed claim; it only makes the two cards
+              disagree, on the page built for choosing between them. A Yoruba-
+              or Igbo-speaking patient comparing them reads her as English
+              only. Rendering this line from the existing prose field for both
+              would add no new claim about her. Their call, not ours. */}
+          {provider.knowsLanguage && provider.knowsLanguage.length > 0 && (
+            <p className="text-small text-np-neutral-600 mt-2">
+              <span className="text-np-ink font-medium">Languages: </span>
+              {/* Intl, not join(', '), so two entries read "English and
+                  Yoruba" — the same sentence the provider page's Languages row
+                  already prints — and three would read "A, B, and C". */}
+              {new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format([
+                ...provider.knowsLanguage,
+              ])}
+            </p>
+          )}
 
           <p className="text-body text-np-neutral-600 mt-5 max-w-[46ch]">{provider.bio}</p>
 

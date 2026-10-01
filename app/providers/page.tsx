@@ -129,6 +129,7 @@ export default function ProvidersPage() {
                       displayName: p.displayName,
                       credentials: p.credentials,
                       licensed: p.licensed,
+                      knowsLanguage: p.knowsLanguage,
                       bio: p.bio[0],
                       treats: p.treats,
                       image: { webp1120: p.image.webp1120 },

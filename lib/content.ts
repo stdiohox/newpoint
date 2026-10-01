@@ -476,8 +476,25 @@ export type Provider = {
    * where `hasCredential` stays omitted for exactly this reason.
    */
   education: string;
-  /** Languages the provider sees patients in. */
+  /** Languages the provider sees patients in, as prose, for the fact rows. */
   languages: string;
+  /**
+   * The same languages, one per entry, for the surfaces that need them
+   * structured rather than as a sentence: `knowsLanguage` in the Person
+   * JSON-LD and the Languages line on the /providers card.
+   *
+   * OPTIONAL, AND SET ON ONE PROVIDER. The client asked on 2026-10-01 for
+   * Dr. Whitaker's languages specifically, sourced to her Headway profile, and
+   * asked explicitly that no language be added for Dr. Ofoegbu. So the two
+   * surfaces that read this field show it for Whitaker and show nothing for
+   * Ofoegbu — not because her prose `languages` is in doubt, but because the
+   * instruction named one provider. Her own page's Languages row is unchanged
+   * and still reads the prose field, as it always has.
+   *
+   * Set this for Ofoegbu when the client confirms hers, and both surfaces
+   * pick her up with no further change.
+   */
+  knowsLanguage?: readonly string[];
   /**
    * The provider's own introduction, in her own voice, one entry per paragraph.
    *
@@ -570,6 +587,20 @@ export const PROVIDERS: Provider[] = [
     /* Headway lists Yoruba; U.S. News records "Speaks English". */
     languages: 'English and Yoruba',
     /**
+     * CLIENT-REVIEW: English and Yoruba, confirmed against the source the
+     * client named on 2026-10-01 —
+     * https://care.headway.co/providers/funmilayo-whitaker-2 — which lists
+     * Yoruba among the languages she practises in. Confirm with the practice
+     * that she sees patients in Yoruba, since a marketplace profile is the
+     * provider's own statement rather than the practice's.
+     *
+     * THE PROSE FIELD ABOVE ALREADY SAID THIS and is unchanged; this is the
+     * same fact structured, so `knowsLanguage` can reach the JSON-LD and the
+     * card without either surface parsing a sentence. The two must stay in
+     * step: edit both or neither.
+     */
+    knowsLanguage: ['English', 'Yoruba'],
+    /**
      * Verbatim from Headway, unedited. Her paragraph break is kept.
      *
      * The "across the lifespan" age claim that the practice's own site made,
@@ -616,12 +647,18 @@ export const PROVIDERS: Provider[] = [
      * lists were originally built from, because they are more recent and she
      * maintains them herself.
      *
-     * NOTE they are NOT added to SERVICE_PAGES' "Conditions we prescribe for"
-     * list on the medication-management page. Treating a condition and
-     * prescribing for it are different claims, and for ADHD the prescribing
-     * claim implies controlled substances and a DEA registration that CLAUDE.md
-     * lists as a regulated fact we do not hold. CLIENT: confirm prescribing
-     * scope for ADHD before that list changes.
+     * ADHD IS NOW ALSO IN SERVICE_PAGES' "Conditions we prescribe for" list on
+     * the medication-management page, added 2026-10-01 at the client's
+     * instruction. This note used to say the opposite and to ask the client to
+     * confirm prescribing scope first. BE PRECISE ABOUT WHAT CHANGED: the
+     * client instructed the line, which is not the same as answering the scope
+     * question. Whether the practice prescribes stimulants for ADHD, and under
+     * whose DEA registration, is still open and still tracked in
+     * OPEN_CLIENT_ITEMS — and the line is publishable without that answer
+     * because ADHD pharmacotherapy is not exclusively controlled. The
+     * reasoning is recorded in full beside that list. Insomnia and substance use are NOT in
+     * it — they were not asked for, and treating a condition and prescribing
+     * for it remain different claims.
      */
     treats: [
       'Depression',
@@ -743,14 +780,18 @@ export const WHAT_WE_TREAT = {
    * The practice-wide list is the union of what the two providers treat, so a
    * condition earns a place here when it is in either `PROVIDERS[].treats`.
    * ADHD, sleep and substance use are each published by both providers on their
-   * own profiles; see the notes on those arrays above for the sourcing and for
-   * why none of the three is added to the medication-management page's
-   * "Conditions we prescribe for" list.
+   * own profiles; see the notes on those arrays above for the sourcing.
    *
-   * ADHD IS THE MOST VALUABLE LINE IN THIS ARRAY. OPEN_CLIENT_ITEMS has carried
-   * it as one of the highest-volume queries a psychiatric NP practice can
-   * answer, absent from the source material and possibly by accident. It was by
-   * accident.
+   * ADHD IS THE MOST VALUABLE LINE IN THIS ARRAY. OPEN_CLIENT_ITEMS carried it
+   * for weeks as one of the highest-volume queries a psychiatric NP practice
+   * can answer, absent from the source material and possibly by accident. The
+   * evidence says omission rather than exclusion — both providers publish it
+   * on their own profiles — though nobody at the practice has said why it was
+   * missing, so that is an inference and is labelled one. The client closed
+   * the question on 2026-10-01: ADHD is
+   * now also in the medication-management page's "Conditions we prescribe for"
+   * list, and the open item has been removed. Sleep and substance use are in
+   * this list only — prescribing for them has not been asked for or confirmed.
    */
   conditions: [
     'Depression',
@@ -1430,10 +1471,44 @@ export const SERVICE_PAGES: ServicePage[] = [
          * live site names as things the practice helps with, not as prescribing
          * indications. Listing them under this heading would assert
          * pharmacotherapy for non-diagnostic states.
+         *
+         * ADHD WAS ADDED ON 2026-10-01 AT THE CLIENT'S INSTRUCTION, and the
+         * note this file carried against doing so is superseded rather than
+         * forgotten. It argued that treating a condition and prescribing for
+         * it are different claims, and that for ADHD the prescribing claim
+         * implies stimulants and therefore a DEA registration CLAUDE.md lists
+         * as a regulated fact nobody has confirmed. BOTH HALVES STILL STAND AS
+         * FACTS; what changed is that the practice, which is the only party
+         * who can answer them, asked for the line. Both providers publish ADHD
+         * among the conditions they treat — see PROVIDERS[].treats — so the
+         * practice-wide treating claim was never the question.
+         *
+         * WHAT THIS LIST DOES NOT SAY, and must not be edited into saying: it
+         * names no medication and no class of medication, here or anywhere on
+         * the page. The hedge in `bullets` — "Appearing on this list does not
+         * mean medication is the answer in every case" — is what keeps the
+         * heading from reading as "every one of these is prescribed for", and
+         * it is load-bearing for this entry in particular.
+         *
+         * THE HEDGE RENDERS AFTER THE CHIPS, NOT BEFORE THEM, and that is
+         * deliberate — see the note in components/sections/ServiceCards.tsx,
+         * which explains that the line has no referent until the chips are on
+         * screen. It is in `bullets`, so it reaches the page only on the
+         * layouts that render bullets: `cards` (this page's) and `grid`. The
+         * prose fallback at app/services/[slug]/page.tsx renders heading, body
+         * and list and NOT bullets, so flipping this service's `layout` would
+         * publish the chip list with no hedge at all. Do not flip it without
+         * moving the hedge into `body` first.
+         *
+         * AND IT HEDGES MODALITY, NOT SCOPE. "Medication is not always the
+         * answer" does not say which medications are in scope for ADHD, which
+         * is the question a transferring patient arrives with. That one is in
+         * OPEN_CLIENT_ITEMS and is not answered anywhere on the site.
          */
         list: [
           'Depression',
           'Anxiety',
+          'ADHD',
           'Bipolar disorder',
           'Panic attacks',
           'OCD',
@@ -2316,10 +2391,18 @@ export const OPEN_CLIENT_ITEMS = [
   'NPI numbers for both providers, or confirmation they prefer not to publish them. CANDIDATE for Whitaker: 1760719512, per U.S. News. Nothing found for Ofoegbu',
   'Certifying body for the "board-certified" claim (the post-nominals imply one, but it is not stated anywhere and must not be assumed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
-  'Confirmed age range served (adults only, or across the lifespan as a practice policy). STILL OPEN, AND THE EVIDENCE NOW CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field',
+  'Confirmed age range served (adults only, or across the lifespan as a practice policy). STILL OPEN, AND THE EVIDENCE NOW CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
   'Whether substance use and addiction treatment is an active service line. THE DIRECTORIES SAY YES: Grow lists addiction for Whitaker, and Headway lists "Substance use / addiction" as Ofoegbu\'s FIRST specialty. Her existing bio already says her last 11 years were in mental health and addiction. This also bears on the new "Mental and behavioral care" hero — in US payer language behavioral health includes SUD, so the headline already implies a door the conditions list does not open',
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
-  'Whether ADHD is treated. It is one of the highest-volume queries for a psychiatric NP practice and appears nowhere in the source material, so it is not claimed — but it may be an omission rather than a deliberate exclusion. THE DIRECTORIES SAY IT IS AN OMISSION: Grow lists ADHD for Whitaker and Headway lists ADD/ADHD for BOTH providers. Highest-value content addition available from the 2026-09-29 capture. Insomnia/sleep is in the same position — Grow, Headway and U.S. News all carry it and WHAT_WE_TREAT.conditions does not',
+  /* The ADHD item was REMOVED on 2026-10-01, closed rather than dropped. It
+     asked whether ADHD is treated at all; both providers publish it, it has
+     been in WHAT_WE_TREAT.conditions since 2026-09-29, and the client has now
+     asked for it in the medication-management prescribing list as well. The
+     insomnia/sleep half of that item closed with it — sleep is in
+     WHAT_WE_TREAT.conditions and is not in the prescribing list, which is the
+     state the client asked for. */
+  'ADHD PRESCRIBING SCOPE — CLOSE THIS BEFORE LAUNCH. ADHD is named in "Conditions we prescribe for" on /services/medication-management at the client\'s instruction of 2026-10-01. The page names no medication and no drug class anywhere, so nothing on it asserts a controlled substance, and the line is publishable as it stands BECAUSE ADHD PHARMACOTHERAPY IS NOT EXCLUSIVELY CONTROLLED — atomoxetine, guanfacine and bupropion need no DEA registration. That is very likely the answer, and it is the one the practice has never given. Four parts to the question, and a no to any of them changes the page: (1) does the practice prescribe stimulants for ADHD, and under whose DEA registration; (2) if not, does it prescribe non-stimulants for ADHD, which is what keeps the line true; (3) does it hold for BOTH providers, since this list is practice-wide and Ofoegbu\'s Headway care type is medication management alone; (4) does it hold by TELEHEALTH, which is how most of this practice\'s care is delivered and the most regulated corner of controlled-substance prescribing. If the answer to (1) and (2) is no, the ADHD chip comes out of that list and stays in WHAT_WE_TREAT.conditions, where it is a treating claim both providers publish. SEE ALSO the age-range item above: ADHD is the highest-paediatric-volume condition on that list, so publishing it raises the stakes on an age range the site still cannot state',
+  'Whether Dr. Whitaker sees patients in Yoruba, and whether Dr. Ofoegbu\'s "English, Igbo, and Yoruba" holds. Both come from the providers\' own Headway profiles and neither is confirmed by the practice — the repo grades both as weak single-source facts in research/provider-directories.md. IT IS NO LONGER ONLY PROSE: as of 2026-10-01 Whitaker\'s languages are structured in PROVIDERS[].knowsLanguage at the client\'s instruction and drive `knowsLanguage` on her Person JSON-LD, the Languages line on her /providers card, and her ContactPoint on /contact. Ofoegbu has no structured entry because the instruction named only Whitaker, so her card shows no Languages line while her own page still does — see the CLIENT question in components/ui/ProviderCard.tsx about whether that asymmetry should stand',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
   "CONFIRM THE NINE PLANS NOW PUBLISHED UNDER CLIENT-REVIEW, or cut them. THIS ITEM CHANGED ON 2026-10-01 AND IT IS NOW URGENT RATHER THAN HOUSEKEEPING. Until then these names sat in PAYER_GROUPS with `confirmed: false` and appeared nowhere a patient or a crawler could see them. The client asked for them to be published, so they now render on /insurance under a `review` note sourced to Dr. Whitaker's Headway profile (https://care.headway.co/providers/funmilayo-whitaker-2). They are: Oscar, Oxford, Carelon Behavioral Health, Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania, Independence Blue Cross Pennsylvania (Virtual National Network), Geisinger, Blue Cross Blue Shield of Massachusetts and The Health Plan. WHAT THE PRACTICE IS BEING ASKED TO CONFIRM, for each name: that NEWPOINT accepts it directly, not that a marketplace is contracted for it — a patient who books through Headway or Grow Therapy is billed by the marketplace — and that it holds for Dr. Ofoegbu as well as Dr. Whitaker. A patient who reads one of these names, books on that basis and is then billed out of network has been told something nobody at the practice has confirmed. FOUR OF THE NINE ARE BETTER EVIDENCED THAN THE NOTE SAYS, so do not spend equal attention on all of them: Oscar, Oxford, Carelon Behavioral Health and Blue Cross Blue Shield of Massachusetts are on DR. OFOEGBU'S Headway profile as well as Dr. Whitaker's, which answers the \"and for Dr. Ofoegbu\" half for those four. The dictated note is carried verbatim on all nine anyway, because the practice-wide half is open for every one of them. To confirm one, set `confirmed: true` and delete its `review` note; the homepage card, its \"and N more\" count and the JSON-LD then pick it up too, none of which the review note touches. TO CUT ONE, IT DEPENDS WHICH: for the six that arrived with this instruction, delete the entry; for Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania and Independence Blue Cross Pennsylvania, cutting means reverting to the repo's shorter name with `confirmed: false` and no `review`, because those three were corroborated candidates on Grow Therapy and Headway before the client's list existed and deleting them would throw that away. The seven payers from the practice's own site are unaffected",
   "The two plans in the 2026-10-01 list whose names do not place them: Blue Cross Blue Shield of Massachusetts and The Health Plan, both now under the \"Other plans\" heading on /insurance. Massachusetts is not a state this practice serves, and this repo previously excluded that name as a Headway national-network artifact; it is listed now because the client asked for it, and it is grouped apart because claiming it as a New Jersey or Pennsylvania plan would be wrong. \"The Health Plan\" states no state, carrier family or network at all — it matches a West Virginia and Ohio carrier of exactly that name, which nothing here assumes. THE RISK HERE IS LICENSURE, NOT ONLY BILLING: both providers are licensed in New Jersey and Pennsylvania only, and for telehealth the governing location is the PATIENT'S, so a Massachusetts resident who recognises their own plan on this page has been given a reason to enquire about care the practice cannot lawfully deliver to them where they are. Nothing beside the wall states the two-state limit; the only place on the page that does is the hero intro. Confirm what each plan actually is, whether either belongs on a two-state practice's list, and whether the list needs a visible scope line",
