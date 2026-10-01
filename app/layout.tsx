@@ -163,11 +163,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 href: `/services/${s.slug}`,
               })),
               /* `credentials`, not `role`: it is the shorter line and the one
-                 that tells the two apart. No "Dr." — CLAUDE.md scopes that to
-                 the /services provider cards, and `name` is used verbatim
-                 everywhere else. */
+                 that tells the two apart — and it is also what PERMITS the
+                 title here. `displayName` carries "Dr.", and CLAUDE.md's
+                 condition is that the credentials or "nurse practitioner" must
+                 be visible beside it; `detail` is that qualifier, on the same
+                 row. A row that dropped `detail` would have to drop the prefix
+                 with it. */
               '/providers': PROVIDERS.map((p) => ({
-                label: p.name,
+                label: p.displayName,
                 href: `/providers/${p.slug}`,
                 detail: p.credentials,
               })),

@@ -167,7 +167,7 @@ export default function ContactPage() {
                     {PROVIDERS.map((p, i) => (
                       <Reveal as="li" key={p.slug} delay={stagger(i, 0.06)}>
                         <p className="text-body text-np-ink font-medium">
-                          {p.name}
+                          {p.displayName}
                           <span className="text-np-neutral-600 font-normal">, {p.credentials}</span>
                         </p>
                         <a

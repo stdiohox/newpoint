@@ -148,6 +148,16 @@ export function personSchemaFor(p: Provider) {
     '@id': providerId(p.slug),
     url: `${BUSINESS.domain}/providers/${p.slug}`,
     name: p.name,
+    /**
+     * The title lives HERE and nowhere else in the markup.
+     *
+     * `name` stays the legal name, `jobTitle` stays the ANCC role string, and
+     * the type stays Person — never Physician. honorificPrefix is the property
+     * schema.org provides for exactly this, so a consumer reads "Dr." as a form
+     * of address rather than as a claim about the occupation, which the
+     * jobTitle and hasOccupation beside it describe correctly.
+     */
+    honorificPrefix: 'Dr.',
     givenName: p.name.split(' ')[0],
     familyName: p.name.split(' ').slice(-1)[0],
     // Verbatim from the research, split into the three distinct post-nominals

@@ -338,7 +338,29 @@ export const FOOTER = {
 
 export type Provider = {
   slug: string;
+  /**
+   * The legal name, with no title.
+   *
+   * THIS IS WHAT MACHINES READ. schema.org `Person.name`, the breadcrumb trail,
+   * every page's metadata and the portrait `alt` all use it, and none of them
+   * may carry "Dr." — see CLAUDE.md's clinician-titles section. Visible copy
+   * uses `displayName`.
+   */
   name: string;
+  /**
+   * The name as it is SHOWN, with the "Dr." prefix the client asked for.
+   *
+   * A SEPARATE FIELD, NOT A PREFIX WRITTEN INTO `name`, and the separation is
+   * the whole of the override. Structured data keeps `name` clean and carries
+   * the title as `honorificPrefix`, so the markup still describes two advanced
+   * practice nurses while the page says "Dr.".
+   *
+   * THE CONDITION ON USING IT: wherever this renders, the credentials or the
+   * words "nurse practitioner" must be visible beside it. A surface that cannot
+   * show one of those keeps `name` — the footer's inbox list is the one place
+   * in the repo that currently does.
+   */
+  displayName: string;
   credentials: string;
   role: string;
   image: { webp560: string; webp1120: string; jpg560: string; jpg1120: string; alt: string };
@@ -419,6 +441,7 @@ export const PROVIDERS: Provider[] = [
   {
     slug: 'funmilayo-whitaker',
     name: 'Funmilayo Whitaker',
+    displayName: 'Dr. Funmilayo Whitaker',
     credentials: 'DNP, FNP-BC, PMHNP-BC',
     role: 'Psychiatric-Mental Health Nurse Practitioner',
     image: {
@@ -515,6 +538,7 @@ export const PROVIDERS: Provider[] = [
   {
     slug: 'anastasia-ofoegbu',
     name: 'Anastasia O. Ofoegbu',
+    displayName: 'Dr. Anastasia O. Ofoegbu',
     credentials: 'DNP, FNP-BC, PMHNP-BC',
     role: 'Psychiatric-Mental Health Nurse Practitioner',
     image: {
@@ -1446,7 +1470,13 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Both states, both providers',
-        body: 'Funmilayo Whitaker and Anastasia O. Ofoegbu are both licensed in New Jersey and Pennsylvania, so telehealth is available across our whole service area rather than in one state only. You need to be physically located in a state where your provider is licensed at the time of your appointment.',
+        /* THE ROLE CLAUSE IS ADDED WITH THE TITLE, not decoration. CLAUDE.md's
+           rule is that "Dr." may only appear where the credentials or the words
+           "nurse practitioner" are visible beside it, and this sentence carried
+           neither — it is the one prose mention that needed a qualifier before
+           the prefix could be used at all. The clause states the role already in
+           PROVIDERS[].role and asserts nothing new. */
+        body: 'Dr. Funmilayo Whitaker and Dr. Anastasia O. Ofoegbu, both psychiatric-mental health nurse practitioners, are licensed in New Jersey and Pennsylvania, so telehealth is available across our whole service area rather than in one state only. You need to be physically located in a state where your provider is licensed at the time of your appointment.',
         bullets: [
           /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was "Which
              licence applies follows where you are sitting, not where your
@@ -1802,7 +1832,7 @@ export const FAQ = {
       items: [
         {
           q: 'Who will I see?',
-          a: 'One of our two providers, Funmilayo Whitaker or Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners, and both are licensed in New Jersey and Pennsylvania.',
+          a: 'One of our two providers, Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners, and both are licensed in New Jersey and Pennsylvania.',
         },
         {
           q: 'What happens at the first appointment?',
@@ -2005,7 +2035,7 @@ export const NEW_PATIENTS_PAGE = {
   expectations: [
     {
       heading: 'You will see a provider, not a queue',
-      body: 'There are two of us. You will see Funmilayo Whitaker or Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified in psychiatric mental health and family practice.',
+      body: 'There are two of us. You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners.',
     },
     {
       // Scope, not duration: session length is not published anywhere, so no
@@ -2121,9 +2151,13 @@ export const FAQ_PAGE = {
  *
  * The cards themselves render nothing but PROVIDERS fields, verbatim.
  *
- * NO "Dr." AND NO VERIFIED BADGE HERE. CLAUDE.md scopes both to the /services
- * "Providers you will see" cards specifically; this is a different surface and
- * inherits neither.
+ * "Dr." IS IN THIS INTRO, under the sitewide override of 2026-10-01, and the
+ * sentence carries "nurse practitioners" itself — which is the condition the
+ * override puts on the prefix rather than an accident of phrasing. Do not trim
+ * that clause without removing the titles with it.
+ *
+ * THE VERIFIED BADGE IS STILL /services-ONLY. The two were decided separately,
+ * and the title override does not widen the badge.
  */
 export const PROVIDERS_PAGE = {
   title: 'Providers you will see',
@@ -2136,7 +2170,7 @@ export const PROVIDERS_PAGE = {
   metaDescription:
     'The two psychiatric-mental health nurse practitioners at Newpoint, both licensed in New Jersey and Pennsylvania.',
   intro:
-    'You will see Funmilayo Whitaker or Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified in psychiatric mental health and family practice.',
+    'You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners.',
 } as const;
 
 export const ROUTES: { path: string; priority: number }[] = [

@@ -416,7 +416,10 @@ export default function ServicesIndex() {
                     constant all already use, so the heading names the same
                     thing the reader clicks through to. It also stays inside the
                     title rules — both are advanced practice nurses, so nothing
-                    here may read as physician, psychiatrist or Dr. */}
+                    here may read as physician or psychiatrist. "Dr." itself is
+                    now permitted by the 2026-10-01 override wherever the
+                    credentials are visible beside it, which on these cards they
+                    are. */}
                 <h2 className="text-h2 max-w-[22ch]">Providers you will see</h2>
               </Reveal>
               <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8">
@@ -514,22 +517,22 @@ export default function ServicesIndex() {
                           </span>
                         </div>
                         <div className="min-w-0">
-                          {/* "Dr." IS A DISPLAY PREFIX HERE AND NOWHERE ELSE.
-                              The client asked for it on 2026-09-30 after being
-                              shown CLAUDE.md's rule against it, and reaffirmed;
-                              CLAUDE.md now records that decision. It is written
-                              inline rather than into PROVIDERS[].name on
-                              purpose, because that field feeds schema.org
-                              Person, the page metadata and the portrait alt
-                              text, and the prohibition on implying `Physician`
-                              in structured data was NOT what was overturned.
-                              Putting it in the data would carry the title into
-                              all three silently.
-                              CLIENT: if this should be site-wide, it needs a
-                              decision per surface — visible copy is one
-                              question, schema and metadata are another. */}
+                          {/* "Dr." IS A DISPLAY PREFIX, NOW SITEWIDE.
+                              Asked for on 2026-09-30 for these cards and
+                              extended to every visible mention on 2026-10-01;
+                              CLAUDE.md records both. It comes from
+                              PROVIDERS[].displayName, a field separate from
+                              `name`, because `name` feeds schema.org Person,
+                              the page metadata and the portrait alt text — and
+                              the prohibition on implying `Physician` in
+                              structured data was NOT what was overturned.
+                              The credentials render directly beneath, which is
+                              the condition the override puts on the prefix.
+                              THE VERIFIED BADGE IS STILL THIS SECTION ONLY. The
+                              two were decided separately; the sitewide title
+                              override does not widen the badge. */}
                           <h3 className="text-h3 group-hover:text-np-blue-600 ease-np-out transition-colors duration-[180ms]">
-                            Dr. {p.name}
+                            {p.displayName}
                           </h3>
                           <p className="font-display text-small text-np-neutral-600 mt-1 font-medium">
                             {p.credentials}

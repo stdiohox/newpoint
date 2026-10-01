@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'motion/react';
 import { useHydrated } from '@/lib/useHydrated';
 
@@ -29,23 +29,22 @@ import { useHydrated } from '@/lib/useHydrated';
  * portrait itself instead of reusing <ProviderPortrait />, which is a server
  * component and cannot be imported across this boundary.
  *
- * A STRETCHED LINK, NOT A WRAPPING ONE. The whole card is still one target and
- * one tab stop, but only the NAME is inside the <a>; an ::after pseudo-element
- * pinned to the card's box collects the clicks.
+ * A STRETCHED LINK, AND IT IS THE BUTTON AT THE FOOT OF THE CARD. The heading is
+ * plain text; the "View full profile" button carries `after:absolute
+ * after:inset-0`, so the whole card is one target and one tab stop while the
+ * visible affordance is a real button.
  *
- * Wrapping the entire card was the obvious first build and it made the link's
- * accessible name the concatenation of the name, the credentials, the licence
- * line, the whole bio and all eleven specialty pills — over 400 characters,
- * read out on every Tab and shown as one unbroken run in a screen reader's
- * links list, with no separators between the pills. It passed SC 2.4.4 and
- * 2.5.3 on a technicality and was miserable to listen to. An aria-label was the
- * other option and is worse: it would duplicate 400 characters of clinical copy
- * that then drifts from what is on screen.
+ * Wrapping the entire card in the <a> was the first build and it made the
+ * link's accessible name the concatenation of the name, the credentials, the
+ * licence line, the whole bio and all eleven specialty pills — over 400
+ * characters, recited on every Tab and shown as one unbroken run in a screen
+ * reader's links list. The name is now the button's aria-label, which extends
+ * the visible label rather than replacing it: "View full profile" is the first
+ * thing in it, so SC 2.5.3 holds and speech input still activates it by what is
+ * on screen.
  *
- * With the stretched link the name is "Funmilayo Whitaker" and the bio and
- * pills are ordinary text a screen-reader user browses rather than has recited
- * at them. The focus ring moves to the card with `has-[a:focus-visible]`, so the
- * visible affordance still matches the hit area.
+ * The focus ring is drawn on the CARD through `has-[a:focus-visible]`, so the
+ * indicator matches the hit area rather than outlining the pill alone.
  *
  * The portrait is alt="" because the name is read immediately after it; a
  * descriptive alt would have the name and credentials announced twice.
@@ -55,7 +54,7 @@ const MAX_TILT = 4;
 
 export type ProviderCardData = {
   slug: string;
-  name: string;
+  displayName: string;
   credentials: string;
   licensed: string;
   bio: string;
@@ -146,18 +145,9 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
             className="size-32 rounded-full object-cover"
           />
 
-          {/* ONLY THE NAME IS THE LINK. after:absolute after:inset-0 stretches
-              its hit area over the whole card, so the target and the tab stop
-              are unchanged while the accessible name is just "Funmilayo
-              Whitaker" instead of the card's entire contents. */}
-          <h2 className="text-h3 text-np-ink mt-5">
-            <Link
-              href={`/providers/${provider.slug}`}
-              className="rounded after:absolute after:inset-0 focus-visible:outline-none"
-            >
-              {provider.name}
-            </Link>
-          </h2>
+          {/* THE HEADING IS NO LONGER THE LINK — the button at the foot of the
+              card is. One link and one tab stop per card either way. */}
+          <h2 className="text-h3 text-np-ink mt-5">{provider.displayName}</h2>
 
           {/* The credentials pill. A span, not a Badge import — the treatment is
               this repo's existing chip token. */}
@@ -191,6 +181,59 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
               </li>
             ))}
           </ul>
+
+          {/* THE BUTTON IS THE STRETCHED LINK. `after:absolute after:inset-0`
+              pins its hit area to the card, so the whole card is still one
+              target and one tab stop while the visible affordance is a real
+              button at the foot of the card rather than an underlined name.
+
+              mt-auto pins it to the bottom whatever the bio and pill list above
+              run to, which is what keeps the two buttons on one line when the
+              cards are stretched to equal height.
+
+              THE ACCESSIBLE NAME IS THE aria-label, not the visible text. "View
+              full profile" repeated on both cards tells a screen-reader user
+              reading a links list nothing about which profile; naming the
+              provider fixes that. SC 2.5.3 is satisfied because the visible
+              label — "View full profile" — is contained in the accessible name,
+              in that order, which is what Label in Name requires. */}
+          <div className="mt-auto pt-7">
+            <Button
+              href={`/providers/${provider.slug}`}
+              variant="quiet"
+              /* THE CREDENTIALS ARE IN THE ACCESSIBLE NAME, not just beside it
+                 on screen. An accessible name is a serialised string — there is
+                 no "beside" in a links list — so a bare "Dr. Funmilayo
+                 Whitaker" here would be the one unqualified title on the site.
+                 components/sections/Providers.tsx does the same with `role`. */
+              ariaLabel={`View full profile for ${provider.displayName}, ${provider.credentials}`}
+              /* THE PRESS SCALE MUST NOT APPLY TO THIS INSTANCE.
+                 Button's base carries `active:scale-[0.98]`, and in Tailwind v4
+                 that sets the `scale` property. Any non-`none` scale makes the
+                 element a containing block for its own absolutely positioned
+                 descendants — so the instant mousedown landed, this link's
+                 stretched ::after stopped resolving against the card and
+                 collapsed to the button's own box. Mouseup over the bio or the
+                 pills then had no link under it and the click dispatched to the
+                 ancestor: pressing the card body did nothing at all, while
+                 pressing the button worked, which is the hardest version of
+                 this bug to notice. Measured both ways before and after.
+                 The `!` is load-bearing: same specificity as the base utility,
+                 so without it the winner is CSS source order.
+
+                 outline-transparent, NOT outline-none: the card already draws a
+                 focus ring through has-[a:focus-visible], and the `quiet`
+                 variant draws its own, so a keyboard user saw two rings in two
+                 different blues — a tight np-blue-900 one on the pill inside a
+                 wider np-blue-600 one on the card. The card's is the one that
+                 matches the hit area, so the button's is suppressed. Transparent
+                 rather than none so forced-colors mode still has an outline to
+                 repaint. */
+              className="after:absolute after:inset-0 active:[scale:none]! focus-visible:outline-transparent"
+            >
+              View full profile
+            </Button>
+          </div>
         </div>
       </motion.div>
     </div>

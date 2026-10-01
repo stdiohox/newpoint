@@ -99,7 +99,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
             body copy beside her portrait, in order, so nothing is lost. */}
         <PageHero
           eyebrow="Provider"
-          title={`${provider.name}, ${provider.credentials}`}
+          title={`${provider.displayName}, ${provider.credentials}`}
           intro={provider.bio[0]}
         />
 

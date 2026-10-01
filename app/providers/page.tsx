@@ -23,10 +23,15 @@ import { breadcrumbSchema, organizationRef } from '@/lib/schema';
  * and the cards show exactly the four fields the brief names: name,
  * credentials, licence line, portrait.
  *
- * NO "Dr." AND NO VERIFIED BADGE. CLAUDE.md records both as client decisions
- * scoped to the /services "Providers you will see" cards. This is a different
- * surface and inherits neither — `name` is rendered verbatim, which is what
- * feeds schema and metadata everywhere else.
+ * "Dr." IS RENDERED HERE, via PROVIDERS[].displayName, under the sitewide
+ * override of 2026-10-01. The credentials pill sits directly beneath the name
+ * on every card, which is the condition CLAUDE.md puts on the prefix.
+ *
+ * THE VERIFIED BADGE IS NOT, and the two were decided separately. The badge is
+ * still scoped to the /services "Providers you will see" cards; do not read the
+ * title override as widening it.
+ *
+ * `name` is untouched and is still what feeds schema, metadata and alt text.
  *
  * NO CRISIS PANEL AND NO "Keep reading", matching the service pages. PageCta
  * is therefore the last block before the footer, so the footer's 988 / 911
@@ -121,7 +126,7 @@ export default function ProvidersPage() {
                   <ProviderCard
                     provider={{
                       slug: p.slug,
-                      name: p.name,
+                      displayName: p.displayName,
                       credentials: p.credentials,
                       licensed: p.licensed,
                       bio: p.bio[0],

@@ -221,6 +221,12 @@ export function Footer() {
                   <a href={`mailto:${p.email}`} className={linkClass}>
                     {p.email}
                   </a>
+                  {/* `name`, NOT `displayName`, and that is the condition the
+                      client set rather than an oversight: "Dr." may only render
+                      where the credentials or the words "nurse practitioner"
+                      are visible beside it. This line is a name under an email
+                      address in a footer column with no room for a role, so it
+                      keeps the plain name. See CLAUDE.md, clinician titles. */}
                   <span className="text-small block text-white/60">{p.name}</span>
                 </li>
               ))}

@@ -120,6 +120,7 @@ export function Button({
   size = 'md',
   withArrow = false,
   className = '',
+  ariaLabel,
 }: {
   children: ReactNode;
   href?: string;
@@ -129,6 +130,16 @@ export function Button({
   /** Renders the hero CTA's arrow disc after the label. Decorative. */
   withArrow?: boolean;
   className?: string;
+  /**
+   * Overrides the accessible name where the visible label is not enough on its
+   * own — /providers renders two "View full profile" buttons, which in a links
+   * list say nothing about whose profile.
+   *
+   * SC 2.5.3 Label in Name is the constraint: whatever is passed here MUST
+   * CONTAIN the visible label, in the same order, or speech input stops being
+   * able to activate the control by what it says on screen.
+   */
+  ariaLabel?: string;
 }) {
   const cls = `${base} ${withArrow ? arrowSizes[size] : sizes[size]} ${variants[variant]} ${className}`;
   const disc = discSizes[size];
@@ -155,19 +166,19 @@ export function Button({
     const internal = href.startsWith('/') || href.startsWith('#');
     if (internal) {
       return (
-        <Link href={href} className={cls}>
+        <Link href={href} className={cls} aria-label={ariaLabel}>
           {body}
         </Link>
       );
     }
     return (
-      <a href={href} className={cls}>
+      <a href={href} className={cls} aria-label={ariaLabel}>
         {body}
       </a>
     );
   }
   return (
-    <button type={type ?? 'button'} className={cls}>
+    <button type={type ?? 'button'} className={cls} aria-label={ariaLabel}>
       {body}
     </button>
   );

@@ -73,7 +73,9 @@ Both providers are **advanced practice nurses**, not physicians. New Jersey and 
 both have title-protection statutes. Treat the title as belonging in the list above.
 
 - **Never** `physician`, `psychiatrist`, or `Dr.` for either provider — in copy, metadata,
-  `alt` text, or schema. In schema that also means never `Physician`, `IndividualPhysician`,
+  `alt` text, or schema. **(`Dr.` in VISIBLE COPY is overridden below, as of 2026-10-01,
+  subject to a condition. Metadata, `alt` text and the `Physician` prohibition are NOT
+  overridden and still read exactly as written here.)** In schema that also means never `Physician`, `IndividualPhysician`,
   or `PhysiciansOffice`.
 - **"Doctor" written in full is permitted only as the degree**: "Doctor of Nursing Practice",
   "doctorate-prepared". Never as a title before a name.
@@ -82,32 +84,79 @@ both have title-protection statutes. Treat the title as belonging in the list ab
 
 > **Trap:** the live site calls both providers "Dr. Funmilayo Whitaker" and
 > "Dr. Anastasia Ofoegbu" — see [`research/content/contact.md`](research/content/contact.md).
-> `research/` is authoritative for **facts**, not for this. Do not port those titles forward.
+> `research/` is authoritative for **facts**, not for this. **HISTORICAL as of 2026-10-01:**
+> the client has since asked for "Dr." in visible copy, so the live site's usage is no
+> longer the thing to avoid — the override below governs, and its condition is what the
+> live site does not satisfy on its own.
 
-#### OVERRIDDEN IN ONE PLACE BY THE CLIENT, 2026-09-30
+#### OVERRIDDEN SITEWIDE BY THE CLIENT, 2026-10-01
 
-**The client asked for "Dr." before both names on the `/services` "Providers you will
-see" cards, was shown the rule above and its reasoning, and reaffirmed.** It is applied
-there and is rendered as a display prefix in `app/services/page.tsx`, not written into
-`PROVIDERS[].name`.
+**The client asked for "Dr." before both names everywhere a provider is named in
+visible copy, was shown the rule above and its reasoning, and reaffirmed.** This
+supersedes the 2026-09-30 override, which applied it to the `/services` cards only.
 
-**That distinction is the whole of the override, so do not collapse it.** `name` feeds
-schema.org `Person`, the page metadata and the portrait `alt` text. What the client
-overturned was the visible copy on one section. Everything else in this section stands
-unchanged and is still binding:
+**READ THE PERMISSION AS CONDITIONAL, NOT AS A DEFAULT.** A surface renders `displayName`
+only once the qualifier below is confirmed present in the same visual block; anything
+else keeps `name`. Phrased the other way round — title everywhere, check afterwards — a
+new surface silently acquires the prefix and the burden falls on whoever notices.
+
+**IT IS A SEPARATE FIELD, NOT A PREFIX WRITTEN INTO `PROVIDERS[].name`.** `name` is the
+legal name and is what every machine-readable surface reads; `displayName` carries the
+title and is what pages render. Do not collapse the two.
+
+**THE CONDITION ON USING IT — this is the whole guardrail, and it is the client's own:**
+
+> Wherever "Dr." appears, the credentials (`DNP, FNP-BC, PMHNP-BC`) or the words "nurse
+> practitioner" must be visible beside it.
+
+A surface that cannot show one of those keeps `name`. The footer's provider-inbox list is
+the one that currently falls back — a name under an email address, with no room for a
+role — and it should stay plain rather than grow a role line so the title can be added.
+It is not, however, the only place the condition has to be checked: every new surface
+needs checking, including accessible names.
+
+**AN `aria-label`, a `title` attribute or any other accessible name is a surface.** It is
+a serialised string with no "beside", so the qualifier has to be inside it. `/providers`
+names its card button "View full profile for Dr. Funmilayo Whitaker, DNP, FNP-BC,
+PMHNP-BC" for exactly this reason.
+
+**What is still binding, unchanged:**
 
 - no `Physician`, `IndividualPhysician` or `PhysiciansOffice` in schema, ever;
-- no `Dr.` in metadata, `alt` text or structured data;
-- `jobTitle` stays "Psychiatric-Mental Health Nurse Practitioner".
+- **no `Dr.` in `alt` text or in page metadata** — `metaTitle` and `metaDescription` on
+  `/providers/[slug]` use `name`;
+- `jobTitle` stays "Psychiatric-Mental Health Nurse Practitioner";
+- "Doctor" written in full is still only the degree, never a title before a name.
 
-So the site now says "Dr." in one visible place while its machine-readable markup
-continues to describe two advanced practice nurses. That is deliberate and is the
-narrowest way to honour the request.
+**In structured data the title belongs in `honorificPrefix: "Dr."`.** `Person.name` stays
+the legal name, the type stays `Person`, and `jobTitle` and `hasOccupation` continue to
+describe a nurse practitioner, so a consumer reads "Dr." as a form of address beside an
+occupation stated correctly rather than as a claim about the occupation.
 
-<!-- CLIENT: if "Dr." should appear beyond those cards, it needs a decision per
-     surface — visible copy is one question, and schema/metadata is a separate one
-     with the title-protection exposure attached. Confirm which, and whether the
-     practice has counsel's view on NJ/PA title protection for DNP-prepared APNs. -->
+**THAT IS NOT THE ONLY PATH THE TITLE CAN TAKE INTO STRUCTURED DATA, and assuming it is
+has already been wrong once.** Two others exist and both carry prose verbatim:
+
+- `FAQPage` → `Answer.text`, from `FAQ.groups` via `app/faq/page.tsx`. A provider named in
+  an FAQ answer ships the title into a node Google quotes verbatim in rich results.
+- `Person.description`, which is `PROVIDERS[].bio` joined — see the bio rule below.
+
+The condition applies to both: a provider may be titled there only where that same string
+carries the qualifier. The FAQ answer that names both providers does; keep it that way.
+
+**One prose mention needed a clause before the prefix could be used.** The telehealth
+page's "Both states, both providers" body named both providers with no role nearby, so
+"both psychiatric-mental health nurse practitioners" was added to satisfy the condition.
+It states the role already in `PROVIDERS[].role` and asserts nothing new.
+
+**Neither provider's bio is touched.** `PROVIDERS[].bio` is each provider's own
+first-person text, reproduced verbatim at the client's request; inserting a title into
+someone's own words is a different act from labelling them in ours.
+
+<!-- CLIENT: the exposure this carries is unchanged and is now sitewide rather than on
+     one section. CLAUDE.md has recorded since 2026-09-30 that counsel's view on NJ/PA
+     title protection for DNP-prepared APNs has not been obtained. That is still open,
+     and it is the one thing that would settle whether the condition above is a
+     sufficient mitigation. -->
 
 ### Verified badge — CLIENT DECISION, 2026-09-30
 

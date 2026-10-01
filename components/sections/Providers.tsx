@@ -392,7 +392,7 @@ export function Providers() {
                       <h3 className="flex items-center gap-3 text-white">
                         <Link
                           href={`/providers/${p.slug}`}
-                          aria-label={`${p.name}, ${p.role}`}
+                          aria-label={`${p.displayName}, ${p.role}`}
                           aria-describedby={bioId}
                           className="after:absolute after:inset-0 focus-visible:outline-none"
                           style={{
@@ -407,7 +407,7 @@ export function Providers() {
                             lineHeight: 1.15,
                           }}
                         >
-                          {p.name}
+                          {p.displayName}
                         </Link>
                         <span
                           aria-hidden="true"
