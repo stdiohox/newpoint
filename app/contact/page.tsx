@@ -1,13 +1,11 @@
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { ContactCrisis } from '@/components/sections/ContactCrisis';
 import { PageFaq } from '@/components/sections/PageFaq';
-import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
-import { Button } from '@/components/ui/Button';
-import { stagger } from '@/lib/motion';
 import { BUSINESS, CONTACT_PAGE, FAQ, PROVIDERS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, contactPageSchema, faqSchema, organizationRef } from '@/lib/schema';
@@ -32,6 +30,30 @@ export const metadata = pageMetadata({
   description: CONTACT_PAGE.metaDescription,
   path: '/contact',
 });
+
+/**
+ * The hero photograph.
+ *
+ * Described rather than decorative, and written off the frame: a man on the
+ * phone is what this page is for, which is the one case where the picture says
+ * something the H1 does not.
+ *
+ * NO objectPosition. At 1440 and 1024 the box is wider than the master's
+ * 1.79:1, so object-cover scales by width, the horizontal overflow is 0 and X
+ * would be inert; the default vertical centre keeps him and the table in frame.
+ */
+const HERO_IMAGE = {
+  src: '/images/contact/contact-hero-2400.webp',
+  alt: 'A man sitting at a wooden table at home, smiling as he speaks on the phone, an open notebook in front of him, with a fiddle-leaf fig and a low shelf of books beside him.',
+  /* 100vw describes the BOX; below lg object-cover scales by height and draws
+     the image wider than the viewport. 1024 rather than the measured maximum,
+     for the reason the other heroes record: it lands a DPR 2 device on the
+     2048 candidate instead of the 3840 one. */
+  sizes: '(min-width: 1024px) 100vw, 1024px',
+  /* 82, as on every downscaled master here — the resampling dominates, not the
+     encoder setting. */
+  quality: 82,
+};
 
 export default function ContactPage() {
   /** Schema only — the visible breadcrumb was removed from PageHero. */
@@ -59,7 +81,71 @@ export default function ContactPage() {
             was already on — a no-op for a pointer user and a focus stop that
             goes nowhere for a keyboard one. The form is the next section, so
             there is nothing for it to do that the page does not already do. */}
-        <PageHero title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} showCta={false} />
+        <PageHero
+          title={CONTACT_PAGE.title}
+          intro={CONTACT_PAGE.intro}
+          image={HERO_IMAGE}
+          /* Centred between the navbar and the hero's foot; `center` centres on
+             the area BELOW the nav, not on the header box, because the header
+             pulls itself up by --nav-h so the photograph runs behind the bar. */
+          align="center"
+          /* Centred from lg, left-aligned below — the service, provider,
+             insurance and new-patient heroes all read this way. */
+          copyAlign="center"
+          /**
+           * scrim="hero" with copyAlign="center", unchanged from the other
+           * photographic heroes.
+           *
+           * NO STRONG EDGE UNDER THE HEADLINE. Sampling mean |dI/dx| down each
+           * column of the master, the largest steps are x 94.5% (the shelf
+           * upright at the right edge), x 2.9% (the curtain at the left) and
+           * x 24.5% / 18.6% (the fig and the book stack). Between x 30% and
+           * x 65% the frame is flat wall — the quietest part of the picture,
+           * and where a centred heading lands.
+           *
+           * Restricting the sample to the rows the headline occupies, the four
+           * strongest columns are 94.5%, 86.8%, 79.7% and 2.9%, landing at css
+           * x 1361 / 1250 / 1148 / 42 at 1440 and 967 / 889 / 816 / 30 at
+           * 1024, against headlines that run 421-1020 and 247-777. All clear.
+           *
+           * BELOW lg THE CROP IS A CENTRED WINDOW — 24.2%-75.8% of the source
+           * at 390 — so every one of those is cropped out. The strongest edge
+           * left inside that window measures 7.14 against 49.5 for the frame's
+           * strongest, and it falls at css x 22, under the first character of
+           * a left-aligned heading. A seventh of the frame's strongest edge,
+           * at the very edge of the glyph run: visible on inspection, not a
+           * seam. The AA figures below are measured with it there.
+           *
+           * GLYPH-CORE CONTRAST, white text, worst backdrop pixel under a
+           * glyph, measured on the rendered page:
+           *
+           *   1440  h1 3.68:1 PASS (floor 3)   intro 4.31:1 (floor 4.5)
+           *   1024  h1 3.69:1 PASS             intro 4.50:1, ON the floor
+           *    390  h1 4.80:1 PASS             intro 5.42:1 PASS
+           *    320  h1 4.38:1 PASS             intro 5.08:1 PASS
+           *
+           * THE HEADING PASSES EVERYWHERE; THE INTRO MISSES AT 1440 AND SITS
+           * EXACTLY ON THE FLOOR AT 1024. Treat 4.50 as failing rather than
+           * passing: it is one rounding step from 4.49, and nothing about the
+           * crop guarantees which side of it a re-encode lands on.
+           *
+           * NOT FIXED HERE, AND THIS IS THE THIRD PAGE WITH THE SAME RESULT.
+           * /insurance (4.25 / 4.29) and /new-patients (4.07 / 4.07) record it
+           * too. The overlay was specified as the service pages', so retuning
+           * it is out of scope; the crop cannot reach it either — sweeping
+           * objectPosition Y across 0/25/50/75/100% moves the intro only
+           * between 4.31:1 and 4.41:1 at 1440. The measured minimum is +0.04
+           * flat alpha over the frame, the `hero` scrim's 0.10 tint to 0.14,
+           * which puts it at 4.50:1 and 4.60:1 at +0.06. This frame needs the
+           * least of the three because its wall is in shadow rather than lit.
+           *
+           * ONE SCRIM VARIANT WOULD CLOSE ALL THREE PAGES: +0.11 is what
+           * /new-patients needs, and it clears this one and /insurance with
+           * room. That is a new overlay value and needs asking for.
+           */
+          scrim="hero"
+          showCta={false}
+        />
 
         {/* THE FORM, AND IT LEADS THE PAGE NOW.
             Every "Request an appointment" on the site points at /contact, so
@@ -108,185 +194,248 @@ export default function ContactPage() {
           ))}
         </div>
 
-        <div className="py-20 md:py-28">
+        {/* WAYS TO REACH US — REBUILT 2026-10-01, and the shape is the point.
+            What was here was four stacked sections, each a full-width h2 with
+            a rule above it: "Request an appointment", "Call us", "Email a
+            provider", "Where we see patients". Four headings, one per screen,
+            for three facts and a sentence. Three things changed:
+
+            ONE SECTION, THREE COLUMNS, HAIRLINE RULES. The three ways to reach
+            the practice are siblings, not a sequence, so they read side by side
+            at lg and stack below it. They are NOT cards: a card implies a
+            boundary around something self-contained, and these are three
+            columns of one answer. `divide-*` draws the same np-neutral-200
+            hairline the rest of the page uses, with no surface, no shadow and
+            no radius — the flattest thing that still separates.
+
+            THE "Request an appointment" HEADING IS GONE. It sat above a call
+            button and an anchor back to the form, so a heading-navigation user
+            who jumped to it landed on neither the form nor an appointment.
+            a11y-architect flagged exactly that. Its sentence survives verbatim
+            as the Call column's lead, where it is true and where the number it
+            refers to is next to it.
+
+            NO NEW COPY. Every string here was already on this page or in
+            CONTACT_PAGE: the three h3s, the call sentence, phoneNote,
+            emailNote, areaNote, the numbers and the addresses. The one new
+            string is the section heading, which the client wrote in the brief
+            and which claims nothing.
+
+            HOURS: THERE ARE NONE TO PUBLISH. The brief asked for hours in this
+            section. No clock hours exist in any source — OPEN_CLIENT_ITEMS has
+            carried the gap since the first audit — so none are invented. What
+            the practice HAS published about when it is available is the
+            "expanded schedule including weekends, evenings, and holidays by
+            request" inside areaNote, which is why that sentence leads the third
+            column rather than sitting last. */}
+        <section aria-labelledby="reach-heading" className="py-20 md:py-28">
           <Container>
-            <div className="grid gap-12 md:gap-16">
-                {/*
-                 * This section's primary action is the one it can actually
-                 * perform: the call.
-                 *
-                 * THE OLD NOTE HERE IS NO LONGER TRUE AND HAS BEEN REPLACED. It
-                 * said the site's CTA pointed at the homepage form and that
-                 * sending the highest-intent click away from /contact was the
-                 * problem this section solved. CTA.href is `/contact` now, and
-                 * the form is on this page, so there is nothing to send away —
-                 * the call simply remains the faster of the two routes.
-                 *
-                 * No booking link is used because none exists: research/ records
-                 * no online scheduling widget, and the only absolute URL in the
-                 * content layer is the site's own domain. So the action is tel:,
-                 * per the fallback.
-                 *
-                 * The label names the action and the number rather than saying
-                 * "Request an appointment", so the accessible name matches what
-                 * activating it does. The form is above, and the link beneath
-                 * this button scrolls to it.
-                 */}
-                <Reveal>
-                  <h2 className="text-h2">Request an appointment</h2>
-                </Reveal>
-                <Reveal delay={0.08}>
-                  <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
-                    Calling is the fastest way to reach us. Please keep health information out of
-                    any message you send — tell us how to reach you and we will take the clinical
-                    details directly.
-                  </p>
-                </Reveal>
-                <Reveal delay={0.14}>
-                  <div className="mt-8 flex flex-wrap items-center gap-5">
-                    <Button href={`tel:${BUSINESS.phonePrimaryHref}`} size="lg">
-                      Call {BUSINESS.phonePrimary}
-                    </Button>
-                    {/* AN ON-PAGE ANCHOR, not CTA.href. The form is on this
-                        page now, so this scrolls to it rather than sending the
-                        highest-intent click to another route. `#contact` is
-                        ContactCrisis's own section id, and globals.css's
-                        scroll-padding-top clears the sticky navbar. */}
+            <Reveal>
+              <h2 id="reach-heading" className="text-h2 max-w-[20ch]">
+                Ways to reach us
+              </h2>
+            </Reveal>
+            {/* THE SECTION'S LEAD, AND IT IS HERE RATHER THAN IN THE CALL
+                COLUMN FOR A CLINICAL REASON. healthcare-reviewer caught it:
+                inside a column whose only contents are three phone numbers,
+                "keep health information out of any message you send" reads as
+                "do not discuss your symptoms when you call" — which is wrong,
+                and which the sentence's own second half contradicts. A phone
+                call is not a message, and it is the channel clinical detail is
+                SUPPOSED to travel over.
+
+                The sentence is unchanged. It introduces all three columns,
+                which is what it did before the redesign, when it led the block
+                that sat above every contact method on the page. The two
+                channel-specific prohibitions are untouched and stay where they
+                belong: emailNote above the mailto: links, and the form's own
+                privacyNote directly above Send. */}
+            <Reveal delay={0.08}>
+              <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                Calling is the fastest way to reach us. Please keep health information out of any
+                message you send — tell us how to reach you and we will take the clinical details
+                directly.
+              </p>
+            </Reveal>
+
+            {/* divide-y below lg, divide-x at lg. The gap-less grid is
+                deliberate: the rules do the separating, and a gap would leave
+                the hairline floating away from both columns. Padding carries
+                the breathing room instead. */}
+            <div className="border-np-neutral-200 divide-np-neutral-200 mt-12 grid divide-y border-t lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+              {/* CALL. First column because it is the fastest route and the
+                  only one that reaches a person in a minute. */}
+              <Reveal className="py-10 lg:py-12 lg:pr-10">
+                <Phone
+                  aria-hidden="true"
+                  size={20}
+                  strokeWidth={1.75}
+                  className="text-np-blue-600"
+                />
+                <h3 className="text-h3 text-np-ink mt-4">Call us</h3>
+                <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
+                  {CONTACT_PAGE.phoneNote}
+                </p>
+                <ul role="list" className="mt-6 space-y-3">
+                  <li>
                     <a
-                      href="#contact"
-                      className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                      href={`tel:${BUSINESS.phonePrimaryHref}`}
+                      className="font-display text-h3 text-np-blue-600 ease-np-out underline-offset-4 transition-colors duration-[180ms] hover:underline"
                     >
-                      Or send the appointment form
+                      {BUSINESS.phonePrimary}
                     </a>
-                  </div>
-                </Reveal>
+                  </li>
+                  {BUSINESS.phoneAlt.map((phone) => (
+                    <li key={phone}>
+                      <a
+                        href={`tel:+1${phone.replace(/\D/g, '')}`}
+                        className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                      >
+                        {phone}
+                      </a>
+                    </li>
+                  ))}
+                  <li className="text-small text-np-neutral-600 pt-1">Fax {BUSINESS.fax}</li>
+                </ul>
+                {/* THE ROUTE BACK TO THE FORM, restored verbatim. It was the
+                    second half of the "Request an appointment" block this
+                    section replaced, and both reviews asked for it back: a
+                    column that opens "calling is the fastest way" offers
+                    nothing to a Deaf, hard-of-hearing or speech-disabled
+                    reader, and the page's only other action by this point is
+                    an email channel the next column says to keep clinical
+                    detail out of. `#contact` is ContactCrisis's own section id
+                    and globals.css's scroll-padding-top clears the navbar.
 
-                {/* Phone */}
-                <div className="border-np-neutral-200 mt-14 border-t pt-10">
-                  <Reveal>
-                    <h2 className="text-h2">Call us</h2>
-                  </Reveal>
-                  <Reveal delay={0.08}>
-                    <p className="text-body text-np-neutral-600 mt-3 max-w-[52ch]">
-                      {CONTACT_PAGE.phoneNote}
-                    </p>
-                  </Reveal>
-                  <Reveal delay={0.12}>
-                    <ul role="list" className="mt-6 space-y-3">
-                      <li>
-                        <a
-                          href={`tel:${BUSINESS.phonePrimaryHref}`}
-                          className="font-display text-h3 text-np-blue-600 ease-np-out underline-offset-4 transition-colors duration-[180ms] hover:underline"
-                        >
-                          {BUSINESS.phonePrimary}
-                        </a>
-                      </li>
-                      {BUSINESS.phoneAlt.map((phone) => (
-                        <li key={phone}>
-                          <a
-                            href={`tel:+1${phone.replace(/\D/g, '')}`}
-                            className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
-                          >
-                            {phone}
-                          </a>
-                        </li>
-                      ))}
-                      <li className="text-small text-np-neutral-600 pt-1">Fax {BUSINESS.fax}</li>
-                    </ul>
-                  </Reveal>
-                  {/* CLIENT: hours of operation are not published anywhere, so no
-                      "we answer between" line is claimed here. */}
-                </div>
+                    NOT the heading that was removed: that was an h2 reading
+                    "Request an appointment" above a call button, which sent a
+                    heading-navigation user somewhere that was neither the form
+                    nor an appointment. This is a link that goes where it says. */}
+                <p className="mt-6">
+                  <a
+                    href="#contact"
+                    className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                  >
+                    Or send the appointment form
+                  </a>
+                </p>
+                {/* CLIENT: hours of operation are not published anywhere, so no
+                    "we answer between" line is claimed here. */}
+              </Reveal>
 
-                {/* Email */}
-                <div className="border-np-neutral-200 mt-14 border-t pt-10">
-                  <Reveal>
-                    <h2 className="text-h2">Email a provider</h2>
-                  </Reveal>
-                  <Reveal delay={0.08}>
-                    <p className="text-body text-np-neutral-600 mt-3 max-w-[58ch]">
-                      {CONTACT_PAGE.emailNote}
-                    </p>
-                  </Reveal>
-                  <ul role="list" className="mt-6 space-y-4">
-                    {PROVIDERS.map((p, i) => (
-                      <Reveal as="li" key={p.slug} delay={stagger(i, 0.06)}>
-                        <p className="text-body text-np-ink font-medium">
-                          {p.displayName}
-                          <span className="text-np-neutral-600 font-normal">, {p.credentials}</span>
-                        </p>
-                        <a
-                          href={`mailto:${p.email}`}
-                          className="text-body text-np-blue-600 underline-offset-4 hover:underline"
-                        >
-                          {p.email}
-                        </a>
-                      </Reveal>
-                    ))}
-                  </ul>
-                  {/* CLIENT: no practice-wide inbox (info@ / contact@) exists, so
-                      the two named provider addresses are listed instead. */}
-                </div>
+              {/* EMAIL. */}
+              <Reveal delay={0.08} className="py-10 lg:px-10 lg:py-12">
+                <Mail
+                  aria-hidden="true"
+                  size={20}
+                  strokeWidth={1.75}
+                  className="text-np-blue-600"
+                />
+                <h3 className="text-h3 text-np-ink mt-4">Email a provider</h3>
+                <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
+                  {CONTACT_PAGE.emailNote}
+                </p>
+                <ul role="list" className="mt-6 space-y-4">
+                  {PROVIDERS.map((p) => (
+                    <li key={p.slug}>
+                      <a
+                        href={`mailto:${p.email}`}
+                        className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                      >
+                        {p.email}
+                      </a>
+                      {/* The name UNDER the address, not the other way round:
+                          an address on its own tells a patient nothing about
+                          who reads it. `displayName` with the credentials
+                          beside it, which is the adjacency CLAUDE.md requires
+                          wherever "Dr." renders. */}
+                      <p className="text-small text-np-neutral-600 mt-1">
+                        {p.displayName}, {p.credentials}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                {/* CLIENT: no practice-wide inbox (info@ / contact@) exists, so
+                    the two named provider addresses are listed instead. */}
+              </Reveal>
 
-                {/* Where we work. Service area, never an address. */}
-                <div className="border-np-neutral-200 mt-14 border-t pt-10">
-                  <Reveal>
-                    <h2 className="text-h2">Where we see patients</h2>
-                  </Reveal>
-                  <Reveal delay={0.08}>
-                    <p className="text-body-l text-np-neutral-600 mt-4 max-w-[60ch]">
-                      {CONTACT_PAGE.areaNote}
-                    </p>
-                  </Reveal>
-                  <Reveal delay={0.12}>
-                    <ul role="list" className="mt-6 flex flex-wrap gap-2.5">
-                      {BUSINESS.serviceArea.map((state) => (
-                        <li
-                          key={state}
-                          className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 px-3 py-1.5"
-                        >
-                          {state}
-                        </li>
-                      ))}
-                    </ul>
-                  </Reveal>
-                  {/* CLIENT: no street address, suite or ZIP is confirmed anywhere,
-                      so none is stated and no map is embedded. Add both here and in
-                      lib/schema.ts together once the client supplies it. */}
-                </div>
+              {/* WHEN AND WHERE. Telehealth, in-person, and the only thing the
+                  practice has published about its schedule — all inside
+                  areaNote, verbatim. */}
+              <Reveal delay={0.16} className="py-10 lg:py-12 lg:pl-10">
+                <MapPin
+                  aria-hidden="true"
+                  size={20}
+                  strokeWidth={1.75}
+                  className="text-np-blue-600"
+                />
+                <h3 className="text-h3 text-np-ink mt-4">Where we see patients</h3>
+                <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
+                  {CONTACT_PAGE.areaNote}
+                </p>
+                {/* THE CHIPS ARE LABELLED "Telehealth", AND THE LABEL IS
+                    LOAD-BEARING. healthcare-reviewer raised this as a High:
+                    unlabelled, the column scans as a map pin, then "Where we
+                    see patients", then two state names — which reads as two
+                    places you can be seen IN PERSON. CLAUDE.md forbids exactly
+                    that inference: both providers are licensed in both states,
+                    but the only place-level evidence anywhere in /research is
+                    one New Jersey township, so in-person care is stated
+                    without a state and a Pennsylvania reader must not be sent
+                    to an office that is not known to exist.
 
-              {/* THE STANDALONE CRISIS PANEL THAT SAT HERE IS GONE, and it was
-                  removed rather than lost. <ContactCrisis /> above now renders
-                  one on this page — the same shared CrisisPanel, sticky for the
-                  length of the form and order-first below md — so keeping this
-                  one too would put two identical panels on a single page.
-                  Crisis guidance moved UP the page with the form, not off it,
-                  and the footer's 988 / 911 strip is unchanged. */}
+                    areaNote says it correctly in prose — both states attached
+                    to telehealth, in-person attached to neither — but prose
+                    between the heading and the chips is not what a scanning
+                    reader reads. One word fixes the scan path, and it is the
+                    same word the sentence above already uses.
+
+                    The treatment is /insurance's scope labels, which this repo
+                    already uses to say what a run of chips is scoped to. */}
+                <p
+                  id="telehealth-states"
+                  className="text-caption text-np-neutral-600 mt-6 tracking-[0.08em] uppercase"
+                >
+                  Telehealth
+                </p>
+                <ul
+                  role="list"
+                  aria-labelledby="telehealth-states"
+                  className="mt-3 flex flex-wrap gap-2.5"
+                >
+                  {BUSINESS.serviceArea.map((state) => (
+                    <li
+                      key={state}
+                      /* border-transparent so the chip keeps a shape in
+                         forced-colors mode, where a background is stripped and
+                         a transparent border is painted. Without it these
+                         become two bare words separated by a 10px gap. */
+                      className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 border border-transparent px-3 py-1.5"
+                    >
+                      {state}
+                    </li>
+                  ))}
+                </ul>
+                {/* CLIENT: no street address, suite or ZIP is confirmed anywhere,
+                    so none is stated and no map is embedded. Add both here and in
+                    lib/schema.ts together once the client supplies it. */}
+              </Reveal>
             </div>
           </Container>
-        </div>
+        </section>
 
-        <RelatedLinks
-          links={[
-            {
-              label: 'Starting care',
-              description: 'The three steps from first contact to ongoing treatment.',
-              href: '/new-patients',
-            },
-            {
-              label: 'Insurance and payment',
-              description: 'The plans we accept and the sliding scale for self-pay patients.',
-              href: '/insurance',
-            },
-            {
-              label: 'Our services',
-              description: 'Assessment, medication management and telehealth, in detail.',
-              href: '/services',
-            },
-          ]}
-        />
+        {/* NO "Keep reading" AND NO CLOSING CTA BAND.
+            "Keep reading" came off at the client's instruction on 2026-10-01,
+            as it has from every other page in turn; its four links are all in
+            the navbar and the footer.
 
-        <PageCta heading="We will take the next step with you" />
+            PageCta went with it, and that one is this page's own logic rather
+            than an instruction: its primary button is CTA.href, which is
+            /contact — the page it would be sitting on. That is the same no-op
+            self-link the hero note above records, and the reason the hero CTA
+            came off. The phone action it also carried is in the Call column
+            above, on a page whose first section is the form. The footer's
+            988 / 911 strip is unchanged. */}
       </main>
       <Footer />
     </>
