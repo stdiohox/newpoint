@@ -102,6 +102,18 @@ export function PageHero({
    * nothing retuned. Requested for /services/medication-management so that hero
    * matches the homepage exactly.
    *
+   * `edge` IS ONE GRADIENT AND NOTHING ELSE: a single left-to-right ramp,
+   * darkest at the left edge where left-aligned copy sits, easing to a floor on
+   * the right so the photograph still reads as a photograph. It exists for the
+   * provider pages, where the four-layer `hero` scrim put a visible vertical
+   * seam near the middle of the frame — four overlapping shapes, each smooth on
+   * its own, whose combined alpha is not monotonic across the width. One ramp
+   * cannot do that.
+   *
+   * Its stops are smoothstep-sampled, 3t^2 - 2t^3 at nine points, for the
+   * reason the `hero` note gives: zero slope at both ends, so the eye has no
+   * change in RATE to catch. DO NOT HAND-EDIT THEM — regenerate from the curve.
+   *
    * READ THE LONG NOTE ON THE SCRIM LAYERS BELOW BEFORE REUSING IT. Those exact
    * ramps were already carried in this component once and were replaced,
    * because they are shaped for a 100vh section whose copy is short and
@@ -110,7 +122,7 @@ export function PageHero({
    * asked for on one page; it is not a safe default, and any page added to it
    * needs its own glyph-level measurement first.
    */
-  scrim?: 'poster' | 'hero' | 'home';
+  scrim?: 'poster' | 'hero' | 'home' | 'edge';
   /**
    * Hard caps on the copy's measure, in any CSS length. Omitted, the h1 keeps
    * `max-w-[18ch]` and the intro `max-w-[56ch]`, which is what the other five
@@ -360,10 +372,37 @@ export function PageHero({
         </>
       )}
 
+      {/* THE `edge` SCRIM: one left-to-right gradient over the full-bleed
+          image, and the only layer this branch draws.
+
+          Two shapes, because the copy's width changes. From lg the text sits in
+          roughly the left half, so the ramp holds 0.80 to 46% and eases to a
+          0.18 floor — enough to carry white text on the left while the right of
+          the frame keeps its light. Below lg the copy fills the width, so the
+          ramp holds 0.84 to 40% and only eases to 0.66; a desktop-shaped ramp
+          would leave the end of every wrapped line on bare photograph.
+
+          THAT 0.66 FLOOR IS MEASURED, NOT CHOSEN. At 0.46 the intro on
+          Ofoegbu's frame came out at 3.27:1 against a 4.5:1 floor — her room is
+          bright to the right edge and at 390 the wrapped lines run into it.
+          0.66 puts the worst glyph on that page at 5.0:1. The two frames differ
+          enough that the shallower ramp passed on one and failed on the other,
+          which is the whole reason this is a measured value.
+
+          The floor is deliberately not zero at either width. A ramp that
+          reaches full transparency has an end, and an end is the seam this
+          replaces. */}
+      {image && scrim === 'edge' && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(16,31,69,0.84)_0%,rgba(16,31,69,0.84)_40%,rgba(16,31,69,0.832)_47.5%,rgba(16,31,69,0.812)_55%,rgba(16,31,69,0.783)_62.5%,rgba(16,31,69,0.75)_70%,rgba(16,31,69,0.717)_77.5%,rgba(16,31,69,0.688)_85%,rgba(16,31,69,0.668)_92.5%,rgba(16,31,69,0.66)_100%)] lg:bg-[linear-gradient(to_right,rgba(16,31,69,0.8)_0%,rgba(16,31,69,0.8)_46%,rgba(16,31,69,0.773)_52.25%,rgba(16,31,69,0.703)_58.5%,rgba(16,31,69,0.604)_64.75%,rgba(16,31,69,0.49)_71%,rgba(16,31,69,0.376)_77.25%,rgba(16,31,69,0.277)_83.5%,rgba(16,31,69,0.207)_89.75%,rgba(16,31,69,0.18)_96%)]"
+        />
+      )}
+
       {/* LAYER 2: the bottom gradient. The `hero` branch is the smoothstep
           curve; the other two are the original ramps and are untouched.
           Skipped entirely under `home`, which brings its own pair above. */}
-      {scrim !== 'home' && (
+      {scrim !== 'home' && scrim !== 'edge' && (
       <div
         aria-hidden="true"
         className={

@@ -3,10 +3,10 @@ import { notFound } from 'next/navigation';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
-import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { PageCta } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
-import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
+import { TeamMemberCard } from '@/components/ui/TeamMemberCard';
 import { stagger } from '@/lib/motion';
 import { PROVIDERS, SERVICE_PAGES, BUSINESS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
@@ -75,7 +75,6 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
   const provider = PROVIDERS.find((p) => p.slug === slug);
   if (!provider) notFound();
 
-  const colleague = PROVIDERS.find((p) => p.slug !== provider.slug);
 
   /** Schema only — the visible breadcrumb was removed from PageHero. */
   const crumbs = [{ name: provider.name, path: `/providers/${provider.slug}` }];
@@ -123,44 +122,61 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           title={`${provider.displayName}, ${provider.credentials}`}
           intro={provider.bio[0]}
           image={HERO_IMAGE[provider.slug]}
+          /* Centred between the navbar and the hero's bottom edge. copyAlign is
+             left by default and stays that way, so this moves the block
+             vertically and nothing else. */
+          align="center"
+          /* No appointment button in this hero. The navbar's, PageCta's and the
+             footer's all remain, so the booking route is intact. */
+          showCta={false}
           /**
-           * scrim="hero", CHOSEN ON MEASUREMENT, not on looks.
+           * scrim="edge", ONE GRADIENT ACROSS THE FULL-BLEED IMAGE.
            *
-           * Both existing photograph scrims clear AA here and both were
-           * measured on these two frames at 1440, 1024 and 390, sampling glyph
-           * core pixels only. Worst case of the twelve readings each:
+           * The four-layer `hero` scrim put a visible vertical seam near the
+           * middle of the frame. Each of its layers is smooth on its own — a
+           * flat tint, a bottom ramp, a left ramp and a radial behind the copy
+           * — but their combined alpha is not monotonic across the width, and
+           * the eye reads the turn as an edge. On Whitaker's frame it fell
+           * almost exactly where the photograph has its own wall corner, which
+           * made it read as a hard join.
            *
-           *   hero    h1 4.40:1 (floor 3)   intro 5.34:1 (floor 4.5)
-           *   poster  h1 4.33:1 (floor 3)   intro 5.36:1 (floor 4.5)
+           * One left-to-right ramp, darkest at the left where the copy is,
+           * cannot produce that: alpha falls monotonically from one edge to the
+           * other. Stops are smoothstep-sampled; see the scrim note in
+           * components/PageHero.tsx.
            *
-           * `hero` wins on the thing that matters for this route rather than on
-           * those numbers, which are a wash. Its layer 3 is a left ramp holding
-           * 0.70 at the far edge, and its own note says LEFT-ALIGNED COPY ONLY —
-           * which is what this hero is and what the three pages that currently
-           * fail AA are not. `poster` would also pass, by flattening the whole
-           * photograph under a 0.62 floor; it is the right answer for the video
-           * posters it was built for and a waste of a real master here.
-           *
-           * The left ramp is why Whitaker's frame works at all: its left half is
-           * a flat sunlit wall, directly under the copy.
+           * MEASURED ON BOTH FRAMES at 1440, 1024 and 390, sampling glyph core
+           * pixels only. Numbers are in the commit message.
            */
-          scrim="hero"
+          scrim="edge"
         />
+
+        {/* THE EDITORIAL CARD, replacing the portrait-beside-intro columns.
+            `position` puts the portrait on the left for Whitaker and the right
+            for Ofoegbu, as asked.
+
+            THE PARAGRAPHS ARE bio.slice(1), which is exactly what this section
+            rendered before — the hero's standfirst is bio[0] and is not
+            repeated. Ofoegbu's Headway bio is a single paragraph, so her card
+            carries the label, the name and the portrait and no body copy; that
+            is not a regression, it is what this page already showed, and her
+            voice picks up in "My approach" below. */}
+        <div className="pt-20 md:pt-28">
+          <Container>
+            <TeamMemberCard
+              provider={provider}
+              paragraphs={provider.bio.slice(1)}
+              position={provider.slug === 'funmilayo-whitaker' ? 'left' : 'right'}
+            />
+          </Container>
+        </div>
 
         <div className="py-20 md:py-28">
           <Container>
             <div className="grid gap-12 md:grid-cols-12 md:gap-16">
               <div className="md:col-span-5">
-                <Reveal>
-                  <ProviderPortrait
-                    provider={provider}
-                    sizes="(min-width: 768px) 440px, 100vw"
-                    className="w-full"
-                    loading="eager"
-                  />
-                </Reveal>
                 <Reveal delay={0.08}>
-                  <dl className="border-np-neutral-200 mt-8 border-t">
+                  <dl className="border-np-neutral-200 border-t">
                     {facts.map((fact) => (
                       <div
                         key={fact.label}
@@ -218,13 +234,12 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     Rendered before "What she treats" deliberately: someone who
                     has just read her name and credentials in the hero wants to
                     know who she is, not to be handed a taxonomy. */}
-                {provider.bio.slice(1).map((para, i) => (
-                  <Reveal key={i} delay={stagger(i, 0.06)}>
-                    <p className="text-body-l text-np-neutral-600 max-w-[62ch] not-first:mt-4">
-                      {para}
-                    </p>
-                  </Reveal>
-                ))}
+                {/* THE REMAINING BIO PARAGRAPHS MOVED TO THE CARD ABOVE and are
+                    not repeated here. They used to render in this column; with
+                    TeamMemberCard carrying them, printing them again put
+                    Whitaker's second paragraph on the page twice, about 600px
+                    apart. Ofoegbu has a single-paragraph bio and was
+                    unaffected, which is why it was easy to miss. */}
 
                 <div
                   className={
@@ -325,30 +340,14 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
           </Container>
         </div>
 
-        <RelatedLinks
-          heading="Elsewhere on the site"
-          links={[
-            ...(colleague
-              ? [
-                  {
-                    label: colleague.name,
-                    description: `${colleague.credentials}. ${colleague.licensed}.`,
-                    href: `/providers/${colleague.slug}`,
-                  },
-                ]
-              : []),
-            {
-              label: 'Starting care',
-              description: 'The three steps from first contact to ongoing treatment.',
-              href: '/new-patients',
-            },
-            {
-              label: 'Insurance and payment',
-              description: 'The plans we accept and the sliding scale for self-pay patients.',
-              href: '/insurance',
-            },
-          ]}
-        />
+        {/* "Elsewhere on the site" REMOVED at the client's request.
+            PageCta is now the last block before the footer, so the footer's
+            988 / 911 strip is the next content a reader meets — the same shape
+            every other page on the site ends in. What is lost is internal
+            linking weight: this grid was the only link from one provider's page
+            to the other's, and to /new-patients and /insurance from here. All
+            three remain reachable from the navbar — the footer carries no
+            provider links — so the cost is weight rather than indexation. */}
 
         <PageCta heading={`Book with ${provider.name.split(' ')[0]}`} />
       </main>
