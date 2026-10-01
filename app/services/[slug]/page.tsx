@@ -81,27 +81,41 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      is not there yet, so the page can be built and reviewed against its real
      layout without a broken image. Nothing changes when they land.
 
-     The alts describe the photographs that were commissioned for these slots.
-     They follow the same rule as the assessment page's: describe the frame,
-     claim nothing about whose hands, room or practice it is, and never name a
-     medication — CLAUDE.md puts drug names and regulated facts behind client
-     confirmation, and alt text is where one gets asserted by accident. */
+     THE ALTS DESCRIBE THE DELIVERED FRAMES, not the brief. They were first
+     written against the commissioning note, before the artwork existed, and
+     every one of the four was wrong once the photographs landed — a desk that
+     is an armchair, a finished form that is being filled in, a clinician at a
+     record who is a man at his own kitchen table, a corridor that is a table.
+     They were rewritten from the images. An alt that describes a different
+     picture is a 1.1.1 failure that no automated check catches, so these are
+     written from the frame and nothing else.
+
+     They follow the assessment page's rule otherwise: describe what is
+     visible, claim nothing about whose hands, room or practice it is, and name
+     no medication and no instrument — CLAUDE.md puts both behind client
+     confirmation, and alt text is where one gets asserted by accident. The
+     second figure in med-plan is "a person", not a clinician, because only
+     their hands and shoulder are in frame. */
   const cardMedia = {
     'prescribing-that-follows-the-plan': {
       src: '/images/services/med-plan.webp',
-      alt: 'A clinician and a patient sitting together at a desk, reviewing a printed treatment plan.',
+      alt: 'A man sitting in an armchair taking a printed treatment plan from the hands of a person seated opposite him.',
     },
     'measured-not-guessed': {
       src: '/images/services/med-measured.webp',
-      alt: 'A completed paper rating scale on a desk beside a pen, with scores filled in along one column.',
+      /* "a printed tick-box questionnaire", not the name on the sheet. Which
+         instruments the practice uses is an open client item. */
+      alt: 'A person filling in a printed tick-box questionnaire with a pen at a wooden table, a glass of water beside them.',
     },
     'adjusting-as-things-change': {
       src: '/images/services/med-adjusting.webp',
-      alt: 'A clinician making notes in a patient record at a desk, a laptop open beside them.',
+      /* No claim that this is a telehealth appointment, with Newpoint or at
+         all — the screen is not in frame. It is a man at a laptop. */
+      alt: 'An older man sitting at a kitchen table looking at an open laptop, wearing a wireless earbud, a mug beside him.',
     },
     'working-with-your-other-clinicians': {
       src: '/images/services/med-clinicians.webp',
-      alt: 'Two clinicians standing in conversation in a corridor, one holding a folder of notes.',
+      alt: 'Two people seated across a table from each other, with an open notebook of handwritten notes between them beside a folder of papers and a closed laptop.',
     },
   } as const;
 
