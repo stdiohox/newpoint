@@ -800,7 +800,13 @@ export type ServicePage = {
    * no photograph. It drops the "On this page" rail; the section ids stay, so
    * existing deep links keep working.
    */
-  layout?: 'feature' | 'cards';
+  /**
+   * `'grid'` is telehealth's layout, in components/sections/ServiceGrid.tsx:
+   * the first section as a featured card with its photograph beside the copy,
+   * and the rest as a three-up grid. Like `'cards'` it drops the "On this page"
+   * rail and keeps the section ids, so deep links still land.
+   */
+  layout?: 'feature' | 'cards' | 'grid';
   /**
    * Drop the appointment button out of this service's hero.
    *
@@ -1334,6 +1340,18 @@ export const SERVICE_PAGES: ServicePage[] = [
   {
     slug: 'telehealth',
     nav: 'Telehealth',
+    /* The homepage's overlay verbatim, as on medication-management. This page
+       still has no hero master of its own and runs on its 1280x720 video
+       poster, so the picture is unchanged — only the layers over it. */
+    heroScrim: 'home',
+    /* Centred between the navbar and the hero's bottom edge, matching
+       medication-management and the assessment page. */
+    heroAlign: 'center',
+    /* No appointment button in this hero. The navbar's, PageCta's and the
+       footer's all remain, so the booking route is intact. */
+    hideHeroCta: true,
+    /* The card-18 grid: one featured card and a three-up row. */
+    layout: 'grid',
     schemaType: 'Service',
     title: 'Telehealth psychiatry in New Jersey and Pennsylvania',
     metaTitle: 'Telehealth Psychiatry in NJ and PA',
@@ -1345,19 +1363,102 @@ export const SERVICE_PAGES: ServicePage[] = [
     sections: [
       {
         heading: 'An expanded schedule',
+        /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
         body: 'Telehealth appointments are offered on an expanded schedule, including weekends, evenings, and holidays by request. If the standard working day is the reason you have not started treatment, say so when you get in touch.',
+        bullets: [
+          /* REWRITTEN AFTER healthcare-reviewer, 2026-10-01. The line read "A
+             private space and a steady connection matter more than which
+             device you use." The tail was a capability claim about this
+             practice's telehealth platform — that any device works — and the
+             platform is unnamed in all source material, which is why the FAQ
+             below carries a CLIENT note saying no joining process may be
+             described. The head of the sentence is this page's OWN APPROVED
+             COPY and is what remains.
+
+             CLIENT-REVIEW — SOURCED. The telehealth FAQ in this same entry:
+             "A private space and a device with a camera and a reliable
+             connection." */
+          'A private space, and a device with a camera and a reliable connection.',
+          /* CLIENT-REVIEW — GENERIC. Says nothing about how long anything
+             takes or how often it happens. */
+          'Checking your camera and microphone beforehand keeps setup out of the appointment.',
+          /* CLIENT-REVIEW — GENERIC. */
+          'Headphones help if other people are home.',
+          /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was
+             "Telehealth takes the travel out of an appointment, not the
+             appointment out of your week." "Out of your week" implies a
+             recurring weekly slot — a frequency and time-commitment claim,
+             made under the practice's own schedule heading. */
+        ],
       },
       {
         heading: 'Both states, both providers',
         body: 'Funmilayo Whitaker and Anastasia O. Ofoegbu are both licensed in New Jersey and Pennsylvania, so telehealth is available across our whole service area rather than in one state only. You need to be physically located in a state where your provider is licensed at the time of your appointment.',
+        bullets: [
+          /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was "Which
+             licence applies follows where you are sitting, not where your
+             provider is." The first half is right and the lead already says
+             it. The second half is not: a provider physically in a third state
+             can trigger that state's licensure requirements, and compacts and
+             state-specific telehealth registrations shape the rest. That is a
+             regulated fact stated as an absolute, which CLAUDE.md's rule on
+             never inventing verifiable regulated facts exists to stop — and
+             nothing on a marketing page needs to adjudicate it. */
+          /* CLIENT-REVIEW — GENERIC. No claim that the practice can or cannot
+             accommodate any particular case. */
+          'Being out of state on the day — travelling, or working elsewhere — can affect whether an appointment can go ahead.',
+          /* CLIENT-REVIEW — GENERIC scheduling advice. */
+          'Upcoming travel is worth mentioning when you book.',
+        ],
       },
       {
         heading: 'What telehealth is good for',
         body: 'Follow-up medication management works particularly well by video: the appointment is a structured review of how you are responding, which does not depend on being in the same room. Comprehensive psychiatric assessments can also be arranged by telehealth — ask us and we will confirm what suits your situation.',
+        bullets: [
+          /* CLIENT-REVIEW — GENERIC. Describes what a structured review covers
+             in general terms. Names no instrument and no medication. */
+          'A structured review — sleep, side effects, what has changed — carries over to video well.',
+          /* CLIENT-REVIEW — GENERIC. */
+          'Having your own notes or questions open on the same screen is easier from home.',
+          /* CLIENT-REVIEW — GENERIC. A limitation of the medium, not of this
+             practice, and it sets up the section that follows. */
+          'Anything that needs a physical examination is not something video can do.',
+        ],
       },
       {
         heading: 'When telehealth is not the right call',
         body: 'Telehealth is not for emergencies. If you are in crisis, call or text 988 for the Suicide and Crisis Lifeline. If you or someone else is in immediate danger, call 911 or go to your nearest emergency room. This practice is not monitored around the clock.',
+        /* NO BULLETS ON THIS SECTION, AND THAT IS DELIBERATE. All three were
+           removed on healthcare-reviewer's advice, 2026-10-01, and the reason
+           is worth keeping so they are not reinstated:
+
+             "If you are not sure how urgent something is, that is itself a
+             reason to call." — names no number. The nearest competing
+             referents on the rendered page are the practice's own phone in the
+             navbar and footer, two sentences after the body says the practice
+             is NOT monitored around the clock. A distressed reader can read
+             "call" as "call the practice", which is a route to voicemail. It
+             is also triage advice, issued by a provider's site, where the only
+             instruction that belongs is the body's: crisis to 988, immediate
+             danger to 911 or the ER.
+
+             "Saving 988 and 911 in your phone now..." — presents the two as an
+             undifferentiated pair, erasing the distinction the body has just
+             drawn. CRISIS's own note in this file says the difference between
+             them must be checked and not guessed. Flattening them is a step
+             toward 911 as the behavioural-health default.
+
+             "Crisis lines are there whether or not you are anyone's patient."
+             — accurate, and removed on placement rather than content. Bullets
+             render as blue ticks in lighter type, which turns the closing
+             content of the crisis card into a reassurance checklist, and the
+             injected hidden heading would read a screen-reader user three tips
+             while the actual 988 / 911 instruction sits in the body above. A
+             benefit-tick affordance is the wrong register for crisis guidance
+             whatever the words say.
+
+           THE BODY IS THIS SECTION'S WHOLE CONTENT ON PURPOSE. Do not add
+           points here without putting the question to the client first. */
       },
     ],
     faqs: [

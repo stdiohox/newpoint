@@ -6,6 +6,7 @@ import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
 import { ServiceCards } from '@/components/sections/ServiceCards';
+import { ServiceGrid } from '@/components/sections/ServiceGrid';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -73,6 +74,19 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      layout; a service with four sections or six gets four or six rows. */
   const useFeatureLayout = service.layout === 'feature';
   const useCardLayout = service.layout === 'cards';
+  const useGridLayout = service.layout === 'grid';
+
+  /* TELEHEALTH'S FEATURED PHOTOGRAPH, keyed by section id so reordering a
+     section cannot hand it another section's picture. The path is reserved
+     ahead of the artwork: ServiceGrid checks it on disk and draws a neutral
+     block at the same shape where the file is not there yet, so the layout can
+     be reviewed without a broken image and nothing moves when it lands. */
+  const gridMedia = {
+    'an-expanded-schedule': {
+      src: '/images/services/tele-schedule.webp',
+      alt: 'A person sitting at a desk at home in the evening, talking to a clinician on a laptop screen.',
+    },
+  } as const;
 
   /* THE SHARED PROSE LAYOUT, which is now the only one of the three that still
      ends with the crisis panel and "Keep reading".
@@ -82,7 +96,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      those apart: medication-management had both removed at the client's
      request, so the gate has to name the prose layout rather than "not the
      feature one". Telehealth is the only service left on it and keeps both. */
-  const useProseLayout = !useFeatureLayout && !useCardLayout;
+  const useProseLayout = !useFeatureLayout && !useCardLayout && !useGridLayout;
 
   /* MEDICATION MANAGEMENT'S CARD PHOTOGRAPHS, keyed by section id rather than
      by position, so reordering a section cannot hand it another section's
@@ -354,6 +368,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              ids travel with the cards, so deep links into this page still
              land. */
           <ServiceCards sections={sectionItems} media={cardMedia} />
+        ) : useGridLayout ? (
+          /* The card-18 grid: a featured card and a three-up row. No "On this
+             page" rail and no modality card; the section ids travel with the
+             cards, so deep links into this page still land. */
+          <ServiceGrid sections={sectionItems} media={gridMedia} />
         ) : (
           <div className="py-20 md:py-28">
             <Container>
@@ -539,8 +558,14 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             THE CARD LAYOUT DROPS IT TOO, at the client's request of
             2026-10-01, on the same grounds: every one of the six destinations
             is reachable from the navbar, so nothing is orphaned, and the cost
-            is internal linking weight rather than indexation. Telehealth is now
-            the only service page that still renders it. */}
+            is internal linking weight rather than indexation.
+
+            NO SERVICE PAGE RENDERS THIS ANY MORE, as of 2026-10-01: telehealth
+            moved to the card-18 grid and dropped it too, so all three services
+            name a layout and `useProseLayout` is false on every one of them.
+            The branch is not dead, though — `layout` is optional, so a service
+            added without one still gets the prose rail, this grid and the
+            crisis panel below. It is the default, not a leftover. */}
         {useProseLayout && (
           <RelatedLinks
             heading="Keep reading"
