@@ -5,6 +5,7 @@ import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
+import { ServiceCards } from '@/components/sections/ServiceCards';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { Reveal } from '@/components/ui/Reveal';
@@ -69,6 +70,40 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      `layout: 'feature'` simply selects the row treatment over the shared prose
      layout; a service with four sections or six gets four or six rows. */
   const useFeatureLayout = service.layout === 'feature';
+  const useCardLayout = service.layout === 'cards';
+
+  /* MEDICATION MANAGEMENT'S CARD PHOTOGRAPHS, keyed by section id rather than
+     by position, so reordering a section cannot hand it another section's
+     picture.
+
+     THE FOUR PATHS ARE RESERVED AHEAD OF THE ARTWORK. ServiceCards checks each
+     one on disk and draws a neutral block at the same 16/9 shape where the file
+     is not there yet, so the page can be built and reviewed against its real
+     layout without a broken image. Nothing changes when they land.
+
+     The alts describe the photographs that were commissioned for these slots.
+     They follow the same rule as the assessment page's: describe the frame,
+     claim nothing about whose hands, room or practice it is, and never name a
+     medication — CLAUDE.md puts drug names and regulated facts behind client
+     confirmation, and alt text is where one gets asserted by accident. */
+  const cardMedia = {
+    'prescribing-that-follows-the-plan': {
+      src: '/images/services/med-plan.webp',
+      alt: 'A clinician and a patient sitting together at a desk, reviewing a printed treatment plan.',
+    },
+    'measured-not-guessed': {
+      src: '/images/services/med-measured.webp',
+      alt: 'A completed paper rating scale on a desk beside a pen, with scores filled in along one column.',
+    },
+    'adjusting-as-things-change': {
+      src: '/images/services/med-adjusting.webp',
+      alt: 'A clinician making notes in a patient record at a desk, a laptop open beside them.',
+    },
+    'working-with-your-other-clinicians': {
+      src: '/images/services/med-clinicians.webp',
+      alt: 'Two clinicians standing in conversation in a corridor, one holding a folder of notes.',
+    },
+  } as const;
 
   /* ONE PHOTOGRAPH PER ROW, in section order. All five are now real assets —
      the gap on "The tools we use" is closed.
@@ -284,6 +319,15 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             this route served before. */}
         {useFeatureLayout ? (
           <ServiceBody sections={sectionItems} media={bodyMedia} />
+        ) : useCardLayout ? (
+          /* The Feature73 card grid. The modality callout moves to the head of
+             the section and the "On this page" rail is gone; the section ids
+             travel with the cards, so deep links into this page still land. */
+          <ServiceCards
+            modality={service.modality}
+            sections={sectionItems}
+            media={cardMedia}
+          />
         ) : (
           <div className="py-20 md:py-28">
             <Container>

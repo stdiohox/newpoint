@@ -781,7 +781,16 @@ export type ServicePage = {
    * Replaces the earlier `journey` and `featurePair` booleans, which were two
    * flags describing one decision.
    */
-  layout?: 'feature';
+  /**
+   * `'cards'` is medication-management's layout: the Feature73 arrangement,
+   * adapted in components/sections/ServiceCards.tsx. The modality callout leads
+   * the section, the first four sections become cards, and anything after the
+   * fourth falls through to its own block below the grid — which is where
+   * "Conditions we prescribe for" renders, because it carries a chip list and
+   * no photograph. It drops the "On this page" rail; the section ids stay, so
+   * existing deep links keep working.
+   */
+  layout?: 'feature' | 'cards';
   /**
    * Drop the appointment button out of this service's hero.
    *
@@ -1077,6 +1086,10 @@ export const SERVICE_PAGES: ServicePage[] = [
     /* The homepage's overlay verbatim, rather than the `hero` treatment a
        master would otherwise select. See the field's note on the type. */
     heroScrim: 'home',
+    /* Feature73 card grid rather than the shared prose rail. Telehealth is
+       deliberately left on the default: this layout assumes four sections that
+       each want a photograph, plus a list-carrying section to close. */
+    layout: 'cards',
     /* No appointment button in this hero. The page keeps the navbar's,
        PageCta's and the footer's, so the booking route is intact — the same
        reasoning the assessment page's `hideHeroCta` note records. */
