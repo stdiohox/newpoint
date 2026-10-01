@@ -1,13 +1,13 @@
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
+import { ContactCrisis } from '@/components/sections/ContactCrisis';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
-import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { stagger } from '@/lib/motion';
-import { BUSINESS, CONTACT_PAGE, CTA, PROVIDERS } from '@/lib/content';
+import { BUSINESS, CONTACT_PAGE, PROVIDERS } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, contactPageSchema, organizationRef } from '@/lib/schema';
 
@@ -40,19 +40,42 @@ export default function ContactPage() {
     <>
       <JsonLd schemas={[organizationRef(), contactPageSchema(), breadcrumbSchema(crumbs)]} />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        <PageHero title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} />
+        {/* NO HERO CTA ON THIS PAGE, and it came off with the CTA retarget.
+            CTA.href is `/contact` now, so the hero button linked to the page it
+            was already on — a no-op for a pointer user and a focus stop that
+            goes nowhere for a keyboard one. The form is the next section, so
+            there is nothing for it to do that the page does not already do. */}
+        <PageHero title={CONTACT_PAGE.title} intro={CONTACT_PAGE.intro} showCta={false} />
+
+        {/* THE FORM, AND IT LEADS THE PAGE NOW.
+            Every "Request an appointment" on the site points at /contact, so
+            the form is this page's primary purpose rather than a thing it
+            refers to elsewhere. It is the same <ContactCrisis /> the homepage
+            renders — same component, same fields, same HIPAA scope, nothing
+            forked — so the two cannot drift.
+
+            IT CARRIES THE PAGE'S CRISIS GUIDANCE. ContactCrisis includes
+            <CrisisPanel /> in its right column, sticky for the length of the
+            form and order-first below md, which is why the standalone sticky
+            panel that used to sit in the contact-methods grid below is gone:
+            two identical "If you need help now" panels on one page is a defect,
+            not redundancy. Putting the form first is what keeps the remaining
+            one high — higher than the old placement, not lower. */}
+        <ContactCrisis />
 
         <div className="py-20 md:py-28">
           <Container>
-            <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-              <div className="md:col-span-7">
+            <div className="grid gap-12 md:gap-16">
                 {/*
-                 * This page's primary action is the one it can actually perform:
-                 * the call. Everywhere else on the site the CTA points at the
-                 * homepage form (CTA.href), which is right for pages that have no
-                 * contact mechanism of their own — but on /contact that sent the
-                 * highest-intent click away from the page whose whole job is to
-                 * handle it.
+                 * This section's primary action is the one it can actually
+                 * perform: the call.
+                 *
+                 * THE OLD NOTE HERE IS NO LONGER TRUE AND HAS BEEN REPLACED. It
+                 * said the site's CTA pointed at the homepage form and that
+                 * sending the highest-intent click away from /contact was the
+                 * problem this section solved. CTA.href is `/contact` now, and
+                 * the form is on this page, so there is nothing to send away —
+                 * the call simply remains the faster of the two routes.
                  *
                  * No booking link is used because none exists: research/ records
                  * no online scheduling widget, and the only absolute URL in the
@@ -61,7 +84,8 @@ export default function ContactPage() {
                  *
                  * The label names the action and the number rather than saying
                  * "Request an appointment", so the accessible name matches what
-                 * activating it does. The form stays reachable underneath.
+                 * activating it does. The form is above, and the link beneath
+                 * this button scrolls to it.
                  */}
                 <Reveal>
                   <h2 className="text-h2">Request an appointment</h2>
@@ -78,8 +102,13 @@ export default function ContactPage() {
                     <Button href={`tel:${BUSINESS.phonePrimaryHref}`} size="lg">
                       Call {BUSINESS.phonePrimary}
                     </Button>
+                    {/* AN ON-PAGE ANCHOR, not CTA.href. The form is on this
+                        page now, so this scrolls to it rather than sending the
+                        highest-intent click to another route. `#contact` is
+                        ContactCrisis's own section id, and globals.css's
+                        scroll-padding-top clears the sticky navbar. */}
                     <a
-                      href={CTA.href}
+                      href="#contact"
                       className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
                     >
                       Or send the appointment form
@@ -180,20 +209,14 @@ export default function ContactPage() {
                       so none is stated and no map is embedded. Add both here and in
                       lib/schema.ts together once the client supplies it. */}
                 </div>
-              </div>
 
-              {/* Crisis guidance, in the same treatment used across the site.
-                  order-first below md: the grid stacks on a phone, and left in
-                  DOM order a distressed visitor would scroll past three headings
-                  and a chip list before reaching 988. */}
-              <div className="order-first md:order-none md:col-span-5">
-                <Reveal delay={0.12}>
-                  {/* h2 here, not the homepage's h3: this panel is a sibling of
-                      the page's other h2 sections rather than sitting under
-                      one. */}
-                  <CrisisPanel headingAs="h2" className="sticky top-28" />
-                </Reveal>
-              </div>
+              {/* THE STANDALONE CRISIS PANEL THAT SAT HERE IS GONE, and it was
+                  removed rather than lost. <ContactCrisis /> above now renders
+                  one on this page — the same shared CrisisPanel, sticky for the
+                  length of the form and order-first below md — so keeping this
+                  one too would put two identical panels on a single page.
+                  Crisis guidance moved UP the page with the form, not off it,
+                  and the footer's 988 / 911 strip is unchanged. */}
             </div>
           </Container>
         </div>

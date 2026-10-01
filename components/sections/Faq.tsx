@@ -1,4 +1,7 @@
+import Link from 'next/link';
 import { FaqSections, type FaqItem } from '@/components/ui/faq-sections';
+import { Container } from '@/components/ui/Container';
+import { Reveal } from '@/components/ui/Reveal';
 import { FAQ } from '@/lib/content';
 
 /**
@@ -29,6 +32,22 @@ import { FAQ } from '@/lib/content';
  *
  * Server component. <FaqSections /> is the only client code, and it is a leaf.
  */
+/**
+ * A PREVIEW NOW, NOT THE WHOLE SET. /faq carries all eight questions under
+ * their group headings; this band shows the first four and links there.
+ *
+ * Four, not eight, because the full list on both URLs would be the same eight
+ * questions and answers on two indexable pages, competing with each other —
+ * which is the duplicate-content problem PageFaq's own note already describes.
+ * The FAQPage JSON-LD moved to /faq with the full set for the same reason, so
+ * app/page.tsx no longer emits faqSchema.
+ *
+ * The four are the first four in source order, so the preview is a prefix of
+ * the page rather than a selection anyone has to maintain. All of them are
+ * "Getting started", which is the right half to show a first-time visitor.
+ */
+const PREVIEW_COUNT = 4;
+
 export function Faq() {
   /*
    * The flatMap is annotated because `as const` makes groups a tuple of
@@ -36,7 +55,7 @@ export function Faq() {
    * question strings as the element type, which the second group then fails to
    * satisfy. Widening to FaqItem[] is the fix, not a cast.
    */
-  const faqs = FAQ.groups.flatMap((g): FaqItem[] => [...g.items]);
+  const faqs = FAQ.groups.flatMap((g): FaqItem[] => [...g.items]).slice(0, PREVIEW_COUNT);
 
   return (
     <section id="faq" className="py-20 md:py-28">
@@ -49,6 +68,21 @@ export function Faq() {
         imageWidth={2000}
         imageHeight={1493}
       />
+
+      <Container>
+        {/* The link out. It names the destination rather than saying "read
+            more", so its accessible name says where it goes when read out of
+            context. */}
+        <Reveal>
+          <Link
+            href="/faq"
+            className="text-body text-np-blue-600 ease-np-out mt-10 inline-flex items-center gap-1 font-medium underline-offset-4 transition-colors duration-[180ms] hover:underline focus-visible:underline motion-reduce:transition-none"
+          >
+            All frequently asked questions
+            <span aria-hidden="true">→</span>
+          </Link>
+        </Reveal>
+      </Container>
     </section>
   );
 }

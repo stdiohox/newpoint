@@ -2090,6 +2090,21 @@ export const CONTACT_PAGE = {
  * the one hand-written entry and read as a stronger guarantee than it gives.
  */
 /**
+ * The /faq page.
+ *
+ * NO NEW BODY COPY. The questions, answers, group titles, heading and intro all
+ * come from FAQ, verbatim and in source order. Only the two metadata strings
+ * below are new, and metadata is where every page needs a unique pair.
+ */
+export const FAQ_PAGE = {
+  /* CLIENT-REVIEW — metadata. Both describe what the page contains and assert
+     nothing about the practice that FAQ's own answers do not already say. */
+  metaTitle: 'Frequently Asked Questions',
+  metaDescription:
+    'Answers to common questions about starting psychiatric care at Newpoint: who you will see, how appointments work, insurance and costs.',
+} as const;
+
+/**
  * The /providers index.
  *
  * It exists because the navbar's "Providers" link pointed at `/#providers`, a
@@ -2131,6 +2146,7 @@ export const ROUTES: { path: string; priority: number }[] = [
   { path: '/insurance', priority: 0.8 },
   { path: '/new-patients', priority: 0.8 },
   { path: '/contact', priority: 0.9 },
+  { path: '/faq', priority: 0.7 },
   /* The index sits above its own detail pages, same as /services does. */
   { path: '/providers', priority: 0.8 },
   ...PROVIDERS.map((p) => ({ path: `/providers/${p.slug}`, priority: 0.7 })),

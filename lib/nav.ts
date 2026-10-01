@@ -43,14 +43,29 @@ export const NAV = [
   { label: 'Providers', href: '/providers' },
   { label: 'Insurance', href: '/insurance' },
   { label: 'New patients', href: '/new-patients' },
-  { label: 'FAQ', href: '/#faq' },
+  /* A PAGE, NOT THE HOMEPAGE SECTION. This was `/#faq`, which scrolled to the
+     homepage's FAQ band. /faq now carries the full set and the homepage keeps
+     a short preview linking to it. */
+  { label: 'FAQ', href: '/faq' },
   { label: 'Contact', href: '/contact' },
 ] as const;
 
-/** Single CTA intent across the entire site. Never a second label for this action. */
+/**
+ * Single CTA intent across the entire site. Never a second label for this
+ * action.
+ *
+ * `/contact`, NOT `/#contact`. It pointed at the homepage form band, which was
+ * right while /contact had no form of its own — it had a "Request an
+ * appointment" heading whose own link sent you back to the homepage. /contact
+ * now renders the same <ContactCrisis /> the homepage does, so the CTA lands on
+ * a page that can actually take the request instead of scrolling another route.
+ *
+ * The homepage section keeps its `id="contact"` for on-page use; nothing links
+ * to `/#contact` any more.
+ */
 export const CTA = {
   label: 'Request an appointment',
-  href: '/#contact',
+  href: '/contact',
 } as const;
 
 /**

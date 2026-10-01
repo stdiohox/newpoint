@@ -7,8 +7,8 @@ import { FeaturedServices } from '@/components/sections/FeaturedServices';
 import { Faq } from '@/components/sections/Faq';
 import { ContactCrisis } from '@/components/sections/ContactCrisis';
 import { JsonLd } from '@/components/JsonLd';
-import { medicalClinicSchema, providersSchema, serviceSchemaFor, faqSchema } from '@/lib/schema';
-import { FAQ, SERVICE_PAGES } from '@/lib/content';
+import { medicalClinicSchema, providersSchema, serviceSchemaFor } from '@/lib/schema';
+import { SERVICE_PAGES } from '@/lib/content';
 
 /**
  * Seven sections, seven distinct layout families. No two consecutive sections
@@ -51,7 +51,10 @@ export default function Home() {
     medicalClinicSchema(),
     ...providersSchema(),
     ...SERVICE_PAGES.map(serviceSchemaFor),
-    faqSchema(FAQ.groups),
+    /* NO faqSchema HERE. The FAQPage node moved to /faq with the full set of
+       questions; this page now shows only a four-question preview, and two
+       documents emitting the same eight questions would compete for one rich
+       result. See components/sections/Faq.tsx. */
   ];
 
   return (
