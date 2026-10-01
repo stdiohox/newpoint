@@ -178,9 +178,11 @@ export function PageHero({
   /**
    * Whether the hero carries the appointment button.
    *
-   * Defaults to true, so the five other routes that use this header are
-   * untouched. /services/psychiatric-evaluation passes false: the client asked
-   * for that button to come off that page on 2026-09-30.
+   * Defaults to true, so the routes that do not pass it are untouched. The
+   * callers that pass false are the three service pages (through
+   * `hideHeroCta`), both provider pages, /providers, /faq, /contact and
+   * /insurance: the client asked for that button to come off each of them
+   * in turn, starting with /services/psychiatric-evaluation on 2026-09-30.
    *
    * THE PAGE STILL HAS AN APPOINTMENT ROUTE, which is what makes this safe to
    * honour rather than a conversion path quietly deleted. Three remain: the
