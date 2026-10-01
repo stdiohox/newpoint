@@ -1,11 +1,12 @@
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
 import { PageHero } from '@/components/PageHero';
-import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
+import { PageCta } from '@/components/sections/PageCta';
+import { ExpectCards } from '@/components/sections/ExpectCards';
+import { StepsBento } from '@/components/sections/StepsBento';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
-import { stagger } from '@/lib/motion';
-import { GETTING_STARTED, NEW_PATIENTS_PAGE, cardPosterFor } from '@/lib/content';
+import { GETTING_STARTED, NEW_PATIENTS_PAGE } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef } from '@/lib/schema';
 
@@ -23,9 +24,31 @@ export const metadata = pageMetadata({
   path: '/new-patients',
 });
 
-export default function NewPatientsPage() {
-  const poster = cardPosterFor('/new-patients');
+/**
+ * The hero photograph, replacing the homepage card's video poster.
+ *
+ * Described rather than decorative: written off the frame, not from the page.
+ *
+ * NO objectPosition. At 1440 and 1024 the hero box is wider than this master's
+ * 1.79:1, so object-cover scales by width, the horizontal overflow is 0 and an
+ * X value would be inert there; the default vertical centre keeps her and the
+ * side table both in frame. Below lg the box is taller and the centred window
+ * holds the wall she is sitting against, which is where the copy goes.
+ */
+const HERO_IMAGE = {
+  src: '/images/new-patients/new-patients-hero-2400.webp',
+  alt: 'A woman sitting in a green armchair at home, smiling at the phone in her hands, with a fiddle-leaf fig and a mug on a small wooden table beside her against a plain wall.',
+  /* 100vw describes the BOX; below lg object-cover scales this by height and
+     draws it wider than the viewport. 1024 rather than the measured maximum,
+     for the reason the insurance and assessment heroes record: it lands a DPR
+     2 device on the 2048 candidate instead of the 3840 one. */
+  sizes: '(min-width: 1024px) 100vw, 1024px',
+  /* 82, as on the other downscaled masters: the resampling dominates, not the
+     encoder setting. */
+  quality: 82,
+};
 
+export default function NewPatientsPage() {
   return (
     <>
       <JsonLd
@@ -38,81 +61,75 @@ export default function NewPatientsPage() {
         <PageHero
           title={NEW_PATIENTS_PAGE.title}
           intro={NEW_PATIENTS_PAGE.intro}
-          image={poster ? { src: poster } : undefined}
+          image={HERO_IMAGE}
+          /* Centred between the navbar and the hero's bottom edge — `center`
+             centres on the area BELOW the nav, not on the header box, because
+             the header pulls itself up by --nav-h so the photograph runs
+             behind the sticky bar. */
+          align="center"
+          /* Centred horizontally from lg, left-aligned below it, as on the
+             service and provider pages. The CTA centres with the copy: see
+             PageHero's `showCta` block, which wraps it in lg:justify-center
+             whenever copyAlign is center. */
+          copyAlign="center"
+          /**
+           * scrim="hero" with copyAlign="center" — the service pages' overlay,
+           * unchanged.
+           *
+           * THE STRONGEST VERTICAL EDGE IS NOWHERE NEAR THE HEADLINE. Sampling
+           * mean |dI/dx| down each column of the master, the largest steps are
+           * at x 3.2% and x 8.9% (the fig's leaves and its pot against the
+           * wall) and x 79.7% (her hair against the wall). Through x 20-55%
+           * the frame is flat wall and the quietest part of the picture, which
+           * is exactly where a centred heading lands.
+           *
+           * At 1440 and 1024 the box is wider than the image's 1.79:1, so the
+           * whole width maps across and those three land at css x 46/128/1148
+           * and x 33/91/816, against headlines that run 421-1020 and 247-777.
+           * Below lg the crop is a centred window — 30.5%-69.5% of the source
+           * at 390, 35.5%-64.5% at 320 — and all three are outside it. The
+           * strongest edge anywhere inside that window measures 0.45 against
+           * 33.1 for the frame's strongest: flat wall, not an edge.
+           *
+           * GLYPH-CORE CONTRAST, white text, worst backdrop pixel under a
+           * glyph, measured on the rendered page — THE HEADING PASSES
+           * EVERYWHERE AND THE INTRO MISSES AT THE TWO DESKTOP WIDTHS:
+           *
+           *   1440  h1 3.55:1 PASS (floor 3)   intro 4.07:1 (floor 4.5)
+           *   1024  h1 3.51:1 PASS             intro 4.07:1 (floor 4.5)
+           *    390  h1 4.86:1 PASS             intro 5.01:1 PASS
+           *    320  h1 4.26:1 PASS             intro 4.72:1 PASS
+           *
+           * NOT FIXED HERE: the overlay was specified as the service pages',
+           * and /insurance records the identical failure on an identically
+           * bright wall. The measured minimum is +0.11 flat alpha over the
+           * frame — the `hero` scrim's 0.10 tint to 0.21 — which puts the
+           * intro at 4.51:1 and 4.52:1. +0.10 is not enough (4.46/4.47). That
+           * is a new overlay value and would move the service pages with it
+           * unless it becomes a separate scrim, so it needs asking for.
+           *
+           * THIS IS NOW THE SECOND PAGE WITH THE SAME RESULT. The pattern is
+           * the frame, not the page: a bright, evenly-lit wall behind centred
+           * copy is exactly what this scrim's radial is too light for.
+           */
+          scrim="hero"
         />
 
         <div className="py-20 md:py-28">
           <Container>
-            <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-              <div className="md:col-span-4">
-                <Reveal>
-                  <h2 className="text-h2">The three steps</h2>
-                </Reveal>
-                <Reveal delay={0.08}>
-                  <p className="text-body text-np-neutral-600 mt-4 max-w-[36ch]">
-                    {GETTING_STARTED.body}
-                  </p>
-                </Reveal>
-              </div>
+            {/* THE COPY IS VERBATIM AND IT IS THE SAME COPY AS BEFORE. "The
+                three steps" was already hard-coded here; GETTING_STARTED.body
+                is the intro it already carried. Only the arrangement changed:
+                the heading column became a section header, and the three
+                bordered rows became the bento. */}
+            <StepsBento
+              heading="The three steps"
+              intro={GETTING_STARTED.body}
+              steps={GETTING_STARTED.steps}
+            />
 
-              {/* role="list" is not redundant, exactly as Providers.tsx and
-                  WhatToExpect.tsx document for their own lists: Tailwind
-                  Preflight sets list-style: none, and WebKit then drops the
-                  list role entirely. That bites hardest here, because the
-                  numerals below are aria-hidden: without this, a VoiceOver
-                  reader gets neither "list, 3 items" nor the numeral, and the
-                  sequence this section exists to convey disappears. */}
-              <ol role="list" className="md:col-span-8">
-                {GETTING_STARTED.steps.map((step, i) => (
-                  <Reveal as="li" key={step.title} delay={stagger(i, 0.08)}>
-                    <div className="border-np-neutral-300 flex gap-6 border-b py-7 first:pt-0 last:border-b-0 last:pb-0">
-                      {/* np-blue-600, matching the numerals in WhatToExpect.tsx
-                          on the homepage, for the reason that section's own
-                          comment sets out. This was np-amber-500 (#e9a93c),
-                          which on this page's --color-np-neutral-50 ground
-                          (#fbfaf8) measures 1.97:1. That is below even the 3:1
-                          floor for large text, and text-h3 renders here at 22px
-                          / weight 550, so the numeral does not qualify as large
-                          text anyway (the exemption wants 24px, or 18.66px at
-                          700). aria-hidden is not a defence: it stops a screen
-                          reader reading the position twice, since the <ol>
-                          already conveys it, but a sighted low-vision reader
-                          has nothing else marking the sequence, so the glyph is
-                          informative and 1.4.3 applies. blue-600 measures
-                          8.47:1 on the same ground. */}
-                      <span
-                        aria-hidden="true"
-                        className="font-display text-h3 text-np-blue-600 tabular-nums"
-                      >
-                        {i + 1}
-                      </span>
-                      <div>
-                        <h3 className="text-h3">{step.title}</h3>
-                        <p className="text-body text-np-neutral-600 mt-2 max-w-[58ch]">
-                          {step.body}
-                        </p>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </ol>
-            </div>
-
-            <div className="border-np-neutral-200 mt-20 border-t pt-12">
-              <Reveal>
-                <h2 className="text-h2 max-w-[22ch]">What to expect</h2>
-              </Reveal>
-              {/* Same Preflight/WebKit list-role fix as the <ol> above. */}
-              <ul role="list" className="mt-10 grid gap-8 md:grid-cols-3">
-                {NEW_PATIENTS_PAGE.expectations.map((item, i) => (
-                  <Reveal as="li" key={item.heading} delay={stagger(i, 0.08)}>
-                    <div className="border-np-neutral-300 border-t pt-6">
-                      <h3 className="text-h3">{item.heading}</h3>
-                      <p className="text-body text-np-neutral-600 mt-3">{item.body}</p>
-                    </div>
-                  </Reveal>
-                ))}
-              </ul>
+            <div className="mt-20">
+              <ExpectCards heading="What to expect" items={NEW_PATIENTS_PAGE.expectations} />
               {/* CLIENT: no "what to bring" checklist is published anywhere and
                   none is invented here. Confirm what the practice actually asks
                   new patients to have ready and it becomes a section. */}
@@ -157,32 +174,11 @@ export default function NewPatientsPage() {
           </Container>
         </div>
 
-        <RelatedLinks
-          links={[
-            {
-              label: 'Psychiatric assessment',
-              description: 'Your first appointment, described step by step.',
-              href: '/services/psychiatric-evaluation',
-            },
-            {
-              label: 'Insurance and payment',
-              description: 'The plans we accept and the sliding scale for self-pay patients.',
-              href: '/insurance',
-            },
-            {
-              label: 'Telehealth',
-              description: 'Video appointments on an expanded schedule, in both states.',
-              href: '/services/telehealth',
-            },
-            {
-              label: 'Medication management',
-              description:
-                'Ongoing prescribing and review, tracked with standardized rating scales.',
-              href: '/services/medication-management',
-            },
-          ]}
-        />
-
+        {/* NO "Keep reading" HERE. Removed at the client's instruction on
+            2026-10-01, as on the service pages, /providers, /faq, /contact and
+            /insurance before it. Every link it carried is in the navbar and in
+            the footer; PageCta below still carries the appointment route. Do
+            not re-add it — flag the conflict instead. */}
         <PageCta heading="Take the first step" />
       </main>
       <Footer />
