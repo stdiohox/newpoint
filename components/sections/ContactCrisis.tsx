@@ -3,7 +3,7 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { OnboardingForm } from '@/components/ui/onboarding-form';
-import { CONTACT, BUSINESS } from '@/lib/content';
+import { CONTACT, BUSINESS, DELIVERY_LINE } from '@/lib/content';
 
 /**
  * Layout family: contained form beside a crisis panel.
@@ -95,7 +95,7 @@ export function ContactCrisis() {
                       end of this column the line was breaking after "in-",
                       which leaves a dangling prefix mid-sentence. */}
                   <p className="text-small text-np-neutral-600">
-                    Telehealth across {BUSINESS.serviceArea.join(' and ')}, and in‑person care.
+                    {DELIVERY_LINE}.
                   </p>
                 </div>
               </div>

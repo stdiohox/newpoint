@@ -43,7 +43,7 @@ import { PROVIDERS } from '@/lib/content';
  */
 const CARD_SENTENCE: Record<string, string> = {
   'funmilayo-whitaker':
-    'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over ten years of direct patient care experience.',
+    'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 15 years of direct patient care experience.',
   'anastasia-ofoegbu':
     'I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction.',
 };
@@ -256,7 +256,7 @@ export function Providers() {
           <Reveal delay={0.08}>
             <p className="text-body-l mx-auto mt-4 max-w-[720px] text-center text-white/85">
               Not a directory, and not a rotating roster. Both hold a Doctor of Nursing Practice and
-              are dual-certified in psychiatric mental health and family practice.
+              are dual board-certified in psychiatric mental health and family practice.
             </p>
           </Reveal>
 

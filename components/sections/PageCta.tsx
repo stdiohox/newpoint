@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
-import { BUSINESS, CTA } from '@/lib/content';
+import { BUSINESS, CTA, DELIVERY_LINE } from '@/lib/content';
 
 /**
  * Two things a patient wants to know at the moment of deciding to make contact,
@@ -29,7 +29,7 @@ import { BUSINESS, CTA } from '@/lib/content';
  */
 const assurances = [
   { icon: ShieldCheck, label: 'No health details needed' },
-  { icon: MapPin, label: 'Telehealth in New Jersey and Pennsylvania' },
+  { icon: MapPin, label: DELIVERY_LINE },
 ];
 
 /**
@@ -259,7 +259,7 @@ export function PageCta({
               an edge rather than dissolving the chip into the panel. */}
             <Reveal delay={0.06}>
               <Badge className="bg-np-surface text-np-blue-700 mt-6 border-transparent">
-                In person or by telehealth
+                {DELIVERY_LINE}
               </Badge>
             </Reveal>
 

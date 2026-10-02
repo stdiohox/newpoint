@@ -214,6 +214,27 @@ So: state telehealth across both states freely. State in-person care **without a
 it to a state**, until the client confirms where. Writing "in person across New Jersey and
 Pennsylvania" sends a PA patient to a location that is not known to exist.
 
+> **SUPERSEDED, 2026-10-02 — THE CLIENT ATTACHED BOTH STATES TO BOTH MODES.** The rule in
+> the paragraph above is no longer what the site does. The client confirmed this delivery
+> line and asked for it wherever the site summarises how and where care is delivered:
+>
+> > **In person or telehealth services across New Jersey and Pennsylvania**
+>
+> It lives in one place, `DELIVERY_LINE` in `lib/content.ts`, and feeds the footer, the
+> closing CTA band's pill and meta row, the contact page intro, the appointment form, the
+> assessment page's modality label, both JSON-LD descriptions and the provider pages.
+> **Edit that constant, not the call sites.**
+>
+> **What this means for the restriction above:** it is lifted, by client decision, for this
+> sentence. The evidence did not change — the Pennsylvania signal is still one platform,
+> one provider, and the street address is still unconfirmed — so the two open rows in the
+> table remain open and `OPEN_CLIENT_ITEMS` still carries them. What changed is who is
+> making the claim: the practice is, in writing.
+>
+> **Do not "fix" this back.** A reviewer who flags "in person" beside two state names is
+> applying the paragraph above, which this note supersedes. Flag the conflict here instead,
+> as the service-furniture rule asks.
+
 > **Update, 2026-09-29 — the rule above still stands, but its premise has weakened.**
 > [`research/provider-directories.md`](research/provider-directories.md) captures the
 > providers' own third-party listings. Three platforms independently give the NJ address as

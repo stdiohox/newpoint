@@ -8,7 +8,7 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { TeamMemberCard } from '@/components/ui/TeamMemberCard';
 import { stagger } from '@/lib/motion';
-import { PROVIDERS, SERVICE_PAGES, BUSINESS } from '@/lib/content';
+import { PROVIDERS, SERVICE_PAGES, BUSINESS, DELIVERY_LINE } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef, personSchemaFor } from '@/lib/schema';
 
@@ -338,9 +338,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                         Naming the practice keeps the sentence true on both
                         pages. */}
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
-                      {provider.name.split(' ')[0]} sees patients across{' '}
-                      {BUSINESS.serviceArea.join(' and ')} by telehealth, and in person. New
-                      patients at {BUSINESS.shortName} start with a comprehensive psychiatric
+                      {provider.name.split(' ')[0]} sees patients at {BUSINESS.shortName}.{' '}
+                      {DELIVERY_LINE}. New patients start with a comprehensive psychiatric
                       assessment; care continues as medication management on a schedule agreed with
                       you.
                     </p>
