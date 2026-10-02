@@ -105,6 +105,29 @@ const variants = {
    */
   onInkQuiet:
     'bg-transparent text-white ring-1 ring-white/50 hover:bg-[var(--np-alpha-white-14)] focus-visible:outline-white',
+  /**
+   * THE GLASS PAIR, for a button sitting on a photograph rather than on a flat
+   * panel. Both carry `.liquid-glass` — the same hero material, unchanged: a
+   * 4px backdrop blur, the masked gradient edge, the inset highlight — and
+   * differ only in the tint class that overrides its fill. See the note beside
+   * those two classes in globals.css for why the tint cannot be a `bg-*`
+   * utility here.
+   *
+   * NO `bg-*`, NO `hover:bg-*` ON THESE VARIANTS, for the same reason: a
+   * Tailwind background utility is in a layer that `.liquid-glass` outranks,
+   * so writing one would look deliberate and do nothing. The hover brightening
+   * lives with the tint.
+   *
+   * White text on both, and the focus ring is white: `outline-offset` draws
+   * the ring onto the ground behind the button, which here is a dusk
+   * photograph under a navy wash — a dark ring would disappear into it. The
+   * measured figures for both labels and both rings are recorded at the call
+   * site in components/sections/PageCta.tsx.
+   *
+   * `rounded-pill` already comes from `base`; it is not repeated here.
+   */
+  onInkGlass: 'liquid-glass liquid-glass-bright text-white focus-visible:outline-white',
+  onInkGlassQuiet: 'liquid-glass liquid-glass-quiet text-white focus-visible:outline-white',
 };
 
 const discSizes = {

@@ -309,32 +309,6 @@
   }
 }
 
-/* Honour a request for less transparency: swap the glass for a solid ink panel
-   and drop the blur. No WCAG criterion covers this yet, but the material is
-   heavy and the preference exists precisely for people who cannot read through
-   it. forced-colors gets the same treatment, since backdrop-filter and the
-   masked gradient edge are stripped there anyway. */
-@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
-  .liquid-glass {
-    background: var(--color-np-ink);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: 1px solid var(--color-np-neutral-400);
-  }
-  .liquid-glass::before {
-    display: none;
-  }
-  /* Same policy, light ground. The contact form card is white/70 over the
-     section's blue-50 → white gradient, so its opaque fallback is the surface
-     white rather than ink, and its border goes to a token that actually reads
-     against that fill once the blur is gone. */
-  .glass-card {
-    background: var(--color-np-surface);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-color: var(--color-np-neutral-300);
-  }
-}
 
 /* ---------------------------------------------------------------------------
    Hero glass material. Verbatim from the hero spec. This is a web glassmorphism
@@ -374,4 +348,130 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   TWO TINTS OF THE SAME GLASS, for the pair of buttons in the closing CTA
+   band. Everything else — the 4px blur, the masked gradient edge, the inset
+   highlight — comes from .liquid-glass above and is untouched; these override
+   one property.
+
+   THEY ARE CLASSES HERE RATHER THAN TAILWIND UTILITIES ON THE ELEMENT, and
+   that is not a preference. `.liquid-glass` is unlayered CSS, and in Tailwind
+   v4 utilities live in `@layer utilities`; unlayered rules beat layered ones
+   whatever the specificity, so `bg-white/20` on the element loses to
+   `.liquid-glass`'s own `background` and the button would render with the
+   glass's default near-black fill. An unlayered override declared after it is
+   the one thing that reliably wins.
+
+   The two alphas are the hierarchy: the appointment button is the brighter
+   object, the phone button the quieter one, and both sit over the same
+   photograph so the difference stays legible wherever the band falls on it.
+
+   0.12 AND 0.05, NOT THE 0.20 AND 0.10 THE BRIEF SUGGESTED, AND THE NUMBERS
+   ARE MEASURED. White text over white glass over a photograph is the one
+   combination where brightening the button darkens the contrast, and the
+   worst case is 390: the panel there is 358x712, so object-cover scales the
+   1.79:1 frame by height and the bright horizon lands behind the buttons.
+   Glyph-core measurements of the appointment label at 390, against a 4.5:1
+   floor, with the band overlay at 0.86:
+
+     white/0.20  3.39:1      white/0.16  3.76:1      white/0.14  4.34:1
+     white/0.12  4.91:1      white/0.10  5.21:1
+
+   0.12 is the brightest tint that clears the floor with a margin rather than
+   on the rounding. The quieter button at 0.05 measures HIGHER (7.01:1),
+   because less white over it means more of the navy wash, and the wash is
+   darker than the glass — the hierarchy here is carried by the tint, not by
+   contrast.
+   --------------------------------------------------------------------------- */
+.liquid-glass-bright {
+  background: rgba(255, 255, 255, 0.12);
+}
+.liquid-glass-quiet {
+  background: rgba(255, 255, 255, 0.05);
+}
+/* HOVER BRIGHTENS THE EDGE MORE THAN THE FILL, which is not a stylistic
+   preference. A fill-only hover big enough to see — 0.12 to 0.17 — drops the
+   appointment label to 4.28:1 at 390 and fails on hover, which SC 1.4.3 does
+   not exempt. Lifting the inset ring instead reads as the same brightening and
+   costs nothing: a 1px inset highlight sits on the button's edge, where no
+   glyph is. Measured on hover: 5.10:1 at 1440 and 4.62:1 at 390 for the
+   appointment label, 6.28:1 and 6.55:1 for the phone.
+
+   Not in a `@media (hover: hover)` guard: a touch device never matches :hover
+   in the first place. */
+.liquid-glass-bright:hover {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+.liquid-glass-quiet:hover {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+/* ---------------------------------------------------------------------------
+   Honour a request for less transparency: swap the glass for a solid ink panel
+   and drop the blur. No WCAG criterion covers this yet, but the material is
+   heavy and the preference exists precisely for people who cannot read through
+   it. forced-colors gets the same treatment, since backdrop-filter and the
+   masked gradient edge are stripped there anyway.
+
+   IT SITS AT THE FOOT OF THE FILE, AFTER EVERY GLASS RULE, AND THAT POSITION IS
+   THE WHOLE REASON IT WORKS. It used to sit ABOVE them. All of these rules are
+   unlayered and single-class, so they have identical specificity and the last
+   one wins — which meant this block lost to `.liquid-glass` and the fallback
+   never applied at all. Verified in the browser before the move: with
+   forced-colors emulated, the CTA band's buttons still computed
+   `rgba(255,255,255,0.12)` with `blur(4px)` and `border: 0px none`. A reader
+   who had asked for less transparency, or who runs Windows High Contrast, got
+   the full glass and no border.
+
+   Caught by a11y-architect, 2026-10-02. Do not move this block back up the
+   file, and add new glass rules ABOVE it, not below.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .liquid-glass {
+    background: var(--color-np-ink);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--color-np-neutral-400);
+  }
+  .liquid-glass::before {
+    display: none;
+  }
+  /* The two button tints fall back with it. Without this they would keep
+     painting white at 5-14% over the opaque ink fill, which is the one surface
+     a reader who asked for less transparency should not get: a washed-out
+     panel with no blur to justify it. Ink plus the neutral-400 border above is
+     the same opaque treatment the rest of the glass takes.
+
+     The hover selectors are listed so the hover state falls back too — it sets
+     both a background and a box-shadow, and in forced-colors a box-shadow is
+     dropped while the background would otherwise survive. */
+  .liquid-glass-bright,
+  .liquid-glass-quiet,
+  .liquid-glass-bright:hover,
+  .liquid-glass-quiet:hover {
+    background: var(--color-np-ink);
+  }
+  /* THE PRIMARY KEEPS AN EDGE THE SECONDARY DOES NOT, because the fallback
+     flattens the two tints into one fill and the pair would otherwise be two
+     identical pills. The label and the phone icon still distinguish them; this
+     is so the hierarchy survives as well as the meaning. */
+  .liquid-glass-bright {
+    border: 1px solid var(--color-np-surface);
+  }
+  /* THE CTA BAND'S PHOTOGRAPH IS HIDDEN, not merely veiled. In forced-colors
+     the panel's own background becomes Canvas and its text CanvasText, but an
+     <img> is still painted — so the heading, the body and the meta row would
+     end up as system-colour type over a dusk photograph, with the navy overlay
+     that makes them legible reduced to whatever the engine leaves of it. The
+     measured contrast figures in components/sections/PageCta.tsx hold only
+     while the photo and the overlay render as measured. Hiding it returns the
+     band to the flat forced-colors treatment the rest of the site gets.
+     Decorative, so nothing is lost with it. */
+  .cta-photo {
+    display: none;
+  }
 }
