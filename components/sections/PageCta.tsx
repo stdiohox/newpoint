@@ -12,17 +12,15 @@ import { BUSINESS, CTA, DELIVERY_LINE } from '@/lib/content';
  * and neither is a new claim. "No health details needed" restates the body copy
  * directly above it, which already asks people to keep health information out of
  * the form; saying it as a reassurance rather than an instruction is the point.
- * The states are the confirmed telehealth footprint, per CLAUDE.md's
- * care-modality note.
  *
- * THE SECOND LINE SAYS "Telehealth in", AND DROPPING THOSE TWO WORDS IS A
- * REGULATED MISTAKE, NOT A TRIM. It first read "New Jersey and Pennsylvania",
- * which sat a few lines under a badge saying "In person or by telehealth" and
- * let the pair be read as in-person care in both states. CLAUDE.md is explicit:
- * state telehealth across both states freely, but state in-person care WITHOUT
- * attaching it to a state until the client confirms where, because the only
- * place-level evidence anywhere is Lawrence Township, NJ. The naming is what
- * keeps a Pennsylvania reader from driving to an office nobody has confirmed.
+ * THE SECOND LINE IS NOW DELIVERY_LINE, the client's own sentence, and the
+ * long note that used to sit here is spent. It said that dropping "Telehealth
+ * in" from the front of "New Jersey and Pennsylvania" was a regulated mistake
+ * rather than a trim, because the pair could then be read as in-person care in
+ * both states — which is precisely the reading the client confirmed on
+ * 2026-10-02. Kept in outline rather than deleted, because it records WHY the
+ * old wording was shaped that way: see the SUPERSEDED block in CLAUDE.md, and
+ * do not restore "Telehealth in" without going through it.
  *
  * Deliberately NOT here: response times, availability, "accepting new patients".
  * All three are the kind of thing a reader would act on and none is sourced.

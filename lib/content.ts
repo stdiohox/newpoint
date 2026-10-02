@@ -144,7 +144,7 @@ export const HERO = {
  */
 export const PRACTICE_FACTS = [
   { fact: 'Two providers', detail: 'Both hold a Doctor of Nursing Practice' },
-  { fact: 'Dual-certified', detail: 'PMHNP-BC and FNP-BC, both providers' },
+  { fact: 'Dual board-certified', detail: 'PMHNP-BC and FNP-BC, both providers' },
   { fact: 'Two states', detail: 'Licensed in New Jersey and Pennsylvania' },
 ] as const;
 
@@ -426,17 +426,21 @@ export const INSURANCE = {
  *
  * NOTHING HERE IS NEW. `description` is the sentence the old footer already
  * carried, lifted out of the component so the copy lives where the rest of it
- * does. `modality` restates the care-modality rule verbatim, the same way
- * SERVICE_PAGES' telehealth `modality` does. No claim on this surface is made
- * that is not already made on a page.
+ * does. `modality` is DELIVERY_LINE, the client's own delivery sentence, which
+ * SUPERSEDES the care-modality rule this note used to say it restated. No
+ * claim on this surface is made that is not already made on a page.
  *
  * CLIENT: still no street address and still no hours, so the footer carries
  * neither. Geography stays service-area only. Add a PostalAddress here and in
  * lib/schema.ts together, once one is confirmed.
  */
 export const FOOTER = {
-  description:
-    'Outpatient psychiatric and behavioral health care. In person or telehealth services across New Jersey and Pennsylvania.',
+  /* INTERPOLATED, NOT COPIED. This held the delivery sentence as a literal for
+     one commit, which is exactly the drift DELIVERY_LINE exists to prevent —
+     the constant's own note says editing it changes nine surfaces at once, and
+     a hardcoded tenth would have gone stale on the first edit. Caught by
+     healthcare-reviewer. */
+  description: `Outpatient psychiatric and behavioral health care. ${DELIVERY_LINE}.`,
   /**
    * THE CLIENT'S DELIVERY LINE, VERBATIM, CONFIRMED 2026-10-02. The same
    * sentence now carries every practice-level statement of how and where care
@@ -2488,7 +2492,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Which states in-person care covers. A SECOND ADDRESS HAS SURFACED: Headway lists 803 West Trenton Avenue Ste 3, Morrisville, PA 19067 for Whitaker as "Location 1 of 2". This is the first Pennsylvania place-level signal in any Newpoint research and would relax CLAUDE.md\'s rule that in-person care is stated without a state. One platform, one provider, unconfirmed — it may be a Headway location rather than a Newpoint office',
   'State nursing license numbers for both providers, or confirmation they prefer not to publish them. CANDIDATES for Whitaker: NJ 26NJ00646400 (APN) and PA SP016195 (CRNP), per Grow Therapy and Headway. Note the two states use different regulatory titles for the same role — APN in New Jersey, CRNP in Pennsylvania — so publish each number with the right one. NOTHING FOUND FOR OFOEGBU IN EITHER STATE: the client confirmed on 2026-09-29 that she holds both, but no number for her appears on any directory, so both of hers have to come from the practice',
   'NPI numbers for both providers, or confirmation they prefer not to publish them. CANDIDATE for Whitaker: 1760719512, per U.S. News. Nothing found for Ofoegbu',
-  'Certifying body for the "board-certified" claim (the post-nominals imply one, but it is not stated anywhere and must not be assumed)',
+  'PRE-LAUNCH — CERTIFYING BODY for the "board-certified" claim. The post-nominals imply one (PMHNP-BC and FNP-BC both expand to Board Certified) but no body is named anywhere in the source material and none is assumed here, which is why `hasCredential` stays out of the JSON-LD. RAISED TO PRE-LAUNCH ON 2026-10-02, when the client changed every "dual-certified" to "dual board-certified": the claim now ships in both providers\' bios, in the FAQ answer, on the homepage, and inside `description` on both Person nodes. The repo escalates an open item when the claim it guards starts shipping — the nine payers and the ADHD prescribing line were both raised on that trigger. Ask the practice to name the body (ANCC is the expected answer for both certifications, and expected is not confirmed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
   'PRE-LAUNCH — AGES SERVED. Confirmed age range (adults only, or across the lifespan as a practice policy). Headway lists CHILDREN AND ADOLESCENTS for Dr. Whitaker, which is the strongest paediatric signal in any Newpoint source and the reason this cannot wait: the site now names ADHD under "Conditions we prescribe for", and a parent reading that has nothing on the page telling them whether their child can be seen. STILL OPEN, AND THE EVIDENCE CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
   'Whether substance use and addiction treatment is an active service line. THE DIRECTORIES SAY YES: Grow lists addiction for Whitaker, and Headway lists "Substance use / addiction" as Ofoegbu\'s FIRST specialty. Her existing bio already says her last 11 years were in mental health and addiction. This also bears on the new "Mental and behavioral care" hero — in US payer language behavioral health includes SUD, so the headline already implies a door the conditions list does not open',

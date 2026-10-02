@@ -235,6 +235,10 @@ Pennsylvania" sends a PA patient to a location that is not known to exist.
 > applying the paragraph above, which this note supersedes. Flag the conflict here instead,
 > as the service-furniture rule asks.
 
+> **HISTORICAL, 2026-09-29. Read the SUPERSEDED block above first — this note predates it
+> and its instruction has been overtaken.** It is kept because its evidence is still the
+> evidence, and because the licensure question it closes is still closed.
+>
 > **Update, 2026-09-29 — the rule above still stands, but its premise has weakened.**
 > [`research/provider-directories.md`](research/provider-directories.md) captures the
 > providers' own third-party listings. Three platforms independently give the NJ address as
@@ -248,6 +252,13 @@ Pennsylvania" sends a PA patient to a location that is not known to exist.
 > **Do not relax the rule on that alone.** One platform, one provider, and it may be a
 > Headway location rather than a Newpoint office. Get the client to confirm, then this
 > restriction can be lifted and the site can claim in-person care in both states.
+>
+> **WHAT ACTUALLY HAPPENED, 2026-10-02:** the client lifted it themselves, by confirming
+> the delivery line, without the Pennsylvania office being confirmed. So the sentence
+> immediately above is spent: the copy restriction is gone and is not coming back on this
+> evidence. The two open rows in the table — which states in-person covers, and the street
+> address — survive as **evidence gaps behind a published claim**, which is a sharper thing
+> than they were when they were gaps behind a hedge. They stay in `OPEN_CLIENT_ITEMS`.
 >
 > **A licensure question that file raised is now closed.** Headway's structured licensure
 > field gives Ofoegbu **New Jersey only**, which put the site's two-state claim for her in

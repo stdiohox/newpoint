@@ -91,9 +91,11 @@ export function ContactCrisis() {
                       {BUSINESS.phonePrimary}
                     </a>
                   </p>
-                  {/* U+2011 non-breaking hyphen in "in-person": at the narrow
-                      end of this column the line was breaking after "in-",
-                      which leaves a dangling prefix mid-sentence. */}
+                  {/* DELIVERY_LINE, the client's delivery sentence, since
+                      2026-10-02. The U+2011 non-breaking hyphen this line used
+                      to carry went with the old wording: it stopped "in-person"
+                      breaking after the hyphen at the narrow end of this
+                      column, and the client's line has no hyphen in it. */}
                   <p className="text-small text-np-neutral-600">
                     {DELIVERY_LINE}.
                   </p>

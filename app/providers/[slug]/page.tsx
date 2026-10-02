@@ -361,10 +361,16 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                   </Reveal>
                 </div>
 
-                {/* CLIENT: "board-certified" is claimed in the practice's own ad
-                    copy, but no certifying body is named anywhere on the live
-                    site. The post-nominals imply one and it must not be assumed,
-                    so no certification statement appears on this page. */}
+                {/* CLIENT: no certifying body is named anywhere, and the
+                    post-nominals imply one that must not be assumed — which is
+                    why `hasCredential` stays out of the JSON-LD.
+                    THIS PAGE DOES CARRY A CERTIFICATION STATEMENT, as of
+                    2026-10-02: the editorial card renders bio[0], which opens
+                    "I am a dual board-certified…". The claim is the practice's
+                    own and predates this site (research/people-trust.md,
+                    research/content/home.md); the body behind it is still
+                    unnamed, which is now an open item rather than a thing this
+                    page avoids saying. */}
               </div>
             </div>
           </Container>

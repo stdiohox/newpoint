@@ -203,8 +203,8 @@ export function personSchemaFor(p: Provider) {
     knowsAbout: p.treats,
     /* Omitted entirely where the provider has no structured languages, rather
        than emitted empty: an absent property says nothing, and `[]` says "no
-       languages", which is false for both of them. Only Dr. Whitaker carries
-       the field today — see the note on Provider.knowsLanguage.
+       languages", which is false for both of them. Both providers carry the
+       field since 2026-10-02 — see the note on Provider.knowsLanguage.
 
        PLAIN NAMES, AND SCHEMA.ORG WOULD RATHER HAVE BCP-47. Its definition of
        `knowsLanguage` asks for a Language object or an IETF tag; consumers
