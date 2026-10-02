@@ -126,7 +126,11 @@ const variants = {
    *
    * `rounded-pill` already comes from `base`; it is not repeated here.
    */
-  onInkGlass: 'liquid-glass liquid-glass-bright text-white focus-visible:outline-white',
+  /* font-semibold, against base's font-medium: the second half of the
+     hierarchy fix. The weight is the cue that survives when the 1px edge is
+     the thing a low-vision reader cannot resolve, and a heavier glyph also
+     puts more pixels at full white, which the contrast sampling rewards. */
+  onInkGlass: 'liquid-glass liquid-glass-bright font-semibold text-white focus-visible:outline-white',
   onInkGlassQuiet: 'liquid-glass liquid-glass-quiet text-white focus-visible:outline-white',
 };
 

@@ -374,7 +374,10 @@
    worst case is 390: the panel there is 358x712, so object-cover scales the
    1.79:1 frame by height and the bright horizon lands behind the buttons.
    Glyph-core measurements of the appointment label at 390, against a 4.5:1
-   floor, with the band overlay at 0.86:
+   floor, measured against the band overlay as it was that day — one flat 0.86
+   layer. The overlay has since become a 0.45 veil plus a 0.68 core behind the
+   copy, which is why the current figure for this tint is 4.90:1 rather than
+   4.91:1; the ordering these numbers establish is what matters here:
 
      white/0.20  3.39:1      white/0.16  3.76:1      white/0.14  4.34:1
      white/0.12  4.91:1      white/0.10  5.21:1
@@ -387,6 +390,17 @@
    --------------------------------------------------------------------------- */
 .liquid-glass-bright {
   background: rgba(255, 255, 255, 0.12);
+  /* THE PERMANENT EDGE IS THE HIERARCHY, NOT THE TINT. a11y-architect's note on
+     the first version: seven alpha points apart, over a photograph whose own
+     luminance varies more than that, two white labels on two pills of the same
+     size is a weak primary/secondary signal for anyone with low contrast
+     sensitivity. A visible edge on one of them is a cue that does not depend on
+     reading the backdrop.
+
+     IT HAS TO BE DECLARED HERE, NOT AS A TAILWIND `border-*` UTILITY. The base
+     `.liquid-glass` sets `border: none` and is unlayered, so it outranks any
+     utility the element carries — the same trap recorded above for the fill. */
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 .liquid-glass-quiet {
   background: rgba(255, 255, 255, 0.05);
@@ -455,12 +469,18 @@
   .liquid-glass-quiet:hover {
     background: var(--color-np-ink);
   }
-  /* THE PRIMARY KEEPS AN EDGE THE SECONDARY DOES NOT, because the fallback
+  /* THE PRIMARY KEEPS A HEAVIER EDGE THAN THE SECONDARY, because the fallback
      flattens the two tints into one fill and the pair would otherwise be two
-     identical pills. The label and the phone icon still distinguish them; this
-     is so the hierarchy survives as well as the meaning. */
+     identical pills.
+
+     2px, NOT A DIFFERENT COLOUR. In forced-colors the engine repaints every
+     border colour with a system colour, so a white border and a neutral-400
+     one come out identical — the first version of this rule set a colour and
+     a11y-architect pointed out that it therefore distinguished nothing.
+     WIDTH survives forced-colors; colour does not. The label and the phone
+     icon still carry the meaning either way. */
   .liquid-glass-bright {
-    border: 1px solid var(--color-np-surface);
+    border-width: 2px;
   }
   /* THE CTA BAND'S PHOTOGRAPH IS HIDDEN, not merely veiled. In forced-colors
      the panel's own background becomes Canvas and its text CanvasText, but an
@@ -471,7 +491,16 @@
      while the photo and the overlay render as measured. Hiding it returns the
      band to the flat forced-colors treatment the rest of the site gets.
      Decorative, so nothing is lost with it. */
-  .cta-photo {
+  .cta-photo,
+  /* THE TWO NAVY GRADIENT LAYERS GO WITH IT, and leaving them was a real
+     defect rather than a tidiness point. forced-colors repaints
+     `background-color` but leaves `background-image`, so both radials kept
+     painting after the photo was hidden: on a light Canvas that put CanvasText
+     over navy at a combined 0.82 alpha behind the copy — about 2.2:1, an
+     SC 1.4.3 failure in the one mode a reader chooses for contrast. Hiding
+     them returns the panel to Canvas with CanvasText on it, which is the flat
+     treatment forced-colors is for. Caught by a11y-architect, 2026-10-02. */
+  .cta-overlay {
     display: none;
   }
 }
