@@ -220,10 +220,23 @@ Pennsylvania" sends a PA patient to a location that is not known to exist.
 >
 > > **In person or telehealth services across New Jersey and Pennsylvania**
 >
-> It lives in one place, `DELIVERY_LINE` in `lib/content.ts`, and feeds the footer, the
-> closing CTA band's pill and meta row, the contact page intro, the appointment form, the
-> assessment page's modality label, both JSON-LD descriptions and the provider pages.
+> It lives in one place, `DELIVERY_LINE` in `lib/content.ts`. As of 2026-10-03 it feeds the
+> footer, the closing CTA band's **meta row**, the contact page's intro and its "Where we
+> see patients" paragraph, the appointment form, the assessment page's modality label, two
+> FAQ answers (which carry it into `FAQPage` JSON-LD), the `/services` hero, the
+> `/new-patients` expectation, both JSON-LD descriptions and the provider pages.
 > **Edit that constant, not the call sites.**
+>
+> The band's **pill** takes `DELIVERY_SHORT` — "In person or by telehealth" — because the
+> pill and the meta row sit about 300px apart and carried the same 66-character sentence
+> twice for a day. One statement per block: the pill says the mode, the meta row says the
+> mode and the states. The short form is a constant too, for the same reason the long one
+> is.
+>
+> **The schedule claim did not move with it.** "An expanded schedule including weekends,
+> evenings, and holidays by request" stays bound to **telehealth** everywhere it appears.
+> The client's decision was about where and how care is delivered, not when; hours remain an
+> open item.
 >
 > **What this means for the restriction above:** it is lifted, by client decision, for this
 > sentence. The evidence did not change — the Pennsylvania signal is still one platform,

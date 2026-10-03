@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { SERVICE_PAGES, WHAT_WE_TREAT, PROVIDERS, cardPosterFor } from '@/lib/content';
+import { SERVICE_PAGES, WHAT_WE_TREAT, PROVIDERS, cardPosterFor, DELIVERY_LINE } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef, serviceSchemaFor } from '@/lib/schema';
 
@@ -184,7 +184,15 @@ export default function ServicesIndex() {
             copy or the hero's height ever changes again. */}
         <PageHero
           title="What we do, and how it works"
-          intro="Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated — in person or by telehealth. Telehealth runs across New Jersey and Pennsylvania. Each of the three below is a page of its own."
+          /* THE DELIVERY SENTENCE IS DELIVERY_LINE SINCE 2026-10-03. It read
+             "— in person or by telehealth. Telehealth runs across New Jersey
+             and Pennsylvania.", which bound the states to telehealth and left
+             in-person attached to none: the construction the client superseded
+             on 2026-10-02. This page then printed the client's line twice
+             below it, as the assessment's "How it is delivered" row and in the
+             closing band, so the hero disagreed with its own page about
+             geography. Caught by healthcare-reviewer. */
+          intro={`Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated. ${DELIVERY_LINE}. Each of the three below is a page of its own.`}
           image={{
             src: '/images/services/services-consult-2752.webp',
             objectPosition: '70% 25%',

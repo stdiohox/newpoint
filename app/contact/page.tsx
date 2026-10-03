@@ -373,35 +373,27 @@ export default function ContactPage() {
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
                   {CONTACT_PAGE.areaNote}
                 </p>
-                {/* THE CHIPS ARE LABELLED "Telehealth", AND THE LABEL IS
-                    LOAD-BEARING. healthcare-reviewer raised this as a High:
-                    unlabelled, the column scans as a map pin, then "Where we
-                    see patients", then two state names — which reads as two
-                    places you can be seen IN PERSON. CLAUDE.md forbids exactly
-                    that inference: both providers are licensed in both states,
-                    but the only place-level evidence anywhere in /research is
-                    one New Jersey township, so in-person care is stated
-                    without a state and a Pennsylvania reader must not be sent
-                    to an office that is not known to exist.
+                {/* THE CHIPS ARE UNLABELLED AGAIN, AND THAT IS NOW THE
+                    CORRECT STATE. They carried a "Telehealth" scope label from
+                    2026-10-01, added as a healthcare-reviewer High: with the
+                    old areaNote binding the two states to telehealth and
+                    in-person to neither, two bare state names under a map pin
+                    and "Where we see patients" scanned as two places you could
+                    be seen in person — which the care-modality rule forbade
+                    inferring.
 
-                    areaNote says it correctly in prose — both states attached
-                    to telehealth, in-person attached to neither — but prose
-                    between the heading and the chips is not what a scanning
-                    reader reads. One word fixes the scan path, and it is the
-                    same word the sentence above already uses.
+                    The client superseded that rule on 2026-10-02 and rewrote
+                    areaNote above to say both modes across both states. The
+                    label was scoping the chips to one mode, so it now
+                    contradicts the sentence directly above it; the scan path
+                    it protected is the reading the practice has confirmed.
 
-                    The treatment is /insurance's scope labels, which this repo
-                    already uses to say what a run of chips is scoped to. */}
-                <p
-                  id="telehealth-states"
-                  className="text-caption text-np-neutral-600 mt-6 tracking-[0.08em] uppercase"
-                >
-                  Telehealth
-                </p>
+                    aria-label replaces the visible label, so the list still
+                    has a name for a screen reader without re-scoping it. */}
                 <ul
                   role="list"
-                  aria-labelledby="telehealth-states"
-                  className="mt-3 flex flex-wrap gap-2.5"
+                  aria-label="States served"
+                  className="mt-6 flex flex-wrap gap-2.5"
                 >
                   {BUSINESS.serviceArea.map((state) => (
                     <li

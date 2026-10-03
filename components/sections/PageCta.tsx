@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
-import { BUSINESS, CTA, DELIVERY_LINE } from '@/lib/content';
+import { BUSINESS, CTA, DELIVERY_LINE, DELIVERY_SHORT } from '@/lib/content';
 
 /**
  * Two things a patient wants to know at the moment of deciding to make contact,
@@ -249,6 +249,23 @@ export function PageCta({
               the modality is the thing a reader actually needs here and it is
               confirmed content.
 
+              THE PILL IS THE SHORT FORM AND THE META ROW BELOW IS THE LONG ONE,
+              reverted on 2026-10-03. Both carried DELIVERY_LINE for a day,
+              which put the same 66-character sentence twice in one band about
+              300px apart — flagged by both reviewers. One statement per block:
+              the pill says the mode, the meta row says the mode and the states.
+
+              rounded-2xl AND py-1 RATHER THAN THE SHARED PILL SHAPE, and that
+              is a wrap fix, not a style preference. a11y-architect measured the
+              long string at 200% text on 390 and 320: four or more lines inside
+              a `rounded-full` shape, whose radius is then half the pill height,
+              so the first and last lines' corners fall outside the white fill
+              and np-blue-700 text lands on navy. The short string does not wrap
+              at those sizes, but the band takes a per-page heading and nothing
+              stops a longer one arriving, so the shape is fixed here rather
+              than left to the next string. The shared Badge variant is
+              untouched — this is a call-site override.
+
               Kept as a white chip rather than made white-on-white with the rest
               of the copy: it is the one element that should read as a separate
               object. The chip is at least 9.79:1 against the panel and carries
@@ -256,8 +273,8 @@ export function PageCta({
               border width with a transparent colour, so forced-colors repaints
               an edge rather than dissolving the chip into the panel. */}
             <Reveal delay={0.06}>
-              <Badge className="bg-np-surface text-np-blue-700 mt-6 border-transparent">
-                {DELIVERY_LINE}
+              <Badge className="rounded-2xl bg-np-surface text-np-blue-700 mt-6 border-transparent py-1">
+                {DELIVERY_SHORT}
               </Badge>
             </Reveal>
 

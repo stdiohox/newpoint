@@ -320,12 +320,15 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <h2 className="text-h2">Appointments</h2>
                   </Reveal>
                   <Reveal delay={0.08}>
-                    {/* Telehealth is stated across both states, because both
-                        providers are licensed in both. In-person care is stated
-                        without a state: the only place-level evidence anywhere
-                        in /research is Lawrence Township, New Jersey, and there
-                        is no Pennsylvania location signal at all. The street
-                        address remains an open item — see OPEN_CLIENT_ITEMS. */}
+                    {/* DELIVERY_LINE, the client's own sentence, since
+                        2026-10-02. This note used to say in-person care is
+                        stated without a state because there is "no
+                        Pennsylvania location signal at all" — a rule CLAUDE.md
+                        has superseded, and a sentence the repo's own research
+                        has since contradicted (Headway lists a Morrisville, PA
+                        address for Dr. Whitaker). The street address is still
+                        an open item; what changed is that the practice, not
+                        this site, is making the geography claim. */}
                     {/* "New patients at Newpoint start with", practice-voiced,
                         NOT a second clause about this provider. Sitting under a
                         named clinician's photograph, "New patients start with a

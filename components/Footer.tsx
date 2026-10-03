@@ -252,7 +252,11 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            <p className="text-small mt-5 max-w-[30ch] text-white/80">{FOOTER.modality}</p>
+            {/* The full stop is added here, not in the constant. DELIVERY_LINE
+                carries none because most of its call sites are labels — a pill,
+                a meta row, a modality row — and this is one of the few places
+                it stands as a sentence beside prose that is punctuated. */}
+            <p className="text-small mt-5 max-w-[30ch] text-white/80">{FOOTER.modality}.</p>
           </div>
         </nav>
 
