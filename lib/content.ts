@@ -22,6 +22,49 @@ import { BRAND } from './nav';
  */
 export { NAV, CTA, CONTACT_AND_FAQ } from './nav';
 
+/**
+ * HOW AND WHERE CARE IS DELIVERED, IN THE CLIENT'S OWN WORDS. Confirmed
+ * 2026-10-02, and it is the one sentence every practice-level surface uses.
+ * The call sites, as of 2026-10-03: FOOTER.modality; the closing CTA band's
+ * meta row (the PILL takes DELIVERY_SHORT below, so the band says it once);
+ * CONTACT_PAGE.intro and .areaNote; the appointment form; the assessment
+ * page's modality label; the "Where do you practice?" and "Can the assessment
+ * be done by telehealth?" FAQ answers, which ship it into FAQPage JSON-LD;
+ * the /services hero; the /new-patients expectation; both JSON-LD
+ * descriptions; and the provider pages' standfirst.
+ *
+ * IT SUPERSEDES THE CARE-MODALITY RULE IT BREAKS, WHICH IS WHY IT IS ONE
+ * CONSTANT AND NOT A STRING COPIED EIGHT TIMES. Until today CLAUDE.md required
+ * in-person care to be stated WITHOUT a state, because the only place-level
+ * evidence in /research is one New Jersey township and a Pennsylvania reader
+ * could otherwise set off for an office nobody had confirmed. This sentence
+ * attaches both states to both modes. The client decided that, in writing, on
+ * 2026-10-02; the rule in CLAUDE.md is rewritten to record it rather than left
+ * to contradict the site. A future reviewer who flags "in person" next to two
+ * state names is reading a rule that has been superseded — point them here.
+ *
+ * NO FULL STOP. It renders as a standalone line in most places (a pill, a meta
+ * row, a modality label) and as a sentence in a few, where the call site adds
+ * the period. Editing it changes nine surfaces at once, which is the point.
+ */
+export const DELIVERY_LINE = 'In person or telehealth services across New Jersey and Pennsylvania';
+
+/**
+ * THE SHORT FORM, for a slot too small for the sentence: today that is the
+ * closing CTA band's pill, which sits about 300px above the meta row carrying
+ * the full line. Both held the long version for a day and printed the same 66
+ * characters twice in one block.
+ *
+ * IT IS HERE, NOT HARDCODED IN THE COMPONENT, so the two cannot drift apart.
+ * If the client ever narrows the delivery claim, both strings are in front of
+ * whoever changes it — a literal in PageCta would have gone on asserting both
+ * modes on six routes with nothing to catch it.
+ *
+ * MODE ONLY, NO STATES, and that is the division of labour: the pill says what
+ * kind of care, the meta row under the buttons says that and where.
+ */
+export const DELIVERY_SHORT = 'In person or by telehealth';
+
 export const BUSINESS = {
   /**
    * Canonical name per CLAUDE.md, defined in lib/nav.ts because the navbar
@@ -121,7 +164,7 @@ export const HERO = {
  */
 export const PRACTICE_FACTS = [
   { fact: 'Two providers', detail: 'Both hold a Doctor of Nursing Practice' },
-  { fact: 'Dual-certified', detail: 'PMHNP-BC and FNP-BC, both providers' },
+  { fact: 'Dual board-certified', detail: 'PMHNP-BC and FNP-BC, both providers' },
   { fact: 'Two states', detail: 'Licensed in New Jersey and Pennsylvania' },
 ] as const;
 
@@ -403,25 +446,34 @@ export const INSURANCE = {
  *
  * NOTHING HERE IS NEW. `description` is the sentence the old footer already
  * carried, lifted out of the component so the copy lives where the rest of it
- * does. `modality` restates the care-modality rule verbatim, the same way
- * SERVICE_PAGES' telehealth `modality` does. No claim on this surface is made
- * that is not already made on a page.
+ * does. `modality` is DELIVERY_LINE, the client's own delivery sentence, which
+ * SUPERSEDES the care-modality rule this note used to say it restated. No
+ * claim on this surface is made that is not already made on a page.
  *
  * CLIENT: still no street address and still no hours, so the footer carries
  * neither. Geography stays service-area only. Add a PostalAddress here and in
  * lib/schema.ts together, once one is confirmed.
  */
 export const FOOTER = {
-  description:
-    'Outpatient psychiatric and behavioral health care by telehealth across New Jersey and Pennsylvania, and in person.',
+  /* NO DELIVERY SENTENCE HERE ANY MORE. It carried one for two commits — first
+     as a hardcoded copy, then interpolated — and either way the footer printed
+     the same 13-word sentence twice, in the brand column and again in the
+     contact column, on every route. Both reviewers flagged it. `modality`
+     below is the single delivery statement, which is the right one of the two:
+     it sits with the phone number and the inboxes, where "how and where" is
+     the question being answered. This stays a blurb. */
+  description: 'Outpatient psychiatric and behavioral health care.',
   /**
-   * U+2011 NON-BREAKING HYPHEN in "in‑person", not an ordinary hyphen.
-   * This sits in a narrow footer column and wraps at almost every width; an
-   * ordinary hyphen lets the browser break the line after it, leaving "in-" at
-   * the end of one line and "person" at the start of the next. It reads as a
-   * typo rather than a line break.
+   * THE CLIENT'S DELIVERY LINE, VERBATIM, CONFIRMED 2026-10-02. The same
+   * sentence now carries every practice-level statement of how and where care
+   * is delivered — see DELIVERY_LINE below and the care-modality section of
+   * CLAUDE.md, which this supersedes.
+   *
+   * The U+2011 non-breaking hyphen that used to be here went with the old
+   * wording: "In person" is two words in the client's line, so there is no
+   * hyphen left to break.
    */
-  modality: 'Telehealth across New Jersey and Pennsylvania, and in‑person care.',
+  modality: DELIVERY_LINE,
   /** Column headings. Labels only. */
   columns: {
     services: 'Services',
@@ -491,10 +543,14 @@ export type Provider = {
    * source and with the same confidence, so the only thing the gap achieved
    * was two cards that disagreed.
    *
-   * NEITHER IS CONFIRMED BY THE PRACTICE, and both carry a CLIENT-REVIEW note
-   * saying so. The prose `languages` field stays the source for the fact rows
-   * on the provider pages; this is the same fact structured, so the JSON-LD
-   * and the card do not have to parse a sentence.
+   * BOTH ARE CONFIRMED BY THE PRACTICE. Dr. Whitaker's on 2026-10-02;
+   * Dr. Ofoegbu's finished on 2026-10-03, when the question of whether Yoruba
+   * was merely unconfirmed or actually wrong was put back and answered — she
+   * is English and Igbo, not the three her Headway profile lists. The field
+   * note on her entry carries that exchange. The CLIENT-REVIEW flags are gone from both. The
+   * prose `languages` field stays the source for the fact rows on the provider
+   * pages; this is the same fact structured, so the JSON-LD and the card do
+   * not have to parse a sentence.
    */
   knowsLanguage?: readonly string[];
   /**
@@ -528,10 +584,13 @@ export type Provider = {
  * that BOTH providers publish on at least one platform each.
  *
  * Deliberately NOT applied, and still open: licence numbers, NPI, the street
- * address, years of experience (Grow says 15 for Whitaker, Headway says 10,
- * and CLAUDE.md makes it a regulated fact), ages served (the two platforms
- * directly contradict each other), named therapy modalities (four candidates,
- * no two agreeing), and anything from the patient reviews.
+ * address, ages served (the two platforms directly contradict each other),
+ * named therapy modalities (four candidates, no two agreeing), and anything
+ * from the patient reviews.
+ *
+ * Years of experience was on that list — Grow said 15 for Whitaker, Headway
+ * said 10 — and came off it on 2026-10-02, when the client confirmed 15. It is
+ * still a regulated fact under CLAUDE.md; it is simply a confirmed one now.
  *
  * ---
  *
@@ -554,9 +613,17 @@ export type Provider = {
  * 4. Mid-sentence capitals on common nouns are lowered, and one missing article
  *    restored, in Ofoegbu's approach line. Marketplace profiles are typed into
  *    a form; a practice site is typeset.
+ * 5. TWO CLIENT CORRECTIONS OF FACT, 2026-10-02, and this class is different
+ *    from the four above because it changes what the bio SAYS rather than how
+ *    it reads. "dual-certified" becomes "dual board-certified" in both bios,
+ *    and Whitaker's "over ten years" becomes "over 15 years". The client is
+ *    the only party who can correct their own providers' profiles, and they
+ *    did, in writing. Each is recorded again at the field it touches.
  *
  * The unedited originals are in research/directories/headway-*.txt. Diff
- * against those before changing anything here.
+ * against those before changing anything here — and expect the differences in
+ * class 5 to show up, because the originals are a capture of what the
+ * marketplace said, not of what the practice has since confirmed.
  */
 export const PROVIDERS: Provider[] = [
   {
@@ -574,27 +641,32 @@ export const PROVIDERS: Provider[] = [
     },
     licensed: 'Licensed in New Jersey and Pennsylvania',
     /**
-     * UNCHANGED at "more than 10", although the directories now offer two other
-     * numbers: Headway says 10 years, Grow Therapy says 15. CLAUDE.md makes
-     * specific years of experience a regulated fact, this is the version the
-     * practice itself published, and it is the only one of the three that is
-     * true whichever of the others is right. CLIENT: 10 or 15?
+     * CONFIRMED BY THE CLIENT, 2026-10-02: 15, not 10.
+     *
+     * The question is closed. Three numbers were in play — the practice's own
+     * site said "more than 10", Headway said 10 and Grow Therapy said 15 — and
+     * this field carried the lowest of them precisely because it was true
+     * whichever of the others was right. The practice has now said 15, so the
+     * hedge comes off here and in her bio, which the homepage and her provider
+     * page both render and which feeds `description` in her Person JSON-LD.
+     *
+     * Years of experience stay a regulated fact under CLAUDE.md. This one is
+     * now confirmed rather than inferred; do not raise it again without the
+     * practice saying so.
      */
-    experience: 'More than 10 years of direct patient care',
+    experience: 'More than 15 years of direct patient care',
     approach: 'Warm, empathic, non-judgmental, and collaborative',
     /* Doximity, Headway and U.S. News independently give the doctorate as
        University of North Florida, which is as corroborated as anything in the
        directory capture gets. The master's is Headway only. */
     education: 'DNP, University of North Florida · MSN, Tennessee State University',
-    /* Headway lists Yoruba; U.S. News records "Speaks English". */
+    /* CONFIRMED BY THE CLIENT, 2026-10-02. Headway listed Yoruba and U.S. News
+       recorded "Speaks English"; the practice has now confirmed both. */
     languages: 'English and Yoruba',
     /**
-     * CLIENT-REVIEW: English and Yoruba, confirmed against the source the
-     * client named on 2026-10-01 —
-     * https://care.headway.co/providers/funmilayo-whitaker-2 — which lists
-     * Yoruba among the languages she practises in. Confirm with the practice
-     * that she sees patients in Yoruba, since a marketplace profile is the
-     * provider's own statement rather than the practice's.
+     * CONFIRMED BY THE CLIENT, 2026-10-02: English and Yoruba. It arrived on
+     * 2026-10-01 from her Headway profile under a CLIENT-REVIEW flag, and the
+     * practice has now confirmed it, so the flag is gone.
      *
      * THE PROSE FIELD ABOVE ALREADY SAID THIS and is unchanged; this is the
      * same fact structured, so `knowsLanguage` can reach the JSON-LD and the
@@ -603,7 +675,17 @@ export const PROVIDERS: Provider[] = [
      */
     knowsLanguage: ['English', 'Yoruba'],
     /**
-     * Verbatim from Headway, unedited. Her paragraph break is kept.
+     * From Headway, her paragraph break kept, AND NO LONGER WORD FOR WORD.
+     * Two client changes on 2026-10-02 edited it:
+     *
+     *   "over ten years" -> "over 15 years"   (the practice confirmed 15)
+     *   "dual-certified" -> "dual board-certified"
+     *
+     * Both are the client correcting their own provider's profile, which is
+     * the only party who can. Recorded here because this field was documented
+     * as verbatim and a future editor diffing it against Headway will find two
+     * differences; those are the two, and they are deliberate. Her bio feeds
+     * `description` on her Person JSON-LD, so the number moved there with it.
      *
      * The "across the lifespan" age claim that the practice's own site made,
      * and that OPEN_CLIENT_ITEMS has always flagged, does not appear in her own
@@ -617,7 +699,7 @@ export const PROVIDERS: Provider[] = [
      * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
     bio: [
-      'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over ten years of direct patient care experience.',
+      'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 15 years of direct patient care experience.',
       'I have worked in diverse roles, diagnosing and treating mental health disorders in group practice, community settings, and telehealth. I offer medication management for various mental health conditions for individuals with psychiatric disorders such as depression, anxiety, bipolar disorder, panic attacks, PTSD, schizophrenia, addiction, etc.',
     ],
     /* Verbatim. The short `approach` above is the scannable version of this
@@ -671,7 +753,7 @@ export const PROVIDERS: Provider[] = [
       'PTSD',
       'Schizophrenia',
       'ADHD',
-      'Insomnia and sleep problems',
+      'Insomnia',
       'Substance use and addiction',
     ],
     email: BUSINESS.emails.whitaker,
@@ -718,22 +800,33 @@ export const PROVIDERS: Provider[] = [
        with the degree unspecified — so La Salle is deliberately not named here
        rather than guessed at. CLIENT: which degree, and in what? */
     education: 'DNP, University of North Florida',
-    languages: 'English, Igbo, and Yoruba',
+    languages: 'English and Igbo',
     /**
-     * CLIENT-REVIEW: the three languages this page has published all along,
-     * structured, in the order the prose field already prints them.
+     * CONFIRMED BY THE CLIENT, 2026-10-02: English and Igbo. YORUBA IS OFF,
+     * and that is a correction rather than a trim.
      *
-     * NOTHING NEW IS CLAIMED. The source is her own Headway profile —
-     * research/directories/headway-ofoegbu.txt, "Igbo, Yoruba, English",
-     * recorded in research/provider-directories.md as Headway-only and graded
-     * weak — which is the same single source, with the same confidence, as the
-     * prose line above it and as Dr. Whitaker's. Confirm with the practice
-     * that she sees patients in Igbo and Yoruba; a marketplace profile is the
-     * provider's own statement rather than the practice's.
+     * Her Headway profile lists "Igbo, Yoruba, English"
+     * (research/directories/headway-ofoegbu.txt), and this site published all
+     * three from 2026-09-29 under a CLIENT-REVIEW flag — the prose field and
+     * this one.
+     *
+     * THE QUESTION IS CLOSED, NOT PARTLY ANSWERED. The first record of this
+     * said the practice had "confirmed two of the three", which healthcare-
+     * reviewer rightly pointed out is not the same as disconfirming the third
+     * — and removal is the lossy direction on a psychiatric site, where
+     * language access is a real signal. Put back to the client on 2026-10-03
+     * and answered: English and Igbo is the complete list, Yoruba comes OFF.
+     * So Yoruba is off her card, her page and her `knowsLanguage`, and it
+     * stays on Dr. Whitaker, where the practice confirmed it. Do not restore
+     * it from the directory capture.
+     *
+     * The research file is NOT edited to match: it records what the directory
+     * said, which is still what the directory says. The difference between a
+     * capture and a confirmation is the whole point of keeping both.
      *
      * The two fields must stay in step: edit both or neither.
      */
-    knowsLanguage: ['English', 'Igbo', 'Yoruba'],
+    knowsLanguage: ['English', 'Igbo'],
     /**
      * Verbatim from Headway, as one paragraph, with two typo fixes and one
      * spelling change: her "My name is Anastasia. Ofoegbu" loses its stray full
@@ -748,7 +841,7 @@ export const PROVIDERS: Provider[] = [
      * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
     bio: [
-      'My name is Anastasia Ofoegbu, a dual certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania. I enjoy traveling, reading and, most of all, love spending time with my family.',
+      'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania. I enjoy traveling, reading and, most of all, love spending time with my family.',
     ],
     /**
      * Verbatim except: "evaluations" becomes "assessments" per the owners'
@@ -779,7 +872,7 @@ export const PROVIDERS: Provider[] = [
       'ADHD',
       'OCD',
       'PTSD',
-      'Sleep problems',
+      'Insomnia',
       'Anger management',
       'Substance use and addiction',
     ],
@@ -822,7 +915,7 @@ export const WHAT_WE_TREAT = {
     'Mood disorders',
     'Psychosis',
     'Substance use and addiction',
-    'Insomnia and sleep problems',
+    'Insomnia',
     'Irritability and anger',
     'Stress and burnout',
   ],
@@ -936,19 +1029,25 @@ export type ServicePage = {
   metaDescription: string;
   intro: string;
   /**
-   * How this service is delivered, in one sentence.
+   * How this service is delivered, in one sentence. Rendered as the "How it is
+   * delivered" row on the /services hub.
    *
-   * Deliberately NOT read off the homepage card's `footerText`. That field is
-   * card chrome; promoted to a titled card on a page whose metaTitle is scoped
-   * "in NJ and PA", "In person and by telehealth" reads in-person-first on a
-   * state-scoped page, which is the exact composition CLAUDE.md's care-modality
-   * rule exists to prevent. These put telehealth first and bind the states to
-   * it, matching the phrasing the assessment FAQ already uses.
+   * THE COMPOSITION RULE THIS FIELD USED TO ENFORCE IS SUPERSEDED. It required
+   * a value to put telehealth first and bind the states to it, because "In
+   * person and by telehealth" on a page scoped "in NJ and PA" was the exact
+   * composition CLAUDE.md's care-modality rule existed to prevent. The client
+   * replaced that rule on 2026-10-02, and the assessment's value is now
+   * DELIVERY_LINE — in-person-first, with both states bound to both modes.
    *
-   * Only psychiatric assessment carries the state scope, because only its own
-   * content states it (see its "Can the assessment be done by telehealth?"
-   * FAQ). Medication management says telehealth and in person without a
-   * geography, because nothing in its own content scopes it.
+   * THE OTHER TWO KEEP NARROWER LINES, AND THAT IS NOT AN OVERSIGHT.
+   * Telehealth's says telehealth because that is what the service is.
+   * Medication management names no state because nothing in its own content
+   * scopes it, and a service page should describe its own service rather than
+   * restate the practice. Practice-level claims use the constant; per-service
+   * ones describe the service.
+   *
+   * Still deliberately NOT read off the homepage card's `footerText`: that
+   * field is card chrome, written for a tile rather than for a definition row.
    */
   modality: string;
   /**
@@ -1158,7 +1257,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       'A comprehensive psychiatric assessment, also called a psychiatric evaluation, in NJ and PA: full history, rating scales, a diagnosis, and a treatment plan.',
     intro:
       'Every patient at Newpoint starts here. A comprehensive psychiatric assessment is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
-    modality: 'By telehealth across New Jersey and Pennsylvania, and in person.',
+    modality: DELIVERY_LINE,
     /* The one service on the bespoke layout. See the field's own comment on
        the type for the shape it assumes. */
     layout: 'feature',
@@ -1292,7 +1391,9 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         q: 'Can the assessment be done by telehealth?',
-        a: 'Yes. The assessment is available by telehealth to patients across New Jersey and Pennsylvania, and in person. Ask us when you get in touch and we will confirm what works for your situation.',
+        /* Same correction as the /contact "Where do you practice?" answer, and
+           it ships in this page's FAQPage JSON-LD for the same reason. */
+        a: `Yes. ${DELIVERY_LINE}. Ask us when you get in touch and we will confirm what works for your situation.`,
       },
       {
         q: 'What do I leave with?',
@@ -2052,7 +2153,7 @@ export const FAQ = {
       items: [
         {
           q: 'Who will I see?',
-          a: 'One of our two providers, Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners, and both are licensed in New Jersey and Pennsylvania.',
+          a: 'One of our two providers, Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners, and both are licensed in New Jersey and Pennsylvania.',
         },
         {
           q: 'What happens at the first appointment?',
@@ -2068,7 +2169,14 @@ export const FAQ = {
         },
         {
           q: 'Where do you practice?',
-          a: 'Telehealth is available to patients across New Jersey and Pennsylvania. We also see patients in person — ask us when you get in touch and we will confirm what is available to you.',
+          /* IN LINE WITH DELIVERY_LINE SINCE 2026-10-03. It read "Telehealth is
+             available to patients across New Jersey and Pennsylvania. We also
+             see patients in person", which bound the states to telehealth
+             only — the superseded care-modality construction. This answer is
+             quoted verbatim in `Answer.text` on /contact, on the same document
+             whose ContactPage.description carries the client's line, so the
+             two were contradicting each other in structured data. */
+          a: `${DELIVERY_LINE}. Ask us when you get in touch and we will confirm what is available to you.`,
         },
       ],
     },
@@ -2255,7 +2363,7 @@ export const NEW_PATIENTS_PAGE = {
   expectations: [
     {
       heading: 'You will see a provider, not a queue',
-      body: 'There are two of us. You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners.',
+      body: 'There are two of us. You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners.',
     },
     {
       // Scope, not duration: session length is not published anywhere, so no
@@ -2265,7 +2373,15 @@ export const NEW_PATIENTS_PAGE = {
     },
     {
       heading: 'Follow-up appointments can be in person or by video',
-      body: 'Telehealth runs across New Jersey and Pennsylvania on an expanded schedule including weekends, evenings, and holidays by request. In-person appointments are available too — ask us which suits you.',
+      /* IN LINE WITH DELIVERY_LINE SINCE 2026-10-03. It read "Telehealth runs
+         across New Jersey and Pennsylvania … In-person appointments are
+         available too", which bound the states to telehealth and left
+         in-person attached to none — the construction the client superseded.
+         This page renders the CTA band, whose meta row is the client's line,
+         so the two were disagreeing about geography a screen apart. The
+         schedule sentence stays bound to telehealth, for the reason recorded
+         on CONTACT_PAGE.areaNote. */
+      body: `${DELIVERY_LINE}. Telehealth runs on an expanded schedule including weekends, evenings, and holidays by request — ask us which suits you.`,
     },
   ],
   // CLIENT: no "what to bring" checklist is published anywhere and none is
@@ -2299,7 +2415,7 @@ export const CONTACT_PAGE = {
   metaDescription:
     'Contact Newpoint for psychiatric care across New Jersey and Pennsylvania, by telehealth and in person. Call, email, or request an appointment online.',
   intro:
-    'Call us, email us, or request an appointment. We see patients across New Jersey and Pennsylvania by telehealth, and in person.',
+    `Call us, email us, or request an appointment. ${DELIVERY_LINE}.`,
   /**
    * CLIENT: no practice-wide inbox exists, so both named provider addresses are
    * listed rather than inventing an info@ or contact@.
@@ -2317,15 +2433,29 @@ export const CONTACT_PAGE = {
   emailNote:
     'Email reaches the providers directly. Please keep symptoms, diagnoses, medications, insurance ID numbers and dates of birth out of it — it is not a secure channel for them.',
   /**
-   * Telehealth is stated across both states because both providers are licensed
-   * in both. In-person care is stated WITHOUT a state, because the only
-   * place-level evidence anywhere in /research is Lawrence Township, New Jersey
-   * — there is no Pennsylvania location signal at all. Saying "in person across
-   * New Jersey and Pennsylvania" would send a PA patient somewhere that is not
-   * known to exist.
+   * BOTH MODES, BOTH STATES, matching DELIVERY_LINE. This paragraph used to
+   * bind the two states to telehealth and leave in-person attached to neither,
+   * under the care-modality rule that CLAUDE.md superseded on 2026-10-02 — and
+   * the result was a page that asserted the client's line in its intro and
+   * hedged it under a heading reading "Where we see patients". healthcare-
+   * reviewer raised that contradiction as a High; this is the half of the fix
+   * that lives in the copy.
+   *
+   * THE SCHEDULE SENTENCE IS KEPT WORD FOR WORD, AND IT STAYS BOUND TO
+   * TELEHEALTH. It is the only published statement about when the practice is
+   * available — hours are still an open item — which is why this field could
+   * not simply be replaced by the constant.
+   *
+   * It was briefly a trailing clause on the delivery line, which kept every
+   * word and still changed the claim: "in person or telehealth services …, on
+   * an expanded schedule including weekends, evenings and holidays" offers a
+   * Saturday IN-PERSON appointment, which nobody at the practice has said
+   * exists. The client's 2026-10-02 decision was about where and how care is
+   * delivered, not when. healthcare-reviewer caught it as a High the same day.
+   * Every other surface in this file binds that schedule to telehealth; so
+   * does this one again.
    */
-  areaNote:
-    'Telehealth is available to patients across New Jersey and Pennsylvania, on an expanded schedule including weekends, evenings, and holidays by request. In-person appointments are available as well — ask us what works for you.',
+  areaNote: `${DELIVERY_LINE}. Telehealth runs on an expanded schedule including weekends, evenings, and holidays by request. Ask us what works for you.`,
 } as const;
 
 /**
@@ -2385,7 +2515,7 @@ export const PROVIDERS_PAGE = {
   metaDescription:
     'The two psychiatric-mental health nurse practitioners at Newpoint, both licensed in New Jersey and Pennsylvania.',
   intro:
-    'You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual-certified as psychiatric mental health and family nurse practitioners.',
+    'You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners.',
 } as const;
 
 export const ROUTES: { path: string; priority: number }[] = [
@@ -2431,7 +2561,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Which states in-person care covers. A SECOND ADDRESS HAS SURFACED: Headway lists 803 West Trenton Avenue Ste 3, Morrisville, PA 19067 for Whitaker as "Location 1 of 2". This is the first Pennsylvania place-level signal in any Newpoint research and would relax CLAUDE.md\'s rule that in-person care is stated without a state. One platform, one provider, unconfirmed — it may be a Headway location rather than a Newpoint office',
   'State nursing license numbers for both providers, or confirmation they prefer not to publish them. CANDIDATES for Whitaker: NJ 26NJ00646400 (APN) and PA SP016195 (CRNP), per Grow Therapy and Headway. Note the two states use different regulatory titles for the same role — APN in New Jersey, CRNP in Pennsylvania — so publish each number with the right one. NOTHING FOUND FOR OFOEGBU IN EITHER STATE: the client confirmed on 2026-09-29 that she holds both, but no number for her appears on any directory, so both of hers have to come from the practice',
   'NPI numbers for both providers, or confirmation they prefer not to publish them. CANDIDATE for Whitaker: 1760719512, per U.S. News. Nothing found for Ofoegbu',
-  'Certifying body for the "board-certified" claim (the post-nominals imply one, but it is not stated anywhere and must not be assumed)',
+  'PRE-LAUNCH — CERTIFYING BODY for the "board-certified" claim. The post-nominals imply one (PMHNP-BC and FNP-BC both expand to Board Certified) but no body is named anywhere in the source material and none is assumed here, which is why `hasCredential` stays out of the JSON-LD. RAISED TO PRE-LAUNCH ON 2026-10-02, when the client changed every "dual-certified" to "dual board-certified": the claim now ships in both providers\' bios, in the FAQ answer, on the homepage, and inside `description` on both Person nodes. The repo escalates an open item when the claim it guards starts shipping — the nine payers and the ADHD prescribing line were both raised on that trigger. Ask the practice to name the body (ANCC is the expected answer for both certifications, and expected is not confirmed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
   'PRE-LAUNCH — AGES SERVED. Confirmed age range (adults only, or across the lifespan as a practice policy). Headway lists CHILDREN AND ADOLESCENTS for Dr. Whitaker, which is the strongest paediatric signal in any Newpoint source and the reason this cannot wait: the site now names ADHD under "Conditions we prescribe for", and a parent reading that has nothing on the page telling them whether their child can be seen. STILL OPEN, AND THE EVIDENCE CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
   'Whether substance use and addiction treatment is an active service line. THE DIRECTORIES SAY YES: Grow lists addiction for Whitaker, and Headway lists "Substance use / addiction" as Ofoegbu\'s FIRST specialty. Her existing bio already says her last 11 years were in mental health and addiction. This also bears on the new "Mental and behavioral care" hero — in US payer language behavioral health includes SUD, so the headline already implies a door the conditions list does not open',
@@ -2444,7 +2574,6 @@ export const OPEN_CLIENT_ITEMS = [
      WHAT_WE_TREAT.conditions and is not in the prescribing list, which is the
      state the client asked for. */
   'ADHD PRESCRIBING SCOPE — CLOSE THIS BEFORE LAUNCH. ADHD is named in "Conditions we prescribe for" on /services/medication-management at the client\'s instruction of 2026-10-01. The page names no medication and no drug class anywhere, so nothing on it asserts a controlled substance, and the line is publishable as it stands BECAUSE ADHD PHARMACOTHERAPY IS NOT EXCLUSIVELY CONTROLLED — atomoxetine, guanfacine and bupropion need no DEA registration. That is very likely the answer, and it is the one the practice has never given. Four parts to the question, and a no to any of them changes the page: (1) does the practice prescribe stimulants for ADHD, and under whose DEA registration; (2) if not, does it prescribe non-stimulants for ADHD, which is what keeps the line true; (3) does it hold for BOTH providers, since this list is practice-wide and Ofoegbu\'s Headway care type is medication management alone; (4) does it hold by TELEHEALTH, which is how most of this practice\'s care is delivered and the most regulated corner of controlled-substance prescribing. If the answer to (1) and (2) is no, the ADHD chip comes out of that list and stays in WHAT_WE_TREAT.conditions, where it is a treating claim both providers publish. SEE ALSO the age-range item above: ADHD is the highest-paediatric-volume condition on that list, so publishing it raises the stakes on an age range the site still cannot state',
-  'Whether Dr. Whitaker sees patients in Yoruba, and whether Dr. Ofoegbu\'s "English, Igbo, and Yoruba" holds. Both come from the providers\' own Headway profiles and neither is confirmed by the practice — the repo grades both as weak single-source facts in research/provider-directories.md. IT IS NO LONGER ONLY PROSE: as of 2026-10-01 Whitaker\'s languages are structured in PROVIDERS[].knowsLanguage at the client\'s instruction and drive `knowsLanguage` on her Person JSON-LD, the Languages line on her /providers card, and her ContactPoint on /contact. Ofoegbu has no structured entry because the instruction named only Whitaker, so her card shows no Languages line while her own page still does — see the CLIENT question in components/ui/ProviderCard.tsx about whether that asymmetry should stand',
   'Whether the practice holds in-network contracts with the listed payers, or accepts them while billing out of network. The site says "accept" throughout, which is the weaker and safer claim',
   "CONFIRM THE NINE PLANS NOW PUBLISHED UNDER CLIENT-REVIEW, or cut them. THIS ITEM CHANGED ON 2026-10-01 AND IT IS NOW URGENT RATHER THAN HOUSEKEEPING. Until then these names sat in PAYER_GROUPS with `confirmed: false` and appeared nowhere a patient or a crawler could see them. The client asked for them to be published, so they now render on /insurance under a `review` note sourced to Dr. Whitaker's Headway profile (https://care.headway.co/providers/funmilayo-whitaker-2). They are: Oscar, Oxford, Carelon Behavioral Health, Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania, Independence Blue Cross Pennsylvania (Virtual National Network), Geisinger, Blue Cross Blue Shield of Massachusetts and The Health Plan. WHAT THE PRACTICE IS BEING ASKED TO CONFIRM, for each name: that NEWPOINT accepts it directly, not that a marketplace is contracted for it — a patient who books through Headway or Grow Therapy is billed by the marketplace — and that it holds for Dr. Ofoegbu as well as Dr. Whitaker. A patient who reads one of these names, books on that basis and is then billed out of network has been told something nobody at the practice has confirmed. FOUR OF THE NINE ARE BETTER EVIDENCED THAN THE NOTE SAYS, so do not spend equal attention on all of them: Oscar, Oxford, Carelon Behavioral Health and Blue Cross Blue Shield of Massachusetts are on DR. OFOEGBU'S Headway profile as well as Dr. Whitaker's, which answers the \"and for Dr. Ofoegbu\" half for those four. The dictated note is carried verbatim on all nine anyway, because the practice-wide half is open for every one of them. To confirm one, set `confirmed: true` and delete its `review` note; the homepage card, its \"and N more\" count and the JSON-LD then pick it up too, none of which the review note touches. TO CUT ONE, IT DEPENDS WHICH: for the six that arrived with this instruction, delete the entry; for Capital Blue Cross Pennsylvania, Highmark Blue Cross Blue Shield Pennsylvania and Independence Blue Cross Pennsylvania, cutting means reverting to the repo's shorter name with `confirmed: false` and no `review`, because those three were corroborated candidates on Grow Therapy and Headway before the client's list existed and deleting them would throw that away. The seven payers from the practice's own site are unaffected",
   'PRE-LAUNCH — INDEPENDENCE BLUE CROSS: ALL PLANS, OR THE VIRTUAL NATIONAL NETWORK ONLY? The page currently names "Independence Blue Cross Pennsylvania (Virtual National Network)", which is the spelling the client supplied from Dr. Whitaker\'s Headway profile. It is the one entry on the wall that names a NETWORK rather than a carrier, on a page whose copy policy is "accept, never in network", and it narrows badly in both directions: an Independence member on Keystone HMO or Personal Choice reads it as "my plan is not listed", while a reader who takes the parenthetical at face value has been told the practice participates in a specific network nobody has confirmed. Two answers close it — "all Independence plans", which makes the entry plain "Independence Blue Cross", or "that network only", which makes the parenthetical a claim the practice has to stand behind',
@@ -2453,7 +2582,8 @@ export const OPEN_CLIENT_ITEMS = [
   "ONE DECISION THE CLIENT STILL OWES ON THE PUBLISHED PLANS: whether /insurance should say, visibly, that some of the plans listed are still being confirmed. As it stands all sixteen names render identically under \"We accept the plans below\", so a patient cannot tell the seven the practice confirmed from the nine it has not. Adding a hedge was NOT done unilaterally — it softens the client's own instruction to publish them, and that is their call to make. The page already owns a string for it if they want one: INSURANCE.unconfirmedScopeNote. This item closes either way, by confirming the nine or by adding the line",
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
-  "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one",
+  'PRE-LAUNCH — UPDATE DR. WHITAKER\'S HEADWAY PROFILE TO 15 YEARS BEFORE LINKING IT. The practice confirmed 15 on 2026-10-02 and the site now says so in her bio, her Experience row and `description` on her Person node. Her Headway profile still says 10 (research/directories/headway-whitaker.txt). Grow Therapy already says 15 and agrees; the U.S. News capture carries no figure at all, so neither of those is blocked. The claim ships on her bio, her Experience row, `description` on her Person node, AND the provider cards on the homepage and /providers, which are the two highest-traffic surfaces carrying it. HER HEADWAY URL IS DELIBERATELY NOT IN sameAs, and must not be added until the profile is updated: sameAs tells a search engine "this is the same person", so linking a profile that disagrees about her career length publishes the disagreement rather than the fact. DR. OFOEGBU\'S HEADWAY PROFILE IS BLOCKED TOO, on two counts: it says 8 years where her entry says 14 in nursing with the last 11 in mental health, and as of 2026-10-03 it lists Igbo, Yoruba and English where the practice has confirmed English and Igbo',
+  "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one. TWO OF THE FIVE ARE BLOCKED, NOT MERELY UNAPPROVED — both providers' Headway profiles disagree with confirmed facts on this site. See the item directly above",
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   "Self-pay session fee and the sliding scale criteria. Grow Therapy lists $150 per session for Whitaker, but that is the marketplace's rate for her time on that platform and is not Newpoint's fee",
   'Original logo file, vector preferred',

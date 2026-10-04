@@ -8,7 +8,7 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { TeamMemberCard } from '@/components/ui/TeamMemberCard';
 import { stagger } from '@/lib/motion';
-import { PROVIDERS, SERVICE_PAGES, BUSINESS } from '@/lib/content';
+import { PROVIDERS, SERVICE_PAGES, BUSINESS, DELIVERY_LINE } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef, personSchemaFor } from '@/lib/schema';
 
@@ -320,12 +320,15 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <h2 className="text-h2">Appointments</h2>
                   </Reveal>
                   <Reveal delay={0.08}>
-                    {/* Telehealth is stated across both states, because both
-                        providers are licensed in both. In-person care is stated
-                        without a state: the only place-level evidence anywhere
-                        in /research is Lawrence Township, New Jersey, and there
-                        is no Pennsylvania location signal at all. The street
-                        address remains an open item — see OPEN_CLIENT_ITEMS. */}
+                    {/* DELIVERY_LINE, the client's own sentence, since
+                        2026-10-02. This note used to say in-person care is
+                        stated without a state because there is "no
+                        Pennsylvania location signal at all" — a rule CLAUDE.md
+                        has superseded, and a sentence the repo's own research
+                        has since contradicted (Headway lists a Morrisville, PA
+                        address for Dr. Whitaker). The street address is still
+                        an open item; what changed is that the practice, not
+                        this site, is making the geography claim. */}
                     {/* "New patients at Newpoint start with", practice-voiced,
                         NOT a second clause about this provider. Sitting under a
                         named clinician's photograph, "New patients start with a
@@ -338,9 +341,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                         Naming the practice keeps the sentence true on both
                         pages. */}
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
-                      {provider.name.split(' ')[0]} sees patients across{' '}
-                      {BUSINESS.serviceArea.join(' and ')} by telehealth, and in person. New
-                      patients at {BUSINESS.shortName} start with a comprehensive psychiatric
+                      {provider.name.split(' ')[0]} sees patients at {BUSINESS.shortName}.{' '}
+                      {DELIVERY_LINE}. New patients start with a comprehensive psychiatric
                       assessment; care continues as medication management on a schedule agreed with
                       you.
                     </p>
@@ -362,10 +364,16 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                   </Reveal>
                 </div>
 
-                {/* CLIENT: "board-certified" is claimed in the practice's own ad
-                    copy, but no certifying body is named anywhere on the live
-                    site. The post-nominals imply one and it must not be assumed,
-                    so no certification statement appears on this page. */}
+                {/* CLIENT: no certifying body is named anywhere, and the
+                    post-nominals imply one that must not be assumed — which is
+                    why `hasCredential` stays out of the JSON-LD.
+                    THIS PAGE DOES CARRY A CERTIFICATION STATEMENT, as of
+                    2026-10-02: the editorial card renders bio[0], which opens
+                    "I am a dual board-certified…". The claim is the practice's
+                    own and predates this site (research/people-trust.md,
+                    research/content/home.md); the body behind it is still
+                    unnamed, which is now an open item rather than a thing this
+                    page avoids saying. */}
               </div>
             </div>
           </Container>

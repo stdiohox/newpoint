@@ -22,6 +22,7 @@
  * `personSchemaFor` and this repo's CLAUDE.md.
  */
 import {
+  DELIVERY_LINE,
   BUSINESS,
   PROVIDERS,
   INSURANCE,
@@ -55,7 +56,7 @@ export function medicalClinicSchema() {
     url: BUSINESS.domain,
     slogan: BUSINESS.tagline,
     description:
-      'Outpatient psychiatric and behavioral health nurse practitioner practice. Telehealth across New Jersey and Pennsylvania, and in-person care. Psychiatric assessment and medication management.',
+      `Outpatient psychiatric and behavioral health nurse practitioner practice. ${DELIVERY_LINE}. Psychiatric assessment and medication management.`,
     medicalSpecialty: 'Psychiatric',
     telephone: BUSINESS.phonePrimary,
     faxNumber: BUSINESS.fax,
@@ -202,8 +203,8 @@ export function personSchemaFor(p: Provider) {
     knowsAbout: p.treats,
     /* Omitted entirely where the provider has no structured languages, rather
        than emitted empty: an absent property says nothing, and `[]` says "no
-       languages", which is false for both of them. Only Dr. Whitaker carries
-       the field today — see the note on Provider.knowsLanguage.
+       languages", which is false for both of them. Both providers carry the
+       field since 2026-10-02 — see the note on Provider.knowsLanguage.
 
        PLAIN NAMES, AND SCHEMA.ORG WOULD RATHER HAVE BCP-47. Its definition of
        `knowsLanguage` asks for a Language object or an IETF tag; consumers
@@ -284,7 +285,7 @@ export function contactPageSchema() {
     url: `${BUSINESS.domain}/contact`,
     name: `Contact ${BUSINESS.legalName}`,
     description:
-      'Phone, email and appointment requests for Newpoint Healthcare Services. Telehealth across New Jersey and Pennsylvania, and in-person care.',
+      `Phone, email and appointment requests for Newpoint Healthcare Services. ${DELIVERY_LINE}.`,
     isPartOf: { '@id': ORG_ID },
     mainEntity: { '@id': ORG_ID },
     /**

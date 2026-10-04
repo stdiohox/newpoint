@@ -1,34 +1,33 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { CalendarCheck, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
-import { BUSINESS, CTA } from '@/lib/content';
+import { BUSINESS, CTA, DELIVERY_LINE, DELIVERY_SHORT } from '@/lib/content';
 
 /**
  * Two things a patient wants to know at the moment of deciding to make contact,
  * and neither is a new claim. "No health details needed" restates the body copy
  * directly above it, which already asks people to keep health information out of
  * the form; saying it as a reassurance rather than an instruction is the point.
- * The states are the confirmed telehealth footprint, per CLAUDE.md's
- * care-modality note.
  *
- * THE SECOND LINE SAYS "Telehealth in", AND DROPPING THOSE TWO WORDS IS A
- * REGULATED MISTAKE, NOT A TRIM. It first read "New Jersey and Pennsylvania",
- * which sat a few lines under a badge saying "In person or by telehealth" and
- * let the pair be read as in-person care in both states. CLAUDE.md is explicit:
- * state telehealth across both states freely, but state in-person care WITHOUT
- * attaching it to a state until the client confirms where, because the only
- * place-level evidence anywhere is Lawrence Township, NJ. The naming is what
- * keeps a Pennsylvania reader from driving to an office nobody has confirmed.
+ * THE SECOND LINE IS NOW DELIVERY_LINE, the client's own sentence, and the
+ * long note that used to sit here is spent. It said that dropping "Telehealth
+ * in" from the front of "New Jersey and Pennsylvania" was a regulated mistake
+ * rather than a trim, because the pair could then be read as in-person care in
+ * both states — which is precisely the reading the client confirmed on
+ * 2026-10-02. Kept in outline rather than deleted, because it records WHY the
+ * old wording was shaped that way: see the SUPERSEDED block in CLAUDE.md, and
+ * do not restore "Telehealth in" without going through it.
  *
  * Deliberately NOT here: response times, availability, "accepting new patients".
  * All three are the kind of thing a reader would act on and none is sourced.
  */
 const assurances = [
   { icon: ShieldCheck, label: 'No health details needed' },
-  { icon: MapPin, label: 'Telehealth in New Jersey and Pennsylvania' },
+  { icon: MapPin, label: DELIVERY_LINE },
 ];
 
 /**
@@ -58,7 +57,12 @@ const assurances = [
  * shadow line instead of a horizon. The footer then reads as a separate thing
  * below it.
  *
- * THE FILL IS A RADIAL, SMOOTHSTEPPED, AT 0.94 ALPHA. Three decisions there:
+ * THE FILL IS TWO RADIALS OVER A PHOTOGRAPH: a 0.45 veil across the whole
+ * panel and a 0.68 core behind the copy only. It was one opaque 0.94 radial
+ * over the page ground until 2026-10-02, then one 0.86 radial over the
+ * photograph, and splitting it is what let the picture come forward without
+ * taking the type with it. The shape of the veil is unchanged throughout.
+ * Three decisions there:
  *
  *   radial, not linear, and anchored at 50% 0%. The light pools at the top
  *   centre, exactly where the medallion and the heading sit, and falls away to
@@ -68,19 +72,31 @@ const assurances = [
  *   np-blue-700 to np-blue-900 rather than one flat navy. Two stops of the same
  *   family give the panel depth without introducing a second hue.
  *
- *   0.94, so the warm page ground lifts it very slightly instead of the panel
- *   being an opaque slab. Measured, the lightest point composites to
- *   rgb(40,65,126) and the darkest to rgb(30,44,80).
+ *   0.45 on the veil, so the meadow and the sky are plainly visible, and 0.68
+ *   behind the copy, which is the lowest core that clears every floor. Both
+ *   numbers are set by the BUTTONS rather than by the type — see the notes on
+ *   the two overlay divs below, which carry every measurement.
  *
  * The stops follow 3t^2-2t^3 for the same reason the hero scrim does: a linear
  * interpolation between two stops has a slope discontinuity at each end, and on
  * a large flat panel that shows as a ring. Regenerate them from the curve rather
  * than hand-editing.
  *
- * Measured on the lightest point, which is the worst case: white heading
- * 9.79:1, white/90 body 8.28:1, white/80 assurances 6.93:1, the white pill
- * 9.79:1, and the secondary button's white/50 ring 3.74:1 against the 3:1
- * SC 1.4.11 wants. The panel itself is 9.39:1 against the page.
+ * EVERY FIGURE IN THIS FILE IS TIED TO ONE IMAGE. They were re-measured on
+ * cta-band-2400.webp at a 0.45 veil plus a 0.68 core; the sets before it
+ * (heading 9.79:1, body 8.28:1,
+ * assurances 6.93:1) belonged to the opaque 0.94 panel and no longer applies.
+ * Replacing the photograph invalidates all of them — the binding case is the
+ * appointment label at 390, where object-cover puts the lit horizon behind the
+ * buttons — so a new frame means a new sweep, not a glance.
+ *
+ * The `white/50 ring at 3.74:1` figure that used to sit here described
+ * `onInkQuiet`, which this band no longer uses. Both buttons are glass now and
+ * carry a white focus ring instead; the ring sits on the 2px band outside the
+ * pill, which is overlay-over-photo rather than glass, and the combined 0.82
+ * behind the copy is what bounds it as well as the type. Lowering that alpha
+ * to chase button
+ * contrast would come out of the focus indicator too.
  *
  * CENTRED COLUMN, NOT THE 7/5 SPLIT IT REPLACED. With the panel gone there is no
  * second column to balance, and the request reads as a single moment.
@@ -104,8 +120,108 @@ export function PageCta({
             use. Deliberate: this panel is several times their area, and a 14px
             radius on something 1136px wide reads as a square with the corners
             filed off rather than as a rounded object. */}
-        <div className="rounded-3xl border border-transparent bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(27,53,118,0.94)_0%,rgba(26,52,115,0.94)_14.3%,rgba(25,49,108,0.94)_28.6%,rgba(23,44,99,0.94)_42.9%,rgba(20,40,88,0.94)_57.1%,rgba(18,35,79,0.94)_71.4%,rgba(17,32,72,0.94)_85.7%,rgba(16,31,69,0.94)_100%)] px-6 py-16 md:px-12 md:py-20">
-          <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <div className="rounded-3xl relative overflow-hidden border border-transparent bg-np-blue-900 px-6 py-16 md:px-12 md:py-20">
+          {/* THE PHOTOGRAPH, FULL-BLEED INSIDE THE PANEL. A dusk meadow, and
+              it is decorative: alt="" because the heading and body say
+              everything this block means, and a description of a field read
+              out between the eyebrow and the heading would be noise. It
+              depicts no person — the repo's standing objection to meadow
+              footage, recorded in OPEN_CLIENT_ITEMS, is specifically about a
+              PERSON in one reading as an implied treatment outcome.
+
+              `fill` needs a positioned ancestor, which is why the panel gained
+              `relative`, and `overflow-hidden` is what keeps the picture
+              inside the 24px radius rather than squaring off the corners.
+
+              Lazy, and sized for the panel rather than the viewport: this
+              block closes nine pages and is below the fold on every one of
+              them. The panel is the container's full width, which caps at
+              1136px, so 1200px covers a DPR 1 screen and the srcset carries
+              the rest. */}
+          <Image
+            src="/images/cta/cta-band-2400.webp"
+            alt=""
+            fill
+            loading="lazy"
+            quality={82}
+            sizes="(min-width: 1280px) 1200px, 100vw"
+            /* cta-photo is not a Tailwind class. It is the hook the
+               forced-colors / reduced-transparency block at the foot of
+               globals.css uses to hide this picture, for the reason recorded
+               there: in forced-colors the panel's own navy becomes Canvas and
+               its type CanvasText, but an <img> keeps painting, so the band
+               would be system-colour text over a photograph. */
+            className="cta-photo object-cover"
+          />
+
+          {/* LAYER ONE: THE VEIL, AT 0.45. It was a single 0.86 layer doing
+              both jobs until 2026-10-02, and doing both is what made it too
+              heavy: an alpha set by what white type needs is an alpha that
+              hides the photograph everywhere, including the four fifths of the
+              panel with no type on it.
+
+              So the two jobs are two layers now. This one is the veil: it ties
+              the picture to the navy the rest of the site uses and keeps the
+              panel reading as one object, at an alpha chosen for the
+              PHOTOGRAPH rather than for the text. Every stop, the ellipse and
+              the 50% 0% anchor are the same shape they have always been.
+
+              At 0.45 the meadow and the dusk sky are plainly legible across
+              the corners and edges. The type sits on layer two.
+
+              The stops are smoothstep-sampled, 3t^2-2t^3; regenerate them from
+              the curve rather than hand-editing, as the note above says. */}
+          <div
+            aria-hidden="true"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(27,53,118,0.45)_0%,rgba(26,52,115,0.45)_14.3%,rgba(25,49,108,0.45)_28.6%,rgba(23,44,99,0.45)_42.9%,rgba(20,40,88,0.45)_57.1%,rgba(18,35,79,0.45)_71.4%,rgba(17,32,72,0.45)_85.7%,rgba(16,31,69,0.45)_100%)]"
+          />
+
+          {/* LAYER TWO: THE COPY RADIAL, and it is the layer that carries the
+              text. The veil above is now light enough to see the meadow
+              through, which is the point of it — but light enough to see
+              through is far too light to put white type on. So the darkening
+              that the type needs sits only where the type is: an ellipse
+              covering the copy column, flat across its inner half so every
+              glyph gets full strength, then easing out so the corners keep the
+              photograph.
+
+              FLAT CORE, THEN SMOOTHSTEP, which is the shape PageHero's `hero`
+              scrim uses and for the same reason: the worst pixel is never at
+              the centre of a text block, it is at the end of the longest line.
+              A conventional peaked radial delivers about half its peak there,
+              so reaching the floor at the edge needs a centre dark enough to
+              read as a spotlight. Holding the core flat to 50% spends the
+              falloff on empty panel instead.
+
+              86% x 96% at 50% 52%: wide enough to cover the meta row's full
+              width at 1440 and tall enough to cover medallion-to-meta at 390,
+              where the copy column is nearly the whole panel.
+
+              0.68 IS THE CORE, AND IT IS THE LOWEST THAT CLEARS EVERY FLOOR.
+              Measured over the 0.45 veil, worst backdrop pixel under a glyph,
+              1440 / 390:
+
+                core  heading       body        meta        appointment label
+                0.74  7.91 / 8.33   7.61/7.71   7.53/9.52   5.73 / 5.34
+                0.68  7.45 / 8.05   7.08/7.22   6.76/9.40   5.41 / 4.90
+                0.62  7.08 / 7.53   6.69/6.79   6.38/9.26   5.22 / 4.54
+                0.56  6.73 / 7.25   6.21/6.39   5.80/8.89   5.09 / 4.30  FAIL
+                0.50  6.29 / 6.95   5.82/5.99   5.43/8.77   4.83 / 4.06  FAIL
+
+              The appointment label at 390 is the binding case at every value,
+              for the reason the button note below gives. 0.68 also holds it on
+              hover, at 4.59:1; 0.62 does not (4.2:1). With the veil at 0.45
+              that is 0.82 of combined alpha behind the copy and 0.45 at the
+              corners, where the old single layer was 0.86 everywhere.
+
+              DO NOT HAND-EDIT THE STOPS. They are 3t^2-2t^3 sampled at eight
+              points; regenerate from the curve. */}
+          <div
+            aria-hidden="true"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_86%_96%_at_50%_52%,rgba(16,31,69,0.68)_0%,rgba(16,31,69,0.68)_50%,rgba(16,31,69,0.651)_56.2%,rgba(16,31,69,0.574)_62.5%,rgba(16,31,69,0.465)_68.8%,rgba(16,31,69,0.34)_75.0%,rgba(16,31,69,0.215)_81.2%,rgba(16,31,69,0.106)_87.5%,rgba(16,31,69,0.029)_93.8%,rgba(16,31,69,0.0)_100.0%)]"
+          />
+
+          <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
             <Reveal>
               {/* Two nested plates rather than one filled tile, so the mark reads
                 as an object on the panel rather than a sticker on it. Decorative,
@@ -133,6 +249,23 @@ export function PageCta({
               the modality is the thing a reader actually needs here and it is
               confirmed content.
 
+              THE PILL IS THE SHORT FORM AND THE META ROW BELOW IS THE LONG ONE,
+              reverted on 2026-10-03. Both carried DELIVERY_LINE for a day,
+              which put the same 66-character sentence twice in one band about
+              300px apart — flagged by both reviewers. One statement per block:
+              the pill says the mode, the meta row says the mode and the states.
+
+              rounded-2xl AND py-1 RATHER THAN THE SHARED PILL SHAPE, and that
+              is a wrap fix, not a style preference. a11y-architect measured the
+              long string at 200% text on 390 and 320: four or more lines inside
+              a `rounded-full` shape, whose radius is then half the pill height,
+              so the first and last lines' corners fall outside the white fill
+              and np-blue-700 text lands on navy. The short string does not wrap
+              at those sizes, but the band takes a per-page heading and nothing
+              stops a longer one arriving, so the shape is fixed here rather
+              than left to the next string. The shared Badge variant is
+              untouched — this is a call-site override.
+
               Kept as a white chip rather than made white-on-white with the rest
               of the copy: it is the one element that should read as a separate
               object. The chip is at least 9.79:1 against the panel and carries
@@ -140,8 +273,8 @@ export function PageCta({
               border width with a transparent colour, so forced-colors repaints
               an edge rather than dissolving the chip into the panel. */}
             <Reveal delay={0.06}>
-              <Badge className="bg-np-surface text-np-blue-700 mt-6 border-transparent">
-                In person or by telehealth
+              <Badge className="rounded-2xl bg-np-surface text-np-blue-700 mt-6 border-transparent py-1">
+                {DELIVERY_SHORT}
               </Badge>
             </Reveal>
 
@@ -161,11 +294,70 @@ export function PageCta({
                 The pair swaps roles on a dark ground. `primary` is np-blue-600,
                 which would sink into this navy panel, so the filled button is
                 white and the outline one carries the white ring. */}
+              {/* BOTH BUTTONS ARE GLASS NOW, over the photograph rather than
+                  over a flat navy. The pair still reads as primary and
+                  secondary, but by tint rather than by fill-versus-outline:
+                  the appointment button is the brighter glass at white/20, the
+                  phone button the quieter at white/10. The white fill this
+                  replaced would have sat on the picture as an opaque slab and
+                  undone the point of putting one there.
+
+                  MEASURED ON THE RENDERED BAND, worst pixel under a glyph, at
+                  1440 and at 390, against a 4.5:1 floor:
+
+                    "Request an appointment"  5.41 / 4.90:1   rest
+                                              5.15 / 4.59:1   hover
+                    the phone number          6.75 / 7.15:1   rest
+                                              6.32 / 6.54:1   hover
+
+                  THE PRIMARY ALSO CARRIES A PERMANENT 1px white/60 EDGE AND
+                  font-semibold, added 2026-10-02. Tint alone was a weak
+                  primary/secondary signal over a photograph — a11y-architect's
+                  finding on the first version — and neither cue depends on
+                  resolving the backdrop. The edge is declared on
+                  .liquid-glass-bright rather than as a border utility, because
+                  .liquid-glass's own `border: none` is unlayered and outranks
+                  one. The heavier weight also puts more pixels at full white,
+                  which is why the label measures slightly higher than it did
+                  at font-medium.
+
+                  The quieter button measures HIGHER because its tint lets more
+                  of the navy wash through, and the wash is darker than the
+                  glass. That is the opposite of what the hierarchy looks like,
+                  and it is fine: both clear the floor, and the hierarchy is
+                  carried by the tint difference, not by contrast.
+
+                  EVERY COPY VARIANT WAS MEASURED, not just this page's. The
+                  band takes a per-page heading and body, which change the
+                  panel's height and so change where object-cover puts the
+                  horizon. The four variants — the default, "Take the first
+                  step", "Let us check your coverage" and "Book with <name>" —
+                  land within 0.02 of each other at 390 (4.90 to 4.92) and
+                  within 0.01 at 1440. /insurance is the worst of them, which
+                  is why its figures are the ones quoted.
+
+                  THE FOCUS RING IS BOUNDED TOO, and separately: it sits on the
+                  2px band outside the pill, which is overlay-over-photo rather
+                  than glass. The brightest backdrop pixel under it measures
+                  L 0.051 at 390 and L 0.049 at 320 under 400% zoom — a white
+                  ring at 10.42:1 and 10.60:1 against a 3:1 floor.
+
+                  390 IS THE BINDING CASE, not 1440: the panel is narrow and
+                  tall there, so object-cover scales the frame by height and
+                  the lit horizon sits behind the buttons.
+
+                  Focus rings are white and come from the variants; the glass
+                  has no ring of its own, so without them a keyboard user would
+                  have nothing but a 4px blur to find. */}
               <div className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
-                <Button href={CTA.href} variant="onInk" size="lg">
+                <Button href={CTA.href} variant="onInkGlass" size="lg">
                   {CTA.label}
                 </Button>
-                <Button href={`tel:${BUSINESS.phonePrimaryHref}`} variant="onInkQuiet" size="lg">
+                <Button
+                  href={`tel:${BUSINESS.phonePrimaryHref}`}
+                  variant="onInkGlassQuiet"
+                  size="lg"
+                >
                   <Phone aria-hidden="true" size={18} strokeWidth={1.75} />
                   {BUSINESS.phonePrimary}
                 </Button>

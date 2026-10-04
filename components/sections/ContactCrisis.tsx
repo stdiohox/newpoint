@@ -3,7 +3,7 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { OnboardingForm } from '@/components/ui/onboarding-form';
-import { CONTACT, BUSINESS } from '@/lib/content';
+import { CONTACT, BUSINESS, DELIVERY_LINE } from '@/lib/content';
 
 /**
  * Layout family: contained form beside a crisis panel.
@@ -91,11 +91,13 @@ export function ContactCrisis() {
                       {BUSINESS.phonePrimary}
                     </a>
                   </p>
-                  {/* U+2011 non-breaking hyphen in "in-person": at the narrow
-                      end of this column the line was breaking after "in-",
-                      which leaves a dangling prefix mid-sentence. */}
+                  {/* DELIVERY_LINE, the client's delivery sentence, since
+                      2026-10-02. The U+2011 non-breaking hyphen this line used
+                      to carry went with the old wording: it stopped "in-person"
+                      breaking after the hyphen at the narrow end of this
+                      column, and the client's line has no hyphen in it. */}
                   <p className="text-small text-np-neutral-600">
-                    Telehealth across {BUSINESS.serviceArea.join(' and ')}, and in‑person care.
+                    {DELIVERY_LINE}.
                   </p>
                 </div>
               </div>

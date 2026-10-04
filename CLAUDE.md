@@ -214,6 +214,44 @@ So: state telehealth across both states freely. State in-person care **without a
 it to a state**, until the client confirms where. Writing "in person across New Jersey and
 Pennsylvania" sends a PA patient to a location that is not known to exist.
 
+> **SUPERSEDED, 2026-10-02 — THE CLIENT ATTACHED BOTH STATES TO BOTH MODES.** The rule in
+> the paragraph above is no longer what the site does. The client confirmed this delivery
+> line and asked for it wherever the site summarises how and where care is delivered:
+>
+> > **In person or telehealth services across New Jersey and Pennsylvania**
+>
+> It lives in one place, `DELIVERY_LINE` in `lib/content.ts`. As of 2026-10-03 it feeds the
+> footer, the closing CTA band's **meta row**, the contact page's intro and its "Where we
+> see patients" paragraph, the appointment form, the assessment page's modality label, two
+> FAQ answers (which carry it into `FAQPage` JSON-LD), the `/services` hero, the
+> `/new-patients` expectation, both JSON-LD descriptions and the provider pages.
+> **Edit that constant, not the call sites.**
+>
+> The band's **pill** takes `DELIVERY_SHORT` — "In person or by telehealth" — because the
+> pill and the meta row sit about 300px apart and carried the same 66-character sentence
+> twice for a day. One statement per block: the pill says the mode, the meta row says the
+> mode and the states. The short form is a constant too, for the same reason the long one
+> is.
+>
+> **The schedule claim did not move with it.** "An expanded schedule including weekends,
+> evenings, and holidays by request" stays bound to **telehealth** everywhere it appears.
+> The client's decision was about where and how care is delivered, not when; hours remain an
+> open item.
+>
+> **What this means for the restriction above:** it is lifted, by client decision, for this
+> sentence. The evidence did not change — the Pennsylvania signal is still one platform,
+> one provider, and the street address is still unconfirmed — so the two open rows in the
+> table remain open and `OPEN_CLIENT_ITEMS` still carries them. What changed is who is
+> making the claim: the practice is, in writing.
+>
+> **Do not "fix" this back.** A reviewer who flags "in person" beside two state names is
+> applying the paragraph above, which this note supersedes. Flag the conflict here instead,
+> as the service-furniture rule asks.
+
+> **HISTORICAL, 2026-09-29. Read the SUPERSEDED block above first — this note predates it
+> and its instruction has been overtaken.** It is kept because its evidence is still the
+> evidence, and because the licensure question it closes is still closed.
+>
 > **Update, 2026-09-29 — the rule above still stands, but its premise has weakened.**
 > [`research/provider-directories.md`](research/provider-directories.md) captures the
 > providers' own third-party listings. Three platforms independently give the NJ address as
@@ -227,6 +265,13 @@ Pennsylvania" sends a PA patient to a location that is not known to exist.
 > **Do not relax the rule on that alone.** One platform, one provider, and it may be a
 > Headway location rather than a Newpoint office. Get the client to confirm, then this
 > restriction can be lifted and the site can claim in-person care in both states.
+>
+> **WHAT ACTUALLY HAPPENED, 2026-10-02:** the client lifted it themselves, by confirming
+> the delivery line, without the Pennsylvania office being confirmed. So the sentence
+> immediately above is spent: the copy restriction is gone and is not coming back on this
+> evidence. The two open rows in the table — which states in-person covers, and the street
+> address — survive as **evidence gaps behind a published claim**, which is a sharper thing
+> than they were when they were gaps behind a hedge. They stay in `OPEN_CLIENT_ITEMS`.
 >
 > **A licensure question that file raised is now closed.** Headway's structured licensure
 > field gives Ofoegbu **New Jersey only**, which put the site's two-state claim for her in
