@@ -21,7 +21,7 @@ import { useHydrated } from '@/lib/useHydrated';
  */
 
 /**
- * Where the band comes to rest, in pixels, once the footer is fully on screen.
+ * The parallax travel, in pixels: the band runs from -TRAVEL to +TRAVEL.
  *
  * THE INPUT RANGE STOPS AT 0.5, NOT 1, AND THAT IS NOT A ROUNDING CHOICE. This
  * footer is the last element on the page, so `scrollYProgress` — which runs
@@ -29,18 +29,34 @@ import { useHydrated } from '@/lib/useHydrated';
  * cannot pass about 0.5: the page stops scrolling while the footer still fills
  * the screen. Mapping [0, 1] meant the back half of the curve was unreachable
  * and the band never arrived anywhere; it stopped wherever the page ran out.
- * Caught by react-reviewer. The travel is the same 200px as before, spent
- * entirely in the half of the range a visitor can actually reach.
+ * Caught by react-reviewer. The travel is spent entirely in the half of the
+ * range a visitor can actually reach.
+ *
+ * 40, NOT 50, SINCE 2026-10-04, AND THE NUMBER IS LOAD-BEARING. The band must
+ * never reach the card — see the clearance arithmetic in components/Footer.tsx,
+ * where the wrapper's bottom padding is sized against this constant. Raising it
+ * moves the band's highest position up by the same amount and eats into that
+ * clearance; raise the padding with it or do not raise it at all.
  */
-const REST_Y = 50;
+const TRAVEL = 40;
+
+/** Where the band sits once the footer is fully on screen, and where it sits
+    for anyone who is not getting the parallax at all. */
+const REST_Y = TRAVEL;
 
 /**
  * The flower band: a cut-out that drifts against the photograph behind it.
  *
  * THE LAYER IS ANCHORED BELOW THE EDGE SO NO GAP CAN OPEN. Moving the band UP
  * is the only thing that would expose the photograph under it, and
- * `-bottom-16` (64px) is more than the 50px of upward travel, so the frame's
+ * `-bottom-16` (64px) is more than the 40px of upward travel, so the frame's
  * bottom edge is covered at every scroll position.
+ *
+ * z-20: ABOVE the photograph, BELOW the card (z-30). The order was the other
+ * way round until 2026-10-04 and the flowers cut the disclaimer line off. The
+ * stacking is now only a backstop, though — the real fix is geometric, and it
+ * lives in components/Footer.tsx: the band cannot reach the card's bottom edge
+ * at any scroll position, so there is nothing left for z-order to rescue.
  *
  * `offset: ['start end', 'end start']` measures the footer from the moment its
  * top enters the viewport to the moment its bottom leaves. On a last-element
@@ -61,7 +77,7 @@ export function FooterFlowers({ src, width, height }: { src: string; width: numb
     target: ref,
     offset: ['start end', 'end start'],
   });
-  const y = useTransform(scrollYProgress, [0, 0.5], [-50, REST_Y]);
+  const y = useTransform(scrollYProgress, [0, 0.5], [-TRAVEL, REST_Y]);
 
   const animate = hydrated && !reduce;
 
@@ -69,46 +85,54 @@ export function FooterFlowers({ src, width, height }: { src: string; width: numb
     /* The measuring element is the full-height wrapper; the band inside it is
        what moves. pointer-events-none on both: this is scenery, and a 1500px
        transparent PNG over the card would otherwise eat clicks on the links. */
-    <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-0 z-20">
-      {/* THE BAND IS GIVEN A HEIGHT, NOT LEFT AT ITS NATURAL ONE, and that is
-          what keeps it off the card. At its own aspect ratio a 2752x1536 strip
-          drawn full-bleed is 804px tall at 1440 — anchored to the bottom of a
-          900px scene it starts 160px down and covers the entire card. A
-          fraction of the scene height with object-cover and object-bottom
-          keeps the flower heads and crops the stems, which is the half of the
-          picture that can be lost without anyone noticing: the band is a
-          repeating meadow and its bottom is foliage. The sides crop for the
-          same reason.
+    <div
+      ref={ref}
+      aria-hidden="true"
+      /* 88% — the middle of the 85–90% the client asked for. The band is a
+         cut-out of a lit meadow and sits directly on the overlay, so a little
+         transparency is what settles it into the scene instead of leaving it
+         stickered on; below about 85% the stems start to go milky. */
+      className="pointer-events-none absolute inset-0 z-20 opacity-[0.88]"
+    >
+      {/* THE BAND IS GIVEN A HEIGHT, NOT LEFT AT ITS NATURAL ONE. At its own
+          aspect ratio a 2752x1536 strip drawn full-bleed is 804px tall at 1440
+          — anchored to the bottom of a 900px scene it starts 160px down and
+          covers the entire card.
 
           A FIXED HEIGHT, NOT A FRACTION OF THE SCENE, and the geometry is
           worth writing out. The card is in flow, so the section grows with it;
           a percentage band would grow too, its top tracking the card down the
           page and never clearing it. Anchored at -bottom-16 the band's top
-          sits at sectionHeight + 64 - bandHeight, while the card's last line
-          sits at sectionHeight minus the wrapper's bottom padding. A fixed
-          band under a bottom padding larger than it is the only pair that
-          clears at every card height, text size and viewport.
+          sits at sectionHeight + 64 - bandHeight + y, while the card's bottom
+          edge sits at sectionHeight minus the wrapper's bottom padding — which
+          is why that padding is expressed in terms of THIS value in
+          components/Footer.tsx. Both ends of the pair have to move together.
 
           38vw IS THE BAND'S OWN ASPECT RATIO, so object-cover crops nothing at
           desktop widths. The asset is pre-cropped to the flowers: the keyed
           frame was 2752x1536 with the first flower pixel 507 rows down, i.e. a
           third of it transparent sky, and the file shipped here is the 1036
-          rows below that. 1036/2752 = 0.376, hence 38vw.
+          rows below that. 1036/2752 = 0.376, hence 38vw. It also means the top
+          of this box IS the tallest stem, to within about four rendered
+          pixels, so measuring the box measures the flowers.
 
-          BOTH NUMBERS MATTER TOGETHER. A box shorter than the band's ratio
-          crops into the flower heads and the crop edge reads as a hard
-          horizontal rule across the picture — which is exactly what a fixed
-          360px box did before this. A taller one pulls empty transparency into
-          the layout and pushes the card up for nothing.
+          THIS IS THE SHORTEST BOX THE PICTURE ALLOWS, which is worth saying
+          because "constrain the height" is the obvious way to keep flowers off
+          a card and it is the wrong one here. Below 37.6vw the box is
+          proportionally shorter than the image, object-cover scales to fill
+          the width instead, and object-bottom then guillotines the flower
+          heads — a hard horizontal rule straight across the picture, which is
+          exactly what a fixed 360px box did before this. The clearance is
+          bought with the wrapper's padding and with TRAVEL instead.
 
-          The 280px floor is for phones, where 37vw is only ~145px: there the
+          The 280px floor is for phones, where 37.6vw is only ~147px: there the
           band scales up and crops its sides instead, which a repeating meadow
           survives. */}
       <motion.div
         className="absolute inset-x-0 -bottom-16 h-[max(280px,38vw)]"
         /* NOT `undefined` WHEN THE PARALLAX IS OFF. A reader with reduced
            motion, or one with no JavaScript, should see the composition the
-           animated one comes to rest in — not one 50px higher. It also means
+           animated one comes to rest in — not one TRAVEL higher. It also means
            that if the OS preference flips mid-session the band snaps to the
            resting offset instead of keeping whatever transform it had. */
         style={{ y: animate ? y : REST_Y }}

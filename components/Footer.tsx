@@ -35,14 +35,23 @@ import {
  *
  * THE CARD IS WHITE NOW, SO EVERY COLOUR MOVED WITH IT, AND ONE OF THEM HAD
  * TO CHANGE. The old panel measured its copy against np-blue-900; this one
- * measures against bg-white/95 over a photograph, which composites to about
- * #fdfdfe over the bright sky and #f5f6f5 over the dark foliage. Measured on
- * the worse of the two:
+ * measures against bg-white/95 over the scene. Glyph-core measurement — the
+ * card captured twice, once with its text painted and once with it
+ * transparent, worst case being the darkest backdrop pixel under any glyph
+ * core — re-run on 2026-10-04 against the 70%-photograph-plus-overlay
+ * composite, at 1440, 1024, 768, 390 and 320, every scroll position:
  *
- *   np-ink        15.72:1    the crisis numbers
- *   np-blue-600    8.16:1    links on hover and focus
- *   np-neutral-600 6.54:1    body, links at rest, column headings
- *   np-neutral-500 4.11:1    FAILS — not used here any more
+ *   np-ink        15.57:1    the wordmark and the crisis line
+ *   np-blue-700   10.57:1    988 and 911
+ *   np-neutral-600 6.48:1    body, links at rest, column headings, legal
+ *   np-neutral-500 4.11:1    FAILED — not used here any more
+ *
+ * The darkest backdrop found anywhere under a glyph was L = 0.9065 (#f6f5f3),
+ * and it barely moves across the five widths: the overlay's job is partly that
+ * — it takes the photograph's own range out of the card's backdrop, so the
+ * numbers no longer depend on which part of the meadow a line happens to sit
+ * over. Lightening the scene cannot lower these, but darkening it can, so
+ * re-measure if the overlay or the 70% ever changes.
  *
  * np-neutral-500 is the quiet grey this card first used for the column
  * headings, the provider names and the whole bottom bar. It is 4.45:1 on pure
@@ -110,13 +119,21 @@ export function Footer() {
        and lets it grow when the card does. svh, not vh: on iOS vh is the
        height with the browser chrome retracted, so a 100vh footer is taller
        than the screen until the user scrolls. */
-    <footer className="relative min-h-[100svh] overflow-hidden">
+    /* bg-white under everything, and it is not decoration: the photograph is
+       painted at 70% now, so SOMETHING has to be the other 30%. Leaning on the
+       page background would make the footer's tone depend on whatever route it
+       is sitting at the bottom of. */
+    <footer className="relative min-h-[100svh] overflow-hidden bg-white">
       {/* THE PHOTOGRAPH. Decorative — the footer's own content says everything
           the footer means — so alt="" with aria-hidden on the wrapper. It is a
           background in the layout sense but a real <Image> rather than a CSS
           background, so it goes through the optimiser and gets a srcset; the
-          wrapper does the bg-cover / bg-center job. */}
-      <div aria-hidden="true" className="absolute inset-0 z-0">
+          wrapper does the bg-cover / bg-center job.
+
+          70%, on the WRAPPER rather than the <Image>, so the optimiser's own
+          element keeps its default compositing and one layer carries the
+          fade. */}
+      <div aria-hidden="true" className="absolute inset-0 z-0 opacity-70">
         <Image
           src="/images/footer/footer-bg-2400.webp"
           alt=""
@@ -128,30 +145,58 @@ export function Footer() {
         />
       </div>
 
-      {/* THE CUT-OUT BAND, in front of the card. This is the parallax layer and
-          the reason the card carries deep bottom padding: the flowers are meant
-          to overlap its lower edge, which is the whole look. Nothing readable
-          is placed in the overlap. */}
+      {/* THE OVERLAY, between the photograph and the flowers. White at the top
+          where the card sits, easing into np-blue-100 (#e3eaf8) at the foot
+          where the flowers are — so the scene reads as light sky above and
+          brand-tinted meadow below, and the card is never floating on a busy
+          patch of photograph.
+
+          THE STOPS ARE CHOSEN TO LEAVE THE PICTURE IN THE PICTURE. 0.45 white
+          at the top is the most this will take: with the photograph already at
+          70%, 0.45 leaves the top of the frame at 0.70 x 0.55 = 38% of the
+          original image, which still reads as a photograph. Past about 0.6 it
+          goes flat white and the brief's "not washed out" is lost. The bottom
+          stop is deliberately the weakest (0.18) because the flowers are drawn
+          over it and a tint strong enough to matter there would haze them. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.28)_45%,rgba(227,234,248,0.18)_100%)]"
+      />
+
+      {/* THE CUT-OUT BAND. The parallax layer, at z-20: above the photograph
+          and the overlay, below the card. */}
       <FooterFlowers src="/images/footer/footer-flowers-band.webp" width={2752} height={1036} />
 
-      {/* THE CARD. z-10 puts it above the photograph and below the flowers.
+      {/* THE CARD, at z-30 — above everything.
 
-          THE DEEP PADDING MOVES BETWEEN THE CARD AND THE WRAPPER, and which
-          one holds it is what decides whether the flowers overlap the card or
-          sit under it.
+          THE FLOWERS NO LONGER OVERLAP IT, AND THE BOTTOM PADDING IS WHY.
+          Until 2026-10-04 the card carried md:pb-[31rem] so the band could
+          rise over 500 points of empty card: flowers in front of the panel,
+          which was the HAUL pattern's look. It cost the disclaimer line, which
+          the stems cut through. Raising the card above the band would have
+          fixed the legibility and left the stems disappearing behind an opaque
+          white edge, so the overlap is gone instead of merely reordered, and
+          the empty card padding with it.
 
-          From md it is on the CARD (pb-[31rem]): the band then rises over 500
-          points of empty card, which is the parallax-footer look — flowers in
-          front of the panel rather than beside it. Below md it is on the
-          WRAPPER instead, because a phone card is already a screen and a half
-          tall and half a screen of empty white inside it would be absurd;
-          there the band simply sits below the card.
+          THE CLEARANCE IS ARITHMETIC, not a tuned number, and both halves live
+          in FooterParallax.tsx. The band's top is at
 
-          Either way the number is the same calculation: the band's height plus
-          the gap the text needs, less the 64px the band already hangs past the
-          bottom edge. */}
-      <div className="relative z-10 px-4 pt-10 pb-[19rem] md:px-8 md:pt-10 md:pb-10">
-        <FooterCard className="rounded-2xl bg-white/95 p-6 pb-10 shadow-xl backdrop-blur-sm sm:p-8 md:rounded-3xl md:p-10 md:pb-[31rem] mx-auto w-full max-w-7xl">
+              sectionHeight + 64 (the -bottom-16 anchor) - BAND + y
+
+          and y bottoms out at -TRAVEL = -40 at the top of the footer's scroll.
+          The card's bottom edge is at sectionHeight - thisPadding. Setting the
+          padding to exactly BAND leaves
+
+              64 - 40 = 24px of clearance at the worst scroll position,
+              64 + 40 = 104px once the footer has settled,
+
+          at every viewport width, every card height and every text size —
+          because both sides are written in the same max(280px,38vw) and the
+          card's own height cancels out of the comparison. Change one of the
+          three (padding, BAND, TRAVEL) and the margin moves; change the
+          padding to anything that is not BAND and the proof is gone. */}
+      <div className="relative z-30 px-4 pt-10 pb-[max(280px,38vw)] md:px-8">
+        <FooterCard className="rounded-2xl bg-white/95 p-6 pb-10 shadow-xl backdrop-blur-sm sm:p-8 md:rounded-3xl md:p-10 mx-auto w-full max-w-7xl">
           {/* TOP ROW. Identity on the left, the site's single CTA on the right. */}
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10 lg:gap-12">
             <div className="max-w-[46ch]">
@@ -252,9 +297,8 @@ export function Footer() {
 
               IT IS THE ONLY CRISIS GUIDANCE on /insurance, /providers/[slug]
               and /services, so its position is the whole of the coverage
-              there. It must never end up under the flower band: the card's
-              bottom padding is what the flowers overlap, and this strip sits
-              above that padding.
+              there. Nothing may ever be drawn over it; the flower band used to
+              be the standing risk and no longer reaches the card at all.
 
               np-blue-50 ground, np-ink numbers at 15.4:1 and np-neutral-600
               body at 6.3:1. */}
