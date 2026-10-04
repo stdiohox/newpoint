@@ -258,7 +258,12 @@ export function Footer() {
               </ul>
             </div>
 
-            <div>
+            {/* min-w-0 BECAUSE A GRID TRACK WILL NOT SHRINK PAST ITS CONTENT
+                otherwise: a grid item's min-width is auto, so an unbreakable
+                24-character address sets this column's floor and pushes the
+                whole nav wider than the card. The wrap rule below is what lets
+                the address break; this is what lets the column follow it. */}
+            <div className="min-w-0">
               <h2 className={headingClass}>{FOOTER.columns.contact}</h2>
               <ul role="list" className="mt-4 space-y-3">
                 <li>
@@ -271,7 +276,23 @@ export function Footer() {
                     on its own tells a patient nothing about who reads it. */}
                 {PROVIDERS.map((p) => (
                   <li key={p.email}>
-                    <a href={`mailto:${p.email}`} className={linkClass}>
+                    {/* `anywhere`, NOT `break-word`, and only on the addresses.
+                        At 200% text these two 24-character strings are the one
+                        thing on the card that cannot wrap: measured at a 32px
+                        root they ran 76px past the card edge at 1024 and 164px
+                        at 768, and the footer's overflow-hidden then cut them
+                        off with no way to scroll to them — SC 1.4.4, found by
+                        a11y-architect. break-word only breaks a word when the
+                        line is otherwise empty, which is not this case; the
+                        address has a label beside it in the flex and prose
+                        line-box. Scoped to the addresses because anywhere also
+                        counts the break opportunity when computing min-content
+                        width, and applying it to every link would let short
+                        nav labels break mid-word too. */}
+                    <a
+                      href={`mailto:${p.email}`}
+                      className={`${linkClass} [overflow-wrap:anywhere]`}
+                    >
                       {p.email}
                     </a>
                     {/* `name`, NOT `displayName`, and that is the condition the
