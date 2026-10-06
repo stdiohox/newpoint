@@ -457,6 +457,46 @@ stimulant/DEA/telehealth scope question, and the age range — ADHD is the
 highest-paediatric-volume condition on that list, and the site still cannot say
 whether it serves children.
 
+### Medical weight management — CLIENT INSTRUCTION, 2026-10-06
+
+A fourth service line, briefed as "add weight loss" with a competitor's printed
+flyer as the reference: *doctor-supervised, weekly injections (semaglutide &
+tirzepatide), 10% off your first month*. Built as `/services/weight-management`.
+The long note at the head of that entry in `lib/content.ts` carries the full
+reasoning; this is the part that governs future edits.
+
+**Three of the flyer's four lines were not adopted, and none of the three is a
+style preference.**
+
+| The flyer says | The site says | Why |
+|---|---|---|
+| "Doctor-Supervised" | the FNP-BC credential, named | **There is no physician at Newpoint.** Both providers are DNP, FNP-BC, PMHNP-BC. In weight-loss advertising "doctor-supervised" is read as *physician*-supervised, and asserting it is exactly the regulated-fact invention this file forbids. FNP-BC — the certification covering general medical care rather than psychiatric care alone — is the more specific claim and the true one. |
+| "Weight Loss Solutions" | "Medical weight management" | That is the **trading name of the practice on the flyer**, 134 Franklin Corner Road, Lawrenceville — the same town the open address item places Newpoint in. Taking a direct competitor's name in its own market is not a copy decision. |
+| "10% off your first month" | nothing about money | Declined by the client on 2026-10-06. A discount implies a monthly price, a term and an interaction with insurance billing, none of which anyone has stated. |
+
+**No outcome is claimed anywhere on that page** — no pounds, no percentages, no
+timeframe, no before-and-after — and the page says so in a section of its own
+rather than staying quiet. Weight-loss advertising is policed hardest on exactly
+that claim. **Do not add one**, and do not add a brand name: Wegovy, Ozempic,
+Zepbound and Mounjaro appear nowhere on this site, because naming generic
+molecules is true whether the product is manufactured or compounded and naming
+a brand is not.
+
+**It is the only service page that renders the in-page crisis panel**, because
+it is the only one on the shared prose layout. That is deliberate, not a
+leftover: a behavioural-health practice advertising weight loss will be read by
+people with eating disorders. The page also asks about eating-disorder history
+in its own copy — it **asks**, at an appointment; it does not screen, name a
+criterion, or invite anyone to type a history into the contact form, which the
+HIPAA rule below forbids.
+
+**Six facts are still open and all six are in `OPEN_CLIENT_ITEMS`** as one item:
+whether it is open to new patients or existing ones only; brand or compounded;
+in-office or self-administered injections; price and terms; insurance or
+cash-pay; and whether it holds for both providers — adding the service has
+already asserted that it does, since both provider pages list every entry in
+`SERVICE_PAGES`.
+
 ## Compliance
 
 **HIPAA-aware.** The v1 contact/intake flow **must NOT collect any health information**.

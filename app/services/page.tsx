@@ -272,8 +272,21 @@ export default function ServicesIndex() {
                           text taking order-1, so the DOM order stays
                           image-then-text and the reading order is identical in
                           both directions. */}
+                      {/* THE NEUTRAL GROUND IS FOR THE SERVICE THAT HAS NO
+                          POSTER YET. Until 2026-10-06 every entry in
+                          SERVICE_PAGES had a homepage card to borrow a video
+                          still from, so the `poster &&` below never failed and
+                          this box never showed. Medical weight management has
+                          no card and no artwork, and with nothing drawn and no
+                          background the row rendered a transparent hole beside
+                          its copy — on the one page where the four services
+                          are sold side by side. np-neutral-100 holds the 4:3
+                          shape so the alternating grid still reads as a grid,
+                          which is what ServiceCards already does for the same
+                          reason. It disappears of its own accord the moment a
+                          master arrives. Found by healthcare-reviewer. */}
                       <div
-                        className={`rounded-media relative aspect-[4/3] overflow-hidden ${
+                        className={`rounded-media bg-np-neutral-100 relative aspect-[4/3] overflow-hidden ${
                           i % 2 === 1 ? 'md:order-2' : ''
                         }`}
                       >
