@@ -1972,6 +1972,35 @@ export const SERVICE_PAGES: ServicePage[] = [
      */
     slug: 'weight-management',
     nav: 'Weight management',
+    /* No appointment button in this hero, matching all three siblings. The
+       navbar's, PageCta's and the footer's all remain. */
+    hideHeroCta: true,
+    /* THE CARD LAYOUT, as on medication-management, since 2026-10-06 — the
+       client asked for this page to be built like the others rather than left
+       on the prose fallback. The shape fits almost exactly: four sections
+       become the grid, and the fifth falls through to its own block below it,
+       which is where a chip list belongs and is precisely where
+       medication-management's "Conditions we prescribe for" renders. The
+       medications section is LAST in this array for that reason, not by
+       narrative preference.
+
+       THIS REVERSES A "DO NOT GIVE THIS SERVICE A LAYOUT" NOTE THAT STOOD HERE
+       FOR ONE COMMIT, and the reason it was wrong is worth recording. It
+       argued the layout could separate the prescribing list from its hedge.
+       It cannot: ServiceCards' fall-through block renders the list through
+       <SectionList /> with `note={section.listNote}`, which is the same
+       component every other layout uses, and both build assertions still fire.
+       The hedge was never at risk.
+
+       WHAT THE CHANGE DOES COST is the in-page crisis panel and the "Keep
+       reading" cluster, which only the prose fallback carries. That is now
+       consistent with all three siblings — CLAUDE.md records that each of them
+       dropped both by client decision, and the footer's 988/911 strip is the
+       crisis guidance on those routes and renders sitewide. It is a real loss
+       on this page specifically, for the reason the eating-disorder line
+       exists, and it is recorded here rather than argued: the client asked for
+       the pages to match. */
+    layout: 'cards',
     /* MedicalTherapy, not MedicalProcedure: this is an ongoing treatment, where
        the assessment is a diagnostic procedure and telehealth is a delivery
        mode. Same reasoning as the note on the schemaType field. */
@@ -2001,81 +2030,53 @@ export const SERVICE_PAGES: ServicePage[] = [
        supervisor is named in the same sentence. */
     metaDescription:
       'Medical weight loss in NJ and PA. Weekly semaglutide or tirzepatide injections, prescribed and reviewed by our nurse practitioners after an appointment.',
+    /* THE TRAILING CLAUSE CAME OFF IN THE REDESIGN — it said the appointment
+       that decides comes first, which is now a card of its own and a bullet
+       inside it, stated twice over. What CANNOT come off is "where a weekly
+       injection is appropriate": this string is also the `description` on the
+       MedicalTherapy node, which ships on / and /services as well as here, and
+       that clause is the only hedge that travels with the drug names. */
     intro:
-      'Medical weight loss, supervised by our own nurse practitioners rather than referred out. Where a weekly injection is appropriate, semaglutide and tirzepatide are the two we prescribe — and the appointment that decides whether either is right for you comes first.',
+      'Medical weight loss, supervised by our own nurse practitioners rather than referred out. Where a weekly injection is appropriate, semaglutide and tirzepatide are the two we prescribe.',
     /* Names no modality, and that is not an oversight: whether injections are
        given in the office or self-administered at home is unconfirmed, and
        either answer changes this line. It names the two states because both
        providers are licensed in both, which this file already asserts on
        /services/telehealth. See OPEN_CLIENT_ITEMS. */
     modality: 'Prescribed and reviewed by our nurse practitioners in New Jersey and Pennsylvania.',
+    /**
+     * FOUR CARDS AND A FALL-THROUGH, in that order, which is what the card
+     * layout renders: sections 1-4 become the grid and anything after the
+     * fourth becomes its own block below it.
+     *
+     * THE COPY WAS CUT TO FIT, not fitted by shrinking the type. The first
+     * draft of this page was written for the prose fallback, which renders a
+     * `detail` paragraph under each `body`; the card layout renders `body`,
+     * `bullets` and `highlight` and ignores `detail` entirely, so every one of
+     * those paragraphs would have vanished silently. Rather than leave them
+     * dangling, the half of each that was doing work moved into the body or
+     * into a bullet and the rest went. Nothing here is a claim that was not on
+     * the page before the redesign.
+     */
     sections: [
       {
         heading: 'What medical weight management involves',
         /* CLIENT-REVIEW — GENERIC. Describes ongoing prescribing care in
            general terms. No duration, no frequency of review, no price, no
            eligibility threshold, no outcome. */
-        body: 'Medical weight management is ongoing care rather than a one-off prescription. It starts with an appointment that goes through your health history, what you have already tried, and anything you are currently taking. If a weight-management medication is appropriate for you, it is prescribed from there and reviewed as you go.',
-        /* CLIENT-REVIEW — GENERIC, and it is the one line on this page that
-           argues for Newpoint over a weight-loss clinic. Both halves are
-           ordinary clinical knowledge rather than claims about this practice:
-           that weight, appetite, sleep and mood move together, and that
-           several psychotropics affect weight directly. Neither names a
-           medication, a mechanism or an outcome. */
-        detail: 'It sits alongside the rest of our care rather than apart from it. Weight, appetite, sleep and mood move together more often than not, and a number of the medications used in psychiatry affect weight directly — which is why this is run by the same providers who handle your psychiatric prescriptions, rather than by a separate service that cannot see them.',
-      },
-      {
-        /**
-         * THE HEADING SAYS "PRESCRIBE", WHICH ARMS THE BUILD ASSERTION.
-         * assertPrescribingHedged() at the foot of this file fails the build if
-         * a section whose heading matches /prescrib/i carries a `list` without
-         * a `listNote`, and SectionList.tsx fails on the rendering half of the
-         * same mistake. That is deliberate here rather than incidental: a
-         * two-item list of GLP-1 medications under a prescribing heading is the
-         * single most over-claimable element on this page, and it is now
-         * impossible to ship it bare.
-         *
-         * WHAT THIS LIST DOES NOT SAY, and must not be edited into saying:
-         * nothing about dose, nothing about brand — Wegovy, Ozempic, Zepbound
-         * and Mounjaro appear nowhere on this site — and nothing about whether
-         * the product is manufactured or compounded. The brand-versus-
-         * compounded question in particular is a live FDA matter and is in
-         * OPEN_CLIENT_ITEMS; naming generic molecules rather than brands is
-         * what the client's own brief did, and it is also the only form of the
-         * claim that is true either way.
-         */
-        /* THE DRUG NAMES ARE IN THE HEADING, not only in the chips, so the one
-           h2 a skim-reader stops on says what this page is actually about.
-           "prescribe" STAYS IN IT: the build assertion matches /prescrib/i on
-           the heading, and a rename that drops the word silently disarms the
-           only thing forcing the hedge to ship with the list.
-
-           NO MECHANISM IS STATED ANYWHERE ON THIS PAGE, and the omission is
-           deliberate rather than a gap. seo-specialist asked for "GLP-1",
-           which is the term patients search; healthcare-reviewer's clearance
-           of the drug facts rests on the fact that no mechanism is claimed, so
-           no mechanism can be wrong. Those two cannot both be had, because
-           "GLP-1 medications" is accurate for semaglutide and imprecise for
-           tirzepatide, which acts at GIP receptors as well. The safety
-           property is worth more than the query. */
-        heading: 'The medications we prescribe: semaglutide and tirzepatide',
-        /* CLIENT-REVIEW — GENERIC pharmacology. That semaglutide and
-           tirzepatide are different molecules and are not interchangeable is a
-           fact about the drugs, not a claim about this practice.
-           THE RISK CLAUSE IS THE LAST SENTENCE, added on healthcare-reviewer's
-           finding that the page was precise about what it would not promise
-           and silent on harm — the asymmetry a nursing board notices first on
-           a page that names two molecules beside an indication. It asserts
-           nothing new: that these carry side effects is on their labelling,
-           and "we go through them with you" is the gate the page already
-           states three other ways. */
-        body: 'Both are weekly injections and both are prescription-only. They are different medications with different active ingredients and they are not interchangeable: which one is prescribed, if either is, is a clinical decision made with your provider. Both carry side effects and risks, and your provider goes through them with you before anything is prescribed.',
-        list: ['Semaglutide — a weekly injection', 'Tirzepatide — a weekly injection'],
-        /* The hedge. It renders immediately after the chips, in every layout,
-           via <SectionList />. Two clauses doing two different jobs: the first
-           stops the list reading as a promise, the second states the gate. */
-        listNote:
-          'Appearing on this list does not mean either medication is right for you. Neither is prescribed without an appointment, and neither is suitable for everyone.',
+        body: 'Ongoing care rather than a one-off prescription. It starts with an appointment that goes through your health history, what you have already tried and anything you are currently taking. If a medication is appropriate, it is prescribed from there and reviewed as you go.',
+        bullets: [
+          /* CLIENT-REVIEW — GENERIC, and between them these two are the whole
+             argument for having this service here rather than at a weight-loss
+             clinic. Both are ordinary clinical knowledge rather than claims
+             about this practice, and neither names a medication, a mechanism
+             or an outcome. */
+          'Weight, appetite, sleep and mood move together more often than not.',
+          'A number of the medications used in psychiatry affect weight directly.',
+        ],
+        /* CLIENT-REVIEW — GENERIC. Says where the service sits, not what it
+           achieves. */
+        highlight: 'Run by the providers who already handle your psychiatric prescriptions, rather than referred out.',
       },
       {
         /* "PRESCRIBES AND REVIEWS", NOT "SUPERVISES", since healthcare-reviewer
@@ -2092,19 +2093,20 @@ export const SERVICE_PAGES: ServicePage[] = [
          * clause is what licenses the "Dr." prefix under CLAUDE.md's title
          * rule — assertTitlesQualified() requires "nurse practitioner" or the
          * post-nominals in the same string, and this has both.
-         *
-         * "FNP-BC is the certification that covers general medical care" is
-         * the most load-bearing sentence on this page, because it is the only
-         * thing that puts weight management inside these providers' scope at
-         * all. It is also the reason the flyer's "doctor-supervised" was worth
-         * replacing rather than softening: this is a more specific claim, it is
-         * true, and it is already evidenced in this file.
          */
-        body: 'Dr. Funmilayo Whitaker and Dr. Anastasia O. Ofoegbu are each certified as family nurse practitioners as well as psychiatric-mental health nurse practitioners — DNP, FNP-BC, PMHNP-BC. The family certification is the one that matters here: it is the credential that covers general medical care rather than psychiatric care alone.',
-        /* CLIENT-REVIEW — GENERIC. Makes no claim about chart systems, about
-           how records are held, or about coordination with outside prescribers.
-           It says only that the prescriber is one of ours. */
-        detail: 'Your care is not handed to a different clinician for this. The provider prescribing a weight-management medication is a provider who already knows what else you are taking, which matters when something on that list affects appetite or weight.',
+        body: 'Dr. Funmilayo Whitaker and Dr. Anastasia O. Ofoegbu are each certified as family nurse practitioners as well as psychiatric-mental health nurse practitioners — DNP, FNP-BC, PMHNP-BC.',
+        bullets: [
+          /* THE LOAD-BEARING LINE ON THIS PAGE. It is the only thing that puts
+             weight management inside these providers' scope at all, and it is
+             why the flyer's "doctor-supervised" was worth replacing rather
+             than softening: more specific, true, and already evidenced in this
+             file. Note what it does NOT say — board certification is not state
+             prescriptive authority, and that question is open. */
+          'The family certification is the one that covers general medical care, rather than psychiatric care alone.',
+          /* CLIENT-REVIEW — GENERIC. Claims nothing about chart systems or
+             about coordination with outside prescribers. */
+          'The provider prescribing already knows what else you are taking.',
+        ],
       },
       {
         heading: 'Before anything is prescribed',
@@ -2115,27 +2117,26 @@ export const SERVICE_PAGES: ServicePage[] = [
          * history of anorexia, bulimia or binge eating, for whom appetite
          * suppression is not a neutral intervention. Asking is standard of
          * care; a weight-loss page that does not ask is the thing worth
-         * noticing.
+         * noticing. IT ASKS, IT DOES NOT SCREEN: no criterion is named, nobody
+         * is excluded, and nothing invites a history into the contact form,
+         * which CLAUDE.md's HIPAA rule forbids.
          *
-         * IT ASKS, IT DOES NOT SCREEN. The line invites disclosure at an
-         * appointment. It does not name a criterion, does not say who is
-         * excluded, and above all does not invite anyone to type a history into
-         * a form — CLAUDE.md's HIPAA rule forbids the contact flow collecting
-         * any of this, and nothing here should be read as softening that.
+         * IT MATTERS MORE SINCE THE REDESIGN, not less. On the prose layout
+         * this page also carried the shared crisis panel; the card layout does
+         * not, so this is now the only eating-disorder-aware content above the
+         * footer on the one page that needs it.
          */
-        /* THE CLOSING CLAUSE ANSWERS THE QUESTION THE LINE RAISES, added on
-           healthcare-reviewer's reading of 2026-10-06. As first written the
-           sentence asked for a disclosure and said nothing about what follows
-           it, so a reader with a history of anorexia or binge eating learned
-           that it mattered and not what it meant for them. "We will talk about
-           whether this is the right approach" excludes nobody and screens
-           nobody; it says the conversation happens. */
-        body: 'Tell us what you are already taking, including anything prescribed elsewhere, and tell us if you have a history of an eating disorder. Both change what is safe and what is appropriate, and neither is something to work out from a form. If you do have that history, we will talk about whether this is the right approach for you.',
-        /* CLIENT-REVIEW — GENERIC, and consistent with the line
-           /services/medication-management already carries: "A diagnosis is made
-           at your assessment, where one can be established, before anything is
-           prescribed." This is the same gate stated for this service. */
-        detail: 'Nothing is prescribed before an appointment. If you get in touch about weight management, the first thing we arrange is the appointment, not the prescription.',
+        body: 'Tell us what you are already taking, including anything prescribed elsewhere, and tell us if you have a history of an eating disorder. Both change what is safe, and neither is something to work out from a form.',
+        bullets: [
+          /* Added on healthcare-reviewer's reading of 2026-10-06: as first
+             written the line asked for a disclosure and said nothing about what
+             follows it. This excludes nobody and screens nobody; it says the
+             conversation happens. */
+          'If you do have that history, we will talk about whether this is the right approach for you.',
+          /* CLIENT-REVIEW — GENERIC, and the same gate
+             /services/medication-management states for its own service. */
+          'Nothing is prescribed before an appointment.',
+        ],
       },
       {
         /**
@@ -2148,19 +2149,67 @@ export const SERVICE_PAGES: ServicePage[] = [
          * tells a patient who has read a competitor's numbers why there are
          * none here, it binds a future editor who might be tempted to add
          * some, and it is the honest answer to the question the page raises.
-         *
-         * NO CRISIS NUMBERS IN THIS BODY. The prose layout renders the shared
-         * CrisisPanel at the foot of this page, and CLAUDE.md's note on the
-         * telehealth page records why a second, differently worded crisis
-         * instruction competing with the first is worse than one. The panel is
-         * the crisis affordance on this route.
          */
         heading: 'What we do not promise',
-        /* CLIENT-REVIEW — GENERIC. Every clause is a refusal to claim. The
-           only positive statement is that response varies and that medication
-           is part of a plan, both of which are true of these drugs generally
-           and are the standard caveat on their own labelling. */
-        body: 'We do not publish an amount of weight you can expect to lose, a timeframe for losing it, or before-and-after photographs. Response to these medications varies from person to person, they are not suitable for everyone, and where one is prescribed it is part of a plan rather than the whole of it.',
+        /* CLIENT-REVIEW — GENERIC. Every clause is a refusal to claim. */
+        body: 'No amount of weight you can expect to lose, no timeframe for losing it, and no before-and-after photographs.',
+        bullets: [
+          /* Both are the standard caveat on these drugs' own labelling, stated
+             about the drugs rather than about this practice. */
+          'Response varies from person to person, and these medications are not suitable for everyone.',
+          'Where one is prescribed, it is part of a plan rather than the whole of it.',
+        ],
+      },
+      {
+        /**
+         * THE FALL-THROUGH BLOCK, and the reason this section is last.
+         *
+         * ServiceCards hands everything after the fourth section to its own
+         * block below the grid — no card, no photograph, no image slot
+         * promised — which is exactly where a chip list belongs and exactly
+         * where medication-management's "Conditions we prescribe for" renders.
+         * Moving this section to the end is what makes the layout fit; it is
+         * not a narrative choice.
+         *
+         * THE HEADING SAYS "PRESCRIBE", WHICH ARMS THE BUILD ASSERTION.
+         * assertPrescribingHedged() fails the build if a section whose heading
+         * matches /prescrib/i carries a `list` with no `listNote`, and
+         * SectionList.tsx fails on the rendering half of the same mistake. The
+         * fall-through block renders the list through that same component, so
+         * the hedge survived the layout change — which is what the "do not
+         * give this service a layout" note of one commit ago got wrong.
+         *
+         * WHAT THIS LIST DOES NOT SAY, and must not be edited into saying:
+         * nothing about dose, nothing about brand — Wegovy, Ozempic, Zepbound
+         * and Mounjaro appear nowhere on this site — and nothing about whether
+         * the product is manufactured or compounded. That last one is a live
+         * FDA matter and is in OPEN_CLIENT_ITEMS; naming generic molecules is
+         * what the client's own brief did and is the only form of the claim
+         * that is true either way.
+         *
+         * NO MECHANISM IS STATED ANYWHERE ON THIS PAGE, and the omission is
+         * deliberate. seo-specialist asked for "GLP-1", which is the term
+         * patients search; healthcare-reviewer's clearance of the drug facts
+         * rests on no mechanism being claimed, so no mechanism can be wrong.
+         * Both cannot be had: "GLP-1 medications" is accurate for semaglutide
+         * and imprecise for tirzepatide, which acts at GIP receptors too. The
+         * safety property is worth more than the query.
+         */
+        heading: 'The medications we prescribe: semaglutide and tirzepatide',
+        /* CLIENT-REVIEW — GENERIC pharmacology. That the two are different
+           molecules and are not interchangeable is a fact about the drugs, not
+           a claim about this practice.
+           THE RISK CLAUSE IS THE LAST SENTENCE, added on healthcare-reviewer's
+           finding that the page was precise about what it would not promise
+           and silent on harm — the asymmetry a nursing board notices first on
+           a page that names two molecules beside an indication. */
+        body: 'Both are weekly injections and both are prescription-only. They are different medications with different active ingredients and they are not interchangeable: which one is prescribed, if either is, is a clinical decision made with your provider. Both carry side effects and risks, and your provider goes through them with you before anything is prescribed.',
+        list: ['Semaglutide — a weekly injection', 'Tirzepatide — a weekly injection'],
+        /* The hedge. It renders immediately after the chips, in every layout,
+           via <SectionList />. Two clauses doing two different jobs: the first
+           stops the list reading as a promise, the second states the gate. */
+        listNote:
+          'Appearing on this list does not mean either medication is right for you. Neither is prescribed without an appointment, and neither is suitable for everyone.',
       },
     ],
     faqs: [

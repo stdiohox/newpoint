@@ -5,7 +5,7 @@ import { PageHero } from '@/components/PageHero';
 import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
-import { ServiceCards } from '@/components/sections/ServiceCards';
+import { ServiceCards, type CardMedia } from '@/components/sections/ServiceCards';
 import { ServiceGrid } from '@/components/sections/ServiceGrid';
 import { SectionList } from '@/components/sections/SectionList';
 import { Container } from '@/components/ui/Container';
@@ -178,6 +178,48 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       alt: 'Two people seated across a table from each other, with an open notebook of handwritten notes between them beside a folder of papers and a closed laptop.',
     },
   } as const;
+
+  /* MEDICAL WEIGHT MANAGEMENT'S FOUR SLOTS, reserved ahead of the artwork in
+     exactly the way medication-management's were — see the note above. None of
+     these four files exists yet, so ServiceCards draws its neutral 16/9 block
+     in each one and the page can be reviewed against its real layout. Nothing
+     here changes when they land.
+
+     EMPTY ALTS, AND THAT IS THE DIFFERENCE FROM THE MAP ABOVE. The long note
+     on that one records what happened when alts were written against a
+     commissioning brief instead of a delivered frame: all four were wrong, a
+     desk turned out to be an armchair, and an alt describing a different
+     picture is a 1.1.1 failure that no automated check catches. So there is
+     nothing to describe until there is a frame, and alt="" is also the right
+     end state for most of these anyway — each sits beside a heading that names
+     its section, so a decorative photograph needs no second voice. Write a
+     real alt only for a frame that carries information the copy does not.
+
+     WHAT TO SHOOT, for whoever sources these: the headings are the brief. No
+     scales, no tape measures, no before-and-after, no bodies as subjects — all
+     four are the visual grammar of the outcome claims this page refuses to
+     make in words. Consulting-room and conversation frames, as on the sibling
+     pages. */
+  const weightMedia = {
+    'what-medical-weight-management-involves': {
+      src: '/images/services/weight-consult.webp',
+      alt: '',
+    },
+    'who-prescribes-and-reviews-your-care': {
+      src: '/images/services/weight-provider.webp',
+      alt: '',
+    },
+    'before-anything-is-prescribed': { src: '/images/services/weight-history.webp', alt: '' },
+    'what-we-do-not-promise': { src: '/images/services/weight-plan.webp', alt: '' },
+  } as const;
+
+  /* Which map this service's cards draw from. Keyed by slug rather than passed
+     down from the content layer because these are page-level art direction,
+     not content — lib/content.ts holds no image paths for the card grid. */
+  const cardsFor: Record<string, Record<string, CardMedia>> = {
+    'medication-management': cardMedia,
+    'weight-management': weightMedia,
+  };
 
   /* ONE PHOTOGRAPH PER ROW, in section order. All five are now real assets —
      the gap on "The tools we use" is closed.
@@ -401,7 +443,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              delivered" card — both removed at the client's request. The section
              ids travel with the cards, so deep links into this page still
              land. */
-          <ServiceCards sections={sectionItems} media={cardMedia} />
+          <ServiceCards sections={sectionItems} media={cardsFor[service.slug] ?? {}} />
         ) : useGridLayout ? (
           /* The card-18 grid: a featured card and a three-up row. No "On this
              page" rail and no modality card; the section ids travel with the
