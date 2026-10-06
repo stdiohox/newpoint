@@ -179,38 +179,50 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     },
   } as const;
 
-  /* MEDICAL WEIGHT MANAGEMENT'S FOUR SLOTS, reserved ahead of the artwork in
-     exactly the way medication-management's were — see the note above. None of
-     these four files exists yet, so ServiceCards draws its neutral 16/9 block
-     in each one and the page can be reviewed against its real layout. Nothing
-     here changes when they land.
+  /* MEDICAL WEIGHT MANAGEMENT'S FOUR PHOTOGRAPHS, delivered 2026-10-06. The
+     slots were reserved before the artwork existed and carried empty alts
+     until it arrived; these alts are written from the delivered frames, which
+     is the rule the note above exists to enforce.
 
-     EMPTY ALTS, AND THAT IS THE DIFFERENCE FROM THE MAP ABOVE. The long note
-     on that one records what happened when alts were written against a
-     commissioning brief instead of a delivered frame: all four were wrong, a
-     desk turned out to be an armchair, and an alt describing a different
-     picture is a 1.1.1 failure that no automated check catches. So there is
-     nothing to describe until there is a frame, and alt="" is also the right
-     end state for most of these anyway — each sits beside a heading that names
-     its section, so a decorative photograph needs no second voice. Write a
-     real alt only for a frame that carries information the copy does not.
+     NOT ONE OF THEM NAMES A ROLE. "A person", "someone opposite", "hands" —
+     never "a clinician", "a nurse practitioner" or "a provider". The reason is
+     sharpest on `weight-provider`: that photograph sits directly beside Dr.
+     Whitaker's and Dr. Ofoegbu's names and credentials, and the woman in it is
+     neither of them. An alt calling her a provider would assert, in the one
+     place a screen-reader user cannot check against the picture, that this is
+     a Newpoint clinician. The same restraint is why med-plan's alt above says
+     "a person" rather than "a clinician.
 
-     WHAT TO SHOOT, for whoever sources these: the headings are the brief. No
-     scales, no tape measures, no before-and-after, no bodies as subjects — all
-     four are the visual grammar of the outcome claims this page refuses to
-     make in words. Consulting-room and conversation frames, as on the sibling
-     pages. */
+     THE BLOOD PRESSURE CUFF IS NAMED, and the two cardboard boxes are not
+     called medication. The cuff is ordinary equipment visible in the frame; the
+     boxes are plain and unlabelled, and calling them medicine would describe
+     something the photograph does not actually show. CLAUDE.md's rule is to
+     name no medication in alt text, and this is where that gets asserted by
+     accident.
+
+     WHAT IS DELIBERATELY ABSENT FROM ALL FOUR: no scales, no tape measures, no
+     bodies as subjects, no before-and-after, no injector pens, no readable
+     paperwork. Each of those is the visual form of a claim this page refuses to
+     make in words, and the art direction behind the set is recorded in the
+     image brief. */
   const weightMedia = {
     'what-medical-weight-management-involves': {
       src: '/images/services/weight-consult.webp',
-      alt: '',
+      alt: 'A woman in a rust-coloured cardigan sitting at a wooden table, looking down at an open handwritten notebook while someone opposite her writes in it.',
     },
     'who-prescribes-and-reviews-your-care': {
       src: '/images/services/weight-provider.webp',
-      alt: '',
+      /* "A woman", not a provider and not a nurse practitioner — see above. */
+      alt: 'A woman in a blue blouse writing on a printed form at a light wooden desk, a laptop with a dark screen and a small potted plant beside her.',
     },
-    'before-anything-is-prescribed': { src: '/images/services/weight-history.webp', alt: '' },
-    'what-we-do-not-promise': { src: '/images/services/weight-plan.webp', alt: '' },
+    'before-anything-is-prescribed': {
+      src: '/images/services/weight-history.webp',
+      alt: 'A man in an olive shirt talking, with a blood pressure cuff fastened around his upper arm and another person steadying it, two plain cardboard boxes on the desk in front of him.',
+    },
+    'what-we-do-not-promise': {
+      src: '/images/services/weight-plan.webp',
+      alt: 'A woman in an oatmeal cardigan sitting at a table listening, reading glasses pushed up on her head, as someone opposite her gestures with an open hand. A glass of water stands between them.',
+    },
   } as const;
 
   /* Which map this service's cards draw from. Keyed by slug rather than passed

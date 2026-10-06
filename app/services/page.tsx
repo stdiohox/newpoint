@@ -221,7 +221,18 @@ export default function ServicesIndex() {
             <ul role="list" className="space-y-20 md:space-y-28">
               {SERVICE_PAGES.map((service, i) => {
                 const href = `/services/${service.slug}`;
-                const poster = cardPosterFor(href);
+                /* THE SERVICE'S OWN HERO IS THE FALLBACK, since 2026-10-06.
+                   `cardPosterFor` reads FEATURED_SERVICES, which is the
+                   HOMEPAGE's card list — so a service with no homepage card has
+                   no poster here and this row drew an empty block beside its
+                   copy. Medical weight management is the first such service and
+                   it does have a hero master, so the row uses that rather than
+                   nothing. Falling back rather than adding the service to
+                   FEATURED_SERVICES on purpose: that array decides what appears
+                   on the HOMEPAGE, which is a separate client decision and was
+                   not part of the brief. The neutral block below now shows only
+                   for a service with neither a card poster nor a hero. */
+                const poster = cardPosterFor(href) ?? service.heroImage?.src;
 
                 return (
                   <Reveal as="li" key={service.slug} delay={stagger(i, 0.06)}>

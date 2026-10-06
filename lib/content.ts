@@ -1972,6 +1972,42 @@ export const SERVICE_PAGES: ServicePage[] = [
      */
     slug: 'weight-management',
     nav: 'Weight management',
+    /**
+     * This page's own hero master, delivered 2026-10-06. 2752x1536 supplied,
+     * served at 2400x1340 — the size both sibling heroes use.
+     *
+     * OBJECT-POSITION MEASURED OFF THE FRAME. She sits in the right third:
+     * her hair starts at y 8%, her eyes sit at y 13% and her chin at y 19%;
+     * her face spans x 76-93%, centred on x 84%. The seated figure with her
+     * back to the camera is at the far left, and the whole middle of the frame
+     * is one continuous wall.
+     *
+     * The source is 1.79:1 and this header is wider than that at desktop, so
+     * cover crops VERTICALLY there — which on this frame means cropping toward
+     * her face. y 22% keeps the crop high enough that her eyes stay in the box
+     * at 1440 and 1024 without pushing her chin into the navbar pill, whose
+     * lower edge sits at about y 83. At 390 the box is taller than 1.79:1,
+     * cover scales by height instead, and there is no vertical crop at all.
+     *
+     * x 50%, not a push to either side: the composition is already balanced
+     * about the centre, and moving it horizontally either loses her or loses
+     * the figure opposite, which is half of what makes the frame read as a
+     * conversation rather than a portrait.
+     *
+     * CONTRAST IS MEASURED AND RECORDED BELOW, beside the scrim choice. This
+     * master is the brightest of the three service heroes — the centre of the
+     * frame is a near-white wall — and that is exactly the case the telehealth
+     * hero fails, so it was measured before shipping rather than after.
+     */
+    heroImage: {
+      src: '/images/services/weight-hero-2400.webp',
+      /* Describes the photograph and stops there. No claim that either woman is
+         a patient, a clinician or anyone at this practice, and no claim that
+         this is a Newpoint room — the same restraint the telehealth and
+         assessment alts carry. */
+      alt: 'A woman sitting in a sage-green armchair in a plain, light room, listening to someone seated opposite her whose back is to the camera. A notebook and pen rest on a small wooden table between them.',
+      objectPosition: '50% 22%',
+    },
     /* No appointment button in this hero, matching all three siblings. The
        navbar's, PageCta's and the footer's all remain. */
     hideHeroCta: true,
