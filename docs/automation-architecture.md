@@ -463,7 +463,7 @@ adapter:
 
 | Agent | Trigger | Inputs | Outputs | Schedule |
 |---|---|---|---|---|
-| **`seo.keyword-research`** | Cron, plus manual run from n8n | Seed matrix (services × towns × NJ/PA × intent), Search Console queries, volume source (D8) | Clustered `marketing.keywords`, plus `content_backlog` items such as page gaps, FAQ candidates and GBP categories | Monthly |
+| **`seo.keyword-research`** | Cron, plus manual run from the Trigger.dev dashboard (never from n8n, which holds no Trigger.dev key, §2) | Seed matrix (services × towns × NJ/PA × intent), Search Console queries, volume source (D8) | Clustered `marketing.keywords`, plus `content_backlog` items such as page gaps, FAQ candidates and GBP categories | Monthly |
 | **`seo.rank-tracker`** | Cron | Search Console API | `keyword_snapshots`, and movers in the weekly report | Weekly, Monday 06:00 ET |
 
 Seed terms use the owners' vocabulary ("psychiatric assessment", "mental and
