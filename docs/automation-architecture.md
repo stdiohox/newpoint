@@ -353,11 +353,18 @@ that caused them.
 ## 5. Agents
 
 "Agent" here means a Trigger.dev task, or a small group of tasks, that has a single
-job. LLM routes use `claude-opus-5-5` with `effort` set per route:
+job. LLM routes use one model per tier:
 
-- `low` for classification and intent
-- `medium` for drafting
-- `high` for referral extraction and compliance review
+| Tier | Model | Routes | Config |
+|---|---|---|---|
+| Low effort: classification and intent | `claude-haiku-4-5` | `messaging.inbound-sms` intent (HIPAA org) | No `effort` parameter on Haiku 4.5. Short `max_tokens`, structured output. |
+| Drafting | `claude-sonnet-5-5` | `gbp.reply-drafter`, `social.planner`, `social.drafter`, `seo.keyword-research` clustering, `geo.probe`, `geo.recommendations` | `effort: "medium"` set explicitly, because Sonnet 5.5 defaults to `high` |
+| Extraction and compliance review | `claude-opus-5-5` | **Only** `referrals.intake` extraction (HIPAA org) and `social.compliance` review | `effort: "high"` set explicitly, because Opus 5.5 defaults to `medium` |
+
+Any new LLM route defaults to `claude-sonnet-5-5`. Moving it to `claude-opus-5-5` is a
+decision recorded here, not a per-task choice. The HIPAA org's feature restrictions
+apply per model, so confirm Haiku 4.5 and Opus 5.5 are both available there before
+Phase 5.
 
 Structured outputs (`output_config.format`) are used wherever the result is parsed.
 Every LLM result is schema-validated with zod. A validation failure **flags the item
