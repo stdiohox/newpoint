@@ -1,0 +1,19 @@
+# Real env files never enter git; only the *.example name lists do.
+.env
+.env.*
+!.env.*.example
+
+# Trigger.dev CLI build output
+.trigger/
+
+# Supabase CLI link state
+supabase/*/supabase/.temp/
+supabase/*/supabase/.branches/
+
+# Key material. The Search Console service-account key is pasted into the
+# Trigger.dev dashboard and the file deleted (README step 3.5); never saved here.
+*.pem
+*.key
+*.p12
+*service-account*.json
+gsc*.json

@@ -180,7 +180,8 @@ automation/
 ├── trigger.marketing.config.ts  Trigger project newpoint-marketing; dirs: ["src/trigger/marketing"]
 ├── eslint.config.mjs            no-restricted-imports: src/trigger/marketing/** may not
 │                                import adapters/llm/anthropic-phi, adapters/messaging,
-│                                adapters/voice, adapters/scheduling or lib/db-phi
+│                                adapters/voice, adapters/scheduling, lib/db-phi or
+│                                any `phi/` directory (catches relative "../../phi/…")
 ├── .env.phi.example             names only, never values (one file per zone)
 ├── .env.marketing.example
 ├── src/
@@ -225,12 +226,13 @@ automation/
 │   ├── vapi-events/             end-of-call report → booking.process-call-report
 │   ├── twilio-inbound/          signature-verified SMS webhook → messaging.inbound-sms
 │   └── intake/                  site contact / booking / referral POST (BAA handler)
-├── supabase/
-│   ├── phi/                     project newpoint-phi
+├── supabase/                    each project is a Supabase CLI workdir, and the CLI
+│   │                            always reads <workdir>/supabase/, hence the nesting
+│   ├── phi/supabase/            project newpoint-phi
 │   │   ├── migrations/          *.sql, timestamped, forward-only
 │   │   └── tests/               pgTAP: RLS, grants, default privileges, no SECURITY
 │   │                            DEFINER leaks, views are security_invoker
-│   └── marketing/               project newpoint-marketing
+│   └── marketing/supabase/      project newpoint-marketing
 │       ├── migrations/
 │       ├── seed.sql             fixtures (non-PHI by definition)
 │       └── tests/
@@ -294,7 +296,7 @@ staff console host. **Hostinger is not allowlisted.**
 | Role | Used by | Grants |
 |---|---|---|
 | `marketing_rw` | Trigger `newpoint-marketing` project | `marketing.*`, `public.*` read/write |
-| `metrics_writer` | `ops.aggregate-metrics` (PHI project) | **Insert only** on `metrics.daily`, nothing else |
+| `metrics_writer` | `ops.aggregate-metrics` (PHI project) | **Insert only** on `metrics.daily` and `metrics.agent_health` (one row per task per day), nothing else. Pushes are `ON CONFLICT DO NOTHING`, so a retry is a no-op. |
 | `n8n_ro` | n8n | Read on `marketing.*`, `public.*`, `metrics.daily` |
 
 ### `phi` schema (BAA-covered)
@@ -346,7 +348,7 @@ that caused them.
 | Object | Notes |
 |---|---|
 | `metrics.daily` | Pushed by `ops.aggregate-metrics`: inquiries, bookings, review requests sent, follow-up conversions. Counts below 5 are stored as null (shown as `<5`). **Crisis counts are never exported.** This is the only PHI-derived data outside `newpoint-phi`. |
-| `metrics.agent_health` | Daily push of `ops.agent_health`, already reduced to an enum, so the marketing heartbeat can report PHI-side task health |
+| `metrics.agent_health` | Daily push of `ops.agent_health`, already reduced to an enum, so the marketing heartbeat can report PHI-side task health. Success and failure are **dates, not timestamps**: for an event-driven task the exact time is the time of a patient interaction. `ops.crisis-page` is refused by a CHECK, because any row for it is a crisis count. |
 
 ---
 
