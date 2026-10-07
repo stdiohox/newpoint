@@ -75,6 +75,31 @@ export function publicText<const T extends string, const V extends SlotValues<T>
   return rendered as PublicText;
 }
 
+/** Joins `PublicText` parts. The result is public because every part is. */
+export function joinPublic(parts: readonly PublicText[], separator: PublicText): PublicText {
+  return parts.join(separator) as PublicText;
+}
+
+/**
+ * Runtime data from a source the plan places in the public zone (§2), which is
+ * the one way a runtime string becomes `PublicText` without a template.
+ *
+ * This is a policy decision, not a proof. Search Console returns aggregated
+ * queries for the public site and drops rare ("anonymized") ones, but a
+ * frequent query can still contain a name. The plan places Search Console in
+ * the public zone (§2), and nothing it returns identifies anyone as a patient:
+ * a query is what someone searched, not a contact with the practice.
+ *
+ * eslint.config.mjs allows importing this only from `src/adapters/google/**`:
+ * every new caller is a new public source and needs the same argument made
+ * there, in review.
+ */
+export type PublicSource = "google_search_console";
+
+export function fromPublicSource(_source: PublicSource, value: string): PublicText {
+  return value as PublicText;
+}
+
 /**
  * Marks a value as PHI. Used by the PHI-zone data layer only (Phase 5); the
  * public zone has no reason to call it, and nothing accepts `Phi<T>` there.

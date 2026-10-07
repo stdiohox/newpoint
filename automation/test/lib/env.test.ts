@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findPhiZoneVariables, loadMarketingEnv } from "../../src/lib/env.js";
+import { findPhiZoneVariables, loadMarketingEnv, supabaseProjectRef } from "../../src/lib/env.js";
 import { ConfigError } from "../../src/lib/errors.js";
 
 const serviceAccount = JSON.stringify({
@@ -8,9 +8,14 @@ const serviceAccount = JSON.stringify({
   private_key: "-----BEGIN PRIVATE KEY-----\nMIIfake\n-----END PRIVATE KEY-----\n",
 });
 
+const MARKETING_REF = "abcdefghijklmnopqrst";
+const PHI_REF = "zyxwvutsrqponmlkjihg";
+
 const valid = {
-  MARKETING_DATABASE_URL:
-    "postgresql://trigger_marketing.abcdefghijklmnop:secret@aws-0-us-east-1.pooler.supabase.com:5432/postgres",
+  MARKETING_DATABASE_URL: `postgresql://trigger_marketing.${MARKETING_REF}:secret@aws-0-us-east-1.pooler.supabase.com:5432/postgres`,
+  MARKETING_DATABASE_CA_CERT: "-----BEGIN CERTIFICATE-----\nMIIfake\n-----END CERTIFICATE-----\n",
+  SUPABASE_MARKETING_PROJECT_REF: MARKETING_REF,
+  ANTHROPIC_API_KEY_PUBLIC: "sk-ant-api03-fake",
   GSC_SITE_URL: "sc-domain:newpointnp.com",
   GSC_SERVICE_ACCOUNT_JSON: serviceAccount,
 };
@@ -53,10 +58,32 @@ describe("loadMarketingEnv", () => {
 
   it("reports missing variables", () => {
     expect(configError(() => loadMarketingEnv({})).variables).toEqual([
+      "ANTHROPIC_API_KEY_PUBLIC",
       "GSC_SERVICE_ACCOUNT_JSON",
       "GSC_SITE_URL",
+      "MARKETING_DATABASE_CA_CERT",
       "MARKETING_DATABASE_URL",
+      "SUPABASE_MARKETING_PROJECT_REF",
     ]);
+  });
+
+  it.each([
+    ["the PHI project's pooler URL", `postgresql://trigger_marketing.${PHI_REF}:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres`],
+    ["the PHI project's direct URL", `postgresql://postgres:pw@db.${PHI_REF}.supabase.co:5432/postgres`],
+    ["a non-Supabase host", "postgresql://u:pw@db.example.com:5432/postgres"],
+    ["a query string that pg would read as the host", `postgresql://trigger_marketing.${MARKETING_REF}:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?host=db.${PHI_REF}.supabase.co`],
+    ["a query string that turns off TLS verification", `postgresql://trigger_marketing.${MARKETING_REF}:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=no-verify`],
+    ["a malformed username encoding", "postgresql://trigger_marketing.%zz:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres"],
+    ["a pooler URL with no project in the user", "postgresql://postgres:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres"],
+  ])("refuses a database URL for %s", (_label, url) => {
+    const error = configError(() => loadMarketingEnv({ ...valid, MARKETING_DATABASE_URL: url }));
+    expect(error.code).toBe("marketing_db_host_mismatch");
+    expect(JSON.stringify(error)).not.toContain("pw");
+  });
+
+  it("accepts the marketing project's direct URL", () => {
+    const url = `postgresql://postgres:pw@db.${MARKETING_REF}.supabase.co:5432/postgres`;
+    expect(loadMarketingEnv({ ...valid, MARKETING_DATABASE_URL: url }).MARKETING_DATABASE_URL).toBe(url);
   });
 
   it.each([
@@ -84,6 +111,15 @@ describe("loadMarketingEnv", () => {
     expect(configError(() => loadMarketingEnv({ TWILIO_ACCOUNT_SID: "AC1" })).code).toBe(
       "phi_zone_variable_in_public_runtime",
     );
+  });
+});
+
+describe("supabaseProjectRef", () => {
+  it("reads the ref from both URL shapes and nothing else", () => {
+    expect(supabaseProjectRef(valid.MARKETING_DATABASE_URL)).toBe(MARKETING_REF);
+    expect(supabaseProjectRef(`postgres://postgres:x@db.${PHI_REF}.supabase.co:6543/postgres`)).toBe(PHI_REF);
+    expect(supabaseProjectRef("postgres://u:x@localhost:5432/postgres")).toBeUndefined();
+    expect(supabaseProjectRef("not a url")).toBeUndefined();
   });
 });
 

@@ -1,8 +1,8 @@
 # Newpoint automation layer
 
 Design: [`docs/automation-architecture.md`](../docs/automation-architecture.md).
-This package is **Phase 0, public zone only** (§7). There is no PHI code here, and
-`trigger.phi.config.ts` is an empty stub until Phase 5.
+This package is **Phases 0 and 1, public zone only** (§7). There is no PHI code here,
+and `trigger.phi.config.ts` is an empty stub until Phase 5.
 
 npm only (`package-lock.json`). Node 24+.
 
@@ -25,6 +25,24 @@ npm run test:db      # pgTAP suite only
 | `supabase/marketing/supabase/` | Migrations and pgTAP tests for the `newpoint-marketing` project. |
 | `test/db/` | Runs the pgTAP suite against an embedded Postgres 17 shaped like Supabase. |
 | `n8n/README.md` | Hostinger/n8n hardening checklist. |
+| `src/lib/task.ts` | `marketingSchedule`: the only way to define a marketing task. The original error never leaves `run()`, so Trigger.dev records a `SafeTaskError` and no vendor text. |
+| `src/trigger/marketing/init.ts` | Global hooks: env check before every attempt, retry policy by failure class, one PHI-safe failure line. |
+| `src/trigger/marketing/seo/` | `seo.keyword-research` (monthly) and `seo.rank-tracker` (Mondays 06:00 ET), §5.3. |
+| `src/adapters/google/search-console.ts` | Search Analytics API (D8: the only keyword data source). |
+| `src/adapters/llm/anthropic-public.ts` | The public Anthropic org. §5 routing; zod-validated structured output; refusals flagged, never defaulted. |
+| `src/domain/seo/` | Seed matrix, clustering checks, backlog rules, snapshot matching. Pure. |
+
+## Phase 1: what the SEO tasks write
+
+| Task | Writes | Read by |
+|---|---|---|
+| `seo.keyword-research` | `marketing.keywords` (seed matrix + 28 days of Search Console queries, clustered by `claude-sonnet-5-5`); `content_backlog` page-gap and FAQ candidates | A human (backlog), the social planner and GEO (later phases) |
+| `seo.rank-tracker` | `marketing.keyword_snapshots`, one row per keyword per day | The `marketing.rank_movers` view, which the n8n weekly report reads with `n8n_reader` |
+
+- A keyword with `cluster` null was not clustered (a refusal, a truncated or malformed
+  answer, or the model left it out). A person assigns it; nothing is guessed (§5).
+- `volume` is null: Search Console has impressions, not search volume (D8).
+- Search Console data settles about three days late, so both tasks stop three days back.
 
 The Supabase CLI always reads `<workdir>/supabase/migrations`, which is why the
 marketing project lives at `supabase/marketing/supabase/` and not one level up.
@@ -44,7 +62,7 @@ The files follow Supabase's pgTAP convention, so they should also run with
 
 ---
 
-## Setup you must do (Phase 0)
+## Setup you must do (Phases 0 and 1)
 
 ### 1. Supabase — project `newpoint-marketing`
 
@@ -75,7 +93,12 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 6. Build each runtime URL with the session pooler, using the custom-role username form
    `<role>.<project-ref>`, and test-connect once:
    - `MARKETING_DATABASE_URL` = `postgresql://trigger_marketing.<project-ref>:<pw>@<pooler-host>:5432/postgres`
+     (no `sslmode` parameter: TLS is configured in code and verified against the CA below)
    - n8n Postgres credential = the same shape, with `n8n_reader`.
+7. Database settings → SSL configuration → **Download certificate**. Its PEM text is
+   `MARKETING_DATABASE_CA_CERT`. The project ID (20 lowercase letters, Project settings)
+   is `SUPABASE_MARKETING_PROJECT_REF`; the runtime refuses a database URL for any other
+   project.
 
 ### 2. Trigger.dev — project `newpoint-marketing`
 
@@ -87,10 +110,12 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 3. Run `npx trigger.dev login` locally. CI deploys need a personal access token in
    `TRIGGER_ACCESS_TOKEN`.
 4. In the dashboard, under Environment Variables (Dev **and** Prod), set:
-   `MARKETING_DATABASE_URL`, `GSC_SITE_URL`, `GSC_SERVICE_ACCOUNT_JSON`.
-   Never add a variable matching `*_PHI*`, `TWILIO_*`, `VAPI_*`,
-   `SUPABASE_SERVICE_ROLE*` or an unqualified `ANTHROPIC_API_KEY`. The runtime refuses
-   to start if one is present.
+   `MARKETING_DATABASE_URL`, `MARKETING_DATABASE_CA_CERT`, `SUPABASE_MARKETING_PROJECT_REF`,
+   `ANTHROPIC_API_KEY_PUBLIC`, `GSC_SITE_URL`, `GSC_SERVICE_ACCOUNT_JSON`.
+   Never add a variable matching `*_PHI*`, `*_HIPAA*`, `TWILIO_*`, `VAPI_*`,
+   `SUPABASE_SERVICE_ROLE*`, `SUPABASE_SERVICE_KEY*`, `SUPABASE_SECRET*` or an unqualified
+   `ANTHROPIC_API_KEY` / `ANTHROPIC_AUTH_TOKEN`. The runtime refuses to start if one is
+   present.
 5. npm 11 blocks install scripts that are not on the allowlist. `esbuild` and
    `@depot/cli` (both from the `trigger.dev` CLI) are still pending. If `trigger
    deploy` fails on bundling, review them and run `npm approve-scripts esbuild`.
@@ -114,6 +139,16 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 
    Delete the downloaded key file afterwards.
 
-### 4. n8n
+### 4. Anthropic — the standard (public) org
+
+1. Use the **standard** Anthropic org, not the HIPAA org that Phase 5 needs (§2).
+2. Create an API key scoped to a workspace for Newpoint marketing, and set it as
+   `ANTHROPIC_API_KEY_PUBLIC` in the Trigger.dev dashboard. Set a monthly spend limit on
+   that workspace: one keyword-research run is a single Sonnet 5.5 call of at most
+   16,000 output tokens.
+3. The request uses the `server-side-fallback-2026-07-01` beta (`fallbacks: "default"`):
+   a policy decline is re-run on Anthropic's recommended model for that category.
+
+### 5. n8n
 
 Work through [`n8n/README.md`](n8n/README.md) before activating any workflow.

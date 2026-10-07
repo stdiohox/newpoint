@@ -5,7 +5,9 @@ import {
   classifyHttpStatus,
   ConfigError,
   isRetryable,
+  SafeTaskError,
   toSafeError,
+  toSafeTaskError,
   VendorHttpError,
 } from "../../src/lib/errors.js";
 
@@ -52,7 +54,8 @@ describe("retryability", () => {
     expect(isRetryable("timeout")).toBe(true);
     expect(isRetryable("vendor_4xx")).toBe(false);
     expect(isRetryable("validation")).toBe(false);
-    expect(isRetryable("unknown")).toBe(false);
+    // Transport failures with no status land here; tasks are idempotent.
+    expect(isRetryable("unknown")).toBe(true);
   });
 });
 
@@ -94,5 +97,32 @@ describe("toSafeError", () => {
       name: "ConfigError",
       code: "invalid_marketing_env",
     });
+  });
+});
+
+describe("SafeTaskError", () => {
+  it("replaces a vendor error with one whose message holds no input", async () => {
+    const { runSafely } = await import("../../src/lib/task.js");
+    const cause = new Error("Invalid To number +16095550123 for Jane Doe");
+    const failing = () => Promise.reject(new VendorHttpError("google", 400, { cause }));
+    const thrown = await runSafely(failing).catch((error: unknown) => error);
+
+    expect(thrown).toBeInstanceOf(SafeTaskError);
+    const safe = thrown as SafeTaskError;
+    expect(safe.message).toBe("vendor_4xx vendor_http_error google http_400");
+    expect(safe.cause).toBeUndefined();
+    expect(`${safe.message}\n${safe.stack ?? ""}`).not.toMatch(/1609|Jane/);
+    expect(toSafeError(safe)).toEqual(safe.safe);
+  });
+
+  it("drops the message of an unknown error entirely", () => {
+    const safe = toSafeTaskError(new TypeError("cannot read 'phone' of +16095550123"));
+    expect(safe.message).toBe("unknown");
+    expect(safe.safe.retryable).toBe(true);
+  });
+
+  it("keeps the retry decision of the original", () => {
+    expect(toSafeTaskError(new VendorHttpError("anthropic", 529)).safe.retryable).toBe(true);
+    expect(classifyError(toSafeTaskError(new VendorHttpError("google", 429)))).toBe("rate_limited");
   });
 });

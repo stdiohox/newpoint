@@ -30,6 +30,15 @@ export const PHI_ZONE_IMPORT_PATTERNS = [
 
 export const PUBLIC_ZONE_FILES = ["src/trigger/marketing/**/*.ts"];
 
+/** `fromPublicSource` brands runtime text as PublicText; only the public-source adapters may call it. */
+export const PUBLIC_SOURCE_ADAPTERS = ["src/adapters/google/**/*.ts"];
+const FROM_PUBLIC_SOURCE = {
+  group: ["**/lib/phi", "**/lib/phi.js"],
+  importNames: ["fromPublicSource"],
+  message:
+    "fromPublicSource is only for the public-source adapters (src/adapters/google). A new caller is a new public source: argue it in review and add it to PUBLIC_SOURCE_ADAPTERS.",
+};
+
 export default tseslint.config(
   { ignores: ["node_modules/**", ".trigger/**", "dist/**"] },
   js.configs.recommended,
@@ -40,6 +49,13 @@ export default tseslint.config(
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  {
+    files: ["src/**/*.ts"],
+    ignores: PUBLIC_SOURCE_ADAPTERS,
+    rules: {
+      "@typescript-eslint/no-restricted-imports": ["error", { patterns: [FROM_PUBLIC_SOURCE] }],
     },
   },
   {
@@ -63,7 +79,15 @@ export default tseslint.config(
       "@typescript-eslint/no-restricted-imports": [
         "error",
         {
+          // Every marketing task goes through src/lib/task.ts, which keeps raw
+          // vendor errors from reaching the run's recorded span.
+          paths: ["@trigger.dev/sdk", "@trigger.dev/sdk/v3"].map((name) => ({
+            name,
+            importNames: ["task", "schemaTask", "schedules"],
+            message: "Define marketing tasks with marketingSchedule from src/lib/task.ts, which strips vendor error text.",
+          })),
           patterns: [
+            FROM_PUBLIC_SOURCE,
             {
               group: PHI_ZONE_IMPORT_PATTERNS,
               message:

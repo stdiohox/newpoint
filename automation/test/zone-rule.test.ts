@@ -65,6 +65,21 @@ describe("zone rule: public-zone tasks cannot import PHI-zone modules", () => {
     expect(await restrictedImportMessages(code, MARKETING_TASK)).toHaveLength(1);
   });
 
+  it.each([
+    'import { schedules } from "@trigger.dev/sdk";\nexport const s = schedules;\n',
+    'import { task } from "@trigger.dev/sdk";\nexport const t = task;\n',
+    'import { schemaTask } from "@trigger.dev/sdk/v3";\nexport const t = schemaTask;\n',
+    'import { fromPublicSource } from "../../../lib/phi.js";\nexport const f = fromPublicSource;\n',
+  ])("rejects bypassing the task wrapper or the public-source gate: %s", async (code) => {
+    expect(await restrictedImportMessages(code, MARKETING_TASK)).toHaveLength(1);
+  });
+
+  it("confines fromPublicSource to the public-source adapters", async () => {
+    const code = 'import { fromPublicSource } from "../lib/phi.js";\nexport const f = fromPublicSource;\n';
+    expect(await restrictedImportMessages(code, "src/domain/example.ts")).toHaveLength(1);
+    expect(await restrictedImportMessages(code.replace("../lib", "../../lib"), "src/adapters/google/x.ts")).toEqual([]);
+  });
+
   it("allows shared lib modules", async () => {
     const code = 'import { publicText } from "../../../lib/phi.js";\nexport const t = publicText("ok");\n';
     expect(await restrictedImportMessages(code, MARKETING_TASK)).toEqual([]);
