@@ -40,6 +40,12 @@ const googleServiceAccount = z
 export const marketingEnvSchema = z.object({
   /** Session-pooler URL for the `trigger_marketing` login (member of `marketing_rw`). */
   MARKETING_DATABASE_URL: postgresUrl,
+  /** Supabase's root CA (PEM), so TLS to the database is verified, not just encrypted. */
+  MARKETING_DATABASE_CA_CERT: z.string().startsWith("-----BEGIN CERTIFICATE-----"),
+  /** The newpoint-marketing project ref (Supabase → Project settings). The DB URL must point at it. */
+  SUPABASE_MARKETING_PROJECT_REF: z.string().regex(/^[a-z]{20}$/, "must be a 20-letter Supabase project ref"),
+  /** Key for the STANDARD (public) Anthropic org. Never the HIPAA org's key (§2). */
+  ANTHROPIC_API_KEY_PUBLIC: z.string().startsWith("sk-ant-"),
   /** Search Console property: `sc-domain:newpointnp.com` or `https://newpointnp.com/`. */
   GSC_SITE_URL: z.string().regex(/^(sc-domain:[a-z0-9.-]+|https:\/\/[^\s]+\/)$/),
   /** Service-account key JSON; the account is added as a restricted user on the property. */
@@ -88,5 +94,41 @@ export function loadMarketingEnv(
     const names = [...new Set(result.error.issues.map((issue) => String(issue.path[0] ?? "(root)")))].sort();
     throw new ConfigError("invalid_marketing_env", names);
   }
+  if (supabaseProjectRef(result.data.MARKETING_DATABASE_URL) !== result.data.SUPABASE_MARKETING_PROJECT_REF) {
+    throw new ConfigError("marketing_db_host_mismatch", [
+      "MARKETING_DATABASE_URL",
+      "SUPABASE_MARKETING_PROJECT_REF",
+    ]);
+  }
   return Object.freeze(result.data);
+}
+
+/**
+ * The Supabase project a connection string points at, or undefined when it is
+ * not a Supabase URL at all. Two shapes exist:
+ *   - session/transaction pooler: user `<role>.<ref>` at `*.pooler.supabase.com`;
+ *   - direct: host `db.<ref>.supabase.co`.
+ * The check is the runtime half of "a marketing deploy has no PHI credential":
+ * a newpoint-phi URL pasted into MARKETING_DATABASE_URL names another project.
+ */
+export function supabaseProjectRef(databaseUrl: string): string | undefined {
+  let url: URL;
+  let username: string;
+  try {
+    url = new URL(databaseUrl);
+    username = decodeURIComponent(url.username);
+  } catch {
+    return undefined;
+  }
+  // pg reads connection options from the query string (`?host=`, `?sslmode=`), and
+  // they win over everything else. A URL with one is refused outright, so the host
+  // checked here is the host connected to (createMarketingPool never passes the URL).
+  if (url.search !== "" || url.hash !== "") return undefined;
+  const host = url.hostname.toLowerCase();
+  const direct = /^db\.([a-z]{20})\.supabase\.co$/.exec(host);
+  if (direct) return direct[1];
+  if (host.endsWith(".pooler.supabase.com")) {
+    return /^[^.]+\.([a-z]{20})$/.exec(username)?.[1];
+  }
+  return undefined;
 }

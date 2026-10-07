@@ -102,12 +102,45 @@ export function classifyHttpStatus(status: number): FailureClass {
   return "unknown";
 }
 
+/**
+ * 4xx and validation failures repeat on retry, so they are not retried.
+ * `unknown` is: it is mostly transport failures with no status (a dropped
+ * socket, a pooler restart, a fetch that never got a response), and every task
+ * is idempotent, so a retry of a genuine bug costs a repeat, not damage.
+ */
 export function isRetryable(failureClass: FailureClass): boolean {
-  return failureClass === "rate_limited" || failureClass === "vendor_5xx" || failureClass === "timeout";
+  return failureClass !== "vendor_4xx" && failureClass !== "validation";
+}
+
+/**
+ * What a task throws in place of the original error (src/lib/task.ts).
+ *
+ * Trigger.dev records whatever leaves `run()` on the run's span, message and
+ * stack included, before any lifecycle hook sees it. So the original error,
+ * whose message may echo vendor input, must never leave `run()`. This one's
+ * message is built from SafeError fields only.
+ */
+export class SafeTaskError extends Error {
+  readonly safe: SafeError;
+
+  constructor(safe: SafeError) {
+    super(
+      [safe.failureClass, safe.code, safe.vendor, safe.status === undefined ? undefined : `http_${String(safe.status)}`]
+        .filter((part) => part !== undefined)
+        .join(" "),
+    );
+    this.name = "SafeTaskError";
+    this.safe = safe;
+  }
+}
+
+export function toSafeTaskError(error: unknown): SafeTaskError {
+  return error instanceof SafeTaskError ? error : new SafeTaskError(toSafeError(error));
 }
 
 /** Maps anything thrown to a FailureClass without reading its message. */
 export function classifyError(error: unknown): FailureClass {
+  if (error instanceof SafeTaskError) return error.safe.failureClass;
   if (error instanceof AppError) return error.failureClass;
   if (error instanceof ZodError) return "validation";
   if (error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError")) {
@@ -128,6 +161,7 @@ export interface SafeError {
 }
 
 export function toSafeError(error: unknown): SafeError {
+  if (error instanceof SafeTaskError) return error.safe;
   const failureClass = classifyError(error);
   const status = error instanceof VendorHttpError ? error.status : statusOf(error);
   return {
