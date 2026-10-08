@@ -107,7 +107,7 @@ export function ContactCrisis() {
 
         <Reveal delay={0.1}>
           <p className="text-body-l text-np-neutral-600 mt-20 max-w-[46ch]">
-            If you have read this far, that is already a step. We will take the next one with you.
+            If you’ve read this far, you’ve already taken a step. We’ll take the next one with you.
           </p>
         </Reveal>
       </Container>

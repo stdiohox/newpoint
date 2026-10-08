@@ -108,7 +108,7 @@ const assurances = [
  */
 export function PageCta({
   heading = 'Ready when you are',
-  body = 'Send us your contact details and we will get back to you about an appointment. Please keep health information out of the form.',
+  body = 'Send us your contact info, and we’ll get back to you about an appointment. Please keep health information out of the form.',
 }: {
   heading?: string;
   body?: string;

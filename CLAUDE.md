@@ -359,7 +359,7 @@ site, only from that page.
 **"Service pages" here means the single-service routes, `/services/[slug]`.**
 Read it no wider than that, because two things that look like exceptions are not:
 
-- **The `/services` hub keeps its "Providers you will see" cards**
+- **The `/services` hub keeps its "Providers you’ll see" cards**
   (`app/services/page.tsx:420`). That section is page-wide rather than bound to
   one service, and it carries two features the client asked for and reaffirmed on
   2026-09-30 — the "Dr." display prefix and the Verified badge, both recorded

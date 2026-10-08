@@ -100,7 +100,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     },
     'both-states-both-providers': {
       src: '/images/services/tele-states.webp',
-      alt: 'An open laptop on a wooden table beside a notebook and pen, a mug and a jar of wildflowers, with a window onto open fields behind.',
+      alt: 'An open laptop on a wooden table beside a notebook and pen, a mug, and a jar of wildflowers, with a window onto open fields behind.',
     },
     'what-telehealth-is-good-for': {
       src: '/images/services/tele-goodfor.webp',
@@ -118,7 +118,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
          because the practice's in-person locations are still unconfirmed under
          CLAUDE.md's care-modality rule. */
       src: '/images/services/tele-inperson.webp',
-      alt: 'An empty consulting room with two armchairs turned towards each other across a small wooden side table holding a tissue box and a glass of water.',
+      alt: 'An empty consulting room with two armchairs turned toward each other across a small wooden side table holding a tissue box and a glass of water.',
     },
   } as const;
 
@@ -165,7 +165,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       src: '/images/services/med-measured.webp',
       /* "a printed tick-box questionnaire", not the name on the sheet. Which
          instruments the practice uses is an open client item. */
-      alt: 'A person filling in a printed tick-box questionnaire with a pen at a wooden table, a glass of water beside them.',
+      alt: 'A person filling out a printed checkbox questionnaire with a pen at a wooden table, a glass of water beside them.',
     },
     'adjusting-as-things-change': {
       src: '/images/services/med-adjusting.webp',
@@ -208,7 +208,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const weightMedia = {
     'what-medical-weight-management-involves': {
       src: '/images/services/weight-consult.webp',
-      alt: 'A woman in a rust-coloured cardigan sitting at a wooden table, looking down at an open handwritten notebook while someone opposite her writes in it.',
+      alt: 'A woman in a rust-colored cardigan sitting at a wooden table, looking down at an open handwritten notebook while someone opposite her writes in it.',
     },
     'who-prescribes-and-reviews-your-care': {
       src: '/images/services/weight-provider.webp',
@@ -285,15 +285,15 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
          names a questionnaire and rating scales generically for the same
          reason the copy does — which instruments the practice uses is not
          something this repo can substantiate. */
-      alt: 'A woman filling in a printed questionnaire with a pen at a wooden table.',
+      alt: 'A woman filling out a printed questionnaire with a pen at a wooden table.',
     },
     {
       src: '/images/services/evaluation-card-2752.webp',
-      alt: 'A quiet consulting room with two armchairs turned towards each other across a small wooden side table, beside a curtained window.',
+      alt: 'A quiet consulting room with two armchairs turned toward each other across a small wooden side table, beside a curtained window.',
     },
     {
       src: '/images/what-to-expect/treatment-plan.webp',
-      alt: 'An open notebook and a pen on a desk, beside a cup of tea, a pair of glasses and a small plant.',
+      alt: 'An open notebook and a pen on a desk, beside a cup of tea, a pair of glasses, and a small plant.',
     },
     {
       src: '/images/services/eval-after-1600.webp',
@@ -501,7 +501,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                           two sidebar labels ahead of the first topical heading
                           pushes UI chrome to the front of the heading outline. */}
                       <h3 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                        How it is delivered
+                        How it’s delivered
                       </h3>
                       <p className="text-body text-np-ink mt-2">{service.modality}</p>
                     </div>

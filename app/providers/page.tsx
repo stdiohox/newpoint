@@ -28,7 +28,7 @@ import { breadcrumbSchema, organizationRef } from '@/lib/schema';
  * on every card, which is the condition CLAUDE.md puts on the prefix.
  *
  * THE VERIFIED BADGE IS NOT, and the two were decided separately. The badge is
- * still scoped to the /services "Providers you will see" cards; do not read the
+ * still scoped to the /services "Providers you’ll see" cards; do not read the
  * title override as widening it.
  *
  * `name` is untouched and is still what feeds schema, metadata and alt text.

@@ -225,7 +225,7 @@ export default function InsurancePage() {
             it; flag the conflict instead. */}
         <PageCta
           heading="Let us check your coverage"
-          body="Send us your contact details and ask us to check your plan before you book. Please do not include insurance ID or member numbers in the form."
+          body="Send us your contact info and ask us to check your plan before you book. Please don’t include insurance ID or member numbers in the form."
         />
       </main>
       <Footer />

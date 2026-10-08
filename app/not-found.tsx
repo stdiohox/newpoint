@@ -24,9 +24,9 @@ export default function NotFound() {
         <div className="py-24 md:py-32">
           <Container>
             <p className="text-caption text-np-blue-600 tracking-[0.08em] uppercase">404</p>
-            <h1 className="text-display-l mt-4 max-w-[18ch]">We could not find that page</h1>
+            <h1 className="text-display-l mt-4 max-w-[18ch]">We couldn’t find that page</h1>
             <p className="text-body-l text-np-neutral-600 mt-5 max-w-[52ch]">
-              The link may be out of date, or the address may have a typo in it. Everything on the
+              The link may be out of date, or there may be a typo in the address. Everything on the
               site is one click away below.
             </p>
 
@@ -44,7 +44,7 @@ export default function NotFound() {
 
             <nav aria-label="Site" className="border-np-neutral-200 mt-16 border-t pt-10">
               <h2 className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                Where you might be going
+                Where you might be headed
               </h2>
               <ul role="list" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {NAV.map((item) => (

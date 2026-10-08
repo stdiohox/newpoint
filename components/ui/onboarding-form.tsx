@@ -474,7 +474,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                   </p>
                   {submitError && (
                     <p role="alert" className={ERROR_CLASS}>
-                      We could not send that. Please try again, or call the practice.
+                      We couldn’t send that. Please try again, or call the practice.
                     </p>
                   )}
                   <Button type="submit" size="lg" className="w-full">

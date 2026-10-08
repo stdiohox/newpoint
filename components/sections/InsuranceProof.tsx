@@ -96,7 +96,7 @@ const CARDS = [
     title: 'Paying without insurance',
     imageUrl: '/images/insurance/self-pay.webp',
     description: INSURANCE.selfPay,
-    ctaText: 'Insurance and payment in full',
+    ctaText: 'See all insurance and payment details',
     ctaHref: '/insurance',
   },
 ] as const;

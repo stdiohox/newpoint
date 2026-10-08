@@ -285,7 +285,7 @@ export function contactPageSchema() {
     url: `${BUSINESS.domain}/contact`,
     name: `Contact ${BUSINESS.legalName}`,
     description:
-      `Phone, email and appointment requests for Newpoint Healthcare Services. ${DELIVERY_LINE}.`,
+      `Phone, email, and appointment requests for Newpoint Healthcare Services. ${DELIVERY_LINE}.`,
     isPartOf: { '@id': ORG_ID },
     mainEntity: { '@id': ORG_ID },
     /**

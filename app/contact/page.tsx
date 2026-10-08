@@ -253,8 +253,8 @@ export default function ContactPage() {
             <Reveal delay={0.08}>
               <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
                 Calling is the fastest way to reach us. Please keep health information out of any
-                message you send — tell us how to reach you and we will take the clinical details
-                directly.
+                message you send — just tell us how to reach you, and we’ll get the clinical
+                details from you directly.
               </p>
             </Reveal>
 
@@ -316,7 +316,7 @@ export default function ContactPage() {
                     href="#contact"
                     className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
                   >
-                    Or send the appointment form
+                    Or fill out the appointment form
                   </a>
                 </p>
                 {/* CLIENT: hours of operation are not published anywhere, so no
