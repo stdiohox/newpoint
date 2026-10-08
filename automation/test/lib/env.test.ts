@@ -151,3 +151,36 @@ describe("findPhiZoneVariables", () => {
     expect(findPhiZoneVariables({ TWILIO_AUTH_TOKEN: "", VAPI_API_KEY: undefined })).toEqual([]);
   });
 });
+
+describe("social env (Phase 3)", async () => {
+  const { approvalWebhookEnv, metaEnv } = await import("../../src/lib/env.js");
+
+  it("is optional at load, and each social task asks for exactly what it needs", () => {
+    const env = loadMarketingEnv(valid);
+    expect(configError(() => metaEnv(env)).variables).toEqual(["META_GRAPH_VERSION", "META_PAGE_ID", "META_PAGE_ACCESS_TOKEN"]);
+    expect(configError(() => approvalWebhookEnv(env)).variables).toEqual([
+      "N8N_SOCIAL_APPROVAL_WEBHOOK_URL",
+      "N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET",
+    ]);
+  });
+
+  it("returns the Meta and webhook settings once set", () => {
+    const env = loadMarketingEnv({
+      ...valid,
+      META_GRAPH_VERSION: "v24.0",
+      META_PAGE_ID: "1234567",
+      META_PAGE_ACCESS_TOKEN: "EAAG-page-token-xxxxxxxx",
+      N8N_SOCIAL_APPROVAL_WEBHOOK_URL: "https://n8n.example/webhook/newpoint-social-approval",
+      N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET: "s".repeat(32),
+    });
+    expect(metaEnv(env)).toMatchObject({ graphVersion: "v24.0", pageId: "1234567", igUserId: undefined });
+    expect(approvalWebhookEnv(env).url).toBe("https://n8n.example/webhook/newpoint-social-approval");
+  });
+
+  it("rejects an unpinned Graph version and a short webhook secret", () => {
+    expect(configError(() => loadMarketingEnv({ ...valid, META_GRAPH_VERSION: "latest" })).variables).toEqual(["META_GRAPH_VERSION"]);
+    expect(configError(() => loadMarketingEnv({ ...valid, N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET: "short" })).variables).toEqual([
+      "N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET",
+    ]);
+  });
+});

@@ -75,6 +75,15 @@ export function publicText<const T extends string, const V extends SlotValues<T>
   return rendered as PublicText;
 }
 
+/**
+ * Public text with angle brackets replaced by look-alikes, for quoting inside a
+ * prompt's <tags>: text that came from the web, the database or a model cannot
+ * close the tag and speak as instructions. Removing characters keeps it public.
+ */
+export function withoutTags(text: PublicText): PublicText {
+  return text.replace(/</g, "\u2039").replace(/>/g, "\u203a") as PublicText;
+}
+
 /** Joins `PublicText` parts. The result is public because every part is. */
 export function joinPublic(parts: readonly PublicText[], separator: PublicText): PublicText {
   return parts.join(separator) as PublicText;

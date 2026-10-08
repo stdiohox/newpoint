@@ -267,3 +267,208 @@ export async function purgeGeoRunDetails(db: Queryable, cutoff: Date, now: Date)
   );
   return result.rowCount ?? 0;
 }
+
+// --- Social (Phase 3, §5.7) ---------------------------------------------------
+
+export type SocialStatus =
+  | "planned"
+  | "drafted"
+  | "in_compliance"
+  | "awaiting_approval"
+  | "approved"
+  | "rejected"
+  | "expired"
+  /** Claimed by social.publisher; the Meta call is in flight or failed. A person checks before any re-run. */
+  | "publishing"
+  | "published";
+
+export interface SocialPost {
+  readonly id: string;
+  readonly channel: "facebook" | "instagram" | "gbp" | "linkedin";
+  readonly topic: PublicText;
+  readonly body: PublicText | null;
+  readonly media: readonly { readonly url: PublicText; readonly alt: PublicText }[];
+  readonly rounds: number;
+  readonly status: SocialStatus;
+  readonly complianceReport: unknown;
+  readonly approvedContentHash: string | null;
+  readonly approvalTokenId: string | null;
+  readonly scheduledFor: Date | null;
+  readonly publishedRef: string | null;
+}
+
+interface SocialRow {
+  id: string;
+  channel: SocialPost["channel"];
+  topic: string;
+  body: string | null;
+  media: unknown;
+  rounds: number;
+  approval_status: SocialStatus;
+  compliance_report: unknown;
+  approved_content_hash: string | null;
+  approval_token_id: string | null;
+  scheduled_for: Date | null;
+  published_ref: string | null;
+}
+
+function mediaOf(value: unknown): SocialPost["media"] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    if (typeof item !== "object" || item === null) return [];
+    const { url, alt } = item as { url?: unknown; alt?: unknown };
+    return typeof url === "string" && typeof alt === "string" ? [{ url: pub(url), alt: pub(alt) }] : [];
+  });
+}
+
+export async function getSocialPost(db: Queryable, id: string): Promise<SocialPost | null> {
+  const result = await db.query<SocialRow>(
+    `select id, channel, topic, body, media, rounds, approval_status, compliance_report,
+            approved_content_hash, approval_token_id, scheduled_for, published_ref
+       from marketing.social_posts where id = $1`,
+    [id],
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    channel: row.channel,
+    topic: pub(row.topic),
+    body: row.body === null ? null : pub(row.body),
+    media: mediaOf(row.media),
+    rounds: row.rounds,
+    status: row.approval_status,
+    complianceReport: row.compliance_report,
+    approvedContentHash: row.approved_content_hash,
+    approvalTokenId: row.approval_token_id,
+    scheduledFor: row.scheduled_for,
+    publishedRef: row.published_ref,
+  };
+}
+
+/** Planned posts for a week; a slot already taken on a channel is left alone. Returns the new ids. */
+export async function insertPlannedPosts(
+  db: Queryable,
+  posts: readonly { readonly channel: string; readonly topic: string; readonly scheduledFor: Date }[],
+): Promise<string[]> {
+  if (posts.length === 0) return [];
+  const result = await db.query<{ id: string }>(
+    `insert into marketing.social_posts (channel, topic, scheduled_for, approval_status)
+     select c, t, s, 'planned' from unnest($1::marketing.social_channel[], $2::text[], $3::timestamptz[]) as x(c, t, s)
+     on conflict (channel, scheduled_for) do nothing
+     returning id`,
+    [posts.map((p) => p.channel), posts.map((p) => p.topic), posts.map((p) => p.scheduledFor.toISOString())],
+  );
+  return result.rows.map((row) => row.id);
+}
+
+/**
+ * Confirmed practice facts only, as "key: value" lines (§4: agents read this
+ * table and never invent facts). The media library is not a fact and is left out.
+ */
+export async function listConfirmedFacts(db: Queryable): Promise<PublicText[]> {
+  const result = await db.query<{ key: string; value: unknown }>(
+    `select key, value from public.practice_facts where confirmed and key <> 'social.media_library' order by key`,
+  );
+  return result.rows.map((row) => pub(`${row.key}: ${typeof row.value === "string" ? row.value : JSON.stringify(row.value)}`));
+}
+
+/** The reviewer's and the rules' feedback from the last compliance round, for the drafter. */
+export async function getDraftFeedback(db: Queryable, id: string): Promise<PublicText[]> {
+  const result = await db.query<{ feedback: unknown }>(
+    `select compliance_report -> 'feedback' as feedback from marketing.social_posts where id = $1`,
+    [id],
+  );
+  const feedback = result.rows[0]?.feedback;
+  return Array.isArray(feedback) ? feedback.filter((f): f is string => typeof f === "string").map(pub) : [];
+}
+
+export interface MediaItem {
+  readonly url: PublicText;
+  readonly description: PublicText;
+}
+
+/**
+ * The confirmed media library: public.practice_facts['social.media_library'] =
+ * [{url, description}], on newpointnp.com only.
+ */
+export async function getMediaLibrary(db: Queryable): Promise<MediaItem[]> {
+  const result = await db.query<{ value: unknown }>(
+    `select value from public.practice_facts where key = 'social.media_library' and confirmed`,
+  );
+  const value = result.rows[0]?.value;
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    if (typeof item !== "object" || item === null) return [];
+    const { url, description } = item as { url?: unknown; description?: unknown };
+    // The practice's own images only: Meta fetches this URL server-side.
+    return typeof url === "string" && /^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\//.test(url) && typeof description === "string"
+      ? [{ url: pub(url), description: pub(description) }]
+      : [];
+  });
+}
+
+/**
+ * Moves a post between states, but only from the state the caller expects.
+ * Returns false when the post was not in that state (a retry, or a race), so
+ * every step is idempotent and no step can skip another.
+ */
+export async function transitionSocialPost(
+  db: Queryable,
+  id: string,
+  from: readonly SocialStatus[],
+  to: SocialStatus,
+  fields: {
+    readonly body?: string;
+    readonly media?: readonly { readonly url: string; readonly alt: string }[];
+    readonly rounds?: number;
+    readonly complianceReport?: unknown;
+    readonly approvalTokenId?: string;
+    readonly approvedContentHash?: string;
+    readonly publishedRef?: string;
+    readonly publishedAt?: Date;
+    readonly statusReason?: string | null;
+  } = {},
+): Promise<boolean> {
+  const result = await db.query(
+    `update marketing.social_posts set
+        approval_status       = $3,
+        body                  = coalesce($4, body),
+        media                 = coalesce($5::jsonb, media),
+        rounds                = coalesce($6, rounds),
+        compliance_report     = coalesce($7::jsonb, compliance_report),
+        approval_token_id     = coalesce($8, approval_token_id),
+        approved_content_hash = coalesce($9, approved_content_hash),
+        published_ref         = coalesce($10, published_ref),
+        published_at          = coalesce($11, published_at),
+        status_reason         = case when $12::boolean then $13 else status_reason end
+      where id = $1 and approval_status = any($2::marketing.social_status[])`,
+    [
+      id,
+      from,
+      to,
+      fields.body ?? null,
+      fields.media === undefined ? null : JSON.stringify(fields.media),
+      fields.rounds ?? null,
+      fields.complianceReport === undefined ? null : JSON.stringify(fields.complianceReport),
+      fields.approvalTokenId ?? null,
+      fields.approvedContentHash ?? null,
+      fields.publishedRef ?? null,
+      fields.publishedAt?.toISOString() ?? null,
+      fields.statusReason !== undefined,
+      fields.statusReason ?? null,
+    ],
+  );
+  return (result.rowCount ?? 0) === 1;
+}
+
+/** Posts still `planned` in a week: a retried planner hands them to the drafter again. */
+export async function listPlannedPostIds(db: Queryable, from: Date, to: Date): Promise<string[]> {
+  const result = await db.query<{ id: string }>(
+    `select id from marketing.social_posts
+      where approval_status = 'planned' and scheduled_for >= $1 and scheduled_for < $2
+      order by scheduled_for, id`,
+    [from.toISOString(), to.toISOString()],
+  );
+  return result.rows.map((row) => row.id);
+}

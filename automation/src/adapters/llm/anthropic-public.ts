@@ -16,10 +16,12 @@ import type { z } from "zod";
 import type { FetchLike } from "../google/search-console.js";
 import type { PublicText } from "../../lib/phi.js";
 
-/** §5 "LLM routes use one model per tier". Only the drafting tier runs in the public org today. */
+/** §5 "LLM routes use one model per tier", as they run in the public org. */
 export const PUBLIC_ROUTES = {
   /** `seo.keyword-research` clustering, `gbp.reply-drafter`, `social.*`, `geo.*`. */
   drafting: { model: "claude-sonnet-5-5", effort: "medium" },
+  /** `social.compliance` review only (§5: Opus 5.5 is a recorded decision, not a per-task choice). */
+  compliance: { model: "claude-opus-5-5", effort: "high" },
 } as const;
 
 export type PublicRoute = keyof typeof PUBLIC_ROUTES;
@@ -60,7 +62,7 @@ export function createPublicClaude(options: PublicClaudeOptions): PublicClaude {
       const response = await client.beta.messages.create({
         model,
         max_tokens: maxTokens,
-        // Sonnet 5.5 defaults to `high`; §5 sets the drafting tier to `medium` explicitly.
+        // Set explicitly per tier: Sonnet 5.5 defaults to `high`, Opus 5.5 to `medium` (§5).
         output_config: { effort, format: betaZodOutputFormat(schema) },
         // A policy decline is re-run server-side on Anthropic's recommended model for that category.
         betas: ["server-side-fallback-2026-07-01"],

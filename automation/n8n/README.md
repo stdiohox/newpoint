@@ -113,3 +113,32 @@ Run on suspected compromise of the VPS or n8n, and when anyone with editor acces
 - [ ] Review user accounts; remove anyone who no longer needs access.
 - [ ] Apply the pinned n8n upgrade if one is due; re-run §3 checks after.
 - [ ] Rotate webhook secrets and the `n8n_reader` password (90-day maximum, §6 layer 7).
+
+## 9. Social post approval (`workflows/social-approval.json`, Phase 3)
+
+`social.approval` POSTs a draft, its compliance report and Trigger.dev's **one-time token
+URL** to this workflow. The owner approves or rejects by email; the workflow then POSTs
+`{ approved, content_hash }` to that URL, which completes the wait. n8n never holds a
+Trigger.dev key or a Meta token (§1, §2).
+
+- [ ] Import `workflows/social-approval.json`. It was written by hand and has **not** been
+      imported into a live n8n yet: open every node after import and check it.
+- [ ] Create a **Header Auth** credential named "Newpoint social approval webhook": header
+      `x-newpoint-webhook-secret`, value a random 32+ character secret. Put the same secret
+      in Trigger.dev as `N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET`.
+- [ ] Bind an SMTP credential named "Newpoint approvals SMTP" (send-only).
+- [ ] Set From and To on "Ask the owner" to the practice's approver(s). The placeholders
+      `SET-BEFORE-ACTIVATING@example.invalid` must not survive.
+- [ ] Settings → Error workflow → "Koret ops alert".
+- [ ] Copy the production webhook URL into Trigger.dev as `N8N_SOCIAL_APPROVAL_WEBHOOK_URL`.
+- [ ] Test: a payload that fails the IF (wrong `kind`, a callback URL not under
+      `https://api.trigger.dev/`) must end at "Invalid request: dropped".
+- [ ] Test: approve once, reject once, and let one wait run out. A timeout or rejection
+      resolves as `approved: false`; Trigger.dev also expires the token at 72 h.
+- [ ] Activate. Watch one real approval end to end before trusting it.
+
+The callback URL in a payload is a bearer capability for one decision on one post. It is
+not shown in the email (the email's buttons come back to n8n). It does sit in n8n's
+execution data while the approval waits, so the §3 settings matter here:
+`EXECUTIONS_DATA_SAVE_ON_SUCCESS=none` and the 7-day prune remove it afterwards, and the
+token is spent (or expired) by then anyway.

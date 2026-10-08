@@ -58,18 +58,39 @@ async function sqlFiles(dir: string): Promise<string[]> {
   return (await readdir(dir)).filter((name) => name.endsWith(".sql")).sort();
 }
 
+/**
+ * A started server on a port no one else holds. freePort() frees its probe
+ * socket before Postgres binds, so another worker can in principle take the
+ * port in between; a failed start therefore retries with a fresh port and a
+ * fresh data directory.
+ */
+async function startServer(): Promise<{ server: EmbeddedPostgres; dataDir: string }> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const dataDir = await mkdtemp(join(tmpdir(), "newpoint-marketing-pg-"));
+    const server = new EmbeddedPostgres({
+      databaseDir: dataDir,
+      port: await freePort(),
+      user: "postgres",
+      password: "postgres",
+      persistent: false,
+      onLog: () => undefined,
+    });
+    try {
+      await server.initialise();
+      await server.start();
+      return { server, dataDir };
+    } catch (error) {
+      lastError = error;
+      await server.stop().catch(() => undefined);
+      await rm(dataDir, { recursive: true, force: true });
+    }
+  }
+  throw new Error("embedded Postgres did not start after 3 attempts", { cause: lastError });
+}
+
 export async function startMarketingDb(): Promise<MarketingDb> {
-  const dataDir = await mkdtemp(join(tmpdir(), "newpoint-marketing-pg-"));
-  const server = new EmbeddedPostgres({
-    databaseDir: dataDir,
-    port: await freePort(),
-    user: "postgres",
-    password: "postgres",
-    persistent: false,
-    onLog: () => undefined,
-  });
-  await server.initialise();
-  await server.start();
+  const { server, dataDir } = await startServer();
   await server.createDatabase("marketing");
 
   const client = server.getPgClient("marketing");

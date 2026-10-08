@@ -155,7 +155,7 @@ rules and checks that the content hash matches what was approved (§5.7).
 | **Google** (GBP, Search Console) | Listing, reviews, search data | **No** | No | A review reply must **never** confirm that someone is a patient (§5.2). |
 | **Meta / LinkedIn** | Social publishing | **No** | No | No patient stories, testimonials or photos of patients. |
 | **Keyword data source** | Search volumes | **No** | No | Open decision D8. |
-| **Staff console host** | PHI queue UI | **Yes** | **Yes** | Open decision D7. The marketing site is hosted on Netlify, and Netlify's standard plans are not BAA-covered, so the marketing site's host does not qualify by default. |
+| **Staff console host** | PHI queue UI | **Yes** | **Yes** | Open decision D7. The marketing site is hosted on Vercel (project `newpoint`, building `main`), and Vercel's standard plans are not BAA-covered, so the marketing site's host does not qualify by default. |
 
 **Hard rule:** a PHI workload does not start until the BAA for every vendor in its
 path is signed. Build order (§7) follows from this. Public-zone systems need no BAA,

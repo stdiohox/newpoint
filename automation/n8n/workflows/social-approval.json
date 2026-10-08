@@ -1,0 +1,216 @@
+{
+  "name": "Newpoint \u00b7 social post approval",
+  "nodes": [
+    {
+      "id": "824f5dc8-99a7-460c-922e-7bd04be74afc",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "4a978812-1dc1-422e-965c-e84bcf2ed967",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "newpoint-social-approval",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Newpoint social approval webhook"
+        }
+      }
+    },
+    {
+      "id": "b4993317-6aab-4293-b068-b3a1974cf367",
+      "name": "Is a valid approval request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "9d36d133-0b81-4d7b-a1ee-29e98206ca11",
+              "leftValue": "={{ $json.body.kind }}",
+              "rightValue": "social.approval_requested",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "d838871a-13a6-44cc-87b9-e63e35649866",
+              "leftValue": "={{ $json.body.callback_url }}",
+              "rightValue": "https://api.trigger.dev/",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "id": "ec20bee4-e156-4f32-9a2b-a8e30a52997b",
+              "leftValue": "={{ $json.body.content_hash }}",
+              "rightValue": "^[0-9a-f]{64}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "de4e1bbd-43e3-4e14-aad7-05ac0147d36a",
+      "name": "Ask the owner (approve or reject)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        -100
+      ],
+      "parameters": {
+        "operation": "sendAndWait",
+        "fromEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+        "toEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+        "subject": "=Newpoint {{ $json.body.channel }} post for {{ $json.body.scheduled_for }}: approve?",
+        "message": "=Channel: {{ $json.body.channel }}\nScheduled: {{ $json.body.scheduled_for }}\nExpires: {{ $json.body.expires_at }}\n\nPOST TEXT\n{{ $json.body.body }}\n\nIMAGE\n{{ $json.body.media.length ? $json.body.media[0].url + '\\nAlt text: ' + $json.body.media[0].alt : 'none' }}\n\nCOMPLIANCE\n{{ $json.body.compliance.passed ? 'Passed automated review' : 'AUTOMATED REVIEW DID NOT PASS after three rounds. Approve only if you have read the notes below and you are sure the post is accurate and appropriate.' }} (round {{ $json.body.compliance.rounds }})\nRules flagged: {{ $json.body.compliance.rules.join(', ') || 'none' }}\nNotes: {{ $json.body.compliance.review_notes.join(' | ') || 'none' }}\n\nApproving publishes exactly this text and image at the scheduled time. Any later edit voids the approval.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Approve",
+            "disapproveLabel": "Reject"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 72,
+              "resumeUnit": "hours"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "smtp": {
+          "id": "",
+          "name": "Newpoint approvals SMTP"
+        }
+      }
+    },
+    {
+      "id": "2f3bd6c2-6b2a-4490-8c55-857bde4b3ffb",
+      "name": "Complete the Trigger.dev token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        -100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.callback_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ approved: $json.data && $json.data.approved === true, content_hash: $('Webhook').item.json.body.content_hash }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "2f467e2e-2b09-4103-ad5a-c5c897662ab2",
+      "name": "Invalid request: dropped",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        120
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "409f2f53-9408-4626-a794-791c68a87316",
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -360
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 760,
+        "height": 220,
+        "content": "## Newpoint social approval (automation/n8n/README.md \u00a79)\nTrigger.dev `social.approval` POSTs the draft and a one-time token URL here. The owner approves or rejects by email; this workflow then POSTs `{approved, content_hash}` to that URL. No Trigger.dev key lives in n8n.\nBefore activating: set From/To on the email node, bind the two credentials, set Settings \u2192 Error workflow to 'Koret ops alert'. A timeout (72 h) or an unclicked email resolves as **rejected**."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is a valid approval request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is a valid approval request?": {
+      "main": [
+        [
+          {
+            "node": "Ask the owner (approve or reject)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid request: dropped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask the owner (approve or reject)": {
+      "main": [
+        [
+          {
+            "node": "Complete the Trigger.dev token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "SET-TO-KORET-OPS-ALERT-WORKFLOW-ID",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}
