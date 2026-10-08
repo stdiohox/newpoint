@@ -2293,7 +2293,7 @@ export const GETTING_STARTED = {
   steps: [
     {
       title: 'Reach out',
-      body: 'Fill out the form below or give us a call. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t send health details through the form.',
+      body: 'Call or email us. Calling is the fastest way to reach us. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t include health details in any message.',
     },
     {
       title: 'Comprehensive psychiatric assessment',
@@ -2369,7 +2369,7 @@ export const WHAT_TO_EXPECT = {
        * already had this right, and carries NEW_PATIENTS_PAGE.privacyBody's
        * reassurance clause so the patient knows where the detail does go.
        */
-      body: 'Fill out the form or give us a call. Tell us how to reach you and why you’re reaching out. Please don’t send health details through the form — we’ll get the clinical details from you directly.',
+      body: 'Call or email us. Calling is the fastest way to reach us. Tell us how to reach you and why you’re reaching out. Please don’t include health details in any message — we’ll get the clinical details from you directly.',
     },
     {
       title: 'Comprehensive psychiatric assessment',
@@ -2816,9 +2816,9 @@ export const CONTACT_PAGE = {
   title: 'Contact Newpoint',
   metaTitle: 'Contact | Psychiatric Care in NJ and PA',
   metaDescription:
-    'Contact Newpoint for psychiatric care across New Jersey and Pennsylvania, by telehealth and in person. Call, email, or request an appointment online.',
+    'Contact Newpoint for psychiatric care across New Jersey and Pennsylvania, by telehealth and in person. Call or email us to request an appointment.',
   intro:
-    `Call us, email us, or request an appointment. ${DELIVERY_LINE}.`,
+    `Call or email us to request an appointment. ${DELIVERY_LINE}.`,
   /**
    * CLIENT: no practice-wide inbox exists, so both named provider addresses are
    * listed rather than inventing an info@ or contact@.
