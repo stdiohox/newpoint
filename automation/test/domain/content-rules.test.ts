@@ -14,7 +14,7 @@ describe("content rules", () => {
     ["psychiatric assessment for children", ["open_client_item"]],
     ["how much does a telehealth visit cost", ["open_client_item"]],
     ["urgent mental health help nj", ["crisis"]],
-    ["how much weight can you lose on tirzepatide", ["weight_outcome"]],
+    ["how much weight can you lose on tirzepatide", ["medication_or_class", "weight_outcome"]],
     ["lose 30 pounds fast", ["weight_outcome"]],
   ])("flags %s", (text, rules) => {
     expect(contentRulesTouched(text)).toEqual(rules);

@@ -1,7 +1,7 @@
 # Newpoint automation layer
 
 Design: [`docs/automation-architecture.md`](../docs/automation-architecture.md).
-This package is **Phases 0, 1 and 2, public zone only** (§7). There is no PHI code here,
+This package is **Phases 0 to 3, public zone only** (§7). There is no PHI code here,
 and `trigger.phi.config.ts` is an empty stub until Phase 5.
 
 npm only (`package-lock.json`). Node 24+.
@@ -87,6 +87,29 @@ The files follow Supabase's pgTAP convention, so they should also run with
 (`supabase db push`) against a fresh Postgres.
 
 ---
+
+## Phase 3: the social engine (§5.7)
+
+```
+social.planner ─▶ social.drafter ─▶ social.compliance ─┬─▶ social.approval ─▶ social.publisher
+ (Mon 07:00 ET)          ▲                              │    (72 h, n8n email)    (at the slot)
+                         └── feedback, at most 3 rounds ┘
+```
+
+| Task | Does |
+|---|---|
+| `social.planner` | Plans the following week: topics × channels from the keyword clusters, confirmed facts and the awareness calendar. |
+| `social.drafter` | Body, plus an image from the confirmed media library and its alt text. A draft that does not fit its channel is rejected, never trimmed. |
+| `social.compliance` | `postViolations` (the brief as code) first, then `claude-opus-5-5` review for tone and implied claims. Back to the drafter at most three times, then to the owner **with the report**. |
+| `social.approval` | Hashes the post, creates a 72 h wait token, sends n8n the draft and the token's one-time URL, waits. |
+| `social.publisher` | Re-hashes and re-runs the rules; refuses on any change or rule break. Facebook and Instagram now (D10); GBP posts stay `approved` for Phase 4. Runs once, retries only Meta 429s, so a post can never go out twice. |
+
+- **Media library:** `public.practice_facts` key `social.media_library`, `confirmed = true`, value
+  `[{ "url": "https://…", "description": "…" }]`. Images the practice owns, on a public https URL.
+  Without it, Instagram is not planned (it cannot post without an image).
+- **Statuses:** `planned → drafted → in_compliance → awaiting_approval → approved → published`, or
+  `rejected` / `expired` with `status_reason` (a code, never vendor text).
+- **Not sent to Meta yet:** alt text (parameter to confirm against the pinned Graph version).
 
 ## Setup you must do (Phases 0 and 1)
 
@@ -175,6 +198,13 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 3. The request uses the `server-side-fallback-2026-07-01` beta (`fallbacks: "default"`):
    a policy decline is re-run on Anthropic's recommended model for that category.
 
-### 5. n8n
+### 5. Meta (Phase 3; full checklist in the deploy notes)
+
+Set, in the Trigger.dev dashboard only: `META_GRAPH_VERSION`, `META_PAGE_ID`,
+`META_PAGE_ACCESS_TOKEN`, and `META_IG_USER_ID` once Instagram is linked. Never in n8n.
+Then `N8N_SOCIAL_APPROVAL_WEBHOOK_URL` and `N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET` from
+[`n8n/README.md` §9](n8n/README.md).
+
+### 6. n8n
 
 Work through [`n8n/README.md`](n8n/README.md) before activating any workflow.
