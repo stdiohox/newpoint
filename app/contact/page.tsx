@@ -253,8 +253,8 @@ export default function ContactPage() {
             <Reveal delay={0.08}>
               <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
                 Calling is the fastest way to reach us. Please keep health information out of any
-                message you send — tell us how to reach you and we will take the clinical details
-                directly.
+                message you send — just tell us how to reach you, and we’ll get the clinical
+                details from you directly.
               </p>
             </Reveal>
 
@@ -297,28 +297,13 @@ export default function ContactPage() {
                   ))}
                   <li className="text-small text-np-neutral-600 pt-1">Fax {BUSINESS.fax}</li>
                 </ul>
-                {/* THE ROUTE BACK TO THE FORM, restored verbatim. It was the
-                    second half of the "Request an appointment" block this
-                    section replaced, and both reviews asked for it back: a
-                    column that opens "calling is the fastest way" offers
-                    nothing to a Deaf, hard-of-hearing or speech-disabled
-                    reader, and the page's only other action by this point is
-                    an email channel the next column says to keep clinical
-                    detail out of. `#contact` is ContactCrisis's own section id
-                    and globals.css's scroll-padding-top clears the navbar.
-
-                    NOT the heading that was removed: that was an h2 reading
-                    "Request an appointment" above a call button, which sent a
-                    heading-navigation user somewhere that was neither the form
-                    nor an appointment. This is a link that goes where it says. */}
-                <p className="mt-6">
-                  <a
-                    href="#contact"
-                    className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
-                  >
-                    Or send the appointment form
-                  </a>
-                </p>
+                {/* NO ROUTE TO THE FORM WHILE IT IS NOT CONNECTED. An "Or fill
+                    out the appointment form" link (to `#contact`) sat here; it
+                    was removed because the form does not send yet. It existed
+                    so a Deaf, hard-of-hearing or speech-disabled reader had a
+                    non-phone route — the email column beside this one is that
+                    route for now. Restore the link when the form's POST target
+                    is connected. */}
                 {/* CLIENT: hours of operation are not published anywhere, so no
                     "we answer between" line is claimed here. */}
               </Reveal>

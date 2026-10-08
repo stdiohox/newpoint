@@ -84,7 +84,7 @@ export function Faq() {
             href="/contact#faq"
             className="text-body text-np-blue-600 ease-np-out mt-10 inline-flex items-center gap-1 font-medium underline-offset-4 transition-colors duration-[180ms] hover:underline focus-visible:underline motion-reduce:transition-none"
           >
-            All frequently asked questions
+            See all FAQs
             <span aria-hidden="true">→</span>
           </Link>
         </Reveal>

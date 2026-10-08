@@ -231,7 +231,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                       >
                         {provider.email}
                       </a>
-                      , or call the practice on{' '}
+                      , or call the practice at{' '}
                       <a
                         href={`tel:${BUSINESS.phonePrimaryHref}`}
                         className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
@@ -246,8 +246,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                         arriving from a name search describes their symptoms into
                         an ordinary mailbox. */}
                     <p className="text-caption text-np-neutral-600 mt-2 max-w-[46ch]">
-                      Please do not include symptoms, diagnoses, medications, or insurance ID
-                      numbers in an email. It is not a secure channel for them.
+                      Please don’t include symptoms, diagnoses, medications, or insurance ID
+                      numbers in an email. Email isn’t secure.
                     </p>
                   </div>
                 </Reveal>
@@ -343,8 +343,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
                       {provider.name.split(' ')[0]} sees patients at {BUSINESS.shortName}.{' '}
                       {DELIVERY_LINE}. New patients start with a comprehensive psychiatric
-                      assessment; care continues as medication management on a schedule agreed with
-                      you.
+                      assessment. After that, care continues as medication management on a schedule
+                      you set together.
                     </p>
                   </Reveal>
                   <Reveal delay={0.12}>

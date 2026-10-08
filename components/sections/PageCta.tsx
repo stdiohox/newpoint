@@ -108,7 +108,7 @@ const assurances = [
  */
 export function PageCta({
   heading = 'Ready when you are',
-  body = 'Send us your contact details and we will get back to you about an appointment. Please keep health information out of the form.',
+  body = 'Call or email us to request an appointment. Calling is the fastest way to reach us. Please keep health information out of any message.',
 }: {
   heading?: string;
   body?: string;

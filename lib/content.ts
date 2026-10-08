@@ -145,7 +145,7 @@ export const HERO = {
    */
   headlineLines: 'Mental and behavioral care across\nNew Jersey and Pennsylvania',
   subtext:
-    'Assessment, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners. Most major insurance accepted.',
+    'Assessment, medication management, and telehealth with two doctorate-prepared psychiatric nurse practitioners. We accept most major insurance plans.',
   /**
    * Three service names for the hero's glass tag, word-for-word as `subtext`
    * already names them. No new service is claimed here.
@@ -382,7 +382,7 @@ export const INSURANCE = {
    * make that stronger claim.
    */
   heading: 'We accept most major plans',
-  body: 'We accept the plans below. If yours is not listed, ask us and we will check your coverage before your first appointment.',
+  body: 'We accept the plans below. Don’t see yours? Ask us, and we’ll check your coverage before your first appointment.',
   groups: PAYER_GROUPS,
   /**
    * CONFIRMED PAYERS ONLY, flat, and derived so it cannot drift from the groups
@@ -424,9 +424,9 @@ export const INSURANCE = {
    * will diverge the moment either context changes.
    */
   unconfirmedScopeNote:
-    'Tell us your plan and we will check your coverage before your first appointment.',
+    'Tell us your plan, and we’ll check your coverage before your first appointment.',
   selfPay:
-    'A session fee and a sliding scale are available for patients paying without insurance. We accept all major credit and debit cards and cash.',
+    'Paying without insurance? There’s a session fee, and a sliding scale is available. We accept cash and all major credit and debit cards.',
   /**
    * Homepage grid only. Medicare and NJ Medicaid each get a card there and
    * neither had a line of its own, so both use this one.
@@ -438,7 +438,7 @@ export const INSURANCE = {
    * than inventing a claim about either one.
    */
   coverageCheckNote:
-    'Tell us your plan details and we will check your coverage before your first appointment.',
+    'Tell us your plan details, and we’ll check your coverage before your first appointment.',
 } as const;
 
 /**
@@ -487,7 +487,7 @@ export const FOOTER = {
   },
   /** Not a disclaimer the practice invented; it is the one the old footer had. */
   legalNote:
-    'This website is for general information and is not medical advice, and it is not monitored around the clock.',
+    'This website is for general information only. It isn’t medical advice, and it isn’t monitored around the clock.',
 } as const;
 
 export type Provider = {
@@ -882,7 +882,7 @@ export const PROVIDERS: Provider[] = [
 
 export const WHAT_WE_TREAT = {
   heading: 'What we treat, and how',
-  body: 'Care begins with a comprehensive psychiatric assessment and a treatment plan built around it. From there we manage medication, monitor progress with standardized clinical measures, and adjust as your needs change.',
+  body: 'Your care starts with a comprehensive psychiatric assessment and a treatment plan built around it. From there, we manage your medication, track your progress with standardized clinical measures, and adjust as your needs change.',
   /**
    * Conditions aggregated in /research/services-analysis.md, plus three added
    * on 2026-09-29 from /research/provider-directories.md.
@@ -929,22 +929,22 @@ export const WHAT_WE_TREAT = {
   services: [
     {
       title: 'Comprehensive psychiatric assessment',
-      body: 'A structured first appointment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
+      body: 'A structured first appointment where we identify risk factors, reach a diagnosis, and build your treatment plan.',
       href: '/services/psychiatric-evaluation',
     },
     {
       title: 'Medication management',
-      body: 'Ongoing prescribing and review, with standardized rating scales used to track progress and catch changes early.',
+      body: 'Ongoing prescribing and check-ins, using standardized rating scales to track your progress and catch changes early.',
       href: '/services/medication-management',
     },
     {
       title: 'Telehealth',
-      body: 'Appointments by video on an expanded schedule, including weekends, evenings, and holidays by request.',
+      body: 'Video appointments on an expanded schedule, including weekends, evenings, and holidays by request.',
       href: '/services/telehealth',
     },
     {
       title: 'Individual counseling and referral',
-      body: 'Supportive counseling alongside medication care, plus referral to follow-up services and coordination with your other clinicians.',
+      body: 'Supportive counseling alongside your medication care, plus referrals to follow-up services and coordination with your other clinicians.',
       href: null,
     },
   ],
@@ -1256,7 +1256,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     metaDescription:
       'A comprehensive psychiatric assessment, also called a psychiatric evaluation, in NJ and PA: full history, rating scales, a diagnosis, and a treatment plan.',
     intro:
-      'Every patient at Newpoint starts here. A comprehensive psychiatric assessment is the appointment where we take a full history, understand what brought you in, and finish with a diagnosis and a treatment plan built around it. It is the foundation everything else is built on.',
+      'Every patient at Newpoint starts here. In a comprehensive psychiatric assessment, we take your full history, get a clear picture of what brought you in, and finish with a diagnosis and a treatment plan built around it. Everything else builds on this visit.',
     modality: DELIVERY_LINE,
     /* The one service on the bespoke layout. See the field's own comment on
        the type for the shape it assumes. */
@@ -1273,11 +1273,11 @@ export const SERVICE_PAGES: ServicePage[] = [
          * appointment is exactly the thing that makes someone hesitate to book.
          * It doubles as the page's synonym coverage — see the slug note above.
          */
-        body: 'The assessment is structured rather than conversational-only, so nothing important gets missed. We work through your history and current symptoms, and we identify the risk factors that may be affecting your mental health — the things that make a condition harder to manage, or easier to miss. If you were referred for a psychiatric evaluation, this is the same appointment under the name we use for it.',
+        body: 'The assessment follows a set structure, not just a conversation, so nothing important gets missed. We go through your history and current symptoms and look for the risk factors that may be affecting your mental health — the things that make a condition harder to manage or easier to miss. If you were referred for a psychiatric evaluation, this is the same appointment. We just call it an assessment.',
       },
       {
         heading: 'The tools we use',
-        body: 'Structured instruments sit alongside the clinical conversation. They give us a baseline to measure against later, which is what makes it possible to tell real progress from a good week.',
+        body: 'Along with the conversation, we use a few structured tools. They give us a baseline to measure against later, so we can tell real progress from a good week.',
         list: [
           'A comprehensive psychiatric assessment questionnaire',
           'Standardized clinical rating scales, recorded at baseline',
@@ -1286,7 +1286,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Reaching a diagnosis',
-        body: 'A diagnosis is determined through assessment, not assumption. We tell you what we have found and what it means, in plain language. If the picture is not yet clear, we say that too rather than reaching for a label that might not fit.',
+        body: 'We reach a diagnosis through assessment, not assumption. We’ll tell you what we found and what it means, in plain language. If the picture isn’t clear yet, we’ll say so instead of reaching for a label that might not fit.',
         /* ONE SENTENCE, AND IT IS THE ONLY ONE THIS SECTION HAD LEFT TO SAY.
            Sourced from research/content/services.md: "diagnoses of mental
            illness are made based on assessments, and then an effective plan of
@@ -1313,14 +1313,14 @@ export const SERVICE_PAGES: ServicePage[] = [
            guaranteed: "where a diagnosis can be established" is the same hedge
            the FAQ uses. */
         detail:
-          'Where a diagnosis can be established, it becomes the thing the rest of your care is built on.',
+          'When we can make a diagnosis, the rest of your care is built on it.',
       },
       {
         heading: 'Your treatment plan',
         // "A treatment plan", not "a written treatment plan you have agreed to":
         // the source says a plan of care is determined, not that it is written
         // down or countersigned. CLIENT: confirm if patients receive it in writing.
-        body: 'The plan that comes out of the assessment combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your circumstances. Where other clinicians are already involved in your care, we collaborate with them to establish the therapy regimen and the medication protocol together rather than in parallel.',
+        body: 'Where both are indicated, your plan combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your situation. If other clinicians are already part of your care, we work with them to set your therapy and medication plan together, not in parallel.',
         /* Both halves are research/content/services.md's "as we evaluate
            progress, we will continue to provide support and education as
            needed". AS NEEDED IS LOAD-BEARING AND IS NOT A SOFTENER: it is the
@@ -1340,7 +1340,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            offers is still open and the four candidates in the directories
            contradict each other. */
         detail:
-          'The plan is reviewed as your response to treatment becomes clear, and support and education continue alongside it as needed.',
+          'We revisit the plan as we see how you respond to treatment, and we keep offering support and education as needed.',
         /* THE PRACTICE'S OWN PUBLISHED LIST of treatment options, from
            research/content/services.md, and none of it has appeared on this
            page before. Three of the six are taken.
@@ -1358,7 +1358,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            plausibly a section of their own, and we need format and cadence to
            describe them. */
         list: [
-          'Medication treatment, where it is indicated',
+          'Medication, when it’s indicated',
           /* "Individual counseling" is the practice's own name for this option
              and it stands alone here on purpose. It previously read
              "alongside your medication care", which did two things the source
@@ -1368,12 +1368,12 @@ export const SERVICE_PAGES: ServicePage[] = [
              site's own framing is that it will "work with you to find" an
              option, which is weaker than providing it. */
           'Individual counseling',
-          'Referral to follow-up services where something falls outside what we provide',
+          'Referrals to follow-up services for anything outside what we provide',
         ],
       },
       {
         heading: 'What happens after',
-        body: 'The plan is not the end of it. We evaluate your progress on an ongoing basis, and provide support and education as you go. Follow-up care is usually medication management, in person or by telehealth.',
+        body: 'The plan isn’t the end of it. We keep checking your progress and offer support and education as you go. Follow-up care is usually medication management, in person or by telehealth.',
         /* Both phrases are already in the sentence above and both name a page
            of their own, so these are links this copy was asking for rather
            than links added to it. The anchor text is the service's own name,
@@ -1387,17 +1387,17 @@ export const SERVICE_PAGES: ServicePage[] = [
     faqs: [
       {
         q: 'Is the first appointment always an assessment?',
-        a: 'Yes. Every new patient begins with a comprehensive psychiatric assessment, because the treatment plan depends on it.',
+        a: 'Yes. Every new patient starts with a comprehensive psychiatric assessment, because your treatment plan depends on it.',
       },
       {
         q: 'Can the assessment be done by telehealth?',
         /* Same correction as the /contact "Where do you practice?" answer, and
            it ships in this page's FAQPage JSON-LD for the same reason. */
-        a: `Yes. ${DELIVERY_LINE}. Ask us when you get in touch and we will confirm what works for your situation.`,
+        a: `Yes. ${DELIVERY_LINE}. Ask us when you reach out, and we’ll confirm what works for you.`,
       },
       {
         q: 'What do I leave with?',
-        a: 'A diagnosis where one can be established, and a treatment plan combining psychotherapy approaches and medication where appropriate.',
+        a: 'A diagnosis, if one can be made, and a treatment plan that combines psychotherapy approaches and medication where appropriate.',
       },
     ],
   },
@@ -1469,33 +1469,33 @@ export const SERVICE_PAGES: ServicePage[] = [
     title: 'Medication management',
     metaTitle: 'Medication Management in NJ and PA',
     metaDescription:
-      'Ongoing psychiatric medication management in New Jersey and Pennsylvania, with standardized rating scales used to track how you are responding.',
+      'Ongoing psychiatric medication management in New Jersey and Pennsylvania, with standardized rating scales to track how you’re responding.',
     intro:
-      'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting treatment as your response becomes clear. Both of our providers are psychiatric mental health nurse practitioners, so the person prescribing your medication is the same person tracking how it is working.',
+      'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting your treatment as we see how you respond. Both of our providers are psychiatric mental health nurse practitioners, so whichever provider you see can both prescribe your medication and track how well it’s working.',
     modality: 'By telehealth and in person.',
     sections: [
       {
         heading: 'Prescribing that follows the plan',
         /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
-        body: 'Medication is prescribed as part of the treatment plan established at your comprehensive psychiatric assessment, not in isolation from it. Psychopharmacology is combined with psychotherapy approaches where both are indicated.',
+        body: 'We prescribe medication as part of the treatment plan from your comprehensive psychiatric assessment, not on its own. When both are indicated, we combine medication with psychotherapy approaches.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "Mental
              illness diagnoses are made based on assessments, and then an
              effective plan of care is determined using psychotherapy modalities
              and psychopharmacology for the individual." */
-          'A diagnosis comes first, at your assessment, and the prescribing decision follows from it.',
+          'Diagnosis comes first, at your assessment. Prescribing decisions follow from it.',
           /* CLIENT-REVIEW — SOURCED. Same sentence as above: the plan of care
              names psychotherapy modalities AND psychopharmacology together. */
-          'Where therapy and medication are both indicated, they are planned as one approach rather than separately.',
+          'When therapy and medication are both indicated, we plan them together, not separately.',
           /* CLIENT-REVIEW — GENERIC patient education. No claim about Newpoint,
              no medication named, nothing about how long or how often. */
-          'Asking what a medicine is meant to do, and why it was chosen, is a reasonable part of the conversation.',
+          'Feel free to ask what a medication is supposed to do and why we chose it.',
           /* CLIENT-REVIEW — GENERIC patient education. Standard pre-appointment
              advice; names nothing and promises nothing.
              "To hand", not "bring": this service is delivered by telehealth as
              well as in person, and "bring" quietly assumes the appointment is
              the in-person one. Raised by healthcare-reviewer, 2026-10-01. */
-          'It helps to have a list of anything you already take to hand, including things bought without a prescription.',
+          'It helps to have a list of everything you already take, including anything over the counter.',
         ],
         /* CLIENT-REVIEW — GENERIC. Restates the lead's own framing without
            adding a claim. */
@@ -1503,7 +1503,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Measured, not guessed',
-        body: 'We use standardized clinical rating scales to monitor your progress against the baseline taken at your assessment. The same measures also help catch decompensation early — a change in the wrong direction is easier to act on when it shows up as a number and not only as a feeling.',
+        body: 'We use standardized clinical rating scales to track your progress against the baseline from your assessment. The same measures help us catch early signs that things are slipping — a change in the wrong direction is easier to act on when it shows up as a number, not just a feeling.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED, across two places, and the split matters.
              research/content/services.md:21 gives the baseline itself: "Use of
@@ -1513,16 +1513,16 @@ export const SERVICE_PAGES: ServicePage[] = [
              from this page's own pre-existing body and FAQ, which already place
              it there — so the line adds no new claim, but services.md:21 alone
              does not carry it. Noted by healthcare-reviewer, 2026-10-01. */
-          'A baseline is taken at your assessment, so later visits have something to compare against.',
+          'We take a baseline at your assessment, so later visits have something to compare against.',
           /* CLIENT-REVIEW — SOURCED. Same line: the same measures are used to
              monitor progress or decompensation over time. NO SCALE IS NAMED,
              here or anywhere — which instruments the practice uses is still an
              open client item. */
-          'The same measures are repeated later, so a change shows up rather than being argued about.',
+          'We repeat the same measures later, so changes are clear instead of a matter of opinion.',
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:21:
              "Screening tests to aid in making a diagnosis and ruling out other
              disorders". */
-          'Screening tests are also used to help rule other conditions in or out.',
+          'We also use screening tests to help rule other conditions in or out.',
           /* CLIENT-REVIEW — GENERIC. Positions a score as a prompt rather than
              a verdict; makes no claim about any instrument or any result. */
           'A score is something to talk about, not a verdict on how you feel.',
@@ -1530,16 +1530,16 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Adjusting as things change',
-        body: 'Psychiatric medication rarely lands perfectly the first time. Follow-up appointments exist to review how you are responding, what side effects you are living with, and what needs to change. Your progress is evaluated on an ongoing basis, with support and education alongside it.',
+        body: 'Psychiatric medication rarely lands perfectly the first time. Follow-up appointments are where we look at how you’re responding, what side effects you’re dealing with, and what needs to change. We keep checking your progress and offer support and education along the way.',
         bullets: [
           /* CLIENT-REVIEW — GENERIC patient education. No frequency, no
              duration, no medication named, no outcome promised. */
-          'Side effects are worth mentioning even when they seem small — they often shape what changes next.',
+          'Tell us about side effects, even small ones — they often shape what we change next.',
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "As we
              evaluate progress, we will continue to provide support and
              education as needed." AS NEEDED IS LOAD-BEARING and is kept: it is
              the source's own clinical-judgement qualifier, not a softener. */
-          'Support and education continue alongside treatment, as needed.',
+          'Support and education continue alongside your treatment, as needed.',
           /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was "Changing
              one thing at a time is what keeps it clear which change did what."
              Dressed as a general principle, but in a section about how THIS
@@ -1549,7 +1549,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              once) would contradict. Do not reinstate it without the client. */
           /* CLIENT-REVIEW — SOURCED. research/content/home.md:28: "Together, we
              can identify what works and what isn't working". */
-          'Working out what is helping, and what is not, is something you do together.',
+          'Figuring out what’s helping and what isn’t is something we do together.',
         ],
         /* CLIENT-REVIEW — GENERIC. Reassurance, not an outcome claim: it says
            adjustment is normal, not that treatment will succeed. */
@@ -1557,24 +1557,24 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Working with your other clinicians',
-        body: 'Where you are already working with a therapist, a primary care provider, or another specialist, we collaborate with them to establish medication protocols that fit the rest of your care rather than cutting across it. Referral to follow-up services is available where something falls outside what we provide.',
+        body: 'If you already see a therapist, a primary care provider, or another specialist, we work with them so your medication fits the rest of your care instead of cutting across it. If you need something outside what we provide, we can refer you to follow-up services.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "The
              treatment plan involves collaborating with other professionals to
              set a regimen of therapy and prescription medication". */
-          'Collaborating with other professionals is part of how the treatment plan is set.',
+          'Working with your other providers is part of how we build your treatment plan.',
           /* CLIENT-REVIEW — GENERIC patient education. Says why telling us is
              useful; claims nothing about what the practice then does. */
-          'Saying who else is treating you is what makes gaps and duplication easier to avoid.',
+          'Let us know who else is treating you. It helps us avoid gaps and overlap.',
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:28-34 lists
              the practice's own treatment options, which include "Referral to
              follow-up services". */
-          'Referral to follow-up services is one of the options the practice names.',
+          'Referrals to follow-up services are one of the options we offer.',
         ],
       },
       {
         heading: 'Conditions we prescribe for',
-        body: 'Medication management is available across the diagnoses we treat.',
+        body: 'Medication management is available for the conditions we treat.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:28-34, the
              practice's own "We will work with you to find the best treatment
@@ -1582,7 +1582,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              consultation, medication treatment, individual counseling and
              referral alongside each other — so medication is one option among
              several rather than the only one. */
-          'Medication is one of the options the practice names, not the only one.',
+          'Medication is one option, not the only one.',
           /* THE HEDGE USED TO BE THE SECOND BULLET HERE. It moved to
              `listNote` on 2026-10-01 so that it travels with the list itself
              rather than with a field two of the four layouts ignore. Same
@@ -1600,7 +1600,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              CLIENT-REVIEW — SOURCED. research/content/services.md:18 for the
              diagnosis-then-plan order; the "where one can be established"
              hedge is the one the assessment page already uses. */
-          'A diagnosis is made at your assessment, where one can be established, before anything is prescribed.',
+          'Before anything is prescribed, we make a diagnosis at your assessment, if one can be made.',
         ],
         /**
          * Deliberately NOT a spread of WHAT_WE_TREAT.conditions. That list also
@@ -1660,17 +1660,17 @@ export const SERVICE_PAGES: ServicePage[] = [
         /* CLIENT-REVIEW — GENERIC. A statement about clinical practice in
            general, not about what Newpoint does in any given case. Unchanged
            wording; it was the second bullet until 2026-10-01. */
-        listNote: 'Appearing on this list does not mean medication is the answer in every case.',
+        listNote: 'Being on this list doesn’t mean medication is the answer in every case.',
       },
     ],
     faqs: [
       {
         q: 'Can I get medication management without an assessment first?',
-        a: 'No. The comprehensive psychiatric assessment establishes the diagnosis and the baseline measurements that medication management depends on.',
+        a: 'No. Medication management depends on the diagnosis and baseline measurements from your comprehensive psychiatric assessment.',
       },
       {
         q: 'How often are follow-up appointments?',
-        a: 'That depends on your treatment plan and how you are responding. We will agree a schedule with you at your assessment.',
+        a: 'It depends on your treatment plan and how you’re responding. We’ll set a schedule with you at your assessment.',
       },
       /**
        * CLIENT: the age range served is not stated as a practice policy
@@ -1734,7 +1734,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       /* Checked against the frame, 2026-10-01, and tightened: "dining table"
          was an assumption about the room, and there is a stack of books on it
          as well as the pad. The rest held. */
-      alt: 'A woman sitting at a wooden table at home, smiling at an open laptop, with a mug, a notepad and a stack of books beside her and a curtained window behind.',
+      alt: 'A woman sitting at a wooden table at home, smiling at an open laptop, with a mug, a notepad, and a stack of books beside her and a curtained window behind.',
       objectPosition: '70% 30%',
     },
     /* The homepage's overlay verbatim, as on medication-management.
@@ -1756,13 +1756,13 @@ export const SERVICE_PAGES: ServicePage[] = [
     metaDescription:
       'Psychiatric appointments by video across New Jersey and Pennsylvania, on an expanded schedule including weekends, evenings, and holidays by request.',
     intro:
-      'Both of our providers are licensed in New Jersey and Pennsylvania, and both see patients by telehealth. For a lot of people it is the difference between keeping psychiatric care going and quietly letting it lapse.',
+      'Both of our providers are licensed in New Jersey and Pennsylvania, and both see patients by telehealth. For a lot of people, it’s the difference between sticking with psychiatric care and quietly letting it slide.',
     modality: 'By telehealth across New Jersey and Pennsylvania.',
     sections: [
       {
         heading: 'An expanded schedule',
         /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
-        body: 'Telehealth appointments are offered on an expanded schedule, including weekends, evenings, and holidays by request. If the standard working day is the reason you have not started treatment, say so when you get in touch.',
+        body: 'We offer telehealth on an expanded schedule, including weekends, evenings, and holidays by request. If a 9-to-5 schedule is what’s kept you from starting treatment, tell us when you reach out.',
         bullets: [
           /* REWRITTEN AFTER healthcare-reviewer, 2026-10-01. The line read "A
              private space and a steady connection matter more than which
@@ -1776,10 +1776,10 @@ export const SERVICE_PAGES: ServicePage[] = [
              CLIENT-REVIEW — SOURCED. The telehealth FAQ in this same entry:
              "A private space and a device with a camera and a reliable
              connection." */
-          'A private space, and a device with a camera and a reliable connection.',
+          'A private space and a device with a camera and a reliable internet connection.',
           /* CLIENT-REVIEW — GENERIC. Says nothing about how long anything
              takes or how often it happens. */
-          'Checking your camera and microphone beforehand keeps setup out of the appointment.',
+          'Test your camera and microphone ahead of time so setup doesn’t eat into your appointment.',
           /* CLIENT-REVIEW — GENERIC. */
           'Headphones help if other people are home.',
           /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was
@@ -1797,7 +1797,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            neither — it is the one prose mention that needed a qualifier before
            the prefix could be used at all. The clause states the role already in
            PROVIDERS[].role and asserts nothing new. */
-        body: 'Dr. Funmilayo Whitaker and Dr. Anastasia O. Ofoegbu, both psychiatric-mental health nurse practitioners, are licensed in New Jersey and Pennsylvania, so telehealth is available across our whole service area rather than in one state only. You need to be physically located in a state where your provider is licensed at the time of your appointment.',
+        body: 'Dr. Funmilayo Whitaker and Dr. Anastasia O. Ofoegbu, both psychiatric-mental health nurse practitioners, are licensed in New Jersey and Pennsylvania, so telehealth is available across our whole service area, not just one state. At the time of your appointment, you need to be physically located in a state where your provider is licensed.',
         bullets: [
           /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was "Which
              licence applies follows where you are sitting, not where your
@@ -1810,23 +1810,23 @@ export const SERVICE_PAGES: ServicePage[] = [
              nothing on a marketing page needs to adjudicate it. */
           /* CLIENT-REVIEW — GENERIC. No claim that the practice can or cannot
              accommodate any particular case. */
-          'Being out of state on the day — travelling, or working elsewhere — can affect whether an appointment can go ahead.',
+          'Being out of state that day — traveling or working somewhere else — can affect whether your appointment can go ahead.',
           /* CLIENT-REVIEW — GENERIC scheduling advice. */
-          'Upcoming travel is worth mentioning when you book.',
+          'If you have travel coming up, mention it when you book.',
         ],
       },
       {
         heading: 'What telehealth is good for',
-        body: 'Follow-up medication management works particularly well by video: the appointment is a structured review of how you are responding, which does not depend on being in the same room. Comprehensive psychiatric assessments can also be arranged by telehealth — ask us and we will confirm what suits your situation.',
+        body: 'Follow-up medication management works especially well by video. It’s a structured check-in on how you’re responding, and that doesn’t require being in the same room. Comprehensive psychiatric assessments can also be done by telehealth — ask us, and we’ll confirm what works for you.',
         bullets: [
           /* CLIENT-REVIEW — GENERIC. Describes what a structured review covers
              in general terms. Names no instrument and no medication. */
           'A structured review — sleep, side effects, what has changed — carries over to video well.',
           /* CLIENT-REVIEW — GENERIC. */
-          'Having your own notes or questions open on the same screen is easier from home.',
+          'It’s easier to keep your notes or questions handy when you’re at home.',
           /* CLIENT-REVIEW — GENERIC. A limitation of the medium, not of this
              practice, and it sets up the section that follows. */
-          'Anything that needs a physical examination is not something video can do.',
+          'Video can’t replace a physical exam.',
         ],
       },
       {
@@ -1878,7 +1878,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         q: 'What do I need for a telehealth appointment?',
         // CLIENT: the telehealth platform is not named anywhere in the source
         // material, so no joining process is described here.
-        a: 'A private space and a device with a camera and a reliable connection. Ask us how to join when you book.',
+        a: 'A private space and a device with a camera and a reliable internet connection. Ask us how to join when you book.',
       },
     ],
   },
@@ -2073,7 +2073,7 @@ export const SERVICE_PAGES: ServicePage[] = [
        MedicalTherapy node, which ships on / and /services as well as here, and
        that clause is the only hedge that travels with the drug names. */
     intro:
-      'Medical weight loss, supervised by our own nurse practitioners rather than referred out. Where a weekly injection is appropriate, semaglutide and tirzepatide are the two we prescribe.',
+      'Medical weight loss, supervised by our own nurse practitioners — not referred out. When a weekly injection is appropriate, semaglutide and tirzepatide are the two we prescribe.',
     /* Names no modality, and that is not an oversight: whether injections are
        given in the office or self-administered at home is unconfirmed, and
        either answer changes this line. It names the two states because both
@@ -2100,19 +2100,19 @@ export const SERVICE_PAGES: ServicePage[] = [
         /* CLIENT-REVIEW — GENERIC. Describes ongoing prescribing care in
            general terms. No duration, no frequency of review, no price, no
            eligibility threshold, no outcome. */
-        body: 'Ongoing care rather than a one-off prescription. It starts with an appointment that goes through your health history, what you have already tried and anything you are currently taking. If a medication is appropriate, it is prescribed from there and reviewed as you go.',
+        body: 'This is ongoing care, not a one-time prescription. It starts with an appointment where we go over your health history, what you’ve already tried, and anything you’re currently taking. If a medication is appropriate, we prescribe it from there and review it as you go.',
         bullets: [
           /* CLIENT-REVIEW — GENERIC, and between them these two are the whole
              argument for having this service here rather than at a weight-loss
              clinic. Both are ordinary clinical knowledge rather than claims
              about this practice, and neither names a medication, a mechanism
              or an outcome. */
-          'Weight, appetite, sleep and mood move together more often than not.',
-          'A number of the medications used in psychiatry affect weight directly.',
+          'Weight, appetite, sleep, and mood often move together.',
+          'Some medications used in psychiatry affect weight directly.',
         ],
         /* CLIENT-REVIEW — GENERIC. Says where the service sits, not what it
            achieves. */
-        highlight: 'Run by the providers who already handle your psychiatric prescriptions, rather than referred out.',
+        highlight: 'Run by the providers who already handle your psychiatric prescriptions — not referred out.',
       },
       {
         /* "PRESCRIBES AND REVIEWS", NOT "SUPERVISES", since healthcare-reviewer
@@ -2138,10 +2138,10 @@ export const SERVICE_PAGES: ServicePage[] = [
              than softening: more specific, true, and already evidenced in this
              file. Note what it does NOT say — board certification is not state
              prescriptive authority, and that question is open. */
-          'The family certification is the one that covers general medical care, rather than psychiatric care alone.',
+          'The family certification covers general medical care, not just psychiatric care.',
           /* CLIENT-REVIEW — GENERIC. Claims nothing about chart systems or
              about coordination with outside prescribers. */
-          'The provider prescribing already knows what else you are taking.',
+          'The provider prescribing for you already knows what else you’re taking.',
         ],
       },
       {
@@ -2162,13 +2162,13 @@ export const SERVICE_PAGES: ServicePage[] = [
          * not, so this is now the only eating-disorder-aware content above the
          * footer on the one page that needs it.
          */
-        body: 'Tell us what you are already taking, including anything prescribed elsewhere, and tell us if you have a history of an eating disorder. Both change what is safe, and neither is something to work out from a form.',
+        body: 'Tell us what you’re already taking, including anything prescribed elsewhere, and let us know if you have a history of an eating disorder. Both affect what’s safe, and neither is something to sort out on a form.',
         bullets: [
           /* Added on healthcare-reviewer's reading of 2026-10-06: as first
              written the line asked for a disclosure and said nothing about what
              follows it. This excludes nobody and screens nobody; it says the
              conversation happens. */
-          'If you do have that history, we will talk about whether this is the right approach for you.',
+          'If you do have that history, we’ll talk about whether this is the right approach for you.',
           /* CLIENT-REVIEW — GENERIC, and the same gate
              /services/medication-management states for its own service. */
           'Nothing is prescribed before an appointment.',
@@ -2188,12 +2188,12 @@ export const SERVICE_PAGES: ServicePage[] = [
          */
         heading: 'What we do not promise',
         /* CLIENT-REVIEW — GENERIC. Every clause is a refusal to claim. */
-        body: 'No amount of weight you can expect to lose, no timeframe for losing it, and no before-and-after photographs.',
+        body: 'We won’t promise a specific amount of weight loss or a timeframe for losing it, and you won’t find before-and-after photos here.',
         bullets: [
           /* Both are the standard caveat on these drugs' own labelling, stated
              about the drugs rather than about this practice. */
-          'Response varies from person to person, and these medications are not suitable for everyone.',
-          'Where one is prescribed, it is part of a plan rather than the whole of it.',
+          'Response varies from person to person, and these medications aren’t right for everyone.',
+          'If one is prescribed, it’s part of a plan, not the whole plan.',
         ],
       },
       {
@@ -2239,23 +2239,23 @@ export const SERVICE_PAGES: ServicePage[] = [
            finding that the page was precise about what it would not promise
            and silent on harm — the asymmetry a nursing board notices first on
            a page that names two molecules beside an indication. */
-        body: 'Both are weekly injections and both are prescription-only. They are different medications with different active ingredients and they are not interchangeable: which one is prescribed, if either is, is a clinical decision made with your provider. Both carry side effects and risks, and your provider goes through them with you before anything is prescribed.',
+        body: 'Both are weekly injections, and both require a prescription. They’re different medications with different active ingredients, and they aren’t interchangeable. Which one is prescribed, if either, is a clinical decision you make with your provider. Both carry side effects and risks, and your provider will go over them with you before anything is prescribed.',
         list: ['Semaglutide — a weekly injection', 'Tirzepatide — a weekly injection'],
         /* The hedge. It renders immediately after the chips, in every layout,
            via <SectionList />. Two clauses doing two different jobs: the first
            stops the list reading as a promise, the second states the gate. */
         listNote:
-          'Appearing on this list does not mean either medication is right for you. Neither is prescribed without an appointment, and neither is suitable for everyone.',
+          'Being on this list doesn’t mean either medication is right for you. Neither is prescribed without an appointment, and neither is right for everyone.',
       },
     ],
     faqs: [
       {
         q: 'Do I need an appointment before a weight loss injection is prescribed?',
-        a: 'Yes. Semaglutide and tirzepatide are prescription-only, and neither is prescribed without an appointment with one of our providers.',
+        a: 'Yes. Semaglutide and tirzepatide require a prescription, and we don’t prescribe either one without an appointment with one of our providers.',
       },
       {
         q: 'Are semaglutide and tirzepatide the same thing?',
-        a: 'No. Both are weekly injections, but they are different medications and are not interchangeable. Which one is appropriate, if either is, is decided with your provider.',
+        a: 'No. Both are weekly injections, but they’re different medications and aren’t interchangeable. You and your provider decide which one, if either, is right for you.',
       },
       {
         // CLIENT: whether the practice bills insurance for weight-management
@@ -2273,7 +2273,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         // Medicare beneficiary could read the softer version as leaving the
         // door open.
         q: 'Will my insurance cover weight-management medication?',
-        a: 'Coverage varies by plan, and many exclude medication prescribed for weight loss — Medicare drug plans generally do not cover it at all. Check with your insurer, and tell us what your plan says when you get in touch.',
+        a: 'Coverage varies by plan, and many exclude medication prescribed for weight loss — Medicare drug plans generally don’t cover it at all. Check with your insurance company, and let us know what your plan says when you reach out.',
       },
       /**
        * CLIENT: "do I have to be an existing Newpoint patient?" is the other
@@ -2293,7 +2293,7 @@ export const GETTING_STARTED = {
   steps: [
     {
       title: 'Reach out',
-      body: 'Send the form below or call us. Tell us how to reach you and, in general terms, what you are looking for. Please do not send health details through the form.',
+      body: 'Call or email us. Calling is the fastest way to reach us. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t include health details in any message.',
     },
     {
       title: 'Comprehensive psychiatric assessment',
@@ -2301,7 +2301,7 @@ export const GETTING_STARTED = {
     },
     {
       title: 'Ongoing care',
-      body: 'Follow-up appointments manage medication and track progress, in person or by telehealth, on a schedule that fits your life.',
+      body: 'At follow-up appointments, we manage your medication and track your progress, in person or by telehealth, on a schedule that fits your life.',
     },
   ],
 } as const;
@@ -2369,7 +2369,7 @@ export const WHAT_TO_EXPECT = {
        * already had this right, and carries NEW_PATIENTS_PAGE.privacyBody's
        * reassurance clause so the patient knows where the detail does go.
        */
-      body: 'Send the form or call us. Tell us how to reach you and why you are getting in touch. Please do not send health details through the form; we will take the clinical details directly.',
+      body: 'Call or email us. Calling is the fastest way to reach us. Tell us how to reach you and why you’re reaching out. Please don’t include health details in any message — we’ll get the clinical details from you directly.',
     },
     {
       title: 'Comprehensive psychiatric assessment',
@@ -2391,11 +2391,11 @@ export const WHAT_TO_EXPECT = {
        * patient who does not want to be prescribed that this practice will
        * prescribe regardless.
        */
-      body: 'A diagnosis is reached through assessment, then a plan of care combining psychotherapy approaches and medication where both are indicated. If other clinicians are already involved, we set the regimen with them.',
+      body: 'We reach a diagnosis through assessment, then build a care plan that combines psychotherapy approaches and medication when both are indicated. If other clinicians are already involved, we set the plan with them.',
     },
     {
       title: 'Follow-up care',
-      body: 'Follow-up appointments manage medication and track your progress against that baseline, in person or by telehealth. We adjust as your response becomes clear.',
+      body: 'At follow-up appointments, we manage your medication and track your progress against that baseline, in person or by telehealth. We adjust as we see how you respond.',
     },
   ],
 } as const;
@@ -2440,7 +2440,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     badge: 'Start here',
     title: 'Comprehensive psychiatric assessment',
     description:
-      'A structured first appointment that identifies risk factors, establishes a diagnosis, and produces a treatment plan.',
+      'A structured first appointment where we identify risk factors, reach a diagnosis, and build your treatment plan.',
     footerText: 'In person and by telehealth',
     category: 'Assessment',
     categoryColor: 'var(--color-np-blue-600)',
@@ -2455,7 +2455,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     badge: null,
     title: 'Medication management',
     description:
-      'Ongoing prescribing and review, with standardized rating scales used to track progress and catch changes early.',
+      'Ongoing prescribing and check-ins, using standardized rating scales to track your progress and catch changes early.',
     footerText: 'In person and by telehealth',
     category: 'Ongoing care',
     categoryColor: 'var(--color-np-blue-700)',
@@ -2470,7 +2470,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     badge: null,
     title: 'Telehealth',
     description:
-      'Appointments by video on an expanded schedule, including weekends, evenings, and holidays by request.',
+      'Video appointments on an expanded schedule, including weekends, evenings, and holidays by request.',
     // This slot is telehealth, so it says telehealth. Both providers are
     // licensed in both states, which is what makes the reach claim safe here.
     footerText: 'By telehealth across New Jersey and Pennsylvania',
@@ -2549,7 +2549,7 @@ export const FAQ = {
    * here asserts anything verifiable about the practice.
    */
   intro:
-    'If your question is not here, ask us when you get in touch and we will answer it before you book.',
+    'Don’t see your question? Ask us when you reach out, and we’ll answer it before you book.',
   groups: [
     {
       title: 'Getting started',
@@ -2579,7 +2579,7 @@ export const FAQ = {
              quoted verbatim in `Answer.text` on /contact, on the same document
              whose ContactPage.description carries the client's line, so the
              two were contradicting each other in structured data. */
-          a: `${DELIVERY_LINE}. Ask us when you get in touch and we will confirm what is available to you.`,
+          a: `${DELIVERY_LINE}. Ask us when you reach out, and we’ll confirm what’s available to you.`,
         },
       ],
     },
@@ -2588,11 +2588,11 @@ export const FAQ = {
       items: [
         {
           q: 'Which insurance do you accept?',
-          a: 'Aetna, Optum, Cigna Evernorth, United Healthcare, Medicare, NJ Medicaid, and Blue Cross Blue Shield Horizon NJ. If your plan is not listed, ask us and we will check.',
+          a: 'Aetna, Optum, Cigna Evernorth, United Healthcare, Medicare, NJ Medicaid, and Blue Cross Blue Shield Horizon NJ. If your plan isn’t listed, ask us, and we’ll check.',
         },
         {
-          q: 'What if I do not have insurance?',
-          a: 'A session fee applies, and a sliding scale is available. Ask us about it when you get in touch.',
+          q: 'What if I don’t have insurance?',
+          a: 'There’s a session fee, and a sliding scale is available. Ask us about it when you reach out.',
         },
         {
           q: 'How can I pay?',
@@ -2605,14 +2605,14 @@ export const FAQ = {
 
 export const CONTACT = {
   heading: 'Get in touch',
-  body: 'Send us your contact details and we will get back to you about an appointment.',
+  body: 'Online requests aren’t connected yet, so for now, call or email us to request an appointment.',
   /**
    * HIPAA-aware v1 per CLAUDE.md: name, email, phone, and a constrained
    * reason-for-contact only. No symptoms, diagnoses, medications, insurance ID,
    * date of birth, free-text clinical prompt, or file upload.
    */
   privacyNote:
-    'Please do not include any health information, medical history, or insurance ID numbers in this form. This form is not secure for medical details and is not monitored around the clock.',
+    'Please don’t include any health information, medical history, or insurance ID numbers. This form isn’t secure for medical details, and it isn’t monitored around the clock.',
   reasons: [
     'New patient inquiry',
     'Existing patient',
@@ -2632,8 +2632,8 @@ export const CONTACT = {
    * at the same time as the form's POST target, not before.
    */
   success: {
-    heading: 'Thank you',
-    body: 'We have your details and will be in touch about an appointment. If you need to reach us sooner, please call the practice.',
+    heading: 'Thanks, we got it',
+    body: 'We have your details and will reach out about an appointment. If you need us sooner, please call the practice.',
   },
   /**
    * What a valid submit actually shows today.
@@ -2709,15 +2709,15 @@ export const INSURANCE_PAGE = {
   metaDescription:
     'Newpoint accepts Aetna, Optum, Cigna Evernorth, United Healthcare, Medicare, NJ Medicaid, and Blue Cross Blue Shield Horizon NJ.',
   intro:
-    'We accept most major plans in New Jersey and Pennsylvania, and there is a sliding scale for people paying without insurance. If cost is the reason you have been putting this off, read this page first and then ask us.',
+    'We accept most major plans in New Jersey and Pennsylvania, and we offer a sliding scale if you’re paying without insurance. If cost is why you’ve been putting this off, start here, then ask us.',
   sections: [
     {
       heading: 'Plans we accept',
-      body: 'If your plan is not on this list, ask us anyway. We can check your coverage before your first appointment rather than leaving you to find out afterwards.',
+      body: 'Don’t see your plan? Ask us anyway. We can check your coverage before your first appointment, so you aren’t surprised later.',
     },
     {
       heading: 'Paying without insurance',
-      body: 'A session fee applies to patients paying out of pocket, and a sliding scale is available. Ask us what your appointment would cost before you book it.',
+      body: 'If you’re paying out of pocket, there’s a session fee, and a sliding scale is available. Ask us what your appointment will cost before you book.',
       // CLIENT: the self-pay session fee and the sliding-scale criteria are not
       // published anywhere. Publishing both is a meaningful conversion win and a
       // strong signal for "psychiatrist cost" queries. Supply figures to add here.
@@ -2728,17 +2728,17 @@ export const INSURANCE_PAGE = {
     },
     {
       heading: 'Before your first appointment',
-      body: 'Have your insurance details to hand when you get in touch so we can verify coverage. Please do not send insurance ID or member numbers through the contact form — it is not a secure channel for them. We will take those details directly.',
+      body: 'Have your insurance info handy when you reach out so we can verify your coverage. Please don’t send insurance ID or member numbers through the contact form — it isn’t secure. We’ll get those details from you directly.',
     },
   ],
   faqs: [
     {
       q: 'Do you take Medicare?',
-      a: 'Yes. We accept Medicare, and NJ Medicaid.',
+      a: 'Yes. We accept Medicare and NJ Medicaid.',
     },
     {
-      q: 'What if my plan is not listed?',
-      a: 'Ask us. We will check your coverage before your first appointment, and tell you what it would cost if you are out of network.',
+      q: 'What if my plan isn’t listed?',
+      a: 'Ask us. We’ll check your coverage before your first appointment and tell you what it would cost if you’re out of network.',
     },
     {
       q: 'Do I need a referral?',
@@ -2746,7 +2746,7 @@ export const INSURANCE_PAGE = {
     },
     {
       q: 'Is there a sliding scale?',
-      a: 'Yes, for patients paying without insurance. Ask us about it when you get in touch.',
+      a: 'Yes, for patients paying without insurance. Ask us about it when you reach out.',
     },
   ],
 } as const;
@@ -2762,17 +2762,17 @@ export const NEW_PATIENTS_PAGE = {
   metaDescription:
     'What to expect as a new patient at Newpoint: how to get in touch, your first psychiatric assessment, and how ongoing care works in NJ and PA.',
   intro:
-    'Starting psychiatric care is an awkward thing to do from a standing start, so here is the whole process written down. Three steps, no surprises, and nothing you need to prepare beyond being willing to talk.',
+    'Starting psychiatric care can feel like a big step, so here’s the whole process, start to finish. Three steps, no surprises.',
   expectations: [
     {
-      heading: 'You will see a provider, not a queue',
-      body: 'There are two of us. You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners.',
+      heading: 'You’ll see a provider directly',
+      body: 'There are two of us. You’ll see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners.',
     },
     {
       // Scope, not duration: session length is not published anywhere, so no
       // relative claim about appointment length is made.
       heading: 'Your first appointment covers more ground than the ones after it',
-      body: 'It is a comprehensive psychiatric assessment: a full history, a review of risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end of it.',
+      body: 'It’s a comprehensive psychiatric assessment: a full history, a look at risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end.',
     },
     {
       heading: 'Follow-up appointments can be in person or by video',
@@ -2784,7 +2784,7 @@ export const NEW_PATIENTS_PAGE = {
          so the two were disagreeing about geography a screen apart. The
          schedule sentence stays bound to telehealth, for the reason recorded
          on CONTACT_PAGE.areaNote. */
-      body: `${DELIVERY_LINE}. Telehealth runs on an expanded schedule including weekends, evenings, and holidays by request — ask us which suits you.`,
+      body: `${DELIVERY_LINE}. Telehealth runs on an expanded schedule including weekends, evenings, and holidays by request — ask us which works best for you.`,
     },
   ],
   // CLIENT: no "what to bring" checklist is published anywhere and none is
@@ -2793,7 +2793,7 @@ export const NEW_PATIENTS_PAGE = {
   // what the practice actually asks for before adding it.
   privacyHeading: 'What not to send us',
   privacyBody:
-    'Please keep health details out of the contact form and out of email. Symptoms, diagnoses, medications, insurance ID numbers, and dates of birth are not safe to send that way, and the form is not monitored around the clock. Tell us how to reach you and we will take the clinical details directly.',
+    'Please keep health details out of the contact form and out of email. Symptoms, diagnoses, medications, insurance ID numbers, and dates of birth aren’t safe to send that way, and the form isn’t monitored around the clock. Just tell us how to reach you, and we’ll get the clinical details from you directly.',
   /**
    * This aside is exactly where someone realising they cannot get help through
    * the form is looking, so the crisis numbers belong in it rather than only in
@@ -2816,9 +2816,9 @@ export const CONTACT_PAGE = {
   title: 'Contact Newpoint',
   metaTitle: 'Contact | Psychiatric Care in NJ and PA',
   metaDescription:
-    'Contact Newpoint for psychiatric care across New Jersey and Pennsylvania, by telehealth and in person. Call, email, or request an appointment online.',
+    'Contact Newpoint for psychiatric care across New Jersey and Pennsylvania, by telehealth and in person. Call or email us to request an appointment.',
   intro:
-    `Call us, email us, or request an appointment. ${DELIVERY_LINE}.`,
+    `Call or email us to request an appointment. ${DELIVERY_LINE}.`,
   /**
    * CLIENT: no practice-wide inbox exists, so both named provider addresses are
    * listed rather than inventing an info@ or contact@.
@@ -2830,11 +2830,11 @@ export const CONTACT_PAGE = {
   // is answered first, and it does not label any of them by state — the 215 area
   // code is an inference, not a published fact.
   phoneNote:
-    'The main line is the best number to try first. The other two also reach the practice.',
+    'Try the main line first. The other two numbers reach the practice too.',
   // Same prohibition set as CONTACT.privacyNote and NEW_PATIENTS_PAGE.privacyBody,
   // including date of birth. /contact may be a patient's only read.
   emailNote:
-    'Email reaches the providers directly. Please keep symptoms, diagnoses, medications, insurance ID numbers and dates of birth out of it — it is not a secure channel for them.',
+    'Email goes straight to the providers. Please keep symptoms, diagnoses, medications, insurance ID numbers, and dates of birth out of it — email isn’t secure.',
   /**
    * BOTH MODES, BOTH STATES, matching DELIVERY_LINE. This paragraph used to
    * bind the two states to telehealth and leave in-person attached to neither,
@@ -2908,7 +2908,7 @@ export const CONTACT_PAGE = {
  * and the title override does not widen the badge.
  */
 export const PROVIDERS_PAGE = {
-  title: 'Providers you will see',
+  title: 'Providers you’ll see',
   /* CLIENT-REVIEW — metadata, composed from confirmed facts only: the
      two-provider count (PRACTICE_FACTS), the role string (CLAUDE.md's
      canonical "Psychiatric-Mental Health Nurse Practitioner", here in its
@@ -2918,7 +2918,7 @@ export const PROVIDERS_PAGE = {
   metaDescription:
     'The two psychiatric-mental health nurse practitioners at Newpoint, both licensed in New Jersey and Pennsylvania.',
   intro:
-    'You will see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu, both of whom hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners.',
+    'You’ll see Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners.',
 } as const;
 
 export const ROUTES: { path: string; priority: number }[] = [

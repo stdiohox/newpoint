@@ -243,7 +243,7 @@ export function Providers() {
                 textWrap: 'balance',
               }}
             >
-              You will see the providers
+              Meet your providers
             </h2>
           </Reveal>
 

@@ -233,7 +233,7 @@ export default function NewPatientsPage() {
             /insurance before it. Every link it carried is in the navbar and in
             the footer; PageCta below still carries the appointment route. Do
             not re-add it — flag the conflict instead. */}
-        <PageCta heading="Take the first step" />
+        <PageCta heading="Get started" />
       </main>
       <Footer />
     </>

@@ -189,10 +189,10 @@ export default function ServicesIndex() {
              and Pennsylvania.", which bound the states to telehealth and left
              in-person attached to none: the construction the client superseded
              on 2026-10-02. This page then printed the client's line twice
-             below it, as the assessment's "How it is delivered" row and in the
+             below it, as the assessment's "How it’s delivered" row and in the
              closing band, so the hero disagreed with its own page about
              geography. Caught by healthcare-reviewer. */
-          intro={`Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it is indicated. ${DELIVERY_LINE}. Each of the three below is a page of its own.`}
+          intro={`Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it’s indicated. ${DELIVERY_LINE}. Each of the three below has its own page.`}
           image={{
             src: '/images/services/services-consult-2752.webp',
             objectPosition: '70% 25%',
@@ -342,14 +342,14 @@ export default function ServicesIndex() {
                             </dd>
                           </div>
 
-                          {/* NO "Providers you will see" HERE, deliberately.
+                          {/* NO "Providers you’ll see" HERE, deliberately.
                               Naming both providers under each service asserts
                               that both personally deliver it. That is sourced
                               for medication management and telehealth, and NOT
                               for the comprehensive psychiatric assessment:
                               Ofoegbu's bio names assessments, Whitaker's names
                               medication management only. The page-wide
-                              "Providers you will see" section below says what is
+                              "Providers you’ll see" section below says what is
                               actually sourced — these are the two clinicians —
                               without binding either to a named service.
                               CLIENT: confirm whether both providers perform
@@ -358,7 +358,7 @@ export default function ServicesIndex() {
 
                           <div>
                             <dt className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
-                              How it is delivered
+                              How it’s delivered
                             </dt>
                             <dd className="text-body text-np-neutral-700 mt-2">
                               {service.modality}
@@ -393,7 +393,7 @@ export default function ServicesIndex() {
               </Reveal>
               <Reveal delay={0.08}>
                 <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
-                  Alongside assessment and medication management, we will work with you to find the
+                  Along with assessment and medication management, we’ll work with you to find the
                   treatment option that fits.
                 </p>
               </Reveal>
@@ -452,7 +452,7 @@ export default function ServicesIndex() {
                     now permitted by the 2026-10-01 override wherever the
                     credentials are visible beside it, which on these cards they
                     are. */}
-                <h2 className="text-h2 max-w-[22ch]">Providers you will see</h2>
+                <h2 className="text-h2 max-w-[22ch]">Providers you’ll see</h2>
               </Reveal>
               <ul role="list" className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8">
                 {PROVIDERS.map((p, i) => (
