@@ -17,6 +17,9 @@ const eslintConfig = [
       'next-env.d.ts',
       'research/**',
       'design-research/**',
+      // A separate npm package with its own tsconfig, ESLint config and lockfile
+      // (docs/automation-architecture.md §3). Never part of the site build.
+      'automation/**',
     ],
   },
 ];
