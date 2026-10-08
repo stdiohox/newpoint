@@ -60,6 +60,10 @@ npm run test:db      # pgTAP suite only
   Clusters that touch a content rule never become prompts.
 - A refused or cut-off answer is not stored (it measured nothing). `competitors_mentioned`
   is NULL when extraction failed, never an empty "none".
+- Retention: `ops.geo-retention` (the 1st, 03:00 ET) clears `answer_excerpt` and
+  `competitors_mentioned` 90 days after a run and sets `details_purged_at`. Those columns
+  hold third-party names; the measurement columns stay for trends. A NULL
+  `competitors_mentioned` with `details_purged_at` set means purged, not a failed extraction.
 - Cost per weekly run: up to 30 probes, each one Sonnet 5.5 answer with up to 5 web
   searches plus one short extraction call. Web search is billed per search.
 - Schema advice is written in source and never recommends an address, `hasCredential`,

@@ -253,3 +253,17 @@ export async function listClusters(db: Queryable): Promise<PublicText[]> {
   );
   return result.rows.map((row) => pub(row.cluster));
 }
+
+/**
+ * Clears the third-party details of runs older than `cutoff` (90-day retention).
+ * Idempotent: a purged row is never touched again, so a retried run changes nothing.
+ */
+export async function purgeGeoRunDetails(db: Queryable, cutoff: Date, now: Date): Promise<number> {
+  const result = await db.query(
+    `update marketing.geo_runs
+        set answer_excerpt = null, competitors_mentioned = null, details_purged_at = $2
+      where run_at < $1 and details_purged_at is null`,
+    [cutoff.toISOString(), now.toISOString()],
+  );
+  return result.rowCount ?? 0;
+}
