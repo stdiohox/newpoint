@@ -7,7 +7,7 @@ import { blockingRulesTouched } from "../content-rules/newpoint-rules.js";
 
 export type Channel = "facebook" | "instagram" | "gbp";
 
-/** D10: Facebook and Instagram publish now; GBP posts are planned and drafted, published from Phase 4. */
+/** Published by social.publisher. GBP posts (D10) are published by gbp.post-publisher instead. */
 export const PUBLISHABLE_NOW: ReadonlySet<Channel> = new Set(["facebook", "instagram"]);
 
 /** Hard limits, below each platform's own maximum so nothing is ever truncated by it. */

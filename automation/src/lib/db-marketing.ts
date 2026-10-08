@@ -432,6 +432,12 @@ export async function transitionSocialPost(
 ): Promise<boolean> {
   const result = await db.query(
     `update marketing.social_posts set
+        -- Stamped on the claim into publishing, so ops.heartbeat can see a post stuck there.
+        publishing_started_at = case when $3::marketing.social_status = 'publishing' and approval_status <> 'publishing'
+                                     then now() else publishing_started_at end,
+        -- A new claim is a new chance to get stuck: it may be alerted on again.
+        stuck_alerted_at      = case when $3::marketing.social_status = 'publishing' and approval_status <> 'publishing'
+                                     then null else stuck_alerted_at end,
         approval_status       = $3,
         body                  = coalesce($4, body),
         media                 = coalesce($5::jsonb, media),
@@ -469,6 +475,180 @@ export async function listPlannedPostIds(db: Queryable, from: Date, to: Date): P
       where approval_status = 'planned' and scheduled_for >= $1 and scheduled_for < $2
       order by scheduled_for, id`,
     [from.toISOString(), to.toISOString()],
+  );
+  return result.rows.map((row) => row.id);
+}
+
+/** Posts claimed for publishing more than `minutes` ago and not yet alerted on (ops.heartbeat). */
+export async function listStuckPublishing(
+  db: Queryable,
+  minutes: number,
+): Promise<{ readonly id: string; readonly channel: SocialPost["channel"]; readonly since: Date }[]> {
+  const result = await db.query<{ id: string; channel: SocialPost["channel"]; publishing_started_at: Date }>(
+    `select id, channel, publishing_started_at from marketing.social_posts
+      where approval_status = 'publishing' and stuck_alerted_at is null
+        and publishing_started_at < now() - make_interval(mins => $1)
+      order by publishing_started_at`,
+    [minutes],
+  );
+  return result.rows.map((row) => ({ id: row.id, channel: row.channel, since: row.publishing_started_at }));
+}
+
+/** Records the alert, so each stuck post is reported once. */
+export async function markStuckAlerted(db: Queryable, id: string): Promise<void> {
+  await db.query(`update marketing.social_posts set stuck_alerted_at = now() where id = $1 and stuck_alerted_at is null`, [id]);
+}
+
+// --- GBP (Phase 4, §5.2) ----------------------------------------------------------
+
+export type ReplyStatus = "none" | "drafted" | "awaiting_approval" | "approved" | "rejected" | "posted" | "expired";
+
+export interface StoredReview {
+  readonly id: string;
+  readonly rating: number;
+  readonly text: PublicText | null;
+  readonly reviewer: PublicText | null;
+  readonly replyDraft: PublicText | null;
+  readonly replyStatus: ReplyStatus;
+  readonly approvalTokenId: string | null;
+  readonly approvedReplyHash: string | null;
+  /** A reply already shows on Google that this pipeline did not post. */
+  readonly existingReply: boolean;
+}
+
+/**
+ * Reviews from Google. A new review lands as `none`; an existing one gets its
+ * current text and rating. `existing_reply` follows Google, so a reply a person
+ * wrote in the GBP UI stops this pipeline from ever drafting one.
+ */
+export async function upsertReviews(
+  db: Queryable,
+  reviews: readonly {
+    readonly reviewId: string;
+    readonly rating: number;
+    readonly text: string | null;
+    readonly reviewer: string | null;
+    readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly hasReply: boolean;
+  }[],
+): Promise<number> {
+  if (reviews.length === 0) return 0;
+  const result = await db.query(
+    `insert into marketing.gbp_reviews (google_review_id, rating, text, author_display, created_at, google_updated_at, existing_reply)
+     select * from unnest($1::text[], $2::smallint[], $3::text[], $4::text[], $5::timestamptz[], $6::timestamptz[], $7::boolean[])
+     on conflict (google_review_id) do update set
+       rating            = excluded.rating,
+       text              = excluded.text,
+       author_display    = excluded.author_display,
+       google_updated_at = excluded.google_updated_at,
+       existing_reply    = excluded.existing_reply and marketing.gbp_reviews.reply_status <> 'posted'`,
+    [
+      reviews.map((r) => r.reviewId),
+      reviews.map((r) => r.rating),
+      reviews.map((r) => r.text),
+      reviews.map((r) => r.reviewer),
+      reviews.map((r) => r.createdAt.toISOString()),
+      reviews.map((r) => r.updatedAt.toISOString()),
+      reviews.map((r) => r.hasReply),
+    ],
+  );
+  return result.rowCount ?? 0;
+}
+
+/** Reviews still waiting for a draft: a retried sync re-hands them all (the trigger is idempotent). */
+export async function listReviewsAwaitingDraft(db: Queryable): Promise<string[]> {
+  const result = await db.query<{ google_review_id: string }>(
+    `select google_review_id from marketing.gbp_reviews
+      where reply_status = 'none' and not existing_reply order by created_at`,
+  );
+  return result.rows.map((row) => row.google_review_id);
+}
+
+export async function getReview(db: Queryable, id: string): Promise<StoredReview | null> {
+  const result = await db.query<{
+    google_review_id: string;
+    rating: number;
+    text: string | null;
+    author_display: string | null;
+    reply_draft: string | null;
+    reply_status: ReplyStatus;
+    approval_token_id: string | null;
+    approved_reply_hash: string | null;
+    existing_reply: boolean;
+  }>(
+    `select google_review_id, rating, text, author_display, reply_draft, reply_status::text as reply_status,
+            approval_token_id, approved_reply_hash, existing_reply
+       from marketing.gbp_reviews where google_review_id = $1`,
+    [id],
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return {
+    id: row.google_review_id,
+    rating: row.rating,
+    text: row.text === null ? null : pub(row.text),
+    reviewer: row.author_display === null ? null : pub(row.author_display),
+    replyDraft: row.reply_draft === null ? null : pub(row.reply_draft),
+    replyStatus: row.reply_status,
+    approvalTokenId: row.approval_token_id,
+    approvedReplyHash: row.approved_reply_hash,
+    existingReply: row.existing_reply,
+  };
+}
+
+/** Moves a review's reply only from the state the caller expects (see transitionSocialPost). */
+export async function transitionReview(
+  db: Queryable,
+  id: string,
+  from: readonly ReplyStatus[],
+  to: ReplyStatus,
+  fields: {
+    readonly replyDraft?: string;
+    readonly approvalTokenId?: string;
+    readonly approvedReplyHash?: string;
+    readonly repliedAt?: Date;
+    readonly statusReason?: string | null;
+  } = {},
+): Promise<boolean> {
+  const result = await db.query(
+    `update marketing.gbp_reviews set
+        reply_status        = $3,
+        reply_draft         = coalesce($4, reply_draft),
+        approval_token_id   = coalesce($5, approval_token_id),
+        approved_reply_hash = coalesce($6, approved_reply_hash),
+        replied_at          = coalesce($7, replied_at),
+        status_reason       = case when $8::boolean then $9 else status_reason end
+      where google_review_id = $1 and reply_status = any($2::marketing.review_reply_status[])`,
+    [
+      id,
+      from,
+      to,
+      fields.replyDraft ?? null,
+      fields.approvalTokenId ?? null,
+      fields.approvedReplyHash ?? null,
+      fields.repliedAt?.toISOString() ?? null,
+      fields.statusReason !== undefined,
+      fields.statusReason ?? null,
+    ],
+  );
+  return (result.rowCount ?? 0) === 1;
+}
+
+/** One confirmed fact as text, or null when it is absent or not confirmed. */
+export async function getConfirmedFact(db: Queryable, key: string): Promise<PublicText | null> {
+  const result = await db.query<{ value: unknown }>(`select value from public.practice_facts where key = $1 and confirmed`, [key]);
+  const value = result.rows[0]?.value;
+  return typeof value === "string" && value.trim() !== "" ? pub(value) : null;
+}
+
+/** GBP posts the owner approved in Phase 3 whose slot has come. */
+export async function listApprovedGbpPostsDue(db: Queryable, now: Date): Promise<string[]> {
+  const result = await db.query<{ id: string }>(
+    `select id from marketing.social_posts
+      where channel = 'gbp' and approval_status = 'approved' and scheduled_for <= $1
+      order by scheduled_for, id`,
+    [now.toISOString()],
   );
   return result.rows.map((row) => row.id);
 }

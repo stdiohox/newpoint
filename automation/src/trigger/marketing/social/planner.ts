@@ -5,8 +5,8 @@
  * then hands each new post to the drafter.
  *
  * D10: Facebook, GBP and (when the media library and the Instagram account
- * exist) Instagram. GBP posts are planned and drafted now; publishing them
- * arrives with Phase 4.
+ * exist) Instagram. GBP posts follow the same approval and are published by
+ * gbp.post-publisher at their slot.
  */
 import type { PublicClaude } from "../../../adapters/llm/anthropic-public.js";
 import {

@@ -216,3 +216,108 @@ export function postViolations(body: string, altTexts: readonly string[] = []): 
 
 /** Every post rule, for validating rule codes read back from storage. */
 export const POST_RULE_NAMES: readonly PostRule[] = [...POST_RULES.map(([rule]) => rule), "title_in_alt_text"];
+
+// --- Review replies (§5.2) ------------------------------------------------------
+// A reply is public and sits under someone's review. It must never confirm or imply
+// that the reviewer is or was a patient (HHS has fined providers for exactly this),
+// never refer to any treatment, visit, condition or detail, never name anyone, and
+// never repeat the review, which also keeps injected text out of the reply.
+
+export type ReplyRule =
+  | "implies_patient"
+  | "provider_name"
+  | "clinical_term"
+  | "names_reviewer"
+  | "repeats_review"
+  | "other_phone"
+  | "post_rule";
+
+export interface ReplyViolation {
+  readonly rule: ReplyRule;
+  readonly fix: string;
+}
+
+const PROVIDERS =
+  /\b(whitaker|ofoegbu|funmilayo|anastasia|nurse practitioners?|np|pmhnp|dnp|fnp|clinicians?|providers?|prescribers?|doctors?|physicians?|psychiatrists?|therapists?|counselors?)\b|\bdr\b\.?/i;
+
+/**
+ * "You" is how a reply slips into implying a patient ("you were seen", "you're
+ * feeling better", "you came in"). Rather than chase phrasings, a reply may say
+ * "you" only inside these phrases, and "your" never.
+ */
+const SAFE_YOU = [
+  /\bthank you\b/gi,
+  /\bif you would like to talk\b/gi,
+  /\bif you'd like to talk\b/gi,
+  /\bwe invite you to (call|contact|reach)\b/gi,
+  /\binvite you to (call|contact|reach)\b/gi,
+  /\bwe would welcome hearing from you\b/gi,
+  /\bhear from you\b/gi,
+];
+
+/** Words that place the reviewer at the practice, whoever the sentence is about. */
+const IMPLIES_PATIENT =
+  /\b(visits?|visited|visiting|appointments?|waits?|waited|waiting|wait time|came in|come in|coming in|stays?|experiences?|feel|feels|feeling|felt|better|recover\w*|progress|journey|session\w*|intake|refills?|follow[- ]?ups?|records?|bills?|billing|office|front desk|check[- ]?in|seen|treated|patients?|clients?|choosing us|trusting us|helped|help you|(could|were able to|are able to) help)\b/i;
+
+const CLINICAL =
+  /\b(anxiety|anxious|depress\w*|adhd|add|bipolar|ptsd|trauma\w*|ocd|schizo\w*|psychos\w*|panic|insomnia|sleep|mood|stress\w*|addict\w*|substance|alcohol|mental|behaviou?ral|medical|clinical|health|wellness|diagnos\w*|therap\w*|counsel\w*|medication\w*|meds|prescri\w*|dose|dosage|symptoms?|disorders?|conditions?|treatment|psychiatric|psychiatry|assessment|weight|injections?|crisis|suicid\w*|telehealth|care plan)\b/i;
+
+/** Lowercased words with accents and apostrophe styles folded, so a copy cannot dodge by spelling. */
+const wordsOf = (text: string): string[] =>
+  visible(text)
+    .normalize("NFD")
+    .replace(/\p{M}+/gu, "")
+    .replace(/[\u2018\u2019\u02bc`]/g, "'")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s']/gu, " ")
+    .split(/\s+/)
+    .filter((w) => w !== "");
+
+const digits = (text: string): string => text.replace(/\D/g, "");
+
+/**
+ * Every rule a draft reply breaks; empty when it may go to the owner.
+ * `practicePhone` is the confirmed practice line, the only number a reply may carry.
+ */
+export function replyViolations(
+  reply: string,
+  review: { readonly text: string | null; readonly reviewer: string | null },
+  practicePhone: string | null,
+): ReplyViolation[] {
+  const text = visible(reply);
+  const found: ReplyViolation[] = [];
+  const add = (rule: ReplyRule, fix: string) => found.push({ rule, fix });
+
+  const withoutSafeYou = SAFE_YOU.reduce((t, phrase) => t.replace(phrase, " "), text);
+  if (IMPLIES_PATIENT.test(text) || /\byour\b/i.test(text) || /\byou\b|\byou'(re|ve|d|ll)\b/i.test(withoutSafeYou)) {
+    add("implies_patient", 'Do not say or imply that the reviewer is or was a patient. Use no "your", and "you" only in "thank you" or "we invite you to call"; no visit, wait, experience or feeling.');
+  }
+  if (PROVIDERS.test(text)) add("provider_name", "Name no provider and use no title.");
+  if (CLINICAL.test(text) || matches("medication_or_class", text) || matches("drug_brand", text)) {
+    add("clinical_term", "Use no clinical word: no condition, treatment, medication or service detail.");
+  }
+
+  const replyWords = wordsOf(text);
+  const replyText = ` ${replyWords.join(" ")} `;
+  const nameParts = wordsOf(review.reviewer ?? "").filter((w) => w.length >= 2);
+  if (nameParts.some((part) => replyText.includes(` ${part} `))) add("names_reviewer", "Do not name the reviewer.");
+
+  // Any three consecutive words of the review: copying, and injected text, stop here.
+  const reviewWords = wordsOf(review.text ?? "");
+  for (let i = 0; i + 3 <= reviewWords.length; i += 1) {
+    if (replyText.includes(` ${reviewWords.slice(i, i + 3).join(" ")} `)) {
+      add("repeats_review", "Do not repeat or quote any words from the review.");
+      break;
+    }
+  }
+
+  const phones = [...text.matchAll(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g)].map((m) => digits(m[0]));
+  if (phones.some((phone) => practicePhone === null || phone !== digits(practicePhone).slice(-10))) {
+    add("other_phone", "The only number a reply may give is the practice line.");
+  }
+
+  // Everything a post may not say, a reply may not say either.
+  const postRules = postViolations(text);
+  if (postRules.length > 0) add("post_rule", postRules.map((v) => v.fix).join(" "));
+  return found;
+}

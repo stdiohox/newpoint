@@ -106,6 +106,8 @@ export function joinPublic(parts: readonly PublicText[], separator: PublicText):
 export type PublicSource =
   /** Search queries for the public site (Phase 1). */
   | "google_search_console"
+  /** Public Google reviews and the public listing (Phase 4). Never joined to the PHI zone (§5.2). */
+  | "google_business_profile"
   /** newpoint-marketing, which holds no patient identifiers by construction (§0.1, §4). */
   | "newpoint_marketing_db"
   /** An answer engine's reply to a GEO prompt, grounded in the public web (§5.6). */
