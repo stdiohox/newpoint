@@ -4,7 +4,7 @@
  * Before anything goes out it re-runs the content rules and checks that the
  * hash of the post now equals the hash the owner approved; either failing
  * refuses the post. D10: Facebook and Instagram publish now; a GBP post stays
- * approved for Phase 4. Publishing credentials live only in this project.
+ * approved for gbp.post-publisher. Publishing credentials live only in this project.
  *
  * A publish is not idempotent: a retry after Meta created the post would post
  * it twice. So the post is claimed (approved → publishing) before the call,
@@ -34,7 +34,7 @@ export async function runSocialPublisher(deps: PublisherDeps, postId: string): P
   const post = await getSocialPost(deps.db, postId);
   if (!post || post.status !== "approved" || post.body === null || post.scheduledFor === null) return { status: "skipped" };
   if (post.channel === "linkedin" || !PUBLISHABLE_NOW.has(post.channel)) {
-    // GBP (Phase 4) and LinkedIn (not in D10): approved, not published here.
+    // GBP (gbp.post-publisher publishes it) and LinkedIn (not in D10): not published here.
     return { status: "not_publishable_yet" };
   }
   const refuse = async (reason: string) => {

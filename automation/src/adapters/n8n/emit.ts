@@ -34,7 +34,34 @@ export interface SocialApprovalRequested {
   readonly expires_at: string;
 }
 
-export type N8nEvent = SocialApprovalRequested;
+/** A review reply for the owner, shown beside the raw review (§5.2). */
+export interface GbpReplyApprovalRequested {
+  readonly kind: "gbp.reply_approval_requested";
+  /** Google's opaque review id. */
+  readonly review_id: string;
+  readonly rating: number;
+  /** The review as Google shows it, untouched, so the owner judges the reply against it. */
+  readonly review_text: PublicText | null;
+  readonly reviewer: PublicText | null;
+  readonly draft: PublicText;
+  readonly content_hash: string;
+  readonly callback_url: string;
+  readonly expires_at: string;
+  /** true on the second request, after the first 72 h ran out (§5.2: "then a reminder is sent"). */
+  readonly reminder: boolean;
+}
+
+/** Something a person at Koret must look at. Codes and ids only. */
+export interface OpsAlert {
+  readonly kind: "ops.alert";
+  readonly code: "post_stuck_publishing";
+  readonly post_id: string;
+  readonly channel: "facebook" | "instagram" | "gbp" | "linkedin";
+  readonly since: string;
+  readonly minutes: number;
+}
+
+export type N8nEvent = SocialApprovalRequested | GbpReplyApprovalRequested | OpsAlert;
 
 export interface N8nEmitter {
   emit(event: N8nEvent): Promise<void>;

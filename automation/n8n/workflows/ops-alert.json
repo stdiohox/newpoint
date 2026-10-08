@@ -1,0 +1,136 @@
+{
+  "name": "Newpoint \u00b7 Koret ops alert (marketing)",
+  "nodes": [
+    {
+      "id": "fb8eb829-0bf0-5cd0-9ab3-36c2a5cf09d6",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "6a7b516a-b468-570c-9b3b-20b5b328c295",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "newpoint-ops-alert",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Newpoint ops alert webhook"
+        }
+      }
+    },
+    {
+      "id": "529ae25d-1ae6-55f5-bc3a-8d1231308cdd",
+      "name": "Is a valid request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "59daaa51-4956-560e-b6a7-c358ce649c35",
+              "leftValue": "={{ $json.body.kind }}",
+              "rightValue": "ops.alert",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "22e302b0-9acb-5240-9d45-0c66272e9f66",
+      "name": "Email Koret ops",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        -100
+      ],
+      "parameters": {
+        "fromEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+        "toEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+        "subject": "=Newpoint automation: {{ $json.body.code }}",
+        "emailFormat": "text",
+        "text": "=Code: {{ $json.body.code }}\nPost: {{ $json.body.post_id }} ({{ $json.body.channel }})\nIn 'publishing' since {{ $json.body.since }} ({{ $json.body.minutes }} minutes).\n\nThe platform call failed or the worker died mid-call. Nothing re-posts it automatically. Check the Facebook Page / Instagram / Google listing: if the post is live, set the row to published with its reference; if not, re-run social.publisher or gbp.post-publisher from the Trigger.dev dashboard.",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "",
+          "name": "Newpoint approvals SMTP"
+        }
+      }
+    },
+    {
+      "id": "0f556de5-1b00-5871-9207-1a0779276973",
+      "name": "Invalid request: dropped",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        120
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is a valid request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is a valid request?": {
+      "main": [
+        [
+          {
+            "node": "Email Koret ops",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid request: dropped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "SET-TO-KORET-OPS-ALERT-WORKFLOW-ID",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}

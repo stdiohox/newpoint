@@ -11,8 +11,8 @@
  * Phase 4). Anything else (timeout, rejection, a malformed decision, a hash for
  * different content) ends the post, with the reason recorded.
  */
-import { wait } from "@trigger.dev/sdk";
 import { z } from "zod";
+import { APPROVAL_TIMEOUT_MS, decisionSchema, triggerApprovalGate, type ApprovalGate } from "../approval-gate.js";
 import type { N8nEmitter } from "../../../adapters/n8n/emit.js";
 import { createN8nEmitter } from "../../../adapters/n8n/emit.js";
 import { getDraftFeedback, getSocialPost, transitionSocialPost, type Queryable } from "../../../lib/db-marketing.js";
@@ -24,36 +24,10 @@ import { contentHash, PUBLISHABLE_NOW } from "../../../domain/social/plan.js";
 import { marketingRuntime, vendorFetch } from "../runtime.js";
 import { triggerNext, type SocialNext } from "./steps.js";
 
-export const APPROVAL_TIMEOUT = "72h";
-const APPROVAL_TIMEOUT_MS = 72 * 3_600_000;
+export { APPROVAL_TIMEOUT, decisionSchema, type ApprovalGate } from "../approval-gate.js";
 
-/** What n8n POSTs to the callback URL. Anything else is not a decision. */
-export const decisionSchema = z.object({
-  approved: z.boolean(),
-  content_hash: z.string().regex(/^[0-9a-f]{64}$/),
-});
-
-export interface ApprovalGate {
-  /** A one-time token for this content; the same post and hash give the same token on retry. */
-  create(postId: string, contentHash: string): Promise<{ readonly tokenId: string; readonly url: string }>;
-  /** Suspends until the token completes or times out. */
-  wait(tokenId: string): Promise<{ readonly ok: true; readonly output: unknown } | { readonly ok: false }>;
-}
-
-export const triggerGate: ApprovalGate = {
-  async create(postId, hash) {
-    const token = await wait.createToken({
-      timeout: APPROVAL_TIMEOUT,
-      idempotencyKey: `social.approval:${postId}:${hash}`,
-      tags: [`post_${postId}`],
-    });
-    return { tokenId: token.id, url: token.url };
-  },
-  async wait(tokenId) {
-    const result = await wait.forToken<unknown>(tokenId);
-    return result.ok ? { ok: true, output: result.output } : { ok: false };
-  },
-};
+/** social.approval's tokens: one per post and content hash (the key Phase 3 shipped with). */
+export const triggerGate: ApprovalGate = triggerApprovalGate("social.approval", "post");
 
 export interface ApprovalDeps {
   readonly db: Queryable;
@@ -127,7 +101,7 @@ export async function runSocialApproval(deps: ApprovalDeps, postId: string): Pro
     await deps.next.publish(postId, post.scheduledFor, hash);
     return { status: "approved_scheduled" };
   }
-  // GBP: approved and kept; Phase 4's publisher posts it (D10).
+  // GBP: approved and kept; gbp.post-publisher posts it at its slot (D10).
   return { status: "approved_awaiting_phase_4" };
 }
 

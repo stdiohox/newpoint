@@ -184,3 +184,24 @@ describe("social env (Phase 3)", async () => {
     ]);
   });
 });
+
+describe("GBP and webhook env (Phase 4)", async () => {
+  const { gbpEnv, webhookEnv } = await import("../../src/lib/env.js");
+
+  it("names exactly what each GBP task is missing", () => {
+    const env = loadMarketingEnv(valid);
+    expect(configError(() => gbpEnv(env)).variables).toEqual([
+      "GBP_OAUTH_CLIENT_ID",
+      "GBP_OAUTH_CLIENT_SECRET",
+      "GBP_OAUTH_REFRESH_TOKEN",
+      "GBP_ACCOUNT_ID",
+      "GBP_LOCATION_ID",
+    ]);
+    expect(configError(() => webhookEnv(env, "ops_alert")).variables).toEqual(["N8N_OPS_ALERT_WEBHOOK_URL", "N8N_OPS_ALERT_WEBHOOK_SECRET"]);
+  });
+
+  it("keeps the NAP audit off unless the flag is exactly true", () => {
+    expect(loadMarketingEnv(valid).GBP_NAP_AUDIT_ENABLED).toBeUndefined();
+    expect(configError(() => loadMarketingEnv({ ...valid, GBP_NAP_AUDIT_ENABLED: "yes" })).variables).toEqual(["GBP_NAP_AUDIT_ENABLED"]);
+  });
+});

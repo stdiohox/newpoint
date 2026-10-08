@@ -1,8 +1,8 @@
 {
-  "name": "Newpoint \u00b7 social post approval",
+  "name": "Newpoint \u00b7 GBP review reply approval",
   "nodes": [
     {
-      "id": "c77a9c76-eced-55b8-8b40-78839d37ad08",
+      "id": "71b426b2-9b36-56c7-866c-83dcc03e8d5c",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
@@ -10,10 +10,10 @@
         0,
         0
       ],
-      "webhookId": "15cd3a59-e6dd-5b02-b44c-9b4b1964af8d",
+      "webhookId": "19b869b6-bb22-59a4-94cc-095ede874c08",
       "parameters": {
         "httpMethod": "POST",
-        "path": "newpoint-social-approval",
+        "path": "newpoint-gbp-reply-approval",
         "authentication": "headerAuth",
         "responseMode": "onReceived",
         "options": {}
@@ -21,12 +21,12 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "",
-          "name": "Newpoint social approval webhook"
+          "name": "Newpoint GBP reply approval webhook"
         }
       }
     },
     {
-      "id": "c4a783a9-b9f0-5d0b-85a9-23f7c966924a",
+      "id": "98208e06-18bc-5bae-b67b-d13dec15887b",
       "name": "Is a valid request?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
@@ -43,16 +43,16 @@
           "combinator": "and",
           "conditions": [
             {
-              "id": "6d5dce16-323a-510e-be2a-3acf13d4aba7",
+              "id": "ea4b2d0f-07e0-5958-8afc-935e787a83e3",
               "leftValue": "={{ $json.body.kind }}",
-              "rightValue": "social.approval_requested",
+              "rightValue": "gbp.reply_approval_requested",
               "operator": {
                 "type": "string",
                 "operation": "equals"
               }
             },
             {
-              "id": "3c0b059f-69af-5e2e-856e-1f0ffbf2e1ad",
+              "id": "e79f96b8-7d91-54da-9e9e-994340b0938e",
               "leftValue": "={{ $json.body.callback_url }}",
               "rightValue": "https://api.trigger.dev/",
               "operator": {
@@ -61,7 +61,7 @@
               }
             },
             {
-              "id": "7df6d311-8f2e-51a9-8eeb-34b799444046",
+              "id": "df2fdd6a-2416-58ba-a857-6a611e5958f0",
               "leftValue": "={{ $json.body.content_hash }}",
               "rightValue": "^[0-9a-f]{64}$",
               "operator": {
@@ -75,7 +75,7 @@
       }
     },
     {
-      "id": "955e373b-ae2e-5a03-9d4d-8df15d74d84b",
+      "id": "665c14ae-1f47-5b90-be46-e5ce0d975ef1",
       "name": "Ask the owner (confirm page)",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
@@ -87,8 +87,8 @@
         "operation": "sendAndWait",
         "fromEmail": "SET-BEFORE-ACTIVATING@example.invalid",
         "toEmail": "SET-BEFORE-ACTIVATING@example.invalid",
-        "subject": "=Newpoint {{ $json.body.channel }} post for {{ $json.body.scheduled_for }}: approve?",
-        "message": "=Channel: {{ $json.body.channel }}\nScheduled: {{ $json.body.scheduled_for }}\nExpires: {{ $json.body.expires_at }}\n\nPOST TEXT\n{{ $json.body.body }}\n\nIMAGE\n{{ $json.body.media.length ? $json.body.media[0].url + '\\nAlt text: ' + $json.body.media[0].alt : 'none' }}\n\nCOMPLIANCE\n{{ $json.body.compliance.passed ? 'Passed automated review' : 'AUTOMATED REVIEW DID NOT PASS after three rounds. Approve only if you have read the notes below and you are sure the post is accurate and appropriate.' }} (round {{ $json.body.compliance.rounds }})\nRules flagged: {{ $json.body.compliance.rules.join(', ') || 'none' }}\nNotes: {{ $json.body.compliance.review_notes.join(' | ') || 'none' }}\n\nApproving publishes exactly this text and image at the scheduled time. Any later edit voids the approval.",
+        "subject": "={{ $json.body.reminder ? 'REMINDER: ' : '' }}Reply to a {{ $json.body.rating }}-star Google review: approve?",
+        "message": "={{ $json.body.reminder ? 'This is the reminder: the first request ran out after 72 hours. If this one runs out too, nothing is posted.\\n\\n' : '' }}THE REVIEW, AS GOOGLE SHOWS IT ({{ $json.body.rating }} stars, by {{ $json.body.reviewer || 'a Google user' }})\n{{ $json.body.review_text || '(rating only, no text)' }}\n\nTHE DRAFT REPLY\n{{ $json.body.draft }}\n\nBEFORE YOU APPROVE, CHECK EACH LINE OF THE REPLY:\n- It does not say or hint that this person is or was a patient (no visit, wait, appointment, treatment, care or feeling better).\n- It names no one: not the reviewer, not a provider.\n- It repeats nothing from the review and mentions no detail of it.\n- It uses no clinical or health word.\nAn automated check looked for these, but it cannot catch everything; you are the last check. Approving posts exactly this reply, publicly, under the practice's name.",
         "responseType": "customForm",
         "defineForm": "fields",
         "formFields": {
@@ -124,7 +124,7 @@
         },
         "options": {
           "messageButtonLabel": "Open the confirm page",
-          "responseFormTitle": "Approve this Newpoint post?",
+          "responseFormTitle": "Approve this reply to a Google review?",
           "responseFormDescription": "Choose Approve or Reject and submit. Nothing is decided until you press Submit.",
           "responseFormButtonLabel": "Submit decision",
           "limitWaitTime": {
@@ -144,7 +144,7 @@
       }
     },
     {
-      "id": "2cae34ea-c464-59ae-8080-9fe8dfc06640",
+      "id": "dfcc8270-37f2-587e-a603-ef2c757f411d",
       "name": "Was a decision submitted?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
@@ -161,7 +161,7 @@
           "combinator": "and",
           "conditions": [
             {
-              "id": "e924ac6a-4288-5174-bf9e-d78e6806099b",
+              "id": "512d296e-b9bd-5a02-b164-ebcabd1648c5",
               "leftValue": "={{ $json.data && $json.data['Decision'] }}",
               "rightValue": "",
               "operator": {
@@ -176,7 +176,7 @@
       }
     },
     {
-      "id": "7ae7c3ef-af12-540d-840e-e04fc730fc7e",
+      "id": "0c5d51ba-fee5-5524-a9cc-943dbfbbfde1",
       "name": "Complete the Trigger.dev token",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -196,7 +196,7 @@
       }
     },
     {
-      "id": "ab6e3601-1af2-5c51-b3ed-a30b05940591",
+      "id": "3888c94a-8d3f-5732-aeaa-9ada9827b456",
       "name": "No decision: let the token time out",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
@@ -207,7 +207,7 @@
       "parameters": {}
     },
     {
-      "id": "15079727-f640-558a-8055-8ec5850711ae",
+      "id": "4ff3bfe4-8e27-5349-90c6-c9fa0ad98b01",
       "name": "Invalid request: dropped",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
@@ -218,7 +218,7 @@
       "parameters": {}
     },
     {
-      "id": "6fc22f8a-4b99-5151-9e81-5a681c150ccf",
+      "id": "0030b02f-0db9-5b24-bb0c-16269fa8de81",
       "name": "Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -230,7 +230,7 @@
         "color": 5,
         "width": 780,
         "height": 240,
-        "content": "## Newpoint social approval (automation/n8n/README.md \u00a79)\nTrigger.dev `social.approval` POSTs the draft and a one-time token URL here. The owner decides on a **confirm page** (a form POST, so link scanners cannot approve); this workflow then POSTs `{approved, content_hash}` to the token URL. No Trigger.dev key lives in n8n. With no decision, n8n posts nothing and Trigger.dev's 72 h timeout expires the post."
+        "content": "## Newpoint GBP review reply approval (automation/n8n/README.md \u00a710)\nTrigger.dev `gbp.reply-drafter` POSTs the raw review, the draft and a one-time token URL. The owner decides on a confirm page (form POST). Never auto-posts. With no decision, n8n posts nothing and Trigger.dev's 72 h timeout sends one reminder, then expires the reply."
       }
     }
   ],

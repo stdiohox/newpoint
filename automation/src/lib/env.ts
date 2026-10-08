@@ -68,6 +68,26 @@ export const marketingEnvSchema = z.object({
   N8N_SOCIAL_APPROVAL_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
   /** That webhook's Header Auth secret (n8n/README.md §5). */
   N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET: z.string().min(32).optional(),
+  // --- Phase 4, GBP (§5.2). Optional at load, demanded by the GBP tasks.
+  /** n8n webhook for review-reply approvals (raw review beside the draft). */
+  N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
+  N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET: z.string().min(32).optional(),
+  /** n8n webhook that alerts Koret ops (ops.heartbeat). */
+  N8N_OPS_ALERT_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
+  N8N_OPS_ALERT_WEBHOOK_SECRET: z.string().min(32).optional(),
+  /** OAuth client and a refresh token of a user who manages the listing (GBP has no service accounts). */
+  GBP_OAUTH_CLIENT_ID: z.string().regex(/\.apps\.googleusercontent\.com$/).optional(),
+  GBP_OAUTH_CLIENT_SECRET: z.string().min(10).optional(),
+  GBP_OAUTH_REFRESH_TOKEN: z.string().min(20).optional(),
+  /** accounts/{GBP_ACCOUNT_ID}/locations/{GBP_LOCATION_ID}: numeric ids from the GBP API. */
+  GBP_ACCOUNT_ID: z.string().regex(/^\d{5,30}$/).optional(),
+  GBP_LOCATION_ID: z.string().regex(/^\d{5,30}$/).optional(),
+  /**
+   * gbp.nap-audit runs only when this is exactly "true". Leave unset until D11 is
+   * confirmed (legal name, street address, storefront vs service area); the task
+   * also refuses unless those facts are confirmed in public.practice_facts.
+   */
+  GBP_NAP_AUDIT_ENABLED: z.enum(["true", "false"]).optional(),
   /** Search Console property: `sc-domain:newpointnp.com` or `https://newpointnp.com/`. */
   GSC_SITE_URL: z.string().regex(/^(sc-domain:[a-z0-9.-]+|https:\/\/[^\s]+\/)$/),
   /** Service-account key JSON; the account is added as a restricted user on the property. */
@@ -177,13 +197,54 @@ export function metaEnv(env: MarketingEnv): MetaEnv {
   };
 }
 
+const WEBHOOKS = {
+  social_approval: ["N8N_SOCIAL_APPROVAL_WEBHOOK_URL", "N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET"],
+  gbp_reply_approval: ["N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL", "N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET"],
+  ops_alert: ["N8N_OPS_ALERT_WEBHOOK_URL", "N8N_OPS_ALERT_WEBHOOK_SECRET"],
+} as const;
+
+/** An n8n webhook and its Header Auth secret, or a ConfigError naming what is missing. */
+export function webhookEnv(env: MarketingEnv, webhook: keyof typeof WEBHOOKS): { readonly url: string; readonly secret: string } {
+  const [urlName, secretName] = WEBHOOKS[webhook];
+  const url = env[urlName];
+  const secret = env[secretName];
+  if (!url || !secret) {
+    throw new ConfigError(`${webhook}_webhook_env_missing` as const, [urlName, secretName].filter((name) => env[name] === undefined));
+  }
+  return { url, secret };
+}
+
 /** The n8n webhook social.approval posts to, or a ConfigError naming what is missing. */
 export function approvalWebhookEnv(env: MarketingEnv): { readonly url: string; readonly secret: string } {
-  if (!env.N8N_SOCIAL_APPROVAL_WEBHOOK_URL || !env.N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET) {
-    const missing = (["N8N_SOCIAL_APPROVAL_WEBHOOK_URL", "N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET"] as const).filter(
-      (name) => env[name] === undefined,
-    );
-    throw new ConfigError("approval_webhook_env_missing", missing);
+  try {
+    return webhookEnv(env, "social_approval");
+  } catch (error) {
+    if (error instanceof ConfigError) throw new ConfigError("approval_webhook_env_missing", error.variables);
+    throw error;
   }
-  return { url: env.N8N_SOCIAL_APPROVAL_WEBHOOK_URL, secret: env.N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET };
+}
+
+export interface GbpEnv {
+  readonly clientId: string;
+  readonly clientSecret: string;
+  readonly refreshToken: string;
+  readonly accountId: string;
+  readonly locationId: string;
+}
+
+/** The GBP OAuth client and listing ids, or a ConfigError naming what is missing. */
+export function gbpEnv(env: MarketingEnv): GbpEnv {
+  const names = ["GBP_OAUTH_CLIENT_ID", "GBP_OAUTH_CLIENT_SECRET", "GBP_OAUTH_REFRESH_TOKEN", "GBP_ACCOUNT_ID", "GBP_LOCATION_ID"] as const;
+  const missing = names.filter((name) => env[name] === undefined);
+  const { GBP_OAUTH_CLIENT_ID, GBP_OAUTH_CLIENT_SECRET, GBP_OAUTH_REFRESH_TOKEN, GBP_ACCOUNT_ID, GBP_LOCATION_ID } = env;
+  if (!GBP_OAUTH_CLIENT_ID || !GBP_OAUTH_CLIENT_SECRET || !GBP_OAUTH_REFRESH_TOKEN || !GBP_ACCOUNT_ID || !GBP_LOCATION_ID) {
+    throw new ConfigError("gbp_env_missing", missing);
+  }
+  return {
+    clientId: GBP_OAUTH_CLIENT_ID,
+    clientSecret: GBP_OAUTH_CLIENT_SECRET,
+    refreshToken: GBP_OAUTH_REFRESH_TOKEN,
+    accountId: GBP_ACCOUNT_ID,
+    locationId: GBP_LOCATION_ID,
+  };
 }

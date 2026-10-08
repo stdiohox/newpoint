@@ -1,7 +1,7 @@
 # Newpoint automation layer
 
 Design: [`docs/automation-architecture.md`](../docs/automation-architecture.md).
-This package is **Phases 0 to 3, public zone only** (§7). There is no PHI code here,
+This package is **Phases 0 to 4, public zone only** (§7). There is no PHI code here,
 and `trigger.phi.config.ts` is an empty stub until Phase 5.
 
 npm only (`package-lock.json`). Node 24+.
@@ -111,6 +111,23 @@ social.planner ─▶ social.drafter ─▶ social.compliance ─┬─▶ socia
   `rejected` / `expired` with `status_reason` (a code, never vendor text).
 - **Not sent to Meta yet:** alt text (parameter to confirm against the pinned Graph version).
 
+## Phase 4: Google Business Profile (§5.2)
+
+| Task | Does |
+|---|---|
+| `gbp.sync` (hourly) | Reviews → `marketing.gbp_reviews`; each unanswered review to the drafter. A reply someone posted in the GBP UI stops the pipeline for that review. |
+| `gbp.reply-drafter` | Sonnet 5.5 draft (no tools, review fenced as untrusted) → `replyViolations` (§5.2: never implies a patient, names no one, no clinical word, never repeats the review) → confirm-page approval with the raw review beside the draft (72 h) → one reminder (72 h) → posted only if approved. **Never auto-posts.** |
+| `gbp.post-publisher` (every 15 min) | Publishes the GBP posts approved through the Phase 3 pipeline at their slot. Hash and rules re-checked; no phone number in a GBP post; claimed before the API call. |
+| `gbp.nap-audit` (monthly) | **Blocked until D11.** Runs only with `GBP_NAP_AUDIT_ENABLED=true` AND `legal_name`, `street_address`, `phone` confirmed in `public.practice_facts`. Mismatches → `content_backlog` (`nap`). |
+| `ops.heartbeat` (every 15 min) | Phase 3 fix: alerts Koret ops once for any post stuck in `publishing` > 30 min. |
+
+- **Facts the GBP tasks read** (`public.practice_facts`, `confirmed = true`, string values):
+  `phone` (the practice line replies may give), and for the NAP audit `legal_name` and
+  `street_address`. Unconfirmed facts are never used.
+- `marketing.gbp_posts` (§4) is unused: GBP posts go through `social_posts` (channel `gbp`)
+  so they share the Phase 3 drafting, compliance and approval.
+- GBP performance metrics (§5.2 inputs) are not fetched: §4 has no table for them.
+
 ## Setup you must do (Phases 0 and 1)
 
 ### 1. Supabase — project `newpoint-marketing`
@@ -205,6 +222,13 @@ Set, in the Trigger.dev dashboard only: `META_GRAPH_VERSION`, `META_PAGE_ID`,
 Then `N8N_SOCIAL_APPROVAL_WEBHOOK_URL` and `N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET` from
 [`n8n/README.md` §9](n8n/README.md).
 
-### 6. n8n
+### 6. Google Business Profile (Phase 4; access steps in the deploy notes)
+
+Set, in the Trigger.dev dashboard only: `GBP_OAUTH_CLIENT_ID`, `GBP_OAUTH_CLIENT_SECRET`,
+`GBP_OAUTH_REFRESH_TOKEN`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`. Leave
+`GBP_NAP_AUDIT_ENABLED` unset until D11 is confirmed. Then the two webhooks from
+[`n8n/README.md` §10 and §11](n8n/README.md).
+
+### 7. n8n
 
 Work through [`n8n/README.md`](n8n/README.md) before activating any workflow.

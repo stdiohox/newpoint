@@ -5,7 +5,7 @@
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { ParseResult, PublicClaude } from "../../src/adapters/llm/anthropic-public.js";
-import type { N8nEvent } from "../../src/adapters/n8n/emit.js";
+import type { N8nEvent, SocialApprovalRequested } from "../../src/adapters/n8n/emit.js";
 import type { MetaPublisher } from "../../src/adapters/social/meta.js";
 import { createLogger } from "../../src/lib/logger.js";
 import { plannerSystem, drafterSystem, reviewerSystem } from "../../src/prompts/social.js";
@@ -53,7 +53,7 @@ interface Script {
   /** One verdict per review; the last repeats. */
   reviews?: readonly ("pass" | "issues")[];
   /** What the owner does, given the event. */
-  decide?: (event: N8nEvent) => unknown;
+  decide?: (event: SocialApprovalRequested) => unknown;
 }
 
 function harness(script: Script) {
@@ -96,7 +96,7 @@ function harness(script: Script) {
     },
   };
 
-  const events: N8nEvent[] = [];
+  const events: SocialApprovalRequested[] = [];
   const published: { channel: string; message: string; imageUrl: string | null }[] = [];
   const meta: MetaPublisher = {
     publishFacebook: (post) => {
@@ -113,7 +113,7 @@ function harness(script: Script) {
     wait: (tokenId) => {
       const event = events.find((e) => `waitpoint_${e.post_id}` === tokenId);
       if (!event) throw new Error("no event for token");
-      const decision = (script.decide ?? ((e: N8nEvent) => ({ approved: true, content_hash: e.content_hash })))(event);
+      const decision = (script.decide ?? ((e: SocialApprovalRequested) => ({ approved: true, content_hash: e.content_hash })))(event);
       return Promise.resolve(decision === undefined ? { ok: false as const } : { ok: true as const, output: decision });
     },
   };
@@ -132,7 +132,10 @@ function harness(script: Script) {
     approve: (postId) => {
       queue.push(() =>
         runSocialApproval(
-          { db: client(), logger, next, gate, now: () => NOW, emitter: { emit: (e) => Promise.resolve(void events.push(e)) } },
+          { db: client(), logger, next, gate, now: () => NOW, emitter: { emit: (e: N8nEvent) => {
+            if (e.kind === "social.approval_requested") events.push(e);
+            return Promise.resolve();
+          } } },
           postId,
         ),
       );
