@@ -114,6 +114,18 @@ describe("loadMarketingEnv", () => {
   });
 });
 
+describe("GEO_SITE_URL", () => {
+  it("defaults to the practice's site and accepts only its domain", () => {
+    expect(loadMarketingEnv(valid).GEO_SITE_URL).toBe("https://newpointnp.com/");
+    expect(loadMarketingEnv({ ...valid, GEO_SITE_URL: "https://staging.newpointnp.com/" }).GEO_SITE_URL).toBe(
+      "https://staging.newpointnp.com/",
+    );
+    for (const url of ["https://169.254.169.254/", "https://localhost/", "https://newpointnp.com.evil.example/", "http://newpointnp.com/"]) {
+      expect(configError(() => loadMarketingEnv({ ...valid, GEO_SITE_URL: url })).variables).toEqual(["GEO_SITE_URL"]);
+    }
+  });
+});
+
 describe("supabaseProjectRef", () => {
   it("reads the ref from both URL shapes and nothing else", () => {
     expect(supabaseProjectRef(valid.MARKETING_DATABASE_URL)).toBe(MARKETING_REF);

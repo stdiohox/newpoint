@@ -4,7 +4,8 @@
  * writes what it returns.
  */
 import { z } from "zod";
-import { contentRuleGuidance, contentRulesTouched } from "../content-rules/newpoint-rules.js";
+import type { BacklogItem } from "../backlog.js";
+import { blockingRulesTouched, contentRuleGuidance, contentRulesTouched } from "../content-rules/newpoint-rules.js";
 import { SERVICE_SLUGS, type KeywordIntent, type Seed, type ServiceSlug, type UsState } from "./seed-matrix.js";
 import type { PublicText } from "../../lib/phi.js";
 
@@ -120,7 +121,7 @@ export function applyClustering(candidates: readonly Candidate[], clustering: Cl
     const cluster = assigned.get(index);
     // A label is a backlog page target in waiting, so a label that breaks a content
     // rule is not stored: its terms stay unclustered for a person to place.
-    if (!cluster || contentRulesTouched(cluster.name).length > 0) {
+    if (!cluster || blockingRulesTouched(cluster.name).length > 0) {
       if (cluster) flagged += 1;
       return { ...candidate, cluster: null };
     }
@@ -132,7 +133,7 @@ export function applyClustering(candidates: readonly Candidate[], clustering: Cl
       serviceSlug:
         candidate.source === "manual"
           ? candidate.serviceSlug
-          : contentRulesTouched(candidate.term).length > 0
+          : blockingRulesTouched(candidate.term).length > 0
             ? null
             : cluster.service_slug,
       intent: candidate.intent ?? cluster.intent,
@@ -141,11 +142,7 @@ export function applyClustering(candidates: readonly Candidate[], clustering: Cl
   return { ok: true, candidates: result, unclustered: candidates.length - assigned.size + flagged };
 }
 
-export interface BacklogItem {
-  readonly kind: "page" | "faq";
-  readonly target: string;
-  readonly rationale: string;
-}
+export type { BacklogItem } from "../backlog.js";
 
 const QUESTION = /^(how|what|when|where|why|who|which|can|does|do|is|are|should|will)\b/i;
 

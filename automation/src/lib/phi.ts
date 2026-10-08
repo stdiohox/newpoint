@@ -90,11 +90,17 @@ export function joinPublic(parts: readonly PublicText[], separator: PublicText):
  * the public zone (§2), and nothing it returns identifies anyone as a patient:
  * a query is what someone searched, not a contact with the practice.
  *
- * eslint.config.mjs allows importing this only from `src/adapters/google/**`:
+ * eslint.config.mjs allows importing this only from PUBLIC_SOURCE_ADAPTERS:
  * every new caller is a new public source and needs the same argument made
  * there, in review.
  */
-export type PublicSource = "google_search_console";
+export type PublicSource =
+  /** Search queries for the public site (Phase 1). */
+  | "google_search_console"
+  /** newpoint-marketing, which holds no patient identifiers by construction (§0.1, §4). */
+  | "newpoint_marketing_db"
+  /** An answer engine's reply to a GEO prompt, grounded in the public web (§5.6). */
+  | "public_web_answer";
 
 export function fromPublicSource(_source: PublicSource, value: string): PublicText {
   return value as PublicText;

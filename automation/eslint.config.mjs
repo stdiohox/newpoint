@@ -31,12 +31,12 @@ export const PHI_ZONE_IMPORT_PATTERNS = [
 export const PUBLIC_ZONE_FILES = ["src/trigger/marketing/**/*.ts"];
 
 /** `fromPublicSource` brands runtime text as PublicText; only the public-source adapters may call it. */
-export const PUBLIC_SOURCE_ADAPTERS = ["src/adapters/google/**/*.ts"];
+export const PUBLIC_SOURCE_ADAPTERS = ["src/adapters/google/**/*.ts", "src/adapters/geo/**/*.ts", "src/lib/db-marketing.ts"];
 const FROM_PUBLIC_SOURCE = {
   group: ["**/lib/phi", "**/lib/phi.js"],
   importNames: ["fromPublicSource"],
   message:
-    "fromPublicSource is only for the public-source adapters (src/adapters/google). A new caller is a new public source: argue it in review and add it to PUBLIC_SOURCE_ADAPTERS.",
+    "fromPublicSource is only for the public-source adapters (PUBLIC_SOURCE_ADAPTERS). A new caller is a new public source: argue it in review and add it to PUBLIC_SOURCE_ADAPTERS.",
 };
 
 export default tseslint.config(
