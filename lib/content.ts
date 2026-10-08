@@ -1320,7 +1320,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         // "A treatment plan", not "a written treatment plan you have agreed to":
         // the source says a plan of care is determined, not that it is written
         // down or countersigned. CLIENT: confirm if patients receive it in writing.
-        body: 'Your plan combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your situation. If other clinicians are already part of your care, we work with them to set your therapy and medication plan together, not in parallel.',
+        body: 'Where both are indicated, your plan combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your situation. If other clinicians are already part of your care, we work with them to set your therapy and medication plan together, not in parallel.',
         /* Both halves are research/content/services.md's "as we evaluate
            progress, we will continue to provide support and education as
            needed". AS NEEDED IS LOAD-BEARING AND IS NOT A SOFTENER: it is the
@@ -1471,7 +1471,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     metaDescription:
       'Ongoing psychiatric medication management in New Jersey and Pennsylvania, with standardized rating scales to track how you’re responding.',
     intro:
-      'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting your treatment as we see how you respond. Both of our providers are psychiatric mental health nurse practitioners, so the person who prescribes your medication is the same person tracking how well it’s working.',
+      'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting your treatment as we see how you respond. Both of our providers are psychiatric mental health nurse practitioners, so whichever provider you see can both prescribe your medication and track how well it’s working.',
     modality: 'By telehealth and in person.',
     sections: [
       {
@@ -2605,7 +2605,7 @@ export const FAQ = {
 
 export const CONTACT = {
   heading: 'Get in touch',
-  body: 'Send us your contact info, and we’ll get back to you about an appointment.',
+  body: 'Online requests aren’t connected yet, so for now, call or email us to request an appointment.',
   /**
    * HIPAA-aware v1 per CLAUDE.md: name, email, phone, and a constrained
    * reason-for-contact only. No symptoms, diagnoses, medications, insurance ID,
@@ -2762,7 +2762,7 @@ export const NEW_PATIENTS_PAGE = {
   metaDescription:
     'What to expect as a new patient at Newpoint: how to get in touch, your first psychiatric assessment, and how ongoing care works in NJ and PA.',
   intro:
-    'Starting psychiatric care can feel like a big step, so here’s the whole process, start to finish. Three steps, no surprises, and nothing to prepare beyond being willing to talk.',
+    'Starting psychiatric care can feel like a big step, so here’s the whole process, start to finish. Three steps, no surprises.',
   expectations: [
     {
       heading: 'You’ll see a provider directly',
