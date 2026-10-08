@@ -56,7 +56,8 @@ const responseSchema = z.object({
     .optional(),
 });
 
-export type FetchLike = typeof fetch;
+import type { FetchLike } from "../../lib/http.js";
+export type { FetchLike };
 
 export interface SearchConsoleOptions {
   /** `sc-domain:newpointnp.com` or `https://newpointnp.com/`. */

@@ -218,6 +218,38 @@ ops = {
     "settings": SETTINGS, "active": False, "pinData": {}, "tags": [],
 }
 
-for filename, workflow in [("social-approval.json", social), ("gbp-reply-approval.json", gbp), ("ops-alert.json", ops)]:
+# PHI zone → n8n (§1, §6): the body is { kind: "action_required", at } and nothing else.
+# The email says only that something is waiting and links to the staff console; it
+# carries no id, count or kind of work, and must not be edited to add any.
+action = {
+    "name": "Newpoint · staff action required (PHI zone notice)",
+    "nodes": [
+        webhook("action", "newpoint-action-required", "Newpoint action-required webhook"),
+        guard("action", "action_required", [
+            {"id": nid("action:c-keys"), "leftValue": "={{ Object.keys($json.body).sort().join(',') }}", "rightValue": "at,kind",
+             "operator": {"type": "string", "operation": "equals"}},
+        ]),
+        {"id": nid("action:send"), "name": "Email staff", "type": "n8n-nodes-base.emailSend", "typeVersion": 2.1,
+         "position": [480, -100],
+         "parameters": {
+             "fromEmail": "SET-BEFORE-ACTIVATING@example.invalid", "toEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+             "subject": "Newpoint: something is waiting in the staff console",
+             "emailFormat": "text",
+             "text": "Something is waiting for the team in the Newpoint staff console. Sign in to see it: SET-CONSOLE-URL-BEFORE-ACTIVATING\n\n"
+                     "This email never contains patient details. Crisis pages do not come through here: they go to the on-call phone directly.",
+             "options": {}},
+         "credentials": {"smtp": {"id": "", "name": "Newpoint approvals SMTP"}}},
+        dropped("action"),
+    ],
+    "connections": {
+        "Webhook": {"main": [[{"node": "Is a valid request?", "type": "main", "index": 0}]]},
+        "Is a valid request?": {"main": [[{"node": "Email staff", "type": "main", "index": 0}],
+                                         [{"node": "Invalid request: dropped", "type": "main", "index": 0}]]},
+    },
+    "settings": SETTINGS, "active": False, "pinData": {}, "tags": [],
+}
+
+for filename, workflow in [("social-approval.json", social), ("gbp-reply-approval.json", gbp), ("ops-alert.json", ops),
+                           ("action-required.json", action)]:
     (OUT / filename).write_text(json.dumps(workflow, indent=2) + "\n")
     print("wrote", filename)

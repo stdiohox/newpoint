@@ -128,7 +128,46 @@ social.planner ─▶ social.drafter ─▶ social.compliance ─┬─▶ socia
   so they share the Phase 3 drafting, compliance and approval.
 - GBP performance metrics (§5.2 inputs) are not fetched: §4 has no table for them.
 
-## Setup you must do (Phases 0 and 1)
+## Phase 5: PHI foundations (§4, §5.0, §5.8, §6) — built, NOT deployable yet
+
+Everything here is PHI zone: Supabase project `newpoint-phi`, Trigger.dev project
+`newpoint-phi` (`trigger.phi.config.ts`, `src/trigger/phi`), the staff console
+(`src/console`). **Nothing may be deployed or pointed at real data until the BAAs in §2
+are signed** (Supabase, Trigger.dev HIPAA add-on, Twilio, Anthropic HIPAA org). Tested
+against the embedded Postgres and fakes only.
+
+| Piece | Does |
+|---|---|
+| `supabase/phi` migration | `phi` + `ops` schemas, 15 tables, `consent_state` view, append-only consents and audit log, audit trigger on every PHI table, 12-month review cap, roles `phi_tasks` / `phi_edge` / `staff_console` (never `service_role`), RLS everywhere keyed on the console's verified `staff_role` claim. pgTAP: `supabase/phi/supabase/tests`. |
+| `messaging.send-sms` | The §5.0 contract. Checks in order: idempotency, contact and phone, **D18 adult only**, active `sms_transactional` consent, verified phone, crisis pause for sequences, quiet hours 08:00–21:00 ET (deferred, not dropped), global budget (breaker pages Koret ops once a day) and per-number limit. Claims the row before Twilio, releases it if Twilio refuses: at most once. |
+| `ops.crisis-page` | Pages the on-call clinician by SMS **and** voice call every 10 min until acknowledged; adds the second provider from 30 min. Fixed text and the console link, no patient detail. n8n is not in this path. |
+| `ops.crisis-dead-man` (every minute) | Any unacknowledged event not paged within 2 min, or whose last page is over 12 min old, is paged from the cron, and Koret ops is paged once for it. |
+| `ops.retention-sweep` (03:00 ET) | Clears message bodies past `purge_after`. **D16 open: nothing sets `purge_after`, so nothing is purged yet.** |
+| Staff console (`src/console`) | **D7 open: host-agnostic, not deployed.** A fetch-style handler: SSO JWT via JWKS with MFA (`aal2`) and `staff_role`, 15-min idle timeout, queries as `staff_console` with the user's claims (RLS decides), every record shown audited, escaped HTML, strict CSP, same-origin POSTs. Callback/ticket queue, crisis acknowledge and resume (clinician only), review-window exclusion (clinician only), age status (D18). |
+| `n8n/workflows/action-required.json` | The PHI zone's only n8n message: `{ kind: "action_required", at }` → an email with the console link. |
+
+- **Placeholders that block production.** `domain/crisis/response.ts` (D15) and
+  `domain/consent/wording.ts` (D20) are `approved: false`. The PHI project's
+  `onStartAttempt` refuses PRODUCTION while either is unapproved.
+- **D18 in force.** `minor_status` defaults to `unknown` and only staff (console) or a
+  future scheduling adapter set it, so until someone marks a contact `adult` no automated
+  text goes to them, the crisis auto-response included. The clinician page still fires.
+- **Zone rules both ways.** ESLint and `test/zone-graph.ts` stop PHI code from reaching
+  public adapters (`anthropic-public`, `google`, `geo`, `social`, `site`, `n8n/emit`,
+  `db-marketing`, `trigger/marketing`), as well as the reverse. PHI env names all carry
+  `PHI`/`TWILIO_`, so the marketing loader refuses them.
+- **Queue hygiene.** `src/trigger/phi/payloads.ts` holds every PHI payload schema (ids
+  and enums only); `test/phi/queue-hygiene.test.ts` enforces it.
+- **At most once, for real.** Twilio is called with no in-call retry and a 10 s timeout.
+  Only a 4xx releases a message claim; a timeout or 5xx keeps it (the text may have gone),
+  so a retry never sends a second copy. Pages go from the voice number, not the patient
+  Messaging Service, so a clinician's STOP can't block them; if the primary on-call can't
+  be reached at all, the secondary is paged in the same round.
+- **Acknowledging is final and attributed.** A trigger forces `staff_ack_by` /
+  `resumed_by` to the signed-in user and refuses un-acknowledging. Task credentials can't
+  acknowledge or resume at all (column grants). Acknowledging opens a `crisis_follow_up`
+  callback; clinicians see the patient's name and number, admins don't.
+
 
 ### 1. Supabase — project `newpoint-marketing`
 
@@ -228,6 +267,24 @@ Set, in the Trigger.dev dashboard only: `GBP_OAUTH_CLIENT_ID`, `GBP_OAUTH_CLIENT
 `GBP_OAUTH_REFRESH_TOKEN`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`. Leave
 `GBP_NAP_AUDIT_ENABLED` unset until D11 is confirmed. Then the two webhooks from
 [`n8n/README.md` §10 and §11](n8n/README.md).
+
+### PHI zone (Phase 5) — only after every §2 BAA is signed
+
+1. Supabase project `newpoint-phi` on a HIPAA-eligible plan with the BAA signed. Apply
+   `supabase/phi` with `npm run db:push:phi` (`PHI_ADMIN_DB_URL`). Create login users that
+   are members of `phi_tasks` and `staff_console`; never give a runtime `service_role`.
+2. Trigger.dev project `newpoint-phi` with the HIPAA add-on and BAA (D3). Env vars
+   (`src/lib/env-phi.ts`): `PHI_DATABASE_URL`, `PHI_DATABASE_CA_CERT`,
+   `SUPABASE_PHI_PROJECT_REF`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
+   `TWILIO_MESSAGING_SERVICE_SID`, `TWILIO_VOICE_FROM`, `ANTHROPIC_API_KEY_PHI`,
+   `PHI_ON_CALL_PRIMARY_PHONE`, `PHI_ON_CALL_SECONDARY_PHONE`, `PHI_OPS_PAGE_PHONE`,
+   `PHI_STAFF_CONSOLE_URL`, `PHI_N8N_ACTION_WEBHOOK_URL`, `PHI_N8N_ACTION_WEBHOOK_SECRET`,
+   optional `SMS_DAILY_BUDGET` (300), `SMS_PER_NUMBER_DAILY` (4). Project ref in
+   `TRIGGER_PROJECT_REF_PHI`.
+3. Twilio on the BAA-eligible edition; Geo Permissions US only; A2P 10DLC (Phase 6).
+4. Staff console host (D7) with a BAA; env in `src/console/env.ts`.
+5. Approve and commit the crisis script (D15) and consent wording (D20) with
+   `approved: true`, approver and date. Production will not start before that.
 
 ### 7. n8n
 

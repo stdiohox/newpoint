@@ -15,12 +15,15 @@
     "check": "npm run typecheck && npm run lint && npm test",
     "dev:marketing": "trigger dev --config trigger.marketing.config.ts --env-file .env.marketing",
     "deploy:marketing": "trigger deploy --config trigger.marketing.config.ts --env-file .env.marketing",
-    "db:push:marketing": "npx --yes supabase@2.120.0 db push --workdir supabase/marketing --db-url \"$MARKETING_ADMIN_DB_URL\""
+    "db:push:marketing": "npx --yes supabase@2.120.0 db push --workdir supabase/marketing --db-url \"$MARKETING_ADMIN_DB_URL\"",
+    "dev:phi": "trigger dev --config trigger.phi.config.ts --env-file .env.phi",
+    "db:push:phi": "npx --yes supabase@2.120.0 db push --workdir supabase/phi --db-url \"$PHI_ADMIN_DB_URL\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.132.0",
     "@trigger.dev/sdk": "4.7.3",
     "google-auth-library": "11.1.0",
+    "jose": "6.2.12",
     "pg": "8.23.1",
     "zod": "4.6.5"
   },
