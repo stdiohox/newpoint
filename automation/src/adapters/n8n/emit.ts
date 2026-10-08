@@ -10,8 +10,8 @@ import type { PostRule } from "../../domain/content-rules/newpoint-rules.js";
 import type { PublicText } from "../../lib/phi.js";
 import type { FetchLike } from "../google/search-console.js";
 
-/** The header n8n's Header Auth credential checks. */
-export const SECRET_HEADER = "x-newpoint-webhook-secret";
+import { SECRET_HEADER } from "../../lib/http.js";
+export { SECRET_HEADER };
 
 /** A draft for the owners, and the one-time URL that completes the approval token. */
 export interface SocialApprovalRequested {

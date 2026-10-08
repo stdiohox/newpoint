@@ -177,3 +177,17 @@ is ever posted without an approval.
       to Koret ops; activate.
 - [ ] Put the URL and secret in Trigger.dev as `N8N_OPS_ALERT_WEBHOOK_URL` /
       `N8N_OPS_ALERT_WEBHOOK_SECRET`.
+
+## 12. Staff action required (`workflows/action-required.json`, Phase 5, PHI zone notice)
+
+The PHI zone posts `{ kind: "action_required", at }` (minute precision) and nothing
+else. The guard drops any body with other keys. The email says that something is waiting
+and links to the staff console; it interpolates nothing from the request.
+
+- [ ] Only after the PHI zone is live: import; Header Auth credential "Newpoint
+      action-required webhook" (own secret); SMTP; set To to the practice's staff list;
+      replace `SET-CONSOLE-URL-BEFORE-ACTIVATING`; activate.
+- [ ] Put the URL and secret in the **newpoint-phi** Trigger.dev project as
+      `PHI_N8N_ACTION_WEBHOOK_URL` / `PHI_N8N_ACTION_WEBHOOK_SECRET`.
+- Never add an id, a count, a name or a kind of work to this workflow. Crisis pages do
+  not go through n8n.

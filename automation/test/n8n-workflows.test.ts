@@ -32,7 +32,7 @@ describe("n8n workflow exports", () => {
     expect(fields.find((f) => f.fieldLabel === "Decision")?.requiredField).toBe(true);
   });
 
-  it.each(["social-approval.json", "gbp-reply-approval.json", "ops-alert.json"])("%s has no Code node, no secrets, and stores no executions", (file) => {
+  it.each(["social-approval.json", "gbp-reply-approval.json", "ops-alert.json", "action-required.json"])("%s has no Code node, no secrets, and stores no executions", (file) => {
     const text = readFileSync(join(DIR, file), "utf8");
     const workflow = load(file);
     expect(workflow.nodes.filter((n) => /code|function|executeCommand/i.test(n.type))).toEqual([]);
@@ -42,7 +42,7 @@ describe("n8n workflow exports", () => {
   });
 
   it("matches what generate.py writes (no hand edits)", () => {
-    const files = ["social-approval.json", "gbp-reply-approval.json", "ops-alert.json"];
+    const files = ["social-approval.json", "gbp-reply-approval.json", "ops-alert.json", "action-required.json"];
     const out = mkdtempSync(join(tmpdir(), "newpoint-n8n-"));
     try {
       execFileSync("python3", [join(DIR, "generate.py"), out], { timeout: 30_000 });
@@ -57,5 +57,13 @@ describe("n8n workflow exports", () => {
     const complete = workflow.nodes.find((n) => n.name === "Complete the Trigger.dev token");
     expect(String(complete?.parameters["jsonBody"])).toContain("$json.data['Decision'] === 'Approve'");
     expect(workflow.nodes.some((n) => n.name === "Was a decision submitted?")).toBe(true);
+  });
+});
+
+describe("action-required.json (PHI zone notice)", () => {
+  it("interpolates nothing from the request into the email", () => {
+    const workflow = JSON.parse(readFileSync(join(DIR, "action-required.json"), "utf8")) as { nodes: { name: string; parameters: Record<string, unknown> }[] };
+    const email = workflow.nodes.find((node) => node.name === "Email staff");
+    expect(JSON.stringify(email?.parameters)).not.toContain("{{");
   });
 });

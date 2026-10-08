@@ -51,3 +51,11 @@ export function marketingTask<TId extends string, TSchema extends z.ZodType, TOu
   // just does not resolve to zod's output type through the generic.
   return schemaTask({ ...rest, run: (payload) => runSafely(() => run(payload as z.output<TSchema>)) });
 }
+
+/**
+ * The newpoint-phi project uses the same wrappers (eslint.config.mjs bans the raw SDK
+ * task constructors in src/trigger/phi too). There the stakes are higher: a Twilio
+ * error echoes the patient's number.
+ */
+export const phiTask = marketingTask;
+export const phiSchedule = marketingSchedule;

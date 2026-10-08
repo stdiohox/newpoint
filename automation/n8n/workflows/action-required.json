@@ -1,0 +1,145 @@
+{
+  "name": "Newpoint \u00b7 staff action required (PHI zone notice)",
+  "nodes": [
+    {
+      "id": "44d39878-317e-515a-ba45-8481e747ecc9",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "5dcc8a5c-fc0f-54fb-b2fc-3a9c41002126",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "newpoint-action-required",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Newpoint action-required webhook"
+        }
+      }
+    },
+    {
+      "id": "8cbe69cc-afa9-5ce2-aa53-51ae3b59b45c",
+      "name": "Is a valid request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "fe1dbefc-ae85-5e79-9bc1-e0715639a34f",
+              "leftValue": "={{ $json.body.kind }}",
+              "rightValue": "action_required",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "8348ee78-73f4-5f99-9094-f7129c737595",
+              "leftValue": "={{ Object.keys($json.body).sort().join(',') }}",
+              "rightValue": "at,kind",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f2d303fd-7519-5c5a-845a-69ecb2b20c50",
+      "name": "Email staff",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        -100
+      ],
+      "parameters": {
+        "fromEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+        "toEmail": "SET-BEFORE-ACTIVATING@example.invalid",
+        "subject": "Newpoint: something is waiting in the staff console",
+        "emailFormat": "text",
+        "text": "Something is waiting for the team in the Newpoint staff console. Sign in to see it: SET-CONSOLE-URL-BEFORE-ACTIVATING\n\nThis email never contains patient details. Crisis pages do not come through here: they go to the on-call phone directly.",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "",
+          "name": "Newpoint approvals SMTP"
+        }
+      }
+    },
+    {
+      "id": "522c6849-b4dd-518f-af84-2c154bbefb06",
+      "name": "Invalid request: dropped",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        120
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is a valid request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is a valid request?": {
+      "main": [
+        [
+          {
+            "node": "Email staff",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid request: dropped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "SET-TO-KORET-OPS-ALERT-WORKFLOW-ID",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}

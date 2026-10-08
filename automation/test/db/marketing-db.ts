@@ -1,5 +1,6 @@
 /**
- * A throwaway Postgres 17 shaped like the newpoint-marketing Supabase project.
+ * A throwaway Postgres 17 shaped like a Supabase project: newpoint-marketing, or
+ * newpoint-phi (Phase 5 onwards), from that project's migrations.
  *
  * What is approximated, and why it matters for the tests:
  * - Supabase's API roles (anon, authenticated, service_role) exist.
@@ -21,7 +22,12 @@ import { join } from "node:path";
 import { loadPgTapSql } from "./pgtap-source.js";
 
 const PROJECT = join(import.meta.dirname, "..", "..");
-export const MARKETING_SUPABASE_DIR = join(PROJECT, "supabase", "marketing", "supabase");
+export type Project = "marketing" | "phi";
+export const SUPABASE_DIRS: Readonly<Record<Project, string>> = {
+  marketing: join(PROJECT, "supabase", "marketing", "supabase"),
+  phi: join(PROJECT, "supabase", "phi", "supabase"),
+};
+export const MARKETING_SUPABASE_DIR = SUPABASE_DIRS.marketing;
 
 const SUPABASE_BASELINE = `
   create role anon nologin noinherit;
@@ -90,6 +96,10 @@ async function startServer(): Promise<{ server: EmbeddedPostgres; dataDir: strin
 }
 
 export async function startMarketingDb(): Promise<MarketingDb> {
+  return startProjectDb("marketing");
+}
+
+export async function startProjectDb(project: Project): Promise<MarketingDb> {
   const { server, dataDir } = await startServer();
   await server.createDatabase("marketing");
 
@@ -102,7 +112,7 @@ export async function startMarketingDb(): Promise<MarketingDb> {
     await client.query(await loadPgTapSql(PROJECT));
     await client.query(`set search_path = "$user", public, extensions`);
 
-    const migrationsDir = join(MARKETING_SUPABASE_DIR, "migrations");
+    const migrationsDir = join(SUPABASE_DIRS[project], "migrations");
     for (const file of await sqlFiles(migrationsDir)) {
       await client.query(await readFile(join(migrationsDir, file), "utf8"));
     }
@@ -123,8 +133,8 @@ export async function startMarketingDb(): Promise<MarketingDb> {
   };
 }
 
-export async function listTestFiles(): Promise<string[]> {
-  return sqlFiles(join(MARKETING_SUPABASE_DIR, "tests"));
+export async function listTestFiles(project: Project = "marketing"): Promise<string[]> {
+  return sqlFiles(join(SUPABASE_DIRS[project], "tests"));
 }
 
 export interface TapResult {
@@ -135,8 +145,8 @@ export interface TapResult {
 }
 
 /** Runs one pgTAP file and parses its TAP stream. */
-export async function runTapFile(client: pg.Client, file: string): Promise<TapResult> {
-  const sql = await readFile(join(MARKETING_SUPABASE_DIR, "tests", file), "utf8");
+export async function runTapFile(client: pg.Client, file: string, project: Project = "marketing"): Promise<TapResult> {
+  const sql = await readFile(join(SUPABASE_DIRS[project], "tests", file), "utf8");
   let results: pg.QueryResult | pg.QueryResult[];
   try {
     // Multi-statement simple query: pg returns one result per statement.

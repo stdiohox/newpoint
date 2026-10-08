@@ -45,6 +45,10 @@ describe("zone rule: public-zone tasks cannot import PHI-zone modules", () => {
     'import * as voice from "../../../adapters/voice";\nexport { voice };\n',
     'import * as phiTasks from "../../phi";\nexport { phiTasks };\n',
     'export * from "../../../adapters/scheduling/manual-queue.js";\n',
+    'import { consoleDb } from "../../../console/db.js";\nexport { consoleDb };\n',
+    'import { CRISIS_SCRIPT } from "../../../domain/crisis/response.js";\nexport { CRISIS_SCRIPT };\n',
+    'import { renderTemplate } from "../../../domain/messaging/templates.js";\nexport { renderTemplate };\n',
+    'import { createPhiNotifier } from "../../../adapters/n8n/phi-notify.js";\nexport { createPhiNotifier };\n',
   ])("rejects %s", async (code) => {
     const messages = await restrictedImportMessages(code, MARKETING_TASK);
     expect(messages).toHaveLength(1);
@@ -88,5 +92,28 @@ describe("zone rule: public-zone tasks cannot import PHI-zone modules", () => {
   it("does not apply outside src/trigger/marketing", async () => {
     const code = 'import { send } from "../adapters/messaging/twilio.js";\nexport { send };\n';
     expect(await restrictedImportMessages(code, "src/domain/example.ts")).toEqual([]);
+  });
+});
+
+describe("zone rule: PHI-zone code cannot import public-zone modules", () => {
+  const PHI_TASK = "src/trigger/phi/messaging/send-sms.ts";
+  it.each([
+    'import { c } from "../../../adapters/llm/anthropic-public.js";\nexport { c };\n',
+    'import { e } from "../../../adapters/n8n/emit.js";\nexport { e };\n',
+    'import { d } from "../../../lib/db-marketing.js";\nexport { d };\n',
+    'import { g } from "../../../adapters/google/search-console.js";\nexport { g };\n',
+    'import { r } from "../../marketing/runtime.js";\nexport { r };\n',
+    'import { task } from "@trigger.dev/sdk";\nexport const t = task;\n',
+  ])("rejects %s", async (code) => {
+    expect(await restrictedImportMessages(code, PHI_TASK)).toHaveLength(1);
+  });
+
+  it("allows the PHI zone's own modules", async () => {
+    const code = 'import { createTwilio } from "../../../adapters/messaging/twilio.js";\nimport { phiTask } from "../../../lib/task.js";\nexport { createTwilio, phiTask };\n';
+    expect(await restrictedImportMessages(code, PHI_TASK)).toEqual([]);
+  });
+
+  it("rejects dynamic loading in the PHI zone", async () => {
+    expect(await zoneMessages('export const load = () => import("x");\n', "src/console/server.ts", "no-restricted-syntax")).toHaveLength(1);
   });
 });
