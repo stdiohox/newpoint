@@ -7,7 +7,10 @@
  */
 import { retry } from "@trigger.dev/sdk";
 import type pg from "pg";
+import { createClaudeWebSearchEngine } from "../../adapters/geo/claude-web-search.js";
+import type { GeoEngine } from "../../adapters/geo/engine.js";
 import { createSearchConsole, serviceAccountToken, type SearchConsole } from "../../adapters/google/search-console.js";
+import { createSiteSchemaReader, type SiteSchemaReader } from "../../adapters/site/schema-coverage.js";
 import { createPublicClaude, type PublicClaude } from "../../adapters/llm/anthropic-public.js";
 import { createMarketingPool } from "../../lib/db-marketing.js";
 import { loadMarketingEnv, type MarketingEnv } from "../../lib/env.js";
@@ -18,6 +21,9 @@ export interface MarketingRuntime {
   readonly db: pg.Pool;
   readonly searchConsole: SearchConsole;
   readonly claude: PublicClaude;
+  /** D9: Claude only in v1. Another engine is one more entry here. */
+  readonly engines: readonly GeoEngine[];
+  readonly site: SiteSchemaReader;
   readonly logger: Logger;
 }
 
@@ -58,6 +64,8 @@ export function marketingRuntime(): MarketingRuntime {
       accessToken: serviceAccountToken(env.GSC_SERVICE_ACCOUNT_JSON),
     }),
     claude: createPublicClaude({ apiKey: env.ANTHROPIC_API_KEY_PUBLIC, fetch: vendorFetch }),
+    engines: [createClaudeWebSearchEngine({ apiKey: env.ANTHROPIC_API_KEY_PUBLIC, fetch: vendorFetch })],
+    site: createSiteSchemaReader({ siteUrl: env.GEO_SITE_URL, fetch: vendorFetch }),
     logger: createLogger(),
   });
   return runtime;

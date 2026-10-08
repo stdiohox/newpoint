@@ -1,7 +1,7 @@
 # Newpoint automation layer
 
 Design: [`docs/automation-architecture.md`](../docs/automation-architecture.md).
-This package is **Phases 0 and 1, public zone only** (§7). There is no PHI code here,
+This package is **Phases 0, 1 and 2, public zone only** (§7). There is no PHI code here,
 and `trigger.phi.config.ts` is an empty stub until Phase 5.
 
 npm only (`package-lock.json`). Node 24+.
@@ -31,6 +31,11 @@ npm run test:db      # pgTAP suite only
 | `src/adapters/google/search-console.ts` | Search Analytics API (D8: the only keyword data source). |
 | `src/adapters/llm/anthropic-public.ts` | The public Anthropic org. §5 routing; zod-validated structured output; refusals flagged, never defaulted. |
 | `src/domain/seo/` | Seed matrix, clustering checks, backlog rules, snapshot matching. Pure. |
+| `src/trigger/marketing/geo/` | `geo.probe` (Tuesdays 07:00 ET) and `geo.recommendations` (the 4th, 08:00 ET), §5.6. |
+| `src/adapters/geo/` | The answer-engine interface and its one v1 engine: Claude with web search, public org (D9). |
+| `src/adapters/site/schema-coverage.ts` | Reads the public site's sitemap and JSON-LD for `geo.recommendations`. |
+| `src/domain/geo/` | Prompts from clusters, answer analysis, the schema audit against the brief, recommendation screening. Pure. |
+| `src/domain/content-rules/` | The brief's titles, terminology, brand, drug and outcome rules as code. |
 
 ## Phase 1: what the SEO tasks write
 
@@ -43,6 +48,23 @@ npm run test:db      # pgTAP suite only
   answer, or the model left it out). A person assigns it; nothing is guessed (§5).
 - `volume` is null: Search Console has impressions, not search volume (D8).
 - Search Console data settles about three days late, so both tasks stop three days back.
+
+## Phase 2: what the GEO tasks write
+
+| Task | Writes | Read by |
+|---|---|---|
+| `geo.probe` | New `geo_prompts` from the keyword clusters (one question per cluster per state, plus town questions); one `geo_runs` row per prompt per engine per week | `geo.recommendations`; n8n reports (read-only) |
+| `geo.recommendations` | `content_backlog`: `schema` fixes and gaps against the brief, `citation` targets (sites cited instead of Newpoint), `faq` entries for questions where Newpoint is missing | A person editing the site repo |
+
+- Prompts are seeded once and then belong to people: set `active = false` to stop probing one.
+  Clusters that touch a content rule never become prompts.
+- A refused or cut-off answer is not stored (it measured nothing). `competitors_mentioned`
+  is NULL when extraction failed, never an empty "none".
+- Cost per weekly run: up to 30 probes, each one Sonnet 5.5 answer with up to 5 web
+  searches plus one short extraction call. Web search is billed per search.
+- Schema advice is written in source and never recommends an address, `hasCredential`,
+  an NPI identifier, `Physician` or `areaServed` on a Person. FAQ suggestions that touch
+  a content rule are dropped before they reach the backlog.
 
 The Supabase CLI always reads `<workdir>/supabase/migrations`, which is why the
 marketing project lives at `supabase/marketing/supabase/` and not one level up.

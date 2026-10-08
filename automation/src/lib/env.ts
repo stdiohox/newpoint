@@ -46,6 +46,14 @@ export const marketingEnvSchema = z.object({
   SUPABASE_MARKETING_PROJECT_REF: z.string().regex(/^[a-z]{20}$/, "must be a 20-letter Supabase project ref"),
   /** Key for the STANDARD (public) Anthropic org. Never the HIPAA org's key (§2). */
   ANTHROPIC_API_KEY_PUBLIC: z.string().startsWith("sk-ant-"),
+  /**
+   * The public site geo.recommendations reads for schema.org coverage (§5.6).
+   * Pinned to the practice's own domain: the task fetches whatever this names.
+   */
+  GEO_SITE_URL: z
+    .string()
+    .regex(/^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\/$/, "must be https://newpointnp.com/ or a subdomain, ending in /")
+    .default("https://newpointnp.com/"),
   /** Search Console property: `sc-domain:newpointnp.com` or `https://newpointnp.com/`. */
   GSC_SITE_URL: z.string().regex(/^(sc-domain:[a-z0-9.-]+|https:\/\/[^\s]+\/)$/),
   /** Service-account key JSON; the account is added as a restricted user on the property. */

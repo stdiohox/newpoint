@@ -52,7 +52,9 @@ export type Vendor =
   | "linkedin"
   | "n8n"
   | "twilio"
-  | "vapi";
+  | "vapi"
+  /** The practice's own public website, read for schema.org coverage (§5.6). */
+  | "newpoint_site";
 
 export class VendorHttpError extends AppError {
   readonly failureClass: FailureClass;
