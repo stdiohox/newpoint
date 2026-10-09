@@ -5,7 +5,15 @@
  */
 import type { PhiDb } from "../../src/lib/db-phi.js";
 
-export type Enqueue = (taskId: "messaging.inbound-sms" | "messaging.send-sms" | "referrals.lead-follow-up", payload: Record<string, unknown>, idempotencyKey: string) => Promise<void>;
+export type TaskId =
+  | "messaging.inbound-sms"
+  | "messaging.send-sms"
+  | "referrals.lead-follow-up"
+  | "booking.request"
+  | "booking.process-call-report"
+  | "ops.crisis-page";
+
+export type Enqueue = (taskId: TaskId, payload: Record<string, unknown>, idempotencyKey: string) => Promise<void>;
 
 export interface EdgeDeps {
   readonly db: PhiDb;

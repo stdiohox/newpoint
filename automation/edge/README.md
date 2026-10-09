@@ -1,7 +1,7 @@
 # Edge handlers (PHI zone)
 
-`twilio-inbound/` and `intake/` (Phase 6), and in later phases `vapi-tools/` and
-`vapi-events/`, are written as **host-agnostic fetch handlers**:
+`twilio-inbound/` and `intake/` (Phase 6) and `vapi-tools/` and `vapi-events/` (Phase 8)
+are written as **host-agnostic fetch handlers**:
 `(Request) => Promise<Response>`, with every dependency injected.
 
 §3 names Supabase Edge Functions as the host, but **D5 is open**: Supabase has not yet
