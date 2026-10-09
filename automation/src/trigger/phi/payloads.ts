@@ -26,4 +26,5 @@ export const PHI_PAYLOADS = {
   "booking.request": z.object({ bookingRequestId: z.uuid() }).strict(),
   "referrals.no-show": z.object({ followUpId: z.uuid() }).strict(),
   "referrals.post-visit-logistics": z.object({ followUpId: z.uuid() }).strict(),
+  "booking.process-call-report": z.object({ conversationId: z.uuid() }).strict(),
 } as const;

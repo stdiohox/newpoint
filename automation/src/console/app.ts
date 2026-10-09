@@ -211,7 +211,7 @@ async function act(db: ConsoleDb, session: StaffSession, action: Action, id: str
 const rows = (result: { rowCount: number | null }): boolean => (result.rowCount ?? 0) > 0;
 
 interface CrisisRow {
-  id: string; contact_id: string; detected_at: Date; page_count: number; staff_ack_at: Date | null; channel: string;
+  id: string; contact_id: string | null; detected_at: Date; page_count: number; staff_ack_at: Date | null; channel: string;
   first_name: string | null; last_name: string | null; phone_e164: string | null;
 }
 
@@ -230,7 +230,7 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
     const crises = (await q.query<CrisisRow>(
       `select e.id, e.contact_id, e.detected_at, e.page_count, e.staff_ack_at, e.channel::text as channel,
               c.first_name, c.last_name, c.phone_e164
-         from phi.crisis_events e join phi.contacts c on c.id = e.contact_id
+         from phi.crisis_events e left join phi.contacts c on c.id = e.contact_id
         where e.staff_ack_at is null or e.sequences_resumed_at is null order by e.detected_at limit 100`)).rows;
     const tickets = (await q.query<TicketRow>(
       `select t.id, t.kind::text as kind, t.created_at, t.contact_id, c.first_name, c.phone_e164, c.minor_status::text as minor_status
@@ -249,7 +249,7 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
     await auditReads(q, "tickets", tickets.map((r) => r.id));
     await auditReads(q, "review_requests", reviews.map((r) => r.id));
     await auditReads(q, "contacts", [
-      ...new Set([...(isClinician ? crises.map((r) => r.contact_id) : []), ...tickets.flatMap((r) => (r.contact_id === null ? [] : [r.contact_id])), ...reviews.map((r) => r.contact_id), ...appointments.map((r) => r.contact_id)]),
+      ...new Set([...(isClinician ? crises.flatMap((r) => (r.contact_id === null ? [] : [r.contact_id])) : []), ...tickets.flatMap((r) => (r.contact_id === null ? [] : [r.contact_id])), ...reviews.map((r) => r.contact_id), ...appointments.map((r) => r.contact_id)]),
     ]);
 
     const button = (action: string, label: string, extra?: Html) =>
@@ -263,7 +263,7 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
     return html`<h1>Staff console</h1><p>Signed in as ${session.sub} (${session.role === "staff_clinician" ? "clinician" : "admin"}).</p>
 <h2>Crisis events</h2>
 <p>Acknowledging stops the pages and opens a crisis follow-up callback in the queue below.</p>
-<table><tr><th>Detected</th><th>Patient</th><th>Phone</th><th>Via</th><th>Pages</th><th>Status</th><th></th></tr>${crises.map((c) => html`<tr><td>${et(c.detected_at)}</td><td>${isClinician ? [c.first_name, c.last_name].filter(Boolean).join(" ") || "(no name)" : "clinician only"}</td><td>${isClinician ? c.phone_e164 : null}</td><td>${c.channel}</td><td>${c.page_count}</td><td>${c.staff_ack_at === null ? "NOT ACKNOWLEDGED" : "acknowledged, sequences paused"}</td><td>${
+<table><tr><th>Detected</th><th>Patient</th><th>Phone</th><th>Via</th><th>Pages</th><th>Status</th><th></th></tr>${crises.map((c) => html`<tr><td>${et(c.detected_at)}</td><td>${isClinician ? (c.contact_id === null ? "caller withheld their number" : [c.first_name, c.last_name].filter(Boolean).join(" ") || "(no name)") : "clinician only"}</td><td>${isClinician ? c.phone_e164 : null}</td><td>${c.channel}</td><td>${c.page_count}</td><td>${c.staff_ack_at === null ? "NOT ACKNOWLEDGED" : "acknowledged, sequences paused"}</td><td>${
       !isClinician ? "clinician only" : c.staff_ack_at === null ? button(`/crisis/${c.id}/ack`, "Acknowledge") : button(`/crisis/${c.id}/resume`, "Resume sequences")
     }</td></tr>`)}</table>
 <h2>Callbacks and tickets</h2>

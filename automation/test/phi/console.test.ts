@@ -161,6 +161,16 @@ describe("actions", () => {
     expect(audit.rows.at(-1)).toEqual({ actor: "clinician-1" });
   });
 
+  it("a voice crisis from a withheld number is shown, acknowledged and followed up", async () => {
+    const { rows } = await client().query<{ id: string }>(
+      `insert into phi.crisis_events (contact_id, channel, detected_by, call_ref) values (null, 'voice', 'voice', 'call_withheld') returning id`,
+    );
+    const page = await (await request("/", { token: await token() })).text();
+    expect(page).toContain("caller withheld their number");
+    expect((await request(`/crisis/${rows[0]?.id ?? ""}/ack`, { method: "POST", token: await token() })).status).toBe(303);
+    expect((await client().query(`select kind::text, contact_id from phi.tickets`)).rows).toEqual([{ kind: "crisis_follow_up", contact_id: null }]);
+  });
+
   it("an acknowledgment is final and always names the signed-in clinician", async () => {
     const id = await crisisEvent();
     await client().query("begin");

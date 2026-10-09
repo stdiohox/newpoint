@@ -222,6 +222,29 @@ in `src/adapters/scheduling`). No EHR adapter until D1 picks a system with an AP
   its care.headway.co link would show a mental-health platform and the provider's name in a
   lock-screen preview. Turn it on only after the owners decide how a link may be sent.
 
+## Phase 8: voice receptionist (§5.1, §5.8) — built, NOT deployable yet
+
+| Piece | Does |
+|---|---|
+| `adapters/voice/vapi.ts` | The assistant as typed config: `hipaaEnabled`, no recording, summary off, first sentence says it is an automated assistant and the call is not recorded (D13). Tools: `check_availability`, `request_booking`, `take_message`, `crisis_transfer`, plus a `transferCall` to the D15 destination. English only (D21). Not deployed from here. |
+| `edge/vapi-tools` | Shared secret (constant time) → call id verified with Vapi and our assistant before any write → enum-only arguments (free text refused). Writes requests only: a booking request (one per call → `booking.request`), a callback message, a voice crisis event (one per call → clinician page). `crisis_transfer` always answers with 988/911 and the transfer, even if the database is down. |
+| `edge/vapi-events` | End-of-call report: keeps the structured outcome (an enum and a flag) only; no transcript, summary or recording. Unreadable → "call them back". |
+| `booking.process-call-report` | Queues the call's booking request, opens callbacks for messages and for anything not handled, re-queues an unacknowledged crisis page, closes the call. `ops.reconcile` sweeps calls left open 30 min. |
+
+- **D4 open:** model, transcriber and voice providers are config, to be confirmed in writing
+  with Vapi as inside its BAA. Whether live transcripts are available under `hipaaEnabled`
+  is unknown, so the voice model is the only crisis detector on a call: an accepted risk to
+  record under D15.
+- **D15 open:** `PHI_VAPI_CRISIS_TRANSFER_NUMBER` is the clinicians' choice; nothing defaults it.
+  Everything the caller hears says "988", so it must be a 10-digit line that reaches 988.
+- **Crisis on a call, every path pages a clinician:** the prompt makes `crisis_transfer` (the
+  page) run first, every time, transfer or not, and allows "transferring you" only with
+  `transferCall`; a withheld number still raises a (contactless) event; a Vapi outage still
+  answers with 988 / 911; and if Vapi's analysis says "crisis" but no event was raised, the
+  call report raises it.
+- Vapi field names follow its API as of this writing; contract tests against the Vapi
+  sandbox are a go-live step (§7).
+
 ## Setup you must do (Phases 0 and 1)
 
 ### 1. Supabase — project `newpoint-marketing`
