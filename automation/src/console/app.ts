@@ -63,6 +63,8 @@ const ROUTES: readonly { pattern: RegExp; action: Action }[] = [
   { pattern: new RegExp(`^/tickets/${UUID}/appointment$`), action: "record_appointment" },
   { pattern: new RegExp(`^/appointments/${UUID}/outcome$`), action: "appointment_outcome" },
   { pattern: new RegExp(`^/appointments/${UUID}/logistics$`), action: "appointment_logistics" },
+  { pattern: new RegExp(`^/contacts/${UUID}/review-consent$`), action: "review_consent" },
+  { pattern: new RegExp(`^/contacts/${UUID}/review-consent/withdraw$`), action: "review_consent_withdraw" },
 ];
 type Action =
   | "crisis_ack"
@@ -72,7 +74,9 @@ type Action =
   | "contact_age"
   | "record_appointment"
   | "appointment_outcome"
-  | "appointment_logistics";
+  | "appointment_logistics"
+  | "review_consent"
+  | "review_consent_withdraw";
 
 /** Forms here are one field at most. */
 const MAX_BODY_BYTES = 2_048;
@@ -204,9 +208,33 @@ async function act(db: ConsoleDb, session: StaffSession, action: Action, id: str
           [contactId, id]);
         return true;
       }
+      case "review_consent": {
+        // §5.4 needs an active review_requests consent; staff record the patient's own yes, as
+        // themselves, now (never backdated), with how it was given and the wording version.
+        // No incentive is ever offered (§5.4).
+        const captured = form.get("captured");
+        if (captured !== "in_person" && captured !== "phone") return "bad_input";
+        return rows(await q.query(
+          `insert into phi.consents (contact_id, kind, granted_at, source, evidence)
+           values ($1, 'review_requests', now(), 'staff',
+                   jsonb_build_object('recorded_by', phi.staff_user(), 'captured', $2::text, 'wording', $3::text,
+                                      'wording_version', $4::int, 'recorded_at', now()))`,
+          [id, captured, REVIEW_CONSENT_WORDING, REVIEW_CONSENT_VERSION]));
+      }
+      case "review_consent_withdraw":
+        return rows(await q.query(
+          `insert into phi.consents (contact_id, kind, revoked_at, source, evidence)
+           values ($1, 'review_requests', now(), 'staff',
+                   jsonb_build_object('recorded_by', phi.staff_user(), 'captured', 'patient_withdrew', 'recorded_at', now()))`,
+          [id]));
     }
   });
 }
+
+/** What staff confirm the patient agreed to. Placeholder under D14/D20 until counsel approves. */
+export const REVIEW_CONSENT_VERSION = 0;
+export const REVIEW_CONSENT_WORDING =
+  "The patient agreed to receive one text from Newpoint with a link to leave a public review. No incentive was offered.";
 
 const rows = (result: { rowCount: number | null }): boolean => (result.rowCount ?? 0) > 0;
 
@@ -275,7 +303,7 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
       a.status === "scheduled"
         ? html`${button(`/appointments/${a.id}/outcome`, "Completed", html`<input type="hidden" name="status" value="completed">`)}${button(`/appointments/${a.id}/outcome`, "No-show", html`<input type="hidden" name="status" value="no_show">`)}${button(`/appointments/${a.id}/outcome`, "Cancelled", html`<input type="hidden" name="status" value="cancelled">`)}`
         : a.status === "completed"
-          ? button(`/appointments/${a.id}/logistics`, "Send forms / video-link help text")
+          ? html`${button(`/appointments/${a.id}/logistics`, "Send forms / video-link help text")}${button(`/contacts/${a.contact_id}/review-consent`, "Patient agreed to a review request", html`<select name="captured" required><option value="in_person">in person</option><option value="phone">by phone</option></select>`)}${button(`/contacts/${a.contact_id}/review-consent/withdraw`, "Patient withdrew review consent")}`
           : null
     }</td></tr>`)}</table>
 <h2>Review requests waiting in the clinician window</h2>

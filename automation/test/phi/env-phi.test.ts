@@ -119,3 +119,24 @@ describe("D1 adapters", () => {
     expect(loadPhiEnv({ ...valid, PHI_SCHEDULING_ADAPTERS: "manual-queue,headway-handoff" }).PHI_SCHEDULING_ADAPTERS).toEqual(["manual-queue", "headway-handoff"]);
   });
 });
+
+describe("Phase 9 env", () => {
+  const MKT = "mmmmmmmmmmmmmmmmmmmm";
+  const writer = {
+    PHI_METRICS_WRITER_DATABASE_URL: `postgresql://metrics_writer_rt.${MKT}:secret@aws-0-us-east-1.pooler.supabase.com:5432/postgres`,
+    PHI_METRICS_WRITER_CA_CERT: valid.PHI_DATABASE_CA_CERT,
+    PHI_METRICS_MARKETING_PROJECT_REF: MKT,
+  };
+  it("the metrics writer is all-or-none and must point at newpoint-marketing, never the PHI project", () => {
+    expect(loadPhiEnv({ ...valid, ...writer }).PHI_METRICS_MARKETING_PROJECT_REF).toBe(MKT);
+    expect(configError(() => loadPhiEnv({ ...valid, PHI_METRICS_WRITER_DATABASE_URL: writer.PHI_METRICS_WRITER_DATABASE_URL })).code).toBe("metrics_writer_partial");
+    expect(configError(() => loadPhiEnv({ ...valid, ...writer, PHI_METRICS_MARKETING_PROJECT_REF: REF })).code).toBe("metrics_writer_host_mismatch");
+    expect(
+      configError(() => loadPhiEnv({ ...valid, ...writer, PHI_METRICS_WRITER_DATABASE_URL: writer.PHI_METRICS_WRITER_DATABASE_URL.replace("metrics_writer_rt", "postgres") })).code,
+    ).toBe("metrics_writer_role");
+  });
+  it("only a Google review link is accepted as the review URL", () => {
+    expect(loadPhiEnv({ ...valid, PHI_GOOGLE_REVIEW_URL: "https://g.page/r/CabcdefGHIJ123/review" }).PHI_GOOGLE_REVIEW_URL).toBeDefined();
+    expect(configError(() => loadPhiEnv({ ...valid, PHI_GOOGLE_REVIEW_URL: "https://evil.example/review" })).variables).toEqual(["PHI_GOOGLE_REVIEW_URL"]);
+  });
+});
