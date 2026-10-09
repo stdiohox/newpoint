@@ -9,6 +9,7 @@ import { IDLE_COOKIE, idleCookieValue, type AuthConfig } from "../../src/console
 import { consoleDb } from "../../src/console/db.js";
 import { escapeHtml, html } from "../../src/console/html.js";
 import { fromLocal } from "../../src/domain/scheduling/time.js";
+import { memoryReferralStore } from "../../src/adapters/storage/referral-store.js";
 import { startProjectDb, type MarketingDb } from "../db/marketing-db.js";
 import { seedContact } from "./fixtures.js";
 
@@ -38,7 +39,7 @@ afterAll(async () => {
 });
 beforeEach(async () => {
   await client().query("reset role");
-  await client().query(`truncate phi.audit_log, phi.crisis_events, phi.tickets, phi.review_requests, phi.review_exclusions, phi.appointments, phi.consents, phi.follow_ups, phi.booking_requests cascade; truncate phi.contacts cascade`);
+  await client().query(`truncate phi.audit_log, phi.crisis_events, phi.tickets, phi.review_requests, phi.review_exclusions, phi.appointments, phi.consents, phi.follow_ups, phi.booking_requests, phi.referrals cascade; truncate phi.contacts cascade`);
 });
 
 interface TokenSpec { role?: string | null; aal?: string; sub?: string; issuedMinutesAgo?: number; issuer?: string; expiresInMinutes?: number }
@@ -311,6 +312,88 @@ describe("actions", () => {
       ),
     ).rejects.toThrow(/row-level security/);
     await client().query("rollback");
+  });
+
+  it("referral queue: extracted values shown escaped; confirm makes a contact with NO consent and a callback; reject", async () => {
+    const extracted = {
+      patient: { first_name: "<script>alert(1)</script>", last_name: "Example", phone: "(609) 555-0181", email: null, state: "NJ" },
+      referrer: { organization: null, name: null, phone: null },
+      requested_service: "assessment",
+      urgency: "routine",
+      confidence: 0.8,
+    };
+    const r1 = await client().query<{ id: string }>(
+      `insert into phi.referrals (referrer_org, referrer_name, status, extracted, urgency) values ('Org <b>', 'Ref', 'needs_review', $1, 'routine') returning id`,
+      [JSON.stringify(extracted)],
+    );
+    const r2 = await client().query<{ id: string }>(`insert into phi.referrals (referrer_org, status) values ('Org2', 'needs_review') returning id`);
+    const t = await token();
+    const pageHtml = await (await request("/", { token: t })).text();
+    expect(pageHtml).not.toContain("<script>alert(1)</script>");
+    expect(pageHtml).toContain("&lt;script&gt;");
+    expect(pageHtml).toContain("Org &lt;b&gt;");
+    expect(pageHtml).toContain("UNREAD: treat as urgent");
+    const body = new URLSearchParams({ first_name: "Testpatient", last_name: "Example", phone: "(609) 555-0181", email: "", state: "NJ" }).toString();
+    // The intake's review ticket closes with the decision.
+    await client().query(`insert into phi.tickets (kind, source_kind, source_id) values ('clinician_review', 'referral', $1)`, [r1.rows[0]?.id]);
+    expect((await request(`/referrals/${r1.rows[0]?.id ?? ""}/confirm`, { method: "POST", token: t, body })).status).toBe(303);
+    expect((await client().query(`select status::text from phi.tickets where kind = 'clinician_review'`)).rows).toEqual([{ status: "done" }]);
+    const contact = await client().query<{ id: string; phone_e164: string }>(`select id, phone_e164 from phi.contacts`);
+    expect(contact.rows[0]?.phone_e164).toBe("+16095550181");
+    expect((await client().query(`select count(*)::int as n from phi.consents`)).rows).toEqual([{ n: 0 }]);
+    expect((await client().query(`select status::text, reviewed_by from phi.referrals where id = $1`, [r1.rows[0]?.id])).rows).toEqual([
+      { status: "confirmed", reviewed_by: "clinician-1" },
+    ]);
+    expect((await client().query(`select kind::text, source_kind from phi.tickets where status = 'open'`)).rows).toEqual([{ kind: "callback", source_kind: "referral" }]);
+    expect((await request(`/referrals/${r2.rows[0]?.id ?? ""}/reject`, { method: "POST", token: t })).status).toBe(303);
+    expect((await request(`/referrals/${r2.rows[0]?.id ?? ""}/reject`, { method: "POST", token: t })).status).toBe(403);
+  });
+
+  it("an urgent or unread referral is a clinician's: an admin cannot confirm or reject it, nor see the patient's name", async () => {
+    const extracted = {
+      patient: { first_name: "Urgentname", last_name: null, phone: null, email: null, state: "NJ" },
+      referrer: { organization: null, name: null, phone: null },
+      requested_service: "assessment",
+      urgency: "high_risk",
+      confidence: 0.9,
+    };
+    const r = await client().query<{ id: string }>(
+      `insert into phi.referrals (referrer_org, status, extracted, urgency) values ('Org', 'needs_review', $1, 'high_risk') returning id`,
+      [JSON.stringify(extracted)],
+    );
+    const admin = await token({ role: "staff_admin", sub: "admin-1" });
+    expect(await (await request("/", { token: admin })).text()).not.toContain("Urgentname");
+    expect((await request(`/referrals/${r.rows[0]?.id ?? ""}/reject`, { method: "POST", token: admin })).status).toBe(403);
+    const body = new URLSearchParams({ first_name: "Urgentname", last_name: "", phone: "", email: "u@example.test", state: "NJ" }).toString();
+    expect((await request(`/referrals/${r.rows[0]?.id ?? ""}/confirm`, { method: "POST", token: admin, body })).status).toBe(403);
+    expect((await request(`/referrals/${r.rows[0]?.id ?? ""}/confirm`, { method: "POST", token: await token(), body })).status).toBe(303);
+    expect((await client().query(`select kind::text, source_kind from phi.tickets where status = 'open'`)).rows).toEqual([
+      { kind: "clinician_review", source_kind: "referral_confirmed" },
+    ]);
+  });
+
+  it("a referral is never silently linked to a number already on file", async () => {
+    await seedContact(client(), { phone: "+16095550182" });
+    const r = await client().query<{ id: string }>(`insert into phi.referrals (referrer_org, status, urgency) values ('Org', 'needs_review', 'routine') returning id`);
+    const body = new URLSearchParams({ first_name: "Other", last_name: "", phone: "609-555-0182", email: "", state: "NJ" }).toString();
+    expect((await request(`/referrals/${r.rows[0]?.id ?? ""}/confirm`, { method: "POST", token: await token(), body })).status).toBe(409);
+    expect((await client().query(`select status::text from phi.referrals`)).rows).toEqual([{ status: "needs_review" }]);
+  });
+
+  it("the referral document downloads as an audited attachment, only with a store", async () => {
+    const store = memoryReferralStore();
+    const { rows } = await client().query<{ id: string }>(`insert into phi.referrals (referrer_org, status) values ('Org', 'needs_review') returning id`);
+    const id = rows[0]?.id ?? "";
+    await client().query(`update phi.referrals set document_path = $2 where id = $1`, [id, `referrals/${id}.pdf`]);
+    await store.put(`referrals/${id}.pdf`, new TextEncoder().encode("%PDF-1.7"), "application/pdf");
+    const withStore = createConsole({ auth, db: consoleDb(() => Promise.resolve(client())), origin: ORIGIN, now: () => NOW, store });
+    const t = await token();
+    const response = await withStore(new Request(`${ORIGIN}/referrals/${id}/document`, { headers: { authorization: `Bearer ${t}` } }));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-disposition")).toBe('attachment; filename="referral.pdf"');
+    expect(new TextDecoder().decode(await response.arrayBuffer())).toBe("%PDF-1.7");
+    expect((await client().query(`select count(*)::int as n from phi.audit_log where action = 'read' and entity = 'referrals' and entity_id = $1`, [id])).rows).toEqual([{ n: 1 }]);
+    expect((await request(`/referrals/${id}/document`, { token: t })).status).toBe(404);
   });
 
   it("404s unknown paths and 405s other methods", async () => {

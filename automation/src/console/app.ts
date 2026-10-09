@@ -11,15 +11,20 @@
  */
 import { authenticate, IDLE_COOKIE, TOKEN_COOKIE, type AuthConfig, type StaffSession } from "./auth.js";
 import { auditReads, type ConsoleDb } from "./db.js";
+import type { Queryable } from "../lib/db-phi.js";
 import { html, type Html } from "./html.js";
 import { PROVIDERS, provider } from "../domain/scheduling/providers.js";
 import { fromLocal } from "../domain/scheduling/time.js";
+import type { Extraction } from "../domain/referrals/extraction.js";
+import type { ReferralStore } from "../adapters/storage/referral-store.js";
 
 export interface ConsoleDeps {
   readonly auth: AuthConfig;
   readonly db: ConsoleDb;
   readonly origin: string;
   readonly now: () => number;
+  /** The private referral bucket (Phase 10); null hides the document link. */
+  readonly store?: ReferralStore | null;
 }
 
 const SECURITY_HEADERS = {
@@ -65,6 +70,8 @@ const ROUTES: readonly { pattern: RegExp; action: Action }[] = [
   { pattern: new RegExp(`^/appointments/${UUID}/logistics$`), action: "appointment_logistics" },
   { pattern: new RegExp(`^/contacts/${UUID}/review-consent$`), action: "review_consent" },
   { pattern: new RegExp(`^/contacts/${UUID}/review-consent/withdraw$`), action: "review_consent_withdraw" },
+  { pattern: new RegExp(`^/referrals/${UUID}/confirm$`), action: "referral_confirm" },
+  { pattern: new RegExp(`^/referrals/${UUID}/reject$`), action: "referral_reject" },
 ];
 type Action =
   | "crisis_ack"
@@ -76,7 +83,9 @@ type Action =
   | "appointment_outcome"
   | "appointment_logistics"
   | "review_consent"
-  | "review_consent_withdraw";
+  | "review_consent_withdraw"
+  | "referral_confirm"
+  | "referral_reject";
 
 /** Forms here are one field at most. */
 const MAX_BODY_BYTES = 2_048;
@@ -103,7 +112,9 @@ function route(deps: ConsoleDeps): (request: Request) => Promise<Response> {
     }
     const cookie = `${IDLE_COOKIE}=${auth.idleCookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900`;
 
-    if (request.method === "GET" && url.pathname === "/") return page(200, await queues(deps.db, auth.session), cookie);
+    if (request.method === "GET" && url.pathname === "/") return page(200, await queues(deps.db, auth.session, (deps.store ?? null) !== null), cookie);
+    const doc = new RegExp(`^/referrals/${UUID}/document$`).exec(url.pathname);
+    if (request.method === "GET" && doc?.[1] !== undefined) return referralDocument(deps, auth.session, doc[1], cookie);
     if (request.method !== "POST") return page(405, html`<p>Not allowed.</p>`, cookie);
     if (request.headers.get("origin") !== deps.origin) return page(403, html`<p>Refused: cross-origin request.</p>`, cookie);
 
@@ -116,6 +127,13 @@ function route(deps: ConsoleDeps): (request: Request) => Promise<Response> {
     const form = new URLSearchParams(text);
     const changed = await act(deps.db, auth.session, route.action, route.id, form);
     if (changed === "bad_input") return page(400, html`<p>Bad input.</p>`, cookie);
+    if (changed === "conflict") {
+      return page(
+        409,
+        html`<p>That phone number already belongs to a record here. It may be someone else (a parent, a shared phone), so the referral was not linked. Confirm it without the phone number and add it after checking, or handle it by hand. <a href="/">Back</a></p>`,
+        cookie,
+      );
+    }
     if (!changed) return page(403, html`<p>That change is not allowed for your role, or it was already made. <a href="/">Back</a></p>`, cookie);
     return redirect(cookie);
   };
@@ -125,7 +143,16 @@ function clearCookies(): string[] {
   return [IDLE_COOKIE, TOKEN_COOKIE].map((name) => `${name}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
 }
 
-async function act(db: ConsoleDb, session: StaffSession, action: Action, id: string, form: URLSearchParams): Promise<boolean | "bad_input"> {
+/** The review ticket a referral opened closes with its decision, in the same transaction. */
+async function closeReferralReview(q: Queryable, referralId: string): Promise<void> {
+  await q.query(
+    `update phi.tickets set status = 'done', closed_at = now()
+      where source_kind = 'referral' and source_id = $1 and kind in ('referral_review', 'clinician_review') and status in ('open', 'in_progress')`,
+    [referralId],
+  );
+}
+
+async function act(db: ConsoleDb, session: StaffSession, action: Action, id: string, form: URLSearchParams): Promise<boolean | "bad_input" | "conflict"> {
   return db.asStaff(session, async (q) => {
     switch (action) {
       case "crisis_ack": {
@@ -157,8 +184,11 @@ async function act(db: ConsoleDb, session: StaffSession, action: Action, id: str
         return true;
       }
       case "ticket_close":
+        // A referral review ticket closes only by confirming or rejecting its referral.
         return rows(await q.query(
-          `update phi.tickets set status = 'done', closed_at = now() where id = $1 and status in ('open', 'in_progress')`, [id]));
+          `update phi.tickets set status = 'done', closed_at = now()
+            where id = $1 and status in ('open', 'in_progress')
+              and not (source_kind = 'referral' and kind in ('referral_review', 'clinician_review'))`, [id]));
       case "contact_age": {
         const value = form.get("minor_status");
         if (value !== "adult" && value !== "minor" && value !== "unknown") return "bad_input";
@@ -221,6 +251,56 @@ async function act(db: ConsoleDb, session: StaffSession, action: Action, id: str
                                       'wording_version', $4::int, 'recorded_at', now()))`,
           [id, captured, REVIEW_CONSENT_WORDING, REVIEW_CONSENT_VERSION]));
       }
+      case "referral_confirm": {
+        // Staff have read the document and checked the values; the form carries what THEY confirm.
+        // The contact gets no consent: a referral patient's first contact is a staff call (§5.5).
+        const first = (form.get("first_name") ?? "").trim();
+        const last = (form.get("last_name") ?? "").trim();
+        const phoneRaw = (form.get("phone") ?? "").replace(/[^\d]/g, "");
+        const phone = /^1?[2-9]\d{9}$/.test(phoneRaw) ? `+1${phoneRaw.slice(-10)}` : null;
+        const email = (form.get("email") ?? "").trim();
+        const state = form.get("state");
+        if (first === "" || first.length > 100 || last.length > 100 || email.length > 254) return "bad_input";
+        if (phone === null && email === "") return "bad_input";
+        if (state !== "NJ" && state !== "PA" && state !== "") return "bad_input";
+        const open = await q.query<{ urgency: string | null }>(
+          `select urgency from phi.referrals where id = $1 and status in ('received', 'extracted', 'needs_review') for update`,
+          [id],
+        );
+        const ref = open.rows[0];
+        if (ref === undefined) return false;
+        const urgent = ref.urgency !== "routine";
+        // A number already on file is never linked silently: it may be someone else (a parent,
+        // a shared phone) and may carry SMS consent. Staff resolve it by hand.
+        // ON CONFLICT also covers two staff confirming for the same new number at once.
+        const contactId = (
+          await q.query<{ id: string }>(
+            `insert into phi.contacts (first_name, last_name, phone_e164, email, state) values ($1, $2, $3, $4, $5)
+             on conflict (phone_e164) do nothing returning id`,
+            [first, last === "" ? null : last, phone, email === "" ? null : email, state === "" ? null : state],
+          )
+        ).rows[0]?.id;
+        if (contactId === undefined) return "conflict";
+        const confirmed = await q.query(
+          `update phi.referrals set status = 'confirmed', contact_id = $2, reviewed_by = phi.staff_user(), reviewed_at = now() where id = $1`,
+          [id, contactId],
+        );
+        if ((confirmed.rowCount ?? 0) === 0) return false; // RLS: an admin on an urgent referral
+        await closeReferralReview(q, id);
+        await q.query(
+          `insert into phi.tickets (contact_id, kind, source_kind, source_id) values ($1, $2, $3, $4)
+           on conflict (kind, source_kind, source_id) where status in ('open', 'in_progress') do nothing`,
+          urgent ? [contactId, "clinician_review", "referral_confirmed", id] : [contactId, "callback", "referral", id],
+        );
+        return true;
+      }
+      case "referral_reject": {
+        const rejected = rows(await q.query(
+          `update phi.referrals set status = 'rejected', reviewed_by = phi.staff_user(), reviewed_at = now()
+            where id = $1 and status in ('received', 'extracted', 'needs_review')`, [id]));
+        if (rejected) await closeReferralReview(q, id);
+        return rejected;
+      }
       case "review_consent_withdraw":
         return rows(await q.query(
           `insert into phi.consents (contact_id, kind, revoked_at, source, evidence)
@@ -246,13 +326,38 @@ interface CrisisRow {
 /** Practice-local time, as staff read it. */
 const ET = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" });
 const et = (at: Date): string => `${ET.format(at)} ET`;
-interface TicketRow { id: string; kind: string; created_at: Date; contact_id: string | null; first_name: string | null; phone_e164: string | null; minor_status: string | null }
+interface TicketRow { id: string; source_kind: string | null; kind: string; created_at: Date; contact_id: string | null; first_name: string | null; phone_e164: string | null; minor_status: string | null }
 interface ReviewRow { id: string; contact_id: string; scheduled_for: Date; first_name: string | null }
+interface ReferralRow {
+  id: string; received_at: Date; referrer_org: string | null; referrer_name: string | null; urgency: string | null;
+  extraction_error: string | null; confidence: number | null; extracted: Extraction | null;
+}
 interface AppointmentRow { id: string; contact_id: string; provider_id: string; starts_at: Date; modality: string | null; status: string; first_name: string | null }
 
 const today = (): string => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
 
-async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
+/** The referral document, to staff only, audited, as a download (never rendered inline). */
+async function referralDocument(deps: ConsoleDeps, session: StaffSession, id: string, cookie: string): Promise<Response> {
+  const store = deps.store ?? null;
+  if (store === null) return page(404, html`<p>Not found.</p>`, cookie);
+  const path = await deps.db.asStaff(session, async (q) => {
+    const { rows } = await q.query<{ document_path: string | null }>(`select document_path from phi.referrals where id = $1`, [id]);
+    const p = rows[0]?.document_path ?? null;
+    if (p !== null) await auditReads(q, "referrals", [id]);
+    return p;
+  });
+  const bytes = path === null ? null : await store.get(path);
+  if (bytes === null) return page(404, html`<p>Not found.</p>`, cookie);
+  const headers = new Headers({
+    ...SECURITY_HEADERS,
+    "content-type": "application/pdf",
+    "content-disposition": 'attachment; filename="referral.pdf"',
+  });
+  headers.append("set-cookie", cookie);
+  return new Response(bytes, { status: 200, headers });
+}
+
+async function queues(db: ConsoleDb, session: StaffSession, showDocuments = false): Promise<Html> {
   const isClinician = session.role === "staff_clinician";
   return db.asStaff(session, async (q) => {
     const crises = (await q.query<CrisisRow>(
@@ -261,13 +366,18 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
          from phi.crisis_events e left join phi.contacts c on c.id = e.contact_id
         where e.staff_ack_at is null or e.sequences_resumed_at is null order by e.detected_at limit 100`)).rows;
     const tickets = (await q.query<TicketRow>(
-      `select t.id, t.kind::text as kind, t.created_at, t.contact_id, c.first_name, c.phone_e164, c.minor_status::text as minor_status
+      `select t.id, t.source_kind, t.kind::text as kind, t.created_at, t.contact_id, c.first_name, c.phone_e164, c.minor_status::text as minor_status
          from phi.tickets t left join phi.contacts c on c.id = t.contact_id
         where t.status in ('open', 'in_progress') order by t.created_at limit 200`)).rows;
     const reviews = (await q.query<ReviewRow>(
       `select r.id, r.contact_id, r.scheduled_for, c.first_name from phi.review_requests r join phi.contacts c on c.id = r.contact_id
         where r.status = 'pending_clinician_window' order by r.scheduled_for limit 200`)).rows;
 
+    const referrals = (await q.query<ReferralRow>(
+      `select id, received_at, referrer_org, referrer_name, urgency, extraction_error, extracted, extraction_confidence::float8 as confidence
+         from phi.referrals where status in ('received', 'extracted', 'needs_review')
+        order by (urgency in ('urgent', 'high_risk')) desc nulls first, received_at limit 100`)).rows;
+    await auditReads(q, "referrals", referrals.map((r) => r.id));
     const appointments = (await q.query<AppointmentRow>(
       `select a.id, a.contact_id, a.provider_id, a.starts_at, a.modality::text as modality, a.status::text as status, c.first_name
          from phi.appointments a join phi.contacts c on c.id = a.contact_id
@@ -297,7 +407,7 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
 <h2>Callbacks and tickets</h2>
 <table><tr><th>Kind</th><th>Opened</th><th>Name</th><th>Phone</th><th>Age status</th><th></th></tr>${tickets.map((t) => html`<tr><td>${t.kind}</td><td>${et(t.created_at)}</td><td>${t.first_name}</td><td>${t.phone_e164}</td><td>${t.minor_status}${
       t.contact_id === null ? null : html` ${button(`/contacts/${t.contact_id}/age`, "Set", html`<select name="minor_status"><option value="unknown">unknown</option><option value="adult">adult</option><option value="minor">minor</option></select>`)}`
-    }</td><td>${button(`/tickets/${t.id}/close`, "Close")}${t.kind === "booking" ? recordForm(t.id) : null}</td></tr>`)}</table>
+    }</td><td>${t.source_kind === "referral" ? "Resolve it in Referrals to review" : button(`/tickets/${t.id}/close`, "Close")}${t.kind === "booking" ? recordForm(t.id) : null}</td></tr>`)}</table>
 <h2>Appointments (last 7 days, next 30)</h2>
 <table><tr><th>When</th><th>Name</th><th>Provider</th><th>How</th><th>Status</th><th></th></tr>${appointments.map((a) => html`<tr><td>${et(a.starts_at)}</td><td>${a.first_name}</td><td>${provider(a.provider_id)?.smsName ?? a.provider_id}</td><td>${a.modality}</td><td>${a.status}</td><td>${
       a.status === "scheduled"
@@ -306,6 +416,16 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
           ? html`${button(`/appointments/${a.id}/logistics`, "Send forms / video-link help text")}${button(`/contacts/${a.contact_id}/review-consent`, "Patient agreed to a review request", html`<select name="captured" required><option value="in_person">in person</option><option value="phone">by phone</option></select>`)}${button(`/contacts/${a.contact_id}/review-consent/withdraw`, "Patient withdrew review consent")}`
           : null
     }</td></tr>`)}</table>
+<h2>Referrals to review</h2>
+<p>Read the document, check every value, then confirm. Confirming creates the patient's record for a staff call; they get no automated texts.</p>
+<table><tr><th>Received</th><th>From</th><th>Urgency</th><th>Extracted (unconfirmed)</th><th></th></tr>${referrals.map((r) => {
+      // Urgent, high-risk or unread: a clinician's referral; an admin sees who sent it, not who it is about.
+      const urgentRow = r.urgency !== "routine";
+      const e = urgentRow && !isClinician ? null : r.extracted;
+      return html`<tr><td>${et(r.received_at)}</td><td>${r.referrer_org} (${r.referrer_name})</td><td>${r.urgency === null ? "UNREAD: treat as urgent" : `${r.urgency.toUpperCase()} (model-stated, unverified)`}</td><td>${
+        e === null ? `No values extracted (${r.extraction_error ?? "pending"}). Read the document.` : `confidence ${String(r.confidence ?? 0)}`
+      }${showDocuments ? html` <a href="/referrals/${r.id}/document">Open document</a>` : null}</td><td><form method="post" action="/referrals/${r.id}/confirm"><label>First name <input name="first_name" value="${e?.patient.first_name ?? ""}" required maxlength="100"></label> <label>Last name <input name="last_name" value="${e?.patient.last_name ?? ""}" maxlength="100"></label> <label>Phone <input name="phone" value="${e?.patient.phone ?? ""}" maxlength="32"></label> <label>Email <input name="email" value="${e?.patient.email ?? ""}" maxlength="254"></label> <label>State <select name="state"><option value="">unknown</option><option value="NJ"${e?.patient.state === "NJ" ? html` selected` : null}>NJ</option><option value="PA"${e?.patient.state === "PA" ? html` selected` : null}>PA</option></select></label> <button type="submit">Confirm</button></form>${button(`/referrals/${r.id}/reject`, "Reject")}</td></tr>`;
+    })}</table>
 <h2>Review requests waiting in the clinician window</h2>
 <table><tr><th>Name</th><th>Sends after</th><th></th></tr>${reviews.map((r) => html`<tr><td>${r.first_name}</td><td>${et(r.scheduled_for)}</td><td>${
       isClinician ? button(`/reviews/${r.id}/exclude`, "Do not send, exclude") : "clinician only"
