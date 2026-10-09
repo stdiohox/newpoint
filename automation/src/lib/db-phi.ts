@@ -208,3 +208,21 @@ export async function openTicket(
   );
   return (result.rowCount ?? 0) === 1;
 }
+
+// --- Age (D18) ----------------------------------------------------------------------------
+
+/**
+ * Applies a self-reported age, as the database allows it (minor_status_guard): a "yes" only
+ * fills an UNKNOWN age; a "no" may also replace an earlier self-reported "yes"; nothing ever
+ * overrides a staff decision.
+ */
+export async function answerUnknownAge(q: Queryable, contactId: string, status: "adult" | "minor", source: "web_form" | "voice" | "sms"): Promise<boolean> {
+  const r = await q.query(
+    status === "adult"
+      ? `update phi.contacts set minor_status = 'adult', minor_status_source = $2 where id = $1 and minor_status = 'unknown'`
+      : `update phi.contacts set minor_status = 'minor', minor_status_source = $2
+          where id = $1 and minor_status <> 'minor' and minor_status_source is distinct from 'staff'`,
+    [contactId, source],
+  );
+  return (r.rowCount ?? 0) === 1;
+}

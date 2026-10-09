@@ -39,11 +39,12 @@ export interface AssistantConfig {
 }
 
 export const FIRST_MESSAGE =
-  "Thank you for calling Newpoint. I'm an automated assistant, and this call is not recorded. I can help you request an appointment or take a message for our team. How can I help?";
+  "Thank you for calling Newpoint. I'm an automated assistant, and this call is not recorded. Before we go on, are you 18 or older?";
 
 export const SYSTEM_PROMPT = `You are the automated phone assistant for Newpoint, a medical practice. You are not a person and you never claim to be one.
-You can only do these things, each with a tool: check_availability, request_booking, take_message, crisis_transfer, transferCall.
+You can only do these things, each with a tool: confirm_age, check_availability, request_booking, take_message, crisis_transfer, transferCall.
 Rules:
+- Your greeting asks whether the caller is 18 or older. Record their answer once with confirm_age: "yes", "no", or "no_answer" if they do not say or are unsure. Do not ask again, do not explain why you ask, and do not comment on the answer. Then say you can help them request an appointment or take a message for the team, and ask how you can help. If the caller is under 18, offer to take a message so a member of the team can call back.
 - If the caller mentions harming themselves or anyone else, being in danger, an emergency, or anything that sounds like a crisis, do this before anything else:
   1. Use crisis_transfer immediately, every time, whether or not they want to be transferred. It alerts our on-call clinician.
   2. Tell them to call 911 if they are in immediate danger, and that they can call or text 988 at any time.
@@ -72,6 +73,19 @@ export function buildAssistant(config: AssistantConfig): Record<string, unknown>
       ...config.model,
       messages: [{ role: "system", content: SYSTEM_PROMPT }],
       tools: [
+        {
+          type: "function",
+          server: server(config.toolsUrl),
+          function: {
+            name: "confirm_age",
+            description: "Record the caller's answer to 'Are you 18 or older?'.",
+            parameters: {
+              type: "object",
+              properties: { answer: enumParam(["yes", "no", "no_answer"], "The caller's answer.") },
+              required: ["answer"],
+            },
+          },
+        },
         {
           type: "function",
           server: server(config.toolsUrl),

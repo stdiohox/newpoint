@@ -87,7 +87,8 @@ describe("SMS templates (§5.0): neutral wording, typed slots", () => {
 
   it("only the crisis response ignores quiet hours", () => {
     expect(ids.filter((id) => TEMPLATES[id].anyHour)).toEqual(["crisis_response"]);
-    expect(ids.filter((id) => TEMPLATES[id].beforeVerification)).toEqual(["verification_code"]);
+    // The code itself, and the age question (a reply to a number that just texted us).
+    expect(ids.filter((id) => TEMPLATES[id].beforeVerification)).toEqual(["verification_code", "age_check"]);
   });
 
   it("fills shaped slots and refuses anything else", () => {

@@ -270,6 +270,13 @@ describe("booking.process-call-report (§5.1)", () => {
     expect(await result(await down(toolCall("take_message", { reason: "billing" })))).toBe(REPLIES.unavailable);
   });
 
+  it("an under-18 caller who hangs up still gets a person's call back", async () => {
+    const { conversationId, contactId } = await voiceCall("hung_up", false);
+    await client().query(`update phi.contacts set minor_status = 'minor', minor_status_source = 'voice' where id = $1`, [contactId]);
+    await client().query("set role phi_tasks");
+    expect(await runProcessCallReport(reportDeps(), conversationId)).toEqual({ bookingRequests: 0, tickets: 1, crisis: false });
+  });
+
   it("a clean wrong number opens nothing", async () => {
     const { conversationId } = await voiceCall("wrong_number", false);
     await client().query("set role phi_tasks");

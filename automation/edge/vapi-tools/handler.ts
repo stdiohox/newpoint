@@ -10,6 +10,7 @@
  *   assistant's transferCall tool then sends the caller to the D15 destination.
  */
 import { z } from "zod";
+import { answerUnknownAge } from "../../src/lib/db-phi.js";
 import { boundedText, type EdgeDeps } from "../shared/deps.js";
 import { callConversation, crisisEventIdFor, secretMatches, verifiedCall, type VapiEdgeConfig } from "../shared/vapi.js";
 
@@ -38,6 +39,7 @@ const bookingArgs = z
   .strict();
 const messageArgs = z.object({ reason: z.enum(["appointment_change", "billing", "language_help", "other"]) }).strict();
 const emptyArgs = z.object({}).strict();
+const ageArgs = z.object({ answer: z.enum(["yes", "no", "no_answer"]) }).strict();
 
 const REASON = { appointment_change: "existing_patient", billing: "billing_insurance", language_help: "other", other: "other" } as const;
 
@@ -46,6 +48,7 @@ export const REPLIES = {
   availability: "I can't see the calendar, but I can pass your request to the team and they'll get back to you with a time.",
   booked: "Thanks. I've passed your request to the team. They'll be in touch by text or phone to confirm a time.",
   message: "Thanks. I've asked the team to call you back.",
+  ageNoted: "Thank you.",
   crisis: "I've alerted our on-call clinician. I'm going to transfer you to 988 now. If you are in immediate danger, call 911.",
   noCaller: "I can't take that request on this line because your number isn't available. Please call back from a phone that shows its number, or call 911 or 988 if you need help now.",
   invalid: "Sorry, I didn't catch that. Could you say it again?",
@@ -114,6 +117,20 @@ async function runTool(deps: EdgeDeps, call: Parameters<typeof callConversation>
   switch (name) {
     case "check_availability":
       return REPLIES.availability;
+
+    case "confirm_age": {
+      // D18: a yes or no answers an UNKNOWN age only (never overrides staff or an earlier answer);
+      // no answer leaves it unknown. The caller's number comes from Vapi, never from the model.
+      const args = ageArgs.safeParse(raw);
+      if (!args.success) return REPLIES.invalid;
+      if (args.data.answer === "no_answer") return REPLIES.ageNoted;
+      const status = args.data.answer === "yes" ? "adult" : "minor";
+      await deps.db.tx("edge.vapi-tools", async (q) => {
+        const linked = await callConversation(q, call);
+        if (linked !== null) await answerUnknownAge(q, linked.contactId, status, "voice");
+      });
+      return REPLIES.ageNoted;
+    }
 
     case "crisis_transfer": {
       if (!emptyArgs.safeParse(raw ?? {}).success) return REPLIES.crisis;

@@ -17,23 +17,28 @@
  * a failure throws before the intent is written, so the retry sends it.
  *   4. Everything else is a staff ticket and a neutral template reply. Nothing about
  *      symptoms, medication or diagnosis is ever answered by text (§5.5).
+ *   5. D18, age at first contact: a texter whose age is unknown is asked once per conversation
+ *      "are you 18 or older?" (age_check) in reply to their text; a clear YES or NO reply to
+ *      that question sets the age (only ever from unknown). Crisis, STOP and HELP still come
+ *      first; an unclear reply leaves the age unknown and is handled as any other message.
  * The message's intent is written last; each step is idempotent, so a retry repeats none.
  */
 import { tasks } from "@trigger.dev/sdk";
 import type { PhiClaude } from "../../../adapters/llm/anthropic-phi.js";
 import type { PhiNotifier } from "../../../adapters/n8n/phi-notify.js";
-import { auditRead, openTicket, revokeConsent, type PhiDb } from "../../../lib/db-phi.js";
+import { answerUnknownAge, auditRead, openTicket, revokeConsent, type PhiDb } from "../../../lib/db-phi.js";
 import type { Logger } from "../../../lib/logger.js";
 import { phi } from "../../../lib/phi.js";
 import { phiTask } from "../../../lib/task.js";
 import { keywordIntent } from "../../../domain/consent/opt-out.js";
 import { detectCrisis } from "../../../domain/crisis/detect.js";
+import { parseAgeAnswer } from "../../../domain/messaging/age.js";
 import { INTENT_SYSTEM, intentSchema, ROUTES, type Intent } from "../../../domain/messaging/intent.js";
 import { PHI_PAYLOADS } from "../payloads.js";
 import { phiRuntime } from "../runtime.js";
 import type { SendSmsPayload } from "./send-sms.js";
 
-export type Handled = "crisis" | "stop" | "help" | "routed" | "unclassified" | "already_handled" | "no_body";
+export type Handled = "crisis" | "stop" | "help" | "routed" | "unclassified" | "age_answer" | "already_handled" | "no_body";
 
 export interface InboundDeps {
   readonly db: PhiDb;
@@ -53,6 +58,11 @@ export interface InboundDeps {
 
 interface Loaded {
   readonly contactId: string;
+  readonly minorStatus: "adult" | "minor" | "unknown";
+  /** An age question already went to this conversation (it is never asked twice). */
+  readonly ageAsked: boolean;
+  /** This message is a direct reply to that question (the last outbound text, within 24 h). */
+  readonly answersAge: boolean;
   readonly conversationId: string;
   readonly body: string | null;
   readonly intent: string | null;
@@ -60,16 +70,37 @@ interface Loaded {
 
 export async function runInboundSms(deps: InboundDeps, messageId: string): Promise<{ readonly handled: Handled }> {
   const message = await deps.db.tx(deps.actor, async (q) => {
-    const { rows } = await q.query<{ contact_id: string; conversation_id: string; body: string | null; intent: string | null }>(
-      `select c.contact_id, m.conversation_id, m.body, m.intent
-         from phi.messages m join phi.conversations c on c.id = m.conversation_id
+    const { rows } = await q.query<{
+      contact_id: string; conversation_id: string; body: string | null; intent: string | null; minor_status: Loaded["minorStatus"];
+      age_asked: boolean; answers_age: boolean;
+    }>(
+      `select c.contact_id, m.conversation_id, m.body, m.intent, k.minor_status::text as minor_status,
+              -- Asked at all in this conversation (so never asked twice) ...
+              exists (select 1 from phi.messages a where a.conversation_id = m.conversation_id and a.direction = 'outbound'
+                        and a.template = 'age_check' and a.failed_at is null) as age_asked,
+              -- ... and THIS message answers it: the last outbound text before it was the question,
+              -- sent within the previous 24 hours.
+              coalesce((select a.template = 'age_check' and a.created_at > m.created_at - interval '24 hours'
+                          from phi.messages a
+                         where a.conversation_id = m.conversation_id and a.direction = 'outbound' and a.failed_at is null
+                           and a.created_at < m.created_at
+                         order by a.created_at desc limit 1), false) as answers_age
+         from phi.messages m join phi.conversations c on c.id = m.conversation_id join phi.contacts k on k.id = c.contact_id
         where m.id = $1 and m.direction = 'inbound'`,
       [messageId],
     );
     const row = rows[0];
     if (row === undefined) return null;
     await auditRead(q, "messages", messageId);
-    return { contactId: row.contact_id, conversationId: row.conversation_id, body: row.body, intent: row.intent } satisfies Loaded;
+    return {
+      contactId: row.contact_id,
+      conversationId: row.conversation_id,
+      body: row.body,
+      intent: row.intent,
+      minorStatus: row.minor_status,
+      ageAsked: row.age_asked,
+      answersAge: row.answers_age,
+    } satisfies Loaded;
   });
   if (message === null) return { handled: "no_body" };
   if (message.intent !== null) return { handled: "already_handled" };
@@ -96,8 +127,28 @@ export async function runInboundSms(deps: InboundDeps, messageId: string): Promi
   }
   if (keyword === "help") {
     await deps.send({ template: "help", contactId: message.contactId, entityId: messageId, step: 0 });
+    await askAge(deps, message, messageId);
     await setIntent(deps, messageId, "help");
     return { handled: "help" };
+  }
+
+  // D18: a clear answer to the age question this conversation was asked.
+  if (message.minorStatus === "unknown" && message.answersAge) {
+    const answer = parseAgeAnswer(body);
+    if (answer !== null) {
+      // One transaction: the age, the staff callback for a "no", and "this message is handled"
+      // commit together, so a retry never re-reads the reply as a fresh request.
+      const opened = await deps.db.tx(deps.actor, async (q) => {
+        await answerUnknownAge(q, message.contactId, answer === "yes" ? "adult" : "minor", "sms");
+        // Under 18: no automated texts, so a person must call them back.
+        const ticketOpened =
+          answer === "no" && (await openTicket(q, { contactId: message.contactId, kind: "callback", sourceKind: "message", sourceId: messageId }));
+        await q.query(`update phi.messages set intent = 'age_answer' where id = $1 and intent is null`, [messageId]);
+        return ticketOpened;
+      });
+      if (opened) await deps.notifier.actionRequired(deps.now()).catch(() => undefined);
+      return { handled: "age_answer" };
+    }
   }
 
   // 3. The classifier: enum only.
@@ -116,6 +167,7 @@ export async function runInboundSms(deps: InboundDeps, messageId: string): Promi
   }
   if (!result.ok) {
     await ticket(deps, message.contactId, "message", messageId);
+    await askAge(deps, message, messageId);
     await setIntent(deps, messageId, "unclassified");
     return { handled: "unclassified" };
   }
@@ -128,6 +180,7 @@ export async function runInboundSms(deps: InboundDeps, messageId: string): Promi
   }
   if (intent === "help") {
     await deps.send({ template: "help", contactId: message.contactId, entityId: messageId, step: 0 });
+    await askAge(deps, message, messageId);
     await setIntent(deps, messageId, "help");
     return { handled: "help" };
   }
@@ -147,6 +200,7 @@ export async function runInboundSms(deps: InboundDeps, messageId: string): Promi
     });
     if (bookingRequestId === undefined) throw new Error("inbound-sms: no booking request");
     await deps.startBooking(bookingRequestId);
+    await askAge(deps, message, messageId);
     await setIntent(deps, messageId, intent);
     return { handled: "routed" };
   }
@@ -155,8 +209,15 @@ export async function runInboundSms(deps: InboundDeps, messageId: string): Promi
   const route = ROUTES[intent];
   await ticket(deps, message.contactId, route.ticket, messageId);
   await deps.send({ template: route.reply, contactId: message.contactId, entityId: messageId, step: 0 });
+  await askAge(deps, message, messageId);
   await setIntent(deps, messageId, intent);
   return { handled: "routed" };
+}
+
+/** D18: ask an unknown-age texter once per conversation, in reply to this message. */
+async function askAge(deps: InboundDeps, message: Loaded, messageId: string): Promise<void> {
+  if (message.minorStatus !== "unknown" || message.ageAsked) return;
+  await deps.send({ template: "age_check", contactId: message.contactId, entityId: messageId, step: 0 });
 }
 
 async function handleCrisis(deps: InboundDeps, messageId: string, message: Loaded, detectedBy: "keyword" | "llm"): Promise<void> {

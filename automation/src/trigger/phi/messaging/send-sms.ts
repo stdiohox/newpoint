@@ -63,7 +63,8 @@ export type RefusalReason =
   | "phone_unverified"
   | "sequences_paused"
   | "global_budget"
-  | "number_limit";
+  | "number_limit"
+  | "age_check_limit";
 
 export type SendOutcome =
   | { readonly status: "sent"; readonly messageId: string }
@@ -126,7 +127,7 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
   const contact = await getContact(q, payload.contactId);
   if (contact === null) return refused("no_contact");
   if (contact.phone === null) return refused("no_phone");
-  if (contact.minorStatus !== "adult") return refused("not_adult");
+  if (contact.minorStatus !== "adult" && !(await pendingAdult(q, payload, contact.minorStatus))) return refused("not_adult");
   if (!(await consentFor(q, payload, contact.id))) return refused("no_consent");
   if (!def.beforeVerification && contact.phoneVerifiedAt === null) return refused("phone_unverified");
   if (def.sequence && (await sequencesPaused(q, contact.id))) return refused("sequences_paused");
@@ -139,6 +140,14 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
     await q.query(`select pg_advisory_xact_lock(hashtext('phi.sms_budget'))`);
     if ((await outboundToday(q, null)) >= deps.env.SMS_DAILY_BUDGET) return { status: "trip" };
     if ((await outboundToday(q, contact.id)) >= deps.env.SMS_PER_NUMBER_DAILY) return refused("number_limit");
+    // The age question can go to numbers that never consented (as a reply): its own hourly
+    // ceiling keeps it from being a cheap way to make Newpoint text many numbers.
+    if (payload.template === "age_check") {
+      const { rows } = await q.query<{ n: number }>(
+        `select count(*)::int as n from phi.messages where template = 'age_check' and failed_at is null and created_at > now() - interval '1 hour'`,
+      );
+      if ((rows[0]?.n ?? 0) >= AGE_CHECK_PER_HOUR) return refused("age_check_limit");
+    }
   }
 
   const body = renderTemplate(payload.template, await resolveSlots(q, payload.template, payload.entityId, { reviewUrl: deps.env.PHI_GOOGLE_REVIEW_URL ?? null }));
@@ -161,6 +170,17 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
  * typing someone else's number into the site can never text them after they opted out.
  */
 async function consentFor(q: Queryable, payload: SendSmsPayload, contactId: string): Promise<boolean> {
+  if (payload.template === "age_check") {
+    // Only ever a direct reply: the entity is an inbound text from this contact in the last
+    // 30 minutes, and never after a STOP. One question, in answer to their own message.
+    if ((await latestConsent(q, contactId, "sms_transactional")) === "revoked") return false;
+    const { rows } = await q.query(
+      `select 1 from phi.messages m join phi.conversations c on c.id = m.conversation_id
+        where m.id = $1 and m.direction = 'inbound' and c.contact_id = $2 and m.created_at > now() - interval '30 minutes'`,
+      [payload.entityId, contactId],
+    );
+    return rows.length > 0;
+  }
   if (payload.template !== "verification_code") return hasActiveConsent(q, contactId, "sms_transactional");
   if ((await latestConsent(q, contactId, "sms_transactional")) === "revoked") return false;
   const pending = await q.query(
@@ -169,6 +189,22 @@ async function consentFor(q: Queryable, payload: SendSmsPayload, contactId: stri
   );
   return pending.rows.length > 0;
 }
+
+/**
+ * D18 exceptions, both for an UNKNOWN age only (never a known minor):
+ *   - the verification code, when the visitor answered "yes" on the form (their answer is
+ *     applied once the code proves the number is theirs);
+ *   - the age question itself, which is how an unknown age gets answered by text.
+ */
+async function pendingAdult(q: Queryable, payload: SendSmsPayload, status: "adult" | "minor" | "unknown"): Promise<boolean> {
+  if (status !== "unknown") return false;
+  if (payload.template === "age_check") return true;
+  if (payload.template !== "verification_code") return false;
+  const { rows } = await q.query(`select 1 from phi.phone_verifications where id = $1 and age_answer = 'yes'`, [payload.entityId]);
+  return rows.length > 0;
+}
+
+export const AGE_CHECK_PER_HOUR = 30;
 
 const BUDGET_PAGE = pageText("Newpoint ops: the daily SMS budget was reached. Automated texts are stopped until tomorrow. Check messaging.send-sms.");
 

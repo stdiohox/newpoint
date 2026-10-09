@@ -36,8 +36,11 @@ export interface CallReportResult {
 
 export async function runProcessCallReport(deps: CallReportDeps, conversationId: string): Promise<CallReportResult | { readonly missing: true }> {
   const found = await deps.db.tx(deps.actor, async (q) => {
-    const { rows } = await q.query<{ contact_id: string; external_ref: string | null; outcome: string | null; callback_requested: boolean | null }>(
-      `select contact_id, external_ref, outcome, callback_requested from phi.conversations where id = $1 and channel = 'voice'`,
+    const { rows } = await q.query<{
+      contact_id: string; external_ref: string | null; outcome: string | null; callback_requested: boolean | null; minor_status: string;
+    }>(
+      `select v.contact_id, v.external_ref, v.outcome, v.callback_requested, c.minor_status::text as minor_status
+         from phi.conversations v join phi.contacts c on c.id = v.contact_id where v.id = $1 and v.channel = 'voice'`,
       [conversationId],
     );
     const row = rows[0];
@@ -80,7 +83,8 @@ export async function runProcessCallReport(deps: CallReportDeps, conversationId:
     // it is a clean "wrong number" or hang-up with no callback asked for. A report that never
     // arrived (outcome null) is treated as "call them back".
     const handled = found.bookings.length > 0 || found.inquiries.length > 0 || found.crises.length > 0;
-    const quiet = (found.outcome === "wrong_number" || found.outcome === "hung_up") && found.callback_requested === false;
+    // An under-18 caller (D18) always gets a person's call back, however the call ended.
+    const quiet = (found.outcome === "wrong_number" || found.outcome === "hung_up") && found.callback_requested === false && found.minor_status !== "minor";
     if (!handled && !quiet) {
       if (await openTicket(q, { contactId: found.contact_id, kind: "callback", sourceKind: "conversation", sourceId: conversationId })) opened += 1;
     }
