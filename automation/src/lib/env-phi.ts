@@ -37,6 +37,17 @@ export const phiEnvSchema = z.object({
   /** n8n receives { kind: "action_required", at } and nothing else (§1). */
   PHI_N8N_ACTION_WEBHOOK_URL: https,
   PHI_N8N_ACTION_WEBHOOK_SECRET: z.string().min(32),
+  /**
+   * D1: both adapters are built; only manual-queue is ON by default. headway-handoff texts a
+   * care.headway.co link whose lock-screen preview names a mental-health platform and the
+   * provider (healthcare review, Phase 7), which §5.0's neutral-wording rule forbids. Turn it
+   * on only after the owners decide how a link may be sent (e.g. a neutral redirect).
+   */
+  PHI_SCHEDULING_ADAPTERS: z
+    .string()
+    .regex(/^(manual-queue|headway-handoff)(,(manual-queue|headway-handoff))*$/)
+    .default("manual-queue")
+    .transform((v) => v.split(",")),
 });
 
 export type PhiEnv = Readonly<z.output<typeof phiEnvSchema>>;

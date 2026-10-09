@@ -12,6 +12,8 @@
 import { authenticate, IDLE_COOKIE, TOKEN_COOKIE, type AuthConfig, type StaffSession } from "./auth.js";
 import { auditReads, type ConsoleDb } from "./db.js";
 import { html, type Html } from "./html.js";
+import { PROVIDERS, provider } from "../domain/scheduling/providers.js";
+import { fromLocal } from "../domain/scheduling/time.js";
 
 export interface ConsoleDeps {
   readonly auth: AuthConfig;
@@ -58,8 +60,19 @@ const ROUTES: readonly { pattern: RegExp; action: Action }[] = [
   { pattern: new RegExp(`^/reviews/${UUID}/exclude$`), action: "review_exclude" },
   { pattern: new RegExp(`^/tickets/${UUID}/close$`), action: "ticket_close" },
   { pattern: new RegExp(`^/contacts/${UUID}/age$`), action: "contact_age" },
+  { pattern: new RegExp(`^/tickets/${UUID}/appointment$`), action: "record_appointment" },
+  { pattern: new RegExp(`^/appointments/${UUID}/outcome$`), action: "appointment_outcome" },
+  { pattern: new RegExp(`^/appointments/${UUID}/logistics$`), action: "appointment_logistics" },
 ];
-type Action = "crisis_ack" | "crisis_resume" | "review_exclude" | "ticket_close" | "contact_age";
+type Action =
+  | "crisis_ack"
+  | "crisis_resume"
+  | "review_exclude"
+  | "ticket_close"
+  | "contact_age"
+  | "record_appointment"
+  | "appointment_outcome"
+  | "appointment_logistics";
 
 /** Forms here are one field at most. */
 const MAX_BODY_BYTES = 2_048;
@@ -147,6 +160,50 @@ async function act(db: ConsoleDb, session: StaffSession, action: Action, id: str
         if (value !== "adult" && value !== "minor" && value !== "unknown") return "bad_input";
         return rows(await q.query(`update phi.contacts set minor_status = $2 where id = $1`, [id, value]));
       }
+      case "record_appointment": {
+        // manual-queue (D1): staff booked it in the real system; this records it so reminders run.
+        const who = provider(form.get("provider") ?? "");
+        const startsAt = fromLocal(form.get("date") ?? "", form.get("time") ?? "");
+        const modality = form.get("modality");
+        if (who === undefined || startsAt === null || (modality !== "in_person" && modality !== "telehealth")) return "bad_input";
+        if (startsAt.getTime() <= Date.now() || startsAt.getTime() > Date.now() + 366 * 86_400_000) return "bad_input";
+        const ticket = await q.query<{ contact_id: string | null; source_kind: string | null; source_id: string | null }>(
+          `select contact_id, source_kind, source_id from phi.tickets where id = $1 and kind = 'booking' and status in ('open', 'in_progress') for update`,
+          [id],
+        );
+        const t = ticket.rows[0];
+        if (t === undefined || t.contact_id === null) return false;
+        const requestId = t.source_kind === "booking_request" ? t.source_id : null;
+        await q.query(
+          `insert into phi.appointments (contact_id, provider_id, external_ref, adapter, starts_at, modality, source_booking_request_id, recorded_by)
+           values ($1, $2, gen_random_uuid()::text, 'manual-queue', $3, $4, $5, phi.staff_user())`,
+          [t.contact_id, who.id, startsAt, modality, requestId],
+        );
+        if (requestId !== null) await q.query(`update phi.booking_requests set status = 'booked' where id = $1`, [requestId]);
+        await q.query(`update phi.tickets set status = 'done', closed_at = now() where id = $1`, [id]);
+        return true;
+      }
+      case "appointment_outcome": {
+        const status = form.get("status");
+        if (status !== "completed" && status !== "no_show" && status !== "cancelled") return "bad_input";
+        // A visit not yet started can only be cancelled (the database enforces this too).
+        return rows(await q.query(
+          `update phi.appointments set status = $2::phi.appointment_status
+            where id = $1 and status = 'scheduled' and ($2::text = 'cancelled' or starts_at <= now())`,
+          [id, status]));
+      }
+      case "appointment_logistics": {
+        // One non-clinical logistics text (forms, video link); booking.sync sends it through send-sms.
+        const appt = await q.query<{ contact_id: string }>(`select contact_id from phi.appointments where id = $1 and status = 'completed'`, [id]);
+        const contactId = appt.rows[0]?.contact_id;
+        if (contactId === undefined) return false;
+        // A repeat click is a harmless no-op, not an error: one text per visit (unique follow-up).
+        await q.query(
+          `insert into phi.follow_ups (contact_id, kind, step, due_at, source_id) values ($1, 'post_visit_logistics', 0, now(), $2)
+           on conflict (kind, source_id, step) where source_id is not null do nothing`,
+          [contactId, id]);
+        return true;
+      }
     }
   });
 }
@@ -163,6 +220,9 @@ const ET = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", date
 const et = (at: Date): string => `${ET.format(at)} ET`;
 interface TicketRow { id: string; kind: string; created_at: Date; contact_id: string | null; first_name: string | null; phone_e164: string | null; minor_status: string | null }
 interface ReviewRow { id: string; contact_id: string; scheduled_for: Date; first_name: string | null }
+interface AppointmentRow { id: string; contact_id: string; provider_id: string; starts_at: Date; modality: string | null; status: string; first_name: string | null }
+
+const today = (): string => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
 
 async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
   const isClinician = session.role === "staff_clinician";
@@ -180,15 +240,25 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
       `select r.id, r.contact_id, r.scheduled_for, c.first_name from phi.review_requests r join phi.contacts c on c.id = r.contact_id
         where r.status = 'pending_clinician_window' order by r.scheduled_for limit 200`)).rows;
 
+    const appointments = (await q.query<AppointmentRow>(
+      `select a.id, a.contact_id, a.provider_id, a.starts_at, a.modality::text as modality, a.status::text as status, c.first_name
+         from phi.appointments a join phi.contacts c on c.id = a.contact_id
+        where a.starts_at between now() - interval '7 days' and now() + interval '30 days' order by a.starts_at limit 300`)).rows;
+    await auditReads(q, "appointments", appointments.map((r) => r.id));
     await auditReads(q, "crisis_events", crises.map((r) => r.id));
     await auditReads(q, "tickets", tickets.map((r) => r.id));
     await auditReads(q, "review_requests", reviews.map((r) => r.id));
     await auditReads(q, "contacts", [
-      ...new Set([...(isClinician ? crises.map((r) => r.contact_id) : []), ...tickets.flatMap((r) => (r.contact_id === null ? [] : [r.contact_id])), ...reviews.map((r) => r.contact_id)]),
+      ...new Set([...(isClinician ? crises.map((r) => r.contact_id) : []), ...tickets.flatMap((r) => (r.contact_id === null ? [] : [r.contact_id])), ...reviews.map((r) => r.contact_id), ...appointments.map((r) => r.contact_id)]),
     ]);
 
     const button = (action: string, label: string, extra?: Html) =>
       html`<form method="post" action="${action}">${extra}<button type="submit">${label}</button></form>`;
+    // manual-queue: the booking made in the real system, recorded here so reminders and sync run.
+    const recordForm = (ticketId: string) =>
+      html`<form method="post" action="/tickets/${ticketId}/appointment"><label>Provider <select name="provider" required>${PROVIDERS.map(
+        (p) => html`<option value="${p.id}">${p.smsName}</option>`,
+      )}</select></label> <label>Date <input type="date" name="date" min="${today()}" required></label> <label>Time (ET) <input type="time" name="time" required></label> <label>How <select name="modality"><option value="telehealth">telehealth</option><option value="in_person">in person</option></select></label> <button type="submit">Record appointment</button></form>`;
 
     return html`<h1>Staff console</h1><p>Signed in as ${session.sub} (${session.role === "staff_clinician" ? "clinician" : "admin"}).</p>
 <h2>Crisis events</h2>
@@ -199,7 +269,15 @@ async function queues(db: ConsoleDb, session: StaffSession): Promise<Html> {
 <h2>Callbacks and tickets</h2>
 <table><tr><th>Kind</th><th>Opened</th><th>Name</th><th>Phone</th><th>Age status</th><th></th></tr>${tickets.map((t) => html`<tr><td>${t.kind}</td><td>${et(t.created_at)}</td><td>${t.first_name}</td><td>${t.phone_e164}</td><td>${t.minor_status}${
       t.contact_id === null ? null : html` ${button(`/contacts/${t.contact_id}/age`, "Set", html`<select name="minor_status"><option value="unknown">unknown</option><option value="adult">adult</option><option value="minor">minor</option></select>`)}`
-    }</td><td>${button(`/tickets/${t.id}/close`, "Close")}</td></tr>`)}</table>
+    }</td><td>${button(`/tickets/${t.id}/close`, "Close")}${t.kind === "booking" ? recordForm(t.id) : null}</td></tr>`)}</table>
+<h2>Appointments (last 7 days, next 30)</h2>
+<table><tr><th>When</th><th>Name</th><th>Provider</th><th>How</th><th>Status</th><th></th></tr>${appointments.map((a) => html`<tr><td>${et(a.starts_at)}</td><td>${a.first_name}</td><td>${provider(a.provider_id)?.smsName ?? a.provider_id}</td><td>${a.modality}</td><td>${a.status}</td><td>${
+      a.status === "scheduled"
+        ? html`${button(`/appointments/${a.id}/outcome`, "Completed", html`<input type="hidden" name="status" value="completed">`)}${button(`/appointments/${a.id}/outcome`, "No-show", html`<input type="hidden" name="status" value="no_show">`)}${button(`/appointments/${a.id}/outcome`, "Cancelled", html`<input type="hidden" name="status" value="cancelled">`)}`
+        : a.status === "completed"
+          ? button(`/appointments/${a.id}/logistics`, "Send forms / video-link help text")
+          : null
+    }</td></tr>`)}</table>
 <h2>Review requests waiting in the clinician window</h2>
 <table><tr><th>Name</th><th>Sends after</th><th></th></tr>${reviews.map((r) => html`<tr><td>${r.first_name}</td><td>${et(r.scheduled_for)}</td><td>${
       isClinician ? button(`/reviews/${r.id}/exclude`, "Do not send, exclude") : "clinician only"

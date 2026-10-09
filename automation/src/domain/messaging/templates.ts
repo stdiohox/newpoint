@@ -81,7 +81,7 @@ export const TEMPLATES = {
     slots: ["time", "provider"], sequence: false, beforeVerification: false, anyHour: false,
   },
   no_show_rebook: {
-    text: "Newpoint: we missed you today. Reply to this text or call the practice line to pick a new time. Reply STOP to opt out.",
+    text: "Newpoint: we missed you at your recent appointment. Reply to this text or call the practice line to pick a new time. Reply STOP to opt out.",
     slots: [], sequence: true, beforeVerification: false, anyHour: false,
   },
   post_visit_logistics: {

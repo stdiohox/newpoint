@@ -218,10 +218,10 @@ describe("messaging.send-sms (§5.0)", () => {
     expect((await runSendSms(deps, payload(b))).status).toBe("sent");
   });
 
-  it("refuses sequence templates whose slots arrive in later phases, without sending", async () => {
+  it("refuses a slotted template whose entity row is missing, without sending", async () => {
     const contact = await seedContact(client());
     await asTasks();
-    await expect(runSendSms(smsDeps(), payload(contact, "appointment_reminder_48h"))).rejects.toThrow("slots_unavailable");
+    await expect(runSendSms(smsDeps(), payload(contact, "appointment_reminder_48h"))).rejects.toThrow("appointment_unavailable");
     expect(twilio.sms).toEqual([]);
   });
 });

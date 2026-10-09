@@ -32,9 +32,10 @@ export interface Route {
 }
 
 /**
- * Phase 6: every request becomes a staff ticket with a neutral acknowledgment. Booking
- * requests become booking_requests in Phase 7 (D1: manual-queue first). Cancelling or
- * moving an appointment by text is never automated in v1 (§5.1: writes create requests only).
+ * Every request other than `book` becomes a staff ticket with a neutral acknowledgment;
+ * `book` becomes a booking_requests row for booking.request (Phase 7), which replies itself.
+ * Cancelling or moving an appointment by text is never automated in v1 (§5.1: writes
+ * create requests only).
  */
 export const ROUTES: Readonly<Record<Exclude<Intent, "stop" | "help" | "crisis">, Route>> = {
   book: { ticket: "booking", reply: "booking_callback" },

@@ -8,6 +8,7 @@ import { createConsole } from "../../src/console/app.js";
 import { IDLE_COOKIE, idleCookieValue, type AuthConfig } from "../../src/console/auth.js";
 import { consoleDb } from "../../src/console/db.js";
 import { escapeHtml, html } from "../../src/console/html.js";
+import { fromLocal } from "../../src/domain/scheduling/time.js";
 import { startProjectDb, type MarketingDb } from "../db/marketing-db.js";
 import { seedContact } from "./fixtures.js";
 
@@ -37,7 +38,7 @@ afterAll(async () => {
 });
 beforeEach(async () => {
   await client().query("reset role");
-  await client().query(`truncate phi.audit_log, phi.crisis_events, phi.tickets, phi.review_requests, phi.review_exclusions, phi.appointments, phi.consents cascade; truncate phi.contacts cascade`);
+  await client().query(`truncate phi.audit_log, phi.crisis_events, phi.tickets, phi.review_requests, phi.review_exclusions, phi.appointments, phi.consents, phi.follow_ups, phi.booking_requests cascade; truncate phi.contacts cascade`);
 });
 
 interface TokenSpec { role?: string | null; aal?: string; sub?: string; issuedMinutesAgo?: number; issuer?: string; expiresInMinutes?: number }
@@ -188,7 +189,7 @@ describe("actions", () => {
   it("a clinician excludes a patient from the pending review window", async () => {
     const contact = await seedContact(client());
     const appt = await client().query<{ id: string }>(
-      `insert into phi.appointments (contact_id, provider_id, adapter, starts_at, status) values ($1, 'p1', 'manual-queue', now() - interval '1 day', 'completed') returning id`,
+      `insert into phi.appointments (contact_id, provider_id, adapter, starts_at, status) values ($1, 'funmilayo-whitaker', 'manual-queue', now() - interval '1 day', 'completed') returning id`,
       [contact],
     );
     const review = await client().query<{ id: string }>(
@@ -229,6 +230,45 @@ describe("actions", () => {
     const response = await broken(new Request(`${ORIGIN}/`, { headers: { authorization: `Bearer ${t}` } }));
     expect(response.status).toBe(500);
     expect(await response.text()).not.toContain("phi_console_rt");
+  });
+
+  it("records a booked appointment from a booking ticket (manual-queue), closing the ticket", async () => {
+    const contact = await seedContact(client());
+    const req = await client().query<{ id: string }>(`insert into phi.booking_requests (contact_id, status) values ($1, 'callback') returning id`, [contact]);
+    const ticket = await client().query<{ id: string }>(
+      `insert into phi.tickets (contact_id, kind, source_kind, source_id) values ($1, 'booking', 'booking_request', $2) returning id`,
+      [contact, req.rows[0]?.id],
+    );
+    const tid = ticket.rows[0]?.id ?? "";
+    const admin = await token({ role: "staff_admin", sub: "admin-1" });
+    const etDate = (days: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(Date.now() + days * 86_400_000);
+    const body = (over: Record<string, string> = {}) =>
+      new URLSearchParams({ provider: "funmilayo-whitaker", date: etDate(14), time: "15:30", modality: "telehealth", ...over }).toString();
+    expect((await request(`/tickets/${tid}/appointment`, { method: "POST", token: admin, body: body({ provider: "dr-nobody" }) })).status).toBe(400);
+    expect((await request(`/tickets/${tid}/appointment`, { method: "POST", token: admin, body: body({ date: etDate(-3) }) })).status).toBe(400);
+    expect((await request(`/tickets/${tid}/appointment`, { method: "POST", token: admin, body: body() })).status).toBe(303);
+    const appt = await client().query(`select provider_id, starts_at, adapter, recorded_by, status::text from phi.appointments`);
+    expect(appt.rows).toEqual([
+      { provider_id: "funmilayo-whitaker", starts_at: fromLocal(etDate(14), "15:30"), adapter: "manual-queue", recorded_by: "admin-1", status: "scheduled" },
+    ]);
+    expect((await client().query(`select status::text from phi.booking_requests`)).rows).toEqual([{ status: "booked" }]);
+    expect((await client().query(`select status::text from phi.tickets where id = $1`, [tid])).rows).toEqual([{ status: "done" }]);
+  });
+
+  it("an appointment outcome is final, and logistics help is only for a completed visit", async () => {
+    const contact = await seedContact(client());
+    const { rows } = await client().query<{ id: string }>(
+      `insert into phi.appointments (contact_id, provider_id, external_ref, adapter, starts_at, status)
+       values ($1, 'funmilayo-whitaker', 'm1', 'manual-queue', now() - interval '1 hour', 'scheduled') returning id`,
+      [contact],
+    );
+    const id = rows[0]?.id ?? "";
+    const t = await token({ role: "staff_admin", sub: "admin-1" });
+    expect((await request(`/appointments/${id}/logistics`, { method: "POST", token: t })).status).toBe(403);
+    expect((await request(`/appointments/${id}/outcome`, { method: "POST", token: t, body: "status=completed" })).status).toBe(303);
+    expect((await request(`/appointments/${id}/outcome`, { method: "POST", token: t, body: "status=no_show" })).status).toBe(403);
+    expect((await request(`/appointments/${id}/logistics`, { method: "POST", token: t })).status).toBe(303);
+    expect((await client().query(`select kind::text, status::text from phi.follow_ups`)).rows).toEqual([{ kind: "post_visit_logistics", status: "scheduled" }]);
   });
 
   it("404s unknown paths and 405s other methods", async () => {

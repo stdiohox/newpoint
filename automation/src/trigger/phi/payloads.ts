@@ -23,4 +23,7 @@ export const PHI_PAYLOADS = {
   "ops.crisis-page": z.object({ crisisEventId: z.uuid() }).strict(),
   "messaging.inbound-sms": z.object({ messageId: z.uuid() }).strict(),
   "referrals.lead-follow-up": z.object({ inquiryId: z.uuid() }).strict(),
+  "booking.request": z.object({ bookingRequestId: z.uuid() }).strict(),
+  "referrals.no-show": z.object({ followUpId: z.uuid() }).strict(),
+  "referrals.post-visit-logistics": z.object({ followUpId: z.uuid() }).strict(),
 } as const;

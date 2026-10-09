@@ -60,8 +60,8 @@ reset role;
 
 -- One review request per contact per 12 months, enforced in SQL.
 insert into phi.appointments (id, contact_id, provider_id, adapter, external_ref, starts_at, status)
-values ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000c1', 'p', 'manual-queue', 'x1', now() - interval '60 days', 'completed'),
-       ('00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000c1', 'p', 'manual-queue', 'x2', now() - interval '1 day', 'completed');
+values ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000c1', 'funmilayo-whitaker', 'manual-queue', 'x1', now() - interval '60 days', 'completed'),
+       ('00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000c1', 'funmilayo-whitaker', 'manual-queue', 'x2', now() - interval '1 day', 'completed');
 insert into phi.review_requests (appointment_id, contact_id, scheduled_for, sent_at, status)
 values ('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000c1', now() - interval '59 days', now() - interval '59 days', 'sent');
 select throws_ok(

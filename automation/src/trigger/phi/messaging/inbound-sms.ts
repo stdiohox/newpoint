@@ -43,6 +43,8 @@ export interface InboundDeps {
   /** Queues a template send; idempotent on (template, entity, step). */
   readonly send: (payload: SendSmsPayload) => Promise<void>;
   readonly pageCrisis: (crisisEventId: string) => Promise<void>;
+  /** Queues booking.request for a new booking_requests row (Phase 7). */
+  readonly startBooking: (bookingRequestId: string) => Promise<void>;
   readonly notifier: PhiNotifier;
   readonly logger: Logger;
   readonly now: () => Date;
@@ -130,7 +132,26 @@ export async function runInboundSms(deps: InboundDeps, messageId: string): Promi
     return { handled: "help" };
   }
 
-  // 4. A person handles it; the patient gets a neutral acknowledgment.
+  // 4a. A booking request goes to booking.request, which decides (D1, D18, D19) and replies.
+  if (intent === "book") {
+    const bookingRequestId = await deps.db.tx(deps.actor, async (q) => {
+      const inserted = await q.query<{ id: string }>(
+        `insert into phi.booking_requests (contact_id, source_message_id) values ($1, $2)
+         on conflict (source_message_id) do nothing returning id`,
+        [message.contactId, messageId],
+      );
+      return (
+        inserted.rows[0]?.id ??
+        (await q.query<{ id: string }>(`select id from phi.booking_requests where source_message_id = $1`, [messageId])).rows[0]?.id
+      );
+    });
+    if (bookingRequestId === undefined) throw new Error("inbound-sms: no booking request");
+    await deps.startBooking(bookingRequestId);
+    await setIntent(deps, messageId, intent);
+    return { handled: "routed" };
+  }
+
+  // 4b. A person handles it; the patient gets a neutral acknowledgment.
   const route = ROUTES[intent];
   await ticket(deps, message.contactId, route.ticket, messageId);
   await deps.send({ template: route.reply, contactId: message.contactId, entityId: messageId, step: 0 });
@@ -217,6 +238,11 @@ export const inboundSms = phiTask({
       pageCrisis: async (crisisEventId) => {
         await tasks.trigger<typeof import("../ops/crisis-page.js").crisisPage>("ops.crisis-page", { crisisEventId }, {
           idempotencyKey: `crisis-page:${crisisEventId}`,
+        });
+      },
+      startBooking: async (bookingRequestId) => {
+        await tasks.trigger<typeof import("../booking/request.js").bookingRequest>("booking.request", { bookingRequestId }, {
+          idempotencyKey: `booking-request:${bookingRequestId}`,
         });
       },
       notifier: rt.notifier,

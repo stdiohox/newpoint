@@ -199,6 +199,29 @@ against the embedded Postgres and fakes only.
   maintenance job outside the runtime roles (e.g. Supabase `pg_cron` as the owner) to delete
   windows older than a day.
 
+## Phase 7: booking (§5.1) — built, NOT deployable yet
+
+D1 conservative default: **`manual-queue` and `headway-handoff` only** (`SchedulingAdapter`
+in `src/adapters/scheduling`). No EHR adapter until D1 picks a system with an API and a BAA.
+
+| Piece | Does |
+|---|---|
+| `domain/scheduling/slot-policy.ts` | D18 minor/unknown age → callback; D19 weight management → callback; state unknown or outside NJ/PA → callback; only providers licensed there with the modality there (in-person confirmed in NJ only, so in-person PA → callback); new patients start with the assessment. |
+| `booking.request` | From an SMS "book" intent now (voice in Phase 8). Everything is a staff booking ticket unless headway-handoff is enabled AND the patient is established, asked for a concrete modality, and exactly one provider is eligible with a recorded page (Whitaker's is; Ofoegbu's is not in the repo). Decided once; a retry re-queues the same idempotent text. |
+| Console | Staff record the appointment they booked in the real system (provider, ET date and time, modality), mark completed / no-show / cancelled (final), and can send one post-visit logistics text. |
+| `booking.reminders` (*/15) | 48 h and 2 h before; a 2 h reminder quiet hours would push within 30 min of the visit is dropped. Reminders keep running during a crisis pause (§5.8). |
+| `booking.sync` (*/15) | Confirmation text for each staff-recorded appointment; a no-show opens a follow-up; due follow-ups are queued. Neither v1 adapter has an appointment feed. |
+| `referrals.no-show` / `referrals.post-visit-logistics` | Only a patient positively known to be new (booking request marked new) gets one rebooking text; anyone else → clinician review ticket. A refused text → staff callback ticket. One logistics text on request. |
+
+- Texts name providers as "Funmilayo Whitaker, DNP": the site allows "Dr." only beside the
+  full credentials, which an SMS slot cannot carry.
+- **D18 makes automated booking inert today**: every contact starts `unknown`, so every
+  request is a staff callback until staff set the age status.
+- A patient who books through Headway is billed by Headway, not Newpoint (D1 note).
+- **`headway-handoff` is built but OFF by default** (`PHI_SCHEDULING_ADAPTERS=manual-queue`):
+  its care.headway.co link would show a mental-health platform and the provider's name in a
+  lock-screen preview. Turn it on only after the owners decide how a link may be sent.
+
 ## Setup you must do (Phases 0 and 1)
 
 ### 1. Supabase — project `newpoint-marketing`
