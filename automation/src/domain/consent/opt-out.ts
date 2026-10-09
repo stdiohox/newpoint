@@ -5,7 +5,7 @@
  */
 const KEYWORDS = new Set(["stop", "stopall", "unsubscribe", "cancel", "end", "quit", "revoke", "optout", "opt out", "opt-out"]);
 const FREE_TEXT =
-  /\b(stop|quit|don'?t|do not|no more|never)\b[^.!?]{0,30}\b(text|texting|message|messaging|contact|sms)\b|\b(remove|take) me (off|from)\b|\bunsubscribe\b|\bleave me alone\b|\bwrong number\b/i;
+  /\b(stop|quit|don'?t|do not|no more|never)\b[^.!?]{0,30}\b(texts?|texting|messages?|messaging|contact(ing)?|sms)\b|\b(remove|take) me (off|from)\b|\bunsubscribe\b|\bleave me alone\b|\bwrong number\b/i;
 const HELP = new Set(["help", "info"]);
 
 export type KeywordIntent = "stop" | "help" | null;

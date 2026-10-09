@@ -9,6 +9,7 @@
  * server-side fallback is covered there is unverified, so the PHI zone does not use it.
  */
 import type pg from "pg";
+import { createPhiClaude, type PhiClaude } from "../../adapters/llm/anthropic-phi.js";
 import { createTwilio, type Twilio } from "../../adapters/messaging/twilio.js";
 import { createPhiNotifier, type PhiNotifier } from "../../adapters/n8n/phi-notify.js";
 import { createPhiPool, poolDb, type PhiDb } from "../../lib/db-phi.js";
@@ -24,6 +25,8 @@ export interface PhiRuntime {
   readonly pool: pg.Pool;
   readonly db: PhiDb;
   readonly twilio: Twilio;
+  /** The HIPAA org (§2). vendorFetch: a model call is safe to retry on 429/5xx. */
+  readonly claude: PhiClaude;
   readonly notifier: PhiNotifier;
   readonly logger: Logger;
 }
@@ -77,6 +80,7 @@ export function phiRuntime(): PhiRuntime {
       },
       noRetryFetch,
     ),
+    claude: createPhiClaude({ apiKey: env.ANTHROPIC_API_KEY_PHI, fetch: vendorFetch }),
     notifier: createPhiNotifier({ url: env.PHI_N8N_ACTION_WEBHOOK_URL, secret: env.PHI_N8N_ACTION_WEBHOOK_SECRET, fetch: vendorFetch }),
     logger: createLogger(),
   });

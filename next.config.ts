@@ -88,6 +88,20 @@ const legacyRedirects = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  /**
+   * THE LIVE INTAKE FORM'S BUILD FLAG (components/sections/ContactCrisis.tsx).
+   *
+   * Listed here, not only read as NEXT_PUBLIC_*, because Next inlines `env` into
+   * the SERVER bundle as well as the client one. ContactCrisis is a server
+   * component, so this is what makes the unset flag a constant there and lets the
+   * build drop the intake form from the page entirely. Both stay empty — and the
+   * site renders the old form, byte for byte — until the PHI zone and its BAAs are
+   * live (automation/docs: Phase 6).
+   */
+  env: {
+    NEXT_PUBLIC_INTAKE_URL: process.env.NEXT_PUBLIC_INTAKE_URL ?? '',
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '',
+  },
   images: {
     formats: ['image/webp'],
     /**

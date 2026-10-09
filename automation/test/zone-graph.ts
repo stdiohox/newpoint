@@ -51,7 +51,8 @@ function forbiddenChains(projectRoot: string, entryDirs: readonly string[], forb
   const src = join(projectRoot, "src");
   const chains: string[][] = [];
 
-  for (const entry of entryDirs.flatMap((dir) => tsFilesUnder(join(src, dir)))) {
+  // Entries are under src/, except a leading "../" which is relative to the package root (edge/).
+  for (const entry of entryDirs.flatMap((dir) => tsFilesUnder(dir.startsWith("..") ? join(projectRoot, dir.slice(3)) : join(src, dir)))) {
     const seen = new Set<string>([entry]);
     const queue: string[][] = [[entry]];
     for (let path = queue.shift(); path !== undefined; path = queue.shift()) {
@@ -82,7 +83,7 @@ export function phiZoneChains(projectRoot: string): string[][] {
 export function publicZoneChains(projectRoot: string): string[][] {
   return forbiddenChains(
     projectRoot,
-    [join("trigger", "phi"), "edge", "console", join("adapters", "messaging"), join("domain", "consent"), join("domain", "crisis"), join("domain", "messaging")],
+    [join("trigger", "phi"), "../edge", "edge", "console", join("adapters", "messaging"), join("domain", "consent"), join("domain", "crisis"), join("domain", "messaging")],
     isPublicZoneModule,
   );
 }

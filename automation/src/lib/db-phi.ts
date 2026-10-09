@@ -136,6 +136,13 @@ export async function hasActiveConsent(q: Queryable, contactId: string, kind: Co
   return rows[0]?.active === true;
 }
 
+/** The latest consent event for (contact, kind): a STOP stays a STOP until the person grants again. */
+export async function latestConsent(q: Queryable, contactId: string, kind: ConsentKind): Promise<"granted" | "revoked" | null> {
+  const { rows } = await q.query<{ active: boolean }>(`select active from phi.consent_state where contact_id = $1 and kind = $2`, [contactId, kind]);
+  const row = rows[0];
+  return row === undefined ? null : row.active ? "granted" : "revoked";
+}
+
 export async function revokeConsent(q: Queryable, contactId: string, kind: ConsentKind, source: string, evidence: object): Promise<void> {
   await q.query(
     `insert into phi.consents (contact_id, kind, revoked_at, source, evidence) values ($1, $2, now(), $3, $4)`,
@@ -161,10 +168,14 @@ export async function openSmsConversation(q: Queryable, contactId: string): Prom
   );
   if (existing.rows[0]) return existing.rows[0].id;
   const created = await q.query<{ id: string }>(
-    `insert into phi.conversations (contact_id, channel) values ($1, 'sms') returning id`,
+    `insert into phi.conversations (contact_id, channel) values ($1, 'sms')
+     on conflict (contact_id) where channel = 'sms' and closed_at is null do nothing returning id`,
     [contactId],
   );
-  const id = created.rows[0]?.id;
+  const id =
+    created.rows[0]?.id ??
+    (await q.query<{ id: string }>(`select id from phi.conversations where contact_id = $1 and channel = 'sms' and closed_at is null`, [contactId]))
+      .rows[0]?.id;
   if (!id) throw new Error("openSmsConversation: no id");
   return id;
 }

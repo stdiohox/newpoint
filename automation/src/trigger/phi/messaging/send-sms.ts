@@ -34,6 +34,7 @@ import {
   auditSend,
   getContact,
   hasActiveConsent,
+  latestConsent,
   openSmsConversation,
   outboundToday,
   sequencesPaused,
@@ -125,7 +126,7 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
   if (contact === null) return refused("no_contact");
   if (contact.phone === null) return refused("no_phone");
   if (contact.minorStatus !== "adult") return refused("not_adult");
-  if (!(await hasActiveConsent(q, contact.id, "sms_transactional"))) return refused("no_consent");
+  if (!(await consentFor(q, payload, contact.id))) return refused("no_consent");
   if (!def.beforeVerification && contact.phoneVerifiedAt === null) return refused("phone_unverified");
   if (def.sequence && (await sequencesPaused(q, contact.id))) return refused("sequences_paused");
 
@@ -138,7 +139,7 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
     if ((await outboundToday(q, contact.id)) >= deps.env.SMS_PER_NUMBER_DAILY) return refused("number_limit");
   }
 
-  const body = renderTemplate(payload.template, await resolveSlots(q, payload.template));
+  const body = renderTemplate(payload.template, await resolveSlots(q, payload.template, payload.entityId));
   const conversationId = await openSmsConversation(q, contact.id);
   const claim = await q.query<{ id: string }>(
     `insert into phi.messages (conversation_id, direction, body, template, idempotency_key)
@@ -149,6 +150,22 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
   // A concurrent run claimed the same key between our check and our insert.
   if (messageId === undefined) return { status: "duplicate" };
   return { status: "claimed", messageId, phone: contact.phone, body };
+}
+
+/**
+ * Consent for this send. The verification code is the one exception to "an active consent
+ * row": the visitor's consent is held pending on the code's own row until they confirm the
+ * code (edge/intake), and a number whose latest event is a STOP gets no code at all, so
+ * typing someone else's number into the site can never text them after they opted out.
+ */
+async function consentFor(q: Queryable, payload: SendSmsPayload, contactId: string): Promise<boolean> {
+  if (payload.template !== "verification_code") return hasActiveConsent(q, contactId, "sms_transactional");
+  if ((await latestConsent(q, contactId, "sms_transactional")) === "revoked") return false;
+  const pending = await q.query(
+    `select 1 from phi.phone_verifications where id = $1 and contact_id = $2 and consent_evidence is not null`,
+    [payload.entityId, contactId],
+  );
+  return pending.rows.length > 0;
 }
 
 const BUDGET_PAGE = pageText("Newpoint ops: the daily SMS budget was reached. Automated texts are stopped until tomorrow. Check messaging.send-sms.");

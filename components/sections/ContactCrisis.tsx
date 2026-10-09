@@ -3,7 +3,26 @@ import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
 import { OnboardingForm } from '@/components/ui/onboarding-form';
-import { CONTACT, BUSINESS, DELIVERY_LINE } from '@/lib/content';
+import type { IntakeForm as IntakeFormType } from '@/components/ui/intake-form';
+import { CONTACT, BUSINESS, DELIVERY_LINE, SMS_CONSENT } from '@/lib/content';
+
+/*
+ * The live intake form ships only when BOTH are set at build time. Unset (the default,
+ * and the only correct state until the PHI zone and its BAAs are live), the section
+ * renders OnboardingForm exactly as before.
+ */
+const INTAKE_URL = process.env.NEXT_PUBLIC_INTAKE_URL;
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+/*
+ * A build-time dead branch, not next/dynamic (which still preloads the chunk): Next
+ * inlines NEXT_PUBLIC_* at build, so with the flag unset webpack drops this require and
+ * the intake form never enters the page's bundle at all.
+ */
+const IntakeForm: typeof IntakeFormType | null =
+  process.env.NEXT_PUBLIC_INTAKE_URL && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+      (require('@/components/ui/intake-form') as typeof import('@/components/ui/intake-form')).IntakeForm
+    : null;
 
 /**
  * Layout family: contained form beside a crisis panel.
@@ -30,6 +49,22 @@ export function ContactCrisis() {
             {/* No <Reveal> wrapper: the card runs its own staggered entrance
                 on whileInView, and nesting the two would fade the card in
                 twice over. */}
+            {IntakeForm && INTAKE_URL && TURNSTILE_SITE_KEY ? (
+              <IntakeForm
+                className="max-w-xl"
+                intakeUrl={INTAKE_URL}
+                turnstileSiteKey={TURNSTILE_SITE_KEY}
+                title={CONTACT.heading}
+                description={CONTACT.live.body}
+                buttonText="Send"
+                reasons={CONTACT.reasons}
+                privacyNote={CONTACT.privacyNote}
+                consent={SMS_CONSENT}
+                success={CONTACT.success}
+                codeStep={{ heading: CONTACT.live.codeHeading, body: CONTACT.live.codeBody }}
+                phone={{ label: BUSINESS.phonePrimary, href: `tel:${BUSINESS.phonePrimaryHref}` }}
+              />
+            ) : (
             <OnboardingForm
               className="max-w-xl"
               imageSrc="/images/what-to-expect/request.webp"
@@ -55,6 +90,7 @@ export function ContactCrisis() {
                 })),
               }}
             />
+            )}
           </div>
 
           {/* order-first below md, matching app/contact/page.tsx: the grid

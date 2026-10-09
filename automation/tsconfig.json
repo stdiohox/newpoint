@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "lib": ["ES2023"],
+    "lib": [
+      "ES2023"
+    ],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "types": ["node"],
-
+    "types": [
+      "node"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -16,10 +19,14 @@
     "useUnknownInCatchVariables": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-
     "skipLibCheck": true,
     "noEmit": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "test", "*.ts"]
+  "include": [
+    "src",
+    "edge",
+    "test",
+    "*.ts"
+  ]
 }
