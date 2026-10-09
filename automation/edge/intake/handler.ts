@@ -11,6 +11,14 @@
  * against SMS pumping), each counted in its own transaction so a later failure cannot
  * roll a hit back. Only US numbers are accepted (NANP area codes outside the US refused).
  *
+ * AGE (D18): "Are you 18 or older?" is optional, and a typed-in number is not proof of anything:
+ *   - "yes" with a phone: applied only once the code texted to that phone is confirmed.
+ *   - "no": applied to a contact this submission creates (no code, no texts: a staff callback);
+ *     for a number already on file it is kept on the inquiry for staff, never applied, so the
+ *     form cannot flip someone else's record.
+ *   - no phone: the answer applies to the new email-only contact (it can never be texted).
+ *   - no answer: unknown (a staff callback).
+ *
  * CONSENT IS PENDING UNTIL THE CODE IS CONFIRMED. The ticked box and the wording (stored
  * verbatim, against the version this server holds) ride on the code's row; /intake/verify
  * writes them to phi.consents only after the code matches. So entering someone else's
@@ -23,7 +31,7 @@
  */
 import { createHmac, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import type { Queryable } from "../../src/lib/db-phi.js";
+import { answerUnknownAge, type Queryable } from "../../src/lib/db-phi.js";
 import { CONSENT_WORDING } from "../../src/domain/consent/wording.js";
 import { boundedText, type EdgeDeps } from "../shared/deps.js";
 import { allow, rateKey } from "../shared/rate-limit.js";
@@ -45,6 +53,8 @@ const intakeSchema = z
     phone: z.string().trim().max(32).optional(),
     reason: z.enum(Object.keys(REASONS) as [keyof typeof REASONS, ...(keyof typeof REASONS)[]]),
     smsConsent: z.boolean(),
+    /** "Are you 18 or older?" Optional: no answer leaves the age unknown (D18: staff callback). */
+    adult: z.enum(["yes", "no"]).optional(),
     consentVersion: z.number().int().min(0),
     turnstileToken: z.string().min(1).max(2048),
   })
@@ -157,7 +167,7 @@ async function submit(config: IntakeConfig, deps: EdgeDeps, ip: string, body: un
   if (!(await config.turnstile(form.turnstileToken, ip))) return json(403, { ok: false }, origin);
 
   const now = deps.now();
-  const wantsCode = form.smsConsent && phone !== null;
+  const wantsCode = form.smsConsent && phone !== null && form.adult !== "no";
   const allowed = await deps.db.tx("edge.intake", async (q) => {
     if (!(await allow(q, rateKey(config.hmacSecret, "ip", ip), 3_600_000, LIMITS.ipPerHour, now))) return false;
     if (phone !== null && !(await allow(q, rateKey(config.hmacSecret, "phone", phone), 86_400_000, LIMITS.phonePerDay, now))) return false;
@@ -190,37 +200,43 @@ async function record(
   now: Date,
 ): Promise<{ inquiryId: string; contactId: string; verificationId: string | null }> {
   const [first = "", ...rest] = form.name.split(/\s+/);
+  // With a phone, "yes" waits for the code; "no" applies only if this submission creates the contact.
+  const answered = (s: "adult" | "minor" | "unknown") => (s === "unknown" ? null : "web_form");
+  const emailOnly = form.adult === "yes" ? "adult" : form.adult === "no" ? "minor" : "unknown";
+  const withPhone = form.adult === "no" ? "minor" : "unknown";
   let contactId: string;
   if (phone === null) {
     const created = await q.query<{ id: string }>(
-      `insert into phi.contacts (first_name, last_name, email) values ($1, $2, $3) returning id`,
-      [first, rest.join(" ") || null, form.email],
+      `insert into phi.contacts (first_name, last_name, email, minor_status, minor_status_source, minor_status_at)
+       values ($1, $2, $3, $4, $5, case when $5::text is null then null else now() end) returning id`,
+      [first, rest.join(" ") || null, form.email, emailOnly, answered(emailOnly)],
     );
     contactId = created.rows[0]?.id ?? "";
   } else {
     // An existing contact keeps its details: the edge role cannot read or overwrite them.
     const created = await q.query<{ id: string }>(
-      `insert into phi.contacts (first_name, last_name, email, phone_e164) values ($1, $2, $3, $4)
+      `insert into phi.contacts (first_name, last_name, email, phone_e164, minor_status, minor_status_source, minor_status_at)
+       values ($1, $2, $3, $4, $5, $6, case when $6::text is null then null else now() end)
        on conflict (phone_e164) do nothing returning id`,
-      [first, rest.join(" ") || null, form.email, phone],
+      [first, rest.join(" ") || null, form.email, phone, withPhone, answered(withPhone)],
     );
     contactId = created.rows[0]?.id ?? (await contactFor(q, phone));
   }
   if (contactId === "") throw new Error("intake: no contact");
 
-  const inquiry = await q.query<{ id: string }>(`insert into phi.inquiries (contact_id, source, reason) values ($1, 'web', $2) returning id`, [
-    contactId,
-    REASONS[form.reason],
-  ]);
+  const inquiry = await q.query<{ id: string }>(
+    `insert into phi.inquiries (contact_id, source, reason, age_answer) values ($1, 'web', $2, $3) returning id`,
+    [contactId, REASONS[form.reason], form.adult ?? null],
+  );
   const inquiryId = inquiry.rows[0]?.id;
   if (inquiryId === undefined) throw new Error("intake: no inquiry");
-  if (!form.smsConsent || phone === null) return { inquiryId, contactId, verificationId: null };
+  if (!form.smsConsent || phone === null || form.adult === "no") return { inquiryId, contactId, verificationId: null };
 
   const verificationId = randomUUID();
   const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
   await q.query(
-    `insert into phi.phone_verifications (id, contact_id, inquiry_id, code, code_hmac, consent_evidence, expires_at)
-     values ($1, $2, $3, $4, $5, $6, $7)`,
+    `insert into phi.phone_verifications (id, contact_id, inquiry_id, code, code_hmac, consent_evidence, expires_at, age_answer)
+     values ($1, $2, $3, $4, $5, $6, $7, $8)`,
     [
       verificationId,
       contactId,
@@ -237,6 +253,7 @@ async function record(
         ticked_at: now.toISOString(),
       }),
       new Date(now.getTime() + LIMITS.codeTtlMs),
+      form.adult ?? null,
     ],
   );
   return { inquiryId, contactId, verificationId };
@@ -258,10 +275,11 @@ async function verify(config: IntakeConfig, deps: EdgeDeps, ip: string, body: un
       contact_id: string;
       code_hmac: string;
       consent_evidence: Record<string, unknown> | null;
+      age_answer: "yes" | "no" | null;
       expires_at: Date;
       attempts: number;
       verified_at: Date | null;
-    }>(`select contact_id, code_hmac, consent_evidence, expires_at, attempts, verified_at from phi.phone_verifications where id = $1 for update`, [
+    }>(`select contact_id, code_hmac, consent_evidence, age_answer, expires_at, attempts, verified_at from phi.phone_verifications where id = $1 for update`, [
       verificationId,
     ]);
     const row = rows[0];
@@ -273,6 +291,8 @@ async function verify(config: IntakeConfig, deps: EdgeDeps, ip: string, body: un
     }
     await q.query(`update phi.phone_verifications set verified_at = $2, code = null where id = $1`, [verificationId, now]);
     await q.query(`update phi.contacts set phone_verified_at = $2 where id = $1`, [row.contact_id, now]);
+    // The number is now proven theirs: a "yes" answers an unknown age.
+    if (row.age_answer === "yes") await answerUnknownAge(q, row.contact_id, "adult", "web_form");
     // Only now does the ticked box become consent: the person has shown the number is theirs.
     if (row.consent_evidence !== null) {
       await q.query(

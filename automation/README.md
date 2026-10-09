@@ -181,9 +181,9 @@ against the embedded Postgres and fakes only.
 
 - **D5 open:** the edge handlers are host-agnostic fetch handlers (`edge/README.md`); nothing
   is mounted until Supabase confirms Edge Functions are in its BAA, or a BAA host is chosen.
-- **D18 makes the SMS side inert today.** Inbound texters and intake contacts are
-  `unknown` age, so send-sms refuses every automated text to them, verification codes
-  included. Every inquiry and every inbound message still becomes a staff ticket.
+- **D18:** an unknown age gets no automated text; age is now asked at first contact (see
+  "Age at first contact" below). Every inquiry and every inbound message still becomes a
+  staff ticket.
 - `test/phi/consent-drift.test.ts` fails if `SMS_CONSENT` in `lib/content.ts` drifts from
   `CONSENT_WORDING`, or the site's reasons from the handler's.
 - **Consent is pending until the code is confirmed.** The ticked box rides on the code's row
@@ -279,6 +279,29 @@ D12: `referrals.referrer-update` is built but OFF.
 - **Go-live setup:** a PRIVATE Supabase Storage bucket on newpoint-phi and storage-scoped JWTs
   (never service_role): a PUT-only one for the internet-facing edge, and one with get/delete for
   tasks and the console, each limited to that bucket by `storage.objects` policies.
+
+## Age at first contact (D18 follow-up)
+
+"Are you 18 or older?" is asked at first contact: yes → `adult`, no → `minor` (staff
+callback only, as before), no answer → stays `unknown` (staff callback). The wording is
+neutral: no reason given, nothing clinical.
+
+| Where | How |
+|---|---|
+| Web form | An optional Yes/No question (nothing pre-selected). A typed-in number proves nothing: a "yes" with a phone applies only once the texted code is confirmed; a "no" applies to a contact this submission creates (no code, no texts, a staff callback) and, for a number already on file, is kept on the inquiry for staff rather than applied. Email-only contacts take the answer at once (they can never be texted). |
+| First SMS exchange | An unknown-age texter is asked once per conversation (`age_check`), in reply to their own text: only to a message from the last 30 minutes, never after a STOP, never to a known minor, at most 30 an hour. A clear YES or NO that directly answers it (the last text we sent, within 24 h) sets the age; a NO opens a staff callback; anything unclear leaves it unknown. Crisis, STOP and HELP still come first. |
+| Start of a call | The greeting says it is automated and not recorded, then asks. The `confirm_age` tool records yes or no (no answer records nothing); the caller's number comes from Vapi, never the model. An under-18 caller always gets a staff call back, however the call ends. |
+
+- **Database rules** (`minor_status_guard`): a self-reported "yes" only fills an UNKNOWN age; a
+  "no" may replace an earlier self-report; nothing automated ever overrides a staff decision;
+  `minor_status_source` (`web_form`, `sms`, `voice`, `staff`) and `minor_status_at` record where
+  and when, and cannot be rewritten on their own. The guards recognise the runtimes' LOGIN
+  roles as members of `phi_tasks` / `phi_edge` (`phi.acts_as`); this also fixes the Phase 6
+  phone-verification guard, which compared `current_user` to the group role's name.
+- **Self-reported.** Nobody checks an ID; caller ID can be spoofed. This is the conservative
+  reading of D18 until counsel and the practice decide.
+- **D20 note:** the age question is the one text that can go to someone who has not given SMS
+  consent, as a single reply to a message they just sent. Counsel should confirm this.
 
 ## Setup you must do (Phases 0 and 1)
 

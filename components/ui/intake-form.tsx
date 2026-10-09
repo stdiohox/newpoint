@@ -68,6 +68,8 @@ export interface IntakeFormProps {
   codeStep: { heading: string; body: string };
   /** The practice line, as a working tel: link: the fallback every failure hands over. */
   phone: { label: string; href: string };
+  /** "Are you 18 or older?" Optional: left unanswered, the practice simply calls back. */
+  ageQuestion: string;
 }
 
 export function IntakeForm({
@@ -83,6 +85,7 @@ export function IntakeForm({
   success,
   codeStep,
   phone,
+  ageQuestion,
 }: IntakeFormProps) {
   const [stage, setStage] = useState<Stage>('form');
   const [errors, setErrors] = useState<Errors>({});
@@ -104,6 +107,7 @@ export function IntakeForm({
   const noteId = useId();
   const consentId = useId();
   const consentTextId = useId();
+  const ageId = useId();
 
   const checkFailed = () => {
     setToken(null);
@@ -170,6 +174,7 @@ export function IntakeForm({
     const email = String(form.get('email') ?? '').trim();
     const phoneValue = String(form.get('phone') ?? '').trim();
     const smsConsent = form.get('smsConsent') === 'on';
+    const adult = form.get('adult');
     const next: Errors = {};
     if (!name) next.name = 'Please enter your name.';
     if (!email) next.email = 'Please enter an email address.';
@@ -195,6 +200,7 @@ export function IntakeForm({
         ...(phoneValue ? { phone: phoneValue } : {}),
         reason: String(form.get('reason') ?? reasons[0]),
         smsConsent,
+        ...(adult === 'yes' || adult === 'no' ? { adult } : {}),
         consentVersion: consent.version,
         turnstileToken: token,
       });
@@ -409,6 +415,22 @@ export function IntakeForm({
                 ))}
               </select>
             </div>
+            {/* Optional, and nothing is pre-selected: no answer is a valid answer (the team calls back). */}
+            <fieldset>
+              <legend id={ageId} className={LABEL_CLASS}>
+                {ageQuestion} <span className="text-np-neutral-600 font-normal">(optional)</span>
+              </legend>
+              <div className="mt-2 flex gap-6">
+                <label className="text-small text-np-ink flex items-center gap-2">
+                  <input type="radio" name="adult" value="yes" className="h-6 w-6" />
+                  Yes
+                </label>
+                <label className="text-small text-np-ink flex items-center gap-2">
+                  <input type="radio" name="adult" value="no" className="h-6 w-6" />
+                  No
+                </label>
+              </div>
+            </fieldset>
             <div className="flex items-start gap-3">
               {/* Unticked by default and never required: consent is not a condition of care.
                   A short accessible name; the full disclosure is its description. 24px for SC 2.5.8. */}

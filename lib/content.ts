@@ -2660,6 +2660,8 @@ export const CONTACT = {
     codeHeading: 'Check your phone',
     codeBody:
       'We texted a 6-digit code to the number you gave. Enter it here so we know the number is yours.',
+    /** Optional. Neutral by design: no reason given, nothing clinical. */
+    ageQuestion: 'Are you 18 or older?',
   },
   unavailable: {
     heading: 'Online requests aren’t active yet',

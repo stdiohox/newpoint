@@ -94,6 +94,14 @@ export const TEMPLATES = {
     text: "Newpoint: if you would like to share feedback publicly, you can leave a review here: {link} Reply STOP to opt out.",
     slots: ["link"], sequence: true, beforeVerification: false, anyHour: false, window: "review",
   },
+  /**
+   * D18: the one question an unknown-age texter is asked, as the reply to their first text.
+   * Neutral: no reason given, nothing clinical. Its answer is read in messaging.inbound-sms.
+   */
+  age_check: {
+    text: "Newpoint: before we continue, are you 18 or older? Reply YES or NO. Reply STOP to opt out.",
+    slots: [], sequence: false, beforeVerification: true, anyHour: false,
+  },
   crisis_response: {
     text: CRISIS_SCRIPT.sms,
     slots: [], sequence: false, beforeVerification: false, anyHour: true,

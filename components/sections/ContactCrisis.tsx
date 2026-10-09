@@ -62,6 +62,7 @@ export function ContactCrisis() {
                 consent={SMS_CONSENT}
                 success={CONTACT.success}
                 codeStep={{ heading: CONTACT.live.codeHeading, body: CONTACT.live.codeBody }}
+                ageQuestion={CONTACT.live.ageQuestion}
                 phone={{ label: BUSINESS.phonePrimary, href: `tel:${BUSINESS.phonePrimaryHref}` }}
               />
             ) : (
