@@ -6,7 +6,8 @@
  *   - a web inquiry with no ticket after 5 minutes → referrals.lead-follow-up;
  *   - a live, unsent verification code → messaging.send-sms;
  *   - a voice call still open 30 minutes after it started (no end-of-call report, or the
- *     hand-off was lost) → booking.process-call-report, which treats it as "call them back".
+ *     hand-off was lost) → booking.process-call-report, which treats it as "call them back";
+ *   - a referral still `received` after 10 minutes → referrals.intake.
  * A crisis event whose page was never queued is the dead-man check's job (ops.crisis-page:
  * every minute, 2-minute threshold), not this sweep's.
  * Every re-queue uses the same idempotency key as the edge, so a run that already exists
@@ -23,6 +24,7 @@ export interface Stranded {
   readonly inquiries: readonly string[];
   readonly codes: readonly { readonly id: string; readonly contactId: string }[];
   readonly calls: readonly string[];
+  readonly referrals: readonly string[];
 }
 
 export async function findStranded(db: PhiDb, actor: string): Promise<Stranded> {
@@ -51,12 +53,33 @@ export async function findStranded(db: PhiDb, actor: string): Promise<Stranded> 
           and started_at < now() - interval '30 minutes' and started_at > now() - interval '1 day'
         order by started_at limit 200`,
     );
+    const referrals = await q.query<{ id: string }>(
+      `select id from phi.referrals where status = 'received' and received_at < now() - interval '10 minutes'
+          and received_at > now() - interval '7 days' order by received_at limit 200`,
+    );
     return {
+      referrals: referrals.rows.map((r) => r.id),
       calls: calls.rows.map((r) => r.id),
       inbound: inbound.rows.map((r) => r.id),
       inquiries: inquiries.rows.map((r) => r.id),
       codes: codes.rows.map((r) => ({ id: r.id, contactId: r.contact_id })),
     };
+  });
+}
+
+/**
+ * A referral still `received` 30 minutes after it arrived (intake keeps failing) is not left
+ * to sit: a clinician review ticket opens (once) so a person reads the document.
+ */
+export async function escalateStuckReferrals(db: PhiDb, actor: string): Promise<number> {
+  return db.tx(actor, async (q) => {
+    const r = await q.query(
+      `insert into phi.tickets (contact_id, kind, source_kind, source_id)
+       select null, 'clinician_review', 'referral', id from phi.referrals
+        where status = 'received' and received_at < now() - interval '30 minutes'
+       on conflict (kind, source_kind, source_id) where status in ('open', 'in_progress') do nothing`,
+    );
+    return r.rowCount ?? 0;
   });
 }
 
@@ -85,6 +108,17 @@ export const reconcile = phiSchedule({
     for (const conversationId of stranded.calls) {
       await tasks.trigger("booking.process-call-report", { conversationId }, { idempotencyKey: `process-call-report:${conversationId}` });
     }
-    return { inbound: stranded.inbound.length, inquiries: stranded.inquiries.length, codes: stranded.codes.length, calls: stranded.calls.length };
+    const escalated = await escalateStuckReferrals(phiRuntime().db, ID);
+    if (escalated > 0) await phiRuntime().notifier.actionRequired(new Date()).catch(() => undefined);
+    for (const referralId of stranded.referrals) {
+      await tasks.trigger("referrals.intake", { referralId }, { idempotencyKey: `referrals-intake:${referralId}` });
+    }
+    return {
+      inbound: stranded.inbound.length,
+      inquiries: stranded.inquiries.length,
+      codes: stranded.codes.length,
+      calls: stranded.calls.length,
+      referrals: stranded.referrals.length,
+    };
   },
 });

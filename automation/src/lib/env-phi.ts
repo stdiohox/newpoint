@@ -45,6 +45,12 @@ export const phiEnvSchema = z.object({
     .string()
     .regex(/^https:\/\/(g\.page\/r\/[A-Za-z0-9_-]{6,80}\/review|search\.google\.com\/local\/writereview\?placeid=[A-Za-z0-9_-]{10,80})$/)
     .optional(),
+  /** Phase 10: the private referral bucket on newpoint-phi, with a storage-scoped JWT (never service_role). All three or none. */
+  PHI_STORAGE_URL: z.string().regex(/^https:\/\/[a-z]{20}\.supabase\.co$/).optional(),
+  PHI_STORAGE_BUCKET: z.string().regex(/^[a-z0-9-]{3,63}$/).optional(),
+  PHI_STORAGE_JWT: z.string().min(40).optional(),
+  /** D12: referrer updates are built but OFF. Turning this on alone sends nothing (no channel is wired). */
+  PHI_REFERRER_UPDATE_ENABLED: z.enum(["true", "false"]).default("false").transform((v) => v === "true"),
   /** Phase 9: the insert-only metrics_writer login on newpoint-marketing (§1 crossing). All three or none. */
   PHI_METRICS_WRITER_DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\/[^\s]+$/).optional(),
   PHI_METRICS_WRITER_CA_CERT: z.string().startsWith("-----BEGIN CERTIFICATE-----").optional(),
@@ -102,6 +108,14 @@ export function loadPhiEnv(source: Readonly<Record<string, string | undefined>> 
   }
   if (supabaseProjectRef(result.data.PHI_DATABASE_URL) !== result.data.SUPABASE_PHI_PROJECT_REF) {
     throw new ConfigError("phi_db_host_mismatch", ["PHI_DATABASE_URL", "SUPABASE_PHI_PROJECT_REF"]);
+  }
+  const storage = [result.data.PHI_STORAGE_URL, result.data.PHI_STORAGE_BUCKET, result.data.PHI_STORAGE_JWT];
+  if (storage.some((v) => v !== undefined) && storage.some((v) => v === undefined)) {
+    throw new ConfigError("storage_partial", ["PHI_STORAGE_BUCKET", "PHI_STORAGE_JWT", "PHI_STORAGE_URL"]);
+  }
+  // The bucket lives in newpoint-phi itself, never anywhere else.
+  if (result.data.PHI_STORAGE_URL !== undefined && result.data.PHI_STORAGE_URL !== `https://${result.data.SUPABASE_PHI_PROJECT_REF}.supabase.co`) {
+    throw new ConfigError("storage_host_mismatch", ["PHI_STORAGE_URL", "SUPABASE_PHI_PROJECT_REF"]);
   }
   const metrics = [result.data.PHI_METRICS_WRITER_DATABASE_URL, result.data.PHI_METRICS_WRITER_CA_CERT, result.data.PHI_METRICS_MARKETING_PROJECT_REF];
   if (metrics.some((v) => v !== undefined) && metrics.some((v) => v === undefined)) {

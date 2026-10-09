@@ -1,6 +1,6 @@
 # Edge handlers (PHI zone)
 
-`twilio-inbound/` and `intake/` (Phase 6) and `vapi-tools/` and `vapi-events/` (Phase 8)
+`twilio-inbound/` and `intake/` (Phase 6; the referral route in Phase 10) and `vapi-tools/` and `vapi-events/` (Phase 8)
 are written as **host-agnostic fetch handlers**:
 `(Request) => Promise<Response>`, with every dependency injected.
 

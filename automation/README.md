@@ -261,6 +261,25 @@ in `src/adapters/scheduling`). No EHR adapter until D1 picks a system with an AP
 - The marketing `ops.heartbeat` stale-agent digest that reads `metrics.agent_health` is not
   built here (§5.9 marketing side); the rows are now pushed for it.
 
+## Phase 10: referral intake (§5.5) — built, NOT deployable yet
+
+D17: the clinician web form is the only path (fax waits for a BAA-covered e-fax vendor).
+D12: `referrals.referrer-update` is built but OFF.
+
+| Piece | Does |
+|---|---|
+| `edge/intake/referral.ts` (`POST /intake/referral`) | Exact Origin, a declared size and a per-IP attempt limit BEFORE the body is read, Turnstile, rate limits (per IP, global daily), referrer fields only, a PDF (must start with `%PDF-`) of at most 10 MB stored in the private bucket under a server-chosen UUID. No patient fields on the form. |
+| `referrals.intake` | The PDF goes only to the Anthropic HIPAA org (Opus 5.5, effort high, no tools), as untrusted data, into a fixed schema. EVERY referral opens a clinician review ticket: the model's urgency is shown as model-stated and unverified, never trusted to route a referral away from a clinician. Never creates a contact or sends anything. A referral whose intake keeps failing opens a clinician review after 30 minutes (`ops.reconcile`). |
+| Console | Referral queue: extracted values shown escaped and pre-filled for staff to check against the document (an audited download, never rendered inline). Confirm creates the contact with NO consent and opens a staff callback (a clinician review for an urgent one); reject. Either closes the review ticket. Urgent, high-risk or unread referrals are clinician-only (admins cannot decide them or see the patient's name). A number already on file is never linked silently: staff resolve it by hand. |
+| `referrals.referrer-update` | Would send only "received and the patient has been scheduled", once per referral. OFF (`PHI_REFERRER_UPDATE_ENABLED=false`) and no channel to referrers is wired, so it sends nothing until counsel (D12) and a BAA-covered channel are decided. |
+| Retention | `ops.retention-sweep` removes documents past `purge_after` (D16 open: nothing sets it yet). |
+
+- **Not built:** the clinician-facing form page itself (where it is hosted is an owner
+  decision, like D7); the edge route is ready for it.
+- **Go-live setup:** a PRIVATE Supabase Storage bucket on newpoint-phi and storage-scoped JWTs
+  (never service_role): a PUT-only one for the internet-facing edge, and one with get/delete for
+  tasks and the console, each limited to that bucket by `storage.objects` policies.
+
 ## Setup you must do (Phases 0 and 1)
 
 ### 1. Supabase — project `newpoint-marketing`

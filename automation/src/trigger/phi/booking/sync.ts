@@ -29,6 +29,8 @@ export interface SyncPlan {
    * Plus requests left pending past their window (a run that died): re-queued once a day.
    */
   readonly reviewCandidates: readonly { readonly appointmentId: string; readonly key: string }[];
+  /** Scheduled appointments for a confirmed referral's patient (§5.5 referrer-update; off under D12). */
+  readonly referredAppointments: readonly string[];
   readonly upserted: number;
 }
 
@@ -80,7 +82,16 @@ export async function planSync(db: PhiDb, actor: string, adapters: readonly Sche
         where r.status = 'pending_clinician_window' and r.scheduled_for < now() - interval '1 hour'
         limit 200`,
     );
+    const referred = await q.query<{ id: string }>(
+      `select a.id from phi.appointments a
+        where a.status = 'scheduled' and a.starts_at > now()
+          and exists (select 1 from phi.referrals r where r.contact_id = a.contact_id and r.status = 'confirmed')
+          and not exists (select 1 from phi.follow_ups f join phi.referrals r2 on r2.id = f.source_id
+                           where f.kind = 'referrer_update' and r2.contact_id = a.contact_id)
+        limit 200`,
+    );
     return {
+      referredAppointments: referred.rows.map((r) => r.id),
       reviewCandidates: reviewCandidates.rows.map((r) => ({ appointmentId: r.id, key: r.key })),
       confirmations: confirmations.rows.map((r) => ({ appointmentId: r.id, contactId: r.contact_id })),
       followUps: due.rows,
@@ -109,6 +120,12 @@ export const bookingSync = phiSchedule({
     for (const f of plan.followUps) {
       const task = f.kind === "no_show" ? "referrals.no-show" : "referrals.post-visit-logistics";
       await tasks.trigger(task, { followUpId: f.id }, { idempotencyKey: `${task}:${f.id}` });
+    }
+    // D12: referrer-update is off; only queued when enabled, so a disabled flag costs nothing.
+    if (rt.env.PHI_REFERRER_UPDATE_ENABLED) {
+      for (const appointmentId of plan.referredAppointments) {
+        await tasks.trigger("referrals.referrer-update", { appointmentId }, { idempotencyKey: `referrer-update:${appointmentId}` });
+      }
     }
     for (const c of plan.reviewCandidates) {
       // Keyed per appointment and eligibility inputs: checked once per change, not every 15 minutes.

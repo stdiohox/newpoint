@@ -11,6 +11,7 @@
 import type pg from "pg";
 import { createPhiClaude, type PhiClaude } from "../../adapters/llm/anthropic-phi.js";
 import { createTwilio, type Twilio } from "../../adapters/messaging/twilio.js";
+import { createSupabaseReferralStore, type ReferralStore } from "../../adapters/storage/referral-store.js";
 import { createPhiNotifier, type PhiNotifier } from "../../adapters/n8n/phi-notify.js";
 import { createHeadwayHandoff } from "../../adapters/scheduling/headway-handoff.js";
 import { createManualQueue } from "../../adapters/scheduling/manual-queue.js";
@@ -32,6 +33,8 @@ export interface PhiRuntime {
   /** The HIPAA org (§2). vendorFetch: a model call is safe to retry on 429/5xx. */
   readonly claude: PhiClaude;
   readonly notifier: PhiNotifier;
+  /** Phase 10: the private referral bucket; null until PHI_STORAGE_* is set. */
+  readonly referralStore: ReferralStore | null;
   /** D1: manual-queue always; headway-handoff when PHI_SCHEDULING_ADAPTERS lists it. */
   readonly scheduling: { readonly manual: SchedulingAdapter; readonly headway: SchedulingAdapter | null };
   readonly logger: Logger;
@@ -78,6 +81,10 @@ export function phiRuntime(): PhiRuntime {
     env,
     pool,
     db,
+    referralStore:
+      env.PHI_STORAGE_URL === undefined || env.PHI_STORAGE_BUCKET === undefined || env.PHI_STORAGE_JWT === undefined
+        ? null
+        : createSupabaseReferralStore({ projectUrl: env.PHI_STORAGE_URL, bucket: env.PHI_STORAGE_BUCKET, jwt: env.PHI_STORAGE_JWT, fetch: vendorFetch }),
     scheduling: {
       manual: createManualQueue(async (bookingRequestId, contactId) =>
         (await db.tx("booking.request", (q) => bookingTicket(q, bookingRequestId, contactId))).id,
