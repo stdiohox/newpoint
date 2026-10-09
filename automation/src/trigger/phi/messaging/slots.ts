@@ -10,7 +10,22 @@ import { templateDef, type Slots, type TemplateId } from "../../../domain/messag
 import { HANDOFF_URLS, provider } from "../../../domain/scheduling/providers.js";
 import { smsDate, smsTime } from "../../../domain/scheduling/time.js";
 
-export async function resolveSlots(q: Queryable, template: TemplateId, entityId: string): Promise<Slots> {
+export interface SlotConfig {
+  /** PHI_GOOGLE_REVIEW_URL: the only link a review text may carry. null = not configured. */
+  readonly reviewUrl: string | null;
+}
+
+export async function resolveSlots(q: Queryable, template: TemplateId, entityId: string, config: SlotConfig = { reviewUrl: null }): Promise<Slots> {
+  if (template === "review_request") {
+    // The entity is a review request just claimed for sending (reviews.request-review); the link is the practice's own.
+    const { rows } = await q.query(
+      `select 1 from phi.review_requests where id = $1 and status = 'sent' and sent_at > now() - interval '1 hour'`,
+      [entityId],
+    );
+    if (rows.length === 0) throw new ValidationError("review_request_unavailable");
+    if (config.reviewUrl === null) throw new ValidationError("review_link_unconfigured");
+    return { link: config.reviewUrl };
+  }
   if (template === "verification_code") {
     // The code row is the entity: a live, unused code only. An expired or used code is never re-sent.
     const { rows } = await q.query<{ code: string }>(

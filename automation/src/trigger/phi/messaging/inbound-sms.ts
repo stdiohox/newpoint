@@ -192,9 +192,13 @@ const BARE = /^\s*(stop|stopall|unsubscribe|cancel|end|quit|revoke|optout|opt[ -
 const isBareKeyword = (body: string): boolean => BARE.test(body);
 
 async function optOut(deps: InboundDeps, contactId: string, messageId: string, body: string): Promise<void> {
-  await deps.db.tx(deps.actor, (q) =>
-    revokeConsent(q, contactId, "sms_transactional", isBareKeyword(body) ? "sms_keyword" : "sms_free_text", { message_id: messageId }),
-  );
+  // A STOP ends every kind of text, the review request included: a later SMS re-consent must
+  // not quietly revive an old review consent.
+  const source = isBareKeyword(body) ? "sms_keyword" : "sms_free_text";
+  await deps.db.tx(deps.actor, async (q) => {
+    await revokeConsent(q, contactId, "sms_transactional", source, { message_id: messageId });
+    await revokeConsent(q, contactId, "review_requests", source, { message_id: messageId });
+  });
 }
 
 async function ticket(deps: InboundDeps, contactId: string, kind: "callback" | "message" | "booking", messageId: string): Promise<void> {

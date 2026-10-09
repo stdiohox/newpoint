@@ -11,7 +11,8 @@
  *   4. an active sms_transactional consent;
  *   5. a verified phone (only the verification code itself goes before);
  *   6. no open crisis for a sequence template (§5.8: reminders keep running);
- *   7. quiet hours 08:00–21:00 America/New_York (NJ and PA): deferred, never dropped;
+ *   7. quiet hours 08:00–21:00 America/New_York (NJ and PA), or the template's narrower window
+ *      (review requests 10:00–19:00): deferred, never dropped;
  *   8. the global daily budget (trips the breaker and pages Koret ops once a day) and
  *      the per-number daily limit.
  * The crisis auto-response is exempt from 7 and 8 only: it answers a message the
@@ -45,7 +46,7 @@ import type { PhiEnv } from "../../../lib/env-phi.js";
 import { VendorHttpError } from "../../../lib/errors.js";
 import { phiTask } from "../../../lib/task.js";
 import type { Phi } from "../../../lib/phi.js";
-import { inWindow, nextInWindow, SMS_WINDOW } from "../../../domain/messaging/quiet-hours.js";
+import { inWindow, nextInWindow, REVIEW_WINDOW, SMS_WINDOW } from "../../../domain/messaging/quiet-hours.js";
 import { renderTemplate, templateDef, type SmsBody } from "../../../domain/messaging/templates.js";
 import { PHI_PAYLOADS } from "../payloads.js";
 import { phiRuntime } from "../runtime.js";
@@ -73,7 +74,7 @@ export type SendOutcome =
 export interface SendSmsDeps {
   readonly db: PhiDb;
   readonly twilio: Pick<Twilio, "sendSms" | "page">;
-  readonly env: Pick<PhiEnv, "SMS_DAILY_BUDGET" | "SMS_PER_NUMBER_DAILY" | "PHI_OPS_PAGE_PHONE">;
+  readonly env: Pick<PhiEnv, "SMS_DAILY_BUDGET" | "SMS_PER_NUMBER_DAILY" | "PHI_OPS_PAGE_PHONE"> & { readonly PHI_GOOGLE_REVIEW_URL?: string | undefined };
   readonly now: () => Date;
   readonly actor: string;
 }
@@ -132,14 +133,15 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
 
   if (!def.anyHour) {
     const now = deps.now();
-    if (!inWindow(now, SMS_WINDOW)) return { status: "deferred", until: nextInWindow(now, SMS_WINDOW) };
+    const window = def.window === "review" ? REVIEW_WINDOW : SMS_WINDOW;
+    if (!inWindow(now, window)) return { status: "deferred", until: nextInWindow(now, window) };
     // Held to commit: the count and the claim below are one step for every concurrent run.
     await q.query(`select pg_advisory_xact_lock(hashtext('phi.sms_budget'))`);
     if ((await outboundToday(q, null)) >= deps.env.SMS_DAILY_BUDGET) return { status: "trip" };
     if ((await outboundToday(q, contact.id)) >= deps.env.SMS_PER_NUMBER_DAILY) return refused("number_limit");
   }
 
-  const body = renderTemplate(payload.template, await resolveSlots(q, payload.template, payload.entityId));
+  const body = renderTemplate(payload.template, await resolveSlots(q, payload.template, payload.entityId, { reviewUrl: deps.env.PHI_GOOGLE_REVIEW_URL ?? null }));
   const conversationId = await openSmsConversation(q, contact.id);
   const claim = await q.query<{ id: string }>(
     `insert into phi.messages (conversation_id, direction, body, template, idempotency_key)

@@ -410,7 +410,7 @@ describe("messaging.inbound-sms (§5.1, §5.8)", () => {
     const tracked: InboundDeps = {
       ...deps,
       sendNow: async (p) => {
-        revokedBefore.push(((await client().query(`select count(*)::int as n from phi.consents where revoked_at is not null`)).rows[0] as { n: number }).n > 0);
+        revokedBefore.push(((await client().query(`select count(*)::int as n from phi.consents where revoked_at is not null and kind = 'sms_transactional'`)).rows[0] as { n: number }).n > 0);
         return sendNow(p);
       },
     };
@@ -418,7 +418,7 @@ describe("messaging.inbound-sms (§5.1, §5.8)", () => {
     expect(revokedBefore).toEqual([false]);
     expect(log).toContain("sendNow:crisis_response");
     await client().query("reset role");
-    expect((await client().query(`select source from phi.consents where revoked_at is not null`)).rows).toEqual([{ source: "sms_free_text" }]);
+    expect((await client().query(`select source from phi.consents where revoked_at is not null and kind = 'sms_transactional'`)).rows).toEqual([{ source: "sms_free_text" }]);
   });
 
   it("is idempotent: a retry neither pages nor opens anything twice", async () => {
@@ -442,7 +442,7 @@ describe("messaging.inbound-sms (§5.1, §5.8)", () => {
     expect(await runInboundSms(deps, b.messageId)).toEqual({ handled: "stop" });
     expect(log).toEqual(["classify"]);
     await client().query("reset role");
-    const sources = await client().query(`select contact_id = $1 as a, source from phi.consents where revoked_at is not null order by a desc`, [a.contactId]);
+    const sources = await client().query(`select contact_id = $1 as a, source from phi.consents where revoked_at is not null and kind = 'sms_transactional' order by a desc`, [a.contactId]);
     expect(sources.rows).toEqual([{ a: true, source: "sms_keyword" }, { a: false, source: "sms_free_text" }]);
   });
 
@@ -453,7 +453,7 @@ describe("messaging.inbound-sms (§5.1, §5.8)", () => {
     expect(await runInboundSms(deps, messageId)).toEqual({ handled: "crisis" });
     expect(log).toEqual(["classify", "page", "sendNow:crisis_response"]);
     await client().query("reset role");
-    expect((await client().query(`select source from phi.consents where revoked_at is not null`)).rows).toEqual([{ source: "sms_free_text" }]);
+    expect((await client().query(`select source from phi.consents where revoked_at is not null and kind = 'sms_transactional'`)).rows).toEqual([{ source: "sms_free_text" }]);
   });
 
   it("a classifier outage still reaches a person: a ticket, no reply", async () => {

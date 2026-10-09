@@ -245,6 +245,22 @@ in `src/adapters/scheduling`). No EHR adapter until D1 picks a system with an AP
 - Vapi field names follow its API as of this writing; contract tests against the Vapi
   sandbox are a go-live step (§7).
 
+## Phase 9: reviews and metrics (§5.4, §5.9) — built, NOT deployable yet
+
+| Piece | Does |
+|---|---|
+| `domain/eligibility/review-eligibility.ts` | Every rule must hold: completed visit, adult (D18), no exclusion, no crisis in 90 days, none sent in 12 months, active `review_requests` AND `sms_transactional` consent. Nothing about how the visit went is an input: no gating. |
+| `reviews.request-review` | Queued by `booking.sync` per completed appointment, again whenever review consent or age status changes. Eligible → a `pending_clinician_window` row shown in the console for 24 h (clinicians can exclude) → the request is CLAIMED (per-patient lock, eligibility re-checked, marked sent) → one text, 10:00–19:00 ET (enforced in send-sms too), the practice's Google review link its only URL. Two visits for one patient can never both text. Budget or rate holds wait for the next window; refusals are recorded with a reason. No reminder, no click tracking (D14). |
+| Console | Staff record the patient's own yes (in person or by phone) or a withdrawal, as themselves, never backdated (the only capture point; wording a placeholder under D14/D20). A STOP by text also revokes review consent. |
+| `reviews.metrics`, `ops.aggregate-metrics` (02:00 ET) | Counts for the day a week ago (late outcomes are in by then; the push is insert-only): inquiries, completed bookings, review requests sent, follow-up conversions, suppressed below 5; and the agent-health enum as dates (event-driven tasks by week), through the insert-only `metrics_writer` (the login must be a `metrics_writer` role). No crisis count, no `ops.crisis-*` row (the marketing database now refuses them too). |
+
+- **Blocked until set:** `PHI_GOOGLE_REVIEW_URL` (needs the verified GBP, D11) and the
+  `PHI_METRICS_WRITER_*` login. Without the link no review text goes out.
+- **No "treating clinician" mapping exists** (providers are not linked to staff logins), so
+  the review window shows to every clinician.
+- The marketing `ops.heartbeat` stale-agent digest that reads `metrics.agent_health` is not
+  built here (§5.9 marketing side); the rows are now pushed for it.
+
 ## Setup you must do (Phases 0 and 1)
 
 ### 1. Supabase — project `newpoint-marketing`

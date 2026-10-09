@@ -7,7 +7,7 @@
  * 2. Staff-recorded appointments get their confirmation text once (booking_confirmed).
  * 3. A no-show opens a `no_show` follow-up and queues referrals.no-show (§5.1, §5.5).
  * 4. Due follow-ups (no_show, post_visit_logistics) are queued to their tasks.
- * A newly completed appointment is the review-eligibility signal Phase 9 consumes.
+ * 5. A newly completed appointment queues reviews.request-review (§5.4), once per appointment.
  *
  * Reminders and confirmations are keyed by appointment id, so a reschedule is a new
  * appointment row (cancel, then record), never an in-place change of starts_at.
@@ -22,6 +22,13 @@ import { phiRuntime } from "../runtime.js";
 export interface SyncPlan {
   readonly confirmations: readonly { readonly appointmentId: string; readonly contactId: string }[];
   readonly followUps: readonly { readonly id: string; readonly kind: "no_show" | "post_visit_logistics" }[];
+  /**
+   * Completed appointments with no review request yet, each with a key that changes when
+   * something eligibility depends on changes (review consent recorded, age status set), so a
+   * visit checked before staff recorded consent is checked again once, not every 15 minutes.
+   * Plus requests left pending past their window (a run that died): re-queued once a day.
+   */
+  readonly reviewCandidates: readonly { readonly appointmentId: string; readonly key: string }[];
   readonly upserted: number;
 }
 
@@ -61,7 +68,20 @@ export async function planSync(db: PhiDb, actor: string, adapters: readonly Sche
       `select id, kind::text as kind from phi.follow_ups
         where status = 'scheduled' and kind in ('no_show', 'post_visit_logistics') and due_at <= now() limit 200`,
     );
+    const reviewCandidates = await q.query<{ id: string; key: string }>(
+      `select a.id, a.id || ':' || coalesce((select max(k.seq) from phi.consents k where k.contact_id = a.contact_id and k.kind = 'review_requests'), 0)
+                  || ':' || c.minor_status::text as key
+         from phi.appointments a join phi.contacts c on c.id = a.contact_id
+        where a.status = 'completed' and a.starts_at > now() - interval '7 days'
+          and not exists (select 1 from phi.review_requests r where r.appointment_id = a.id)
+       union all
+       select r.appointment_id, r.appointment_id || ':retry:' || to_char(now() at time zone 'America/New_York', 'YYYY-MM-DD')
+         from phi.review_requests r
+        where r.status = 'pending_clinician_window' and r.scheduled_for < now() - interval '1 hour'
+        limit 200`,
+    );
     return {
+      reviewCandidates: reviewCandidates.rows.map((r) => ({ appointmentId: r.id, key: r.key })),
       confirmations: confirmations.rows.map((r) => ({ appointmentId: r.id, contactId: r.contact_id })),
       followUps: due.rows,
       upserted,
@@ -90,6 +110,10 @@ export const bookingSync = phiSchedule({
       const task = f.kind === "no_show" ? "referrals.no-show" : "referrals.post-visit-logistics";
       await tasks.trigger(task, { followUpId: f.id }, { idempotencyKey: `${task}:${f.id}` });
     }
-    return { confirmations: plan.confirmations.length, followUps: plan.followUps.length, upserted: plan.upserted };
+    for (const c of plan.reviewCandidates) {
+      // Keyed per appointment and eligibility inputs: checked once per change, not every 15 minutes.
+      await tasks.trigger("reviews.request-review", { appointmentId: c.appointmentId }, { idempotencyKey: `request-review:${c.key}:${rt.env.PHI_GOOGLE_REVIEW_URL === undefined ? "nolink" : "link"}` });
+    }
+    return { confirmations: plan.confirmations.length, followUps: plan.followUps.length, reviews: plan.reviewCandidates.length, upserted: plan.upserted };
   },
 });

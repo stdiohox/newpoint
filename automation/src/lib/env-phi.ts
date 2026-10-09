@@ -38,6 +38,18 @@ export const phiEnvSchema = z.object({
   PHI_N8N_ACTION_WEBHOOK_URL: https,
   PHI_N8N_ACTION_WEBHOOK_SECRET: z.string().min(32),
   /**
+   * Phase 9: the practice's generic Google review link — the only URL a review text may carry.
+   * Unset until the Google Business Profile is verified (D11); no review request goes out without it.
+   */
+  PHI_GOOGLE_REVIEW_URL: z
+    .string()
+    .regex(/^https:\/\/(g\.page\/r\/[A-Za-z0-9_-]{6,80}\/review|search\.google\.com\/local\/writereview\?placeid=[A-Za-z0-9_-]{10,80})$/)
+    .optional(),
+  /** Phase 9: the insert-only metrics_writer login on newpoint-marketing (§1 crossing). All three or none. */
+  PHI_METRICS_WRITER_DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\/[^\s]+$/).optional(),
+  PHI_METRICS_WRITER_CA_CERT: z.string().startsWith("-----BEGIN CERTIFICATE-----").optional(),
+  PHI_METRICS_MARKETING_PROJECT_REF: z.string().regex(/^[a-z]{20}$/).optional(),
+  /**
    * D1: both adapters are built; only manual-queue is ON by default. headway-handoff texts a
    * care.headway.co link whose lock-screen preview names a mental-health platform and the
    * provider (healthcare review, Phase 7), which §5.0's neutral-wording rule forbids. Turn it
@@ -90,6 +102,22 @@ export function loadPhiEnv(source: Readonly<Record<string, string | undefined>> 
   }
   if (supabaseProjectRef(result.data.PHI_DATABASE_URL) !== result.data.SUPABASE_PHI_PROJECT_REF) {
     throw new ConfigError("phi_db_host_mismatch", ["PHI_DATABASE_URL", "SUPABASE_PHI_PROJECT_REF"]);
+  }
+  const metrics = [result.data.PHI_METRICS_WRITER_DATABASE_URL, result.data.PHI_METRICS_WRITER_CA_CERT, result.data.PHI_METRICS_MARKETING_PROJECT_REF];
+  if (metrics.some((v) => v !== undefined) && metrics.some((v) => v === undefined)) {
+    throw new ConfigError("metrics_writer_partial", ["PHI_METRICS_MARKETING_PROJECT_REF", "PHI_METRICS_WRITER_CA_CERT", "PHI_METRICS_WRITER_DATABASE_URL"]);
+  }
+  if (result.data.PHI_METRICS_WRITER_DATABASE_URL !== undefined) {
+    // The writer must point at newpoint-marketing, and never at the PHI project itself.
+    const ref = supabaseProjectRef(result.data.PHI_METRICS_WRITER_DATABASE_URL);
+    // And it must be a metrics_writer login, never postgres or another full-privilege role.
+    const user = decodeURIComponent(new URL(result.data.PHI_METRICS_WRITER_DATABASE_URL).username);
+    if (!/^metrics_writer(_[a-z0-9]+)?(\.[a-z]{20})?$/.test(user)) {
+      throw new ConfigError("metrics_writer_role", ["PHI_METRICS_WRITER_DATABASE_URL"]);
+    }
+    if (ref !== result.data.PHI_METRICS_MARKETING_PROJECT_REF || ref === result.data.SUPABASE_PHI_PROJECT_REF) {
+      throw new ConfigError("metrics_writer_host_mismatch", ["PHI_METRICS_MARKETING_PROJECT_REF", "PHI_METRICS_WRITER_DATABASE_URL"]);
+    }
   }
   return Object.freeze(result.data);
 }

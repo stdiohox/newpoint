@@ -29,6 +29,8 @@ interface TemplateDef {
   readonly beforeVerification: boolean;
   /** Ignores quiet hours (§5.0: only the crisis auto-response, a reply to what was just sent). */
   readonly anyHour: boolean;
+  /** A narrower send window than 08:00–21:00 (§5.4: review requests 10:00–19:00). */
+  readonly window?: "review";
 }
 
 export const TEMPLATES = {
@@ -90,7 +92,7 @@ export const TEMPLATES = {
   },
   review_request: {
     text: "Newpoint: if you would like to share feedback publicly, you can leave a review here: {link} Reply STOP to opt out.",
-    slots: ["link"], sequence: true, beforeVerification: false, anyHour: false,
+    slots: ["link"], sequence: true, beforeVerification: false, anyHour: false, window: "review",
   },
   crisis_response: {
     text: CRISIS_SCRIPT.sms,

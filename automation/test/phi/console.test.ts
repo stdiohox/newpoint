@@ -281,6 +281,38 @@ describe("actions", () => {
     expect((await client().query(`select kind::text, status::text from phi.follow_ups`)).rows).toEqual([{ kind: "post_visit_logistics", status: "scheduled" }]);
   });
 
+  it("staff record a patient's yes to a review request, as themselves; no other consent kind", async () => {
+    const contact = await seedContact(client());
+    const admin = await token({ role: "staff_admin", sub: "admin-1" });
+    expect((await request(`/contacts/${contact}/review-consent`, { method: "POST", token: admin })).status).toBe(400);
+    expect((await request(`/contacts/${contact}/review-consent`, { method: "POST", token: admin, body: "captured=phone" })).status).toBe(303);
+    const rows = await client().query<{ kind: string; source: string; recorded_by: string; captured: string }>(
+      `select kind::text, source, evidence ->> 'recorded_by' as recorded_by, evidence ->> 'captured' as captured from phi.consents where kind = 'review_requests'`,
+    );
+    expect(rows.rows).toEqual([{ kind: "review_requests", source: "staff", recorded_by: "admin-1", captured: "phone" }]);
+    expect((await client().query(`select active from phi.consent_state where contact_id = $1 and kind = 'review_requests'`, [contact])).rows).toEqual([{ active: true }]);
+    expect((await request(`/contacts/${contact}/review-consent/withdraw`, { method: "POST", token: admin })).status).toBe(303);
+    expect((await client().query(`select active from phi.consent_state where contact_id = $1 and kind = 'review_requests'`, [contact])).rows).toEqual([{ active: false }]);
+    await client().query("begin");
+    await client().query("set local role staff_console");
+    await client().query(`select set_config('request.jwt.claims', '{"sub":"admin-1","staff_role":"staff_admin"}', true)`);
+    await expect(
+      client().query(`insert into phi.consents (contact_id, kind, granted_at, source, evidence) values ($1, 'sms_transactional', now(), 'staff', '{"recorded_by":"admin-1","captured":"phone"}')`, [contact]),
+    ).rejects.toThrow(/row-level security/);
+    await client().query("rollback");
+    // Never backdated.
+    await client().query("begin");
+    await client().query("set local role staff_console");
+    await client().query(`select set_config('request.jwt.claims', '{"sub":"admin-1","staff_role":"staff_admin"}', true)`);
+    await expect(
+      client().query(
+        `insert into phi.consents (contact_id, kind, granted_at, source, evidence) values ($1, 'review_requests', now() - interval '30 days', 'staff', '{"recorded_by":"admin-1","captured":"phone"}')`,
+        [contact],
+      ),
+    ).rejects.toThrow(/row-level security/);
+    await client().query("rollback");
+  });
+
   it("404s unknown paths and 405s other methods", async () => {
     const t = await token();
     expect((await request("/tickets/not-a-uuid/close", { method: "POST", token: t })).status).toBe(404);
