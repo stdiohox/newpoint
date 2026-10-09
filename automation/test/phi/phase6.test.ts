@@ -367,6 +367,10 @@ function inboundDeps(intent: string | null, reply: Reply = "sent") {
       log.push("page");
       return Promise.resolve();
     },
+    startBooking: () => {
+      log.push("startBooking");
+      return Promise.resolve();
+    },
     notifier,
     logger: createLogger(() => undefined),
     now: () => NOW,
@@ -486,16 +490,30 @@ describe("messaging.inbound-sms (§5.1, §5.8)", () => {
     expect(log).toEqual(["send:help"]);
   });
 
-  it("routes a booking request to a staff ticket with a neutral reply and an action-required notice", async () => {
+  it("turns a booking request into one booking_requests row for booking.request (Phase 7)", async () => {
     const { messageId } = await inbound("Can I get an appointment next week?");
     await as("phi_tasks");
-    const { deps, log, notes } = inboundDeps("book");
+    const { deps, log } = inboundDeps("book");
     expect(await runInboundSms(deps, messageId)).toEqual({ handled: "routed" });
-    expect(log).toEqual(["classify", "send:booking_callback"]);
+    expect(log).toEqual(["classify", "startBooking"]);
+    await client().query("reset role");
+    await client().query(`update phi.messages set intent = null`);
+    await as("phi_tasks");
+    await runInboundSms(deps, messageId);
+    await client().query("reset role");
+    expect((await client().query(`select count(*)::int as n from phi.booking_requests where source_message_id = $1`, [messageId])).rows).toEqual([{ n: 1 }]);
+    expect((await client().query(`select intent from phi.messages`)).rows).toEqual([{ intent: "book" }]);
+  });
+
+  it("routes a logistics question to a staff ticket with a neutral reply and an action-required notice", async () => {
+    const { messageId } = await inbound("where do I park?");
+    await as("phi_tasks");
+    const { deps, log, notes } = inboundDeps("logistics_question");
+    expect(await runInboundSms(deps, messageId)).toEqual({ handled: "routed" });
+    expect(log).toEqual(["classify", "send:logistics_reply"]);
     expect(notes).toHaveLength(1);
     await client().query("reset role");
-    expect((await client().query(`select kind::text from phi.tickets`)).rows).toEqual([{ kind: "booking" }]);
-    expect((await client().query(`select intent from phi.messages`)).rows).toEqual([{ intent: "book" }]);
+    expect((await client().query(`select kind::text from phi.tickets`)).rows).toEqual([{ kind: "message" }]);
   });
 
   it("the model is a second crisis detector", async () => {

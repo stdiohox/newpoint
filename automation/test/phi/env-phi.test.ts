@@ -112,3 +112,10 @@ describe("loadConsoleEnv", () => {
     expect(configError(() => loadPhiEnv({ ...valid, PHI_CONSOLE_SESSION_SECRET: "x" })).variables).toEqual(["PHI_CONSOLE_SESSION_SECRET"]);
   });
 });
+
+describe("D1 adapters", () => {
+  it("headway-handoff is built but OFF by default (lock-screen link preview); it must be listed to run", () => {
+    expect(loadPhiEnv(valid).PHI_SCHEDULING_ADAPTERS).toEqual(["manual-queue"]);
+    expect(loadPhiEnv({ ...valid, PHI_SCHEDULING_ADAPTERS: "manual-queue,headway-handoff" }).PHI_SCHEDULING_ADAPTERS).toEqual(["manual-queue", "headway-handoff"]);
+  });
+});

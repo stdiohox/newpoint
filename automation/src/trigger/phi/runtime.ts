@@ -12,6 +12,10 @@ import type pg from "pg";
 import { createPhiClaude, type PhiClaude } from "../../adapters/llm/anthropic-phi.js";
 import { createTwilio, type Twilio } from "../../adapters/messaging/twilio.js";
 import { createPhiNotifier, type PhiNotifier } from "../../adapters/n8n/phi-notify.js";
+import { createHeadwayHandoff } from "../../adapters/scheduling/headway-handoff.js";
+import { createManualQueue } from "../../adapters/scheduling/manual-queue.js";
+import type { SchedulingAdapter } from "../../adapters/scheduling/SchedulingAdapter.js";
+import { bookingTicket } from "./booking/ticket.js";
 import { createPhiPool, poolDb, type PhiDb } from "../../lib/db-phi.js";
 import { loadPhiEnv, type PhiEnv } from "../../lib/env-phi.js";
 import { ConfigError } from "../../lib/errors.js";
@@ -28,6 +32,8 @@ export interface PhiRuntime {
   /** The HIPAA org (§2). vendorFetch: a model call is safe to retry on 429/5xx. */
   readonly claude: PhiClaude;
   readonly notifier: PhiNotifier;
+  /** D1: manual-queue always; headway-handoff when PHI_SCHEDULING_ADAPTERS lists it. */
+  readonly scheduling: { readonly manual: SchedulingAdapter; readonly headway: SchedulingAdapter | null };
   readonly logger: Logger;
 }
 
@@ -67,10 +73,17 @@ export function phiRuntime(): PhiRuntime {
   if (runtime) return runtime;
   const env = loadPhiEnv();
   const pool = createPhiPool(env.PHI_DATABASE_URL, env.PHI_DATABASE_CA_CERT);
+  const db = poolDb(pool);
   runtime = Object.freeze({
     env,
     pool,
-    db: poolDb(pool),
+    db,
+    scheduling: {
+      manual: createManualQueue(async (bookingRequestId, contactId) =>
+        (await db.tx("booking.request", (q) => bookingTicket(q, bookingRequestId, contactId))).id,
+      ),
+      headway: env.PHI_SCHEDULING_ADAPTERS.includes("headway-handoff") ? createHeadwayHandoff() : null,
+    },
     twilio: createTwilio(
       {
         accountSid: env.TWILIO_ACCOUNT_SID,
