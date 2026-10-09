@@ -43,7 +43,7 @@ describe("crisis detection (§5.8): deterministic, conservative", () => {
 });
 
 describe("opt-out keywords (D20, FCC 2024 any reasonable means)", () => {
-  it.each(["STOP", "stop.", " Unsubscribe ", "QUIT", "opt out", "Please stop texting me", "don't text me anymore", "remove me from this list", "please stop", "stop please", "opt me out", "STOP 🙏", "Stop!!!"])(
+  it.each(["STOP", "stop.", " Unsubscribe ", "QUIT", "opt out", "Please stop texting me", "don't text me anymore", "remove me from this list", "please stop", "stop please", "opt me out", "STOP 🙏", "Stop!!!", "No more texts.", "never message me again"])(
     "%s is an opt-out",
     (text) => {
       expect(keywordIntent(text)).toBe("stop");

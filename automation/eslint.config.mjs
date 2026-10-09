@@ -71,6 +71,7 @@ export const PUBLIC_ZONE_IMPORT_PATTERNS = [
 export const PHI_ZONE_FILES = [
   "src/trigger/phi/**/*.ts",
   "src/edge/**/*.ts",
+  "edge/**/*.ts",
   "src/console/**/*.ts",
   "src/adapters/messaging/**/*.ts",
   "src/adapters/voice/**/*.ts",

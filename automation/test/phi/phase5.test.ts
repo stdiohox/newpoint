@@ -116,12 +116,12 @@ describe("messaging.send-sms (§5.0)", () => {
     expect(await runSendSms(smsDeps(NIGHT), payload(contact, "crisis_response"))).toEqual({ status: "refused", reason: "not_adult" });
   });
 
-  it("sends the verification code before the phone is verified, but still needs consent", async () => {
-    const unverified = await seedContact(client(), { verified: false });
+  it("a verification code needs its own pending-consent row, not just any consent", async () => {
+    const consented = await seedContact(client(), { verified: false });
     const noConsent = await seedContact(client(), { verified: false, consent: "none" });
     await asTasks();
-    // verification_code has a {code} slot whose resolver arrives with Phase 6; it is refused until then.
-    await expect(runSendSms(smsDeps(), payload(unverified, "verification_code"))).rejects.toThrow("slots_unavailable");
+    // Phase 6: the code's consent rides on its phone_verifications row (sent: test/phi/phase6.test.ts).
+    expect(await runSendSms(smsDeps(), payload(consented, "verification_code"))).toEqual({ status: "refused", reason: "no_consent" });
     expect(await runSendSms(smsDeps(), payload(noConsent, "verification_code"))).toEqual({ status: "refused", reason: "no_consent" });
   });
 
@@ -386,7 +386,7 @@ describe("ops.retention-sweep", () => {
       [conv],
     );
     await asTasks();
-    expect(await runRetentionSweep(clientDb(client()), "ops.retention-sweep")).toEqual({ messageBodies: 1 });
+    expect(await runRetentionSweep(clientDb(client()), "ops.retention-sweep")).toEqual({ messageBodies: 1, codes: 0 });
     const left = await client().query(`select body from phi.messages order by body nulls first`);
     expect(left.rows.map((r: { body: string | null }) => r.body)).toEqual([null, "kept", "no period"]);
   });

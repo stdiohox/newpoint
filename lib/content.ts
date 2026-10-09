@@ -2649,12 +2649,40 @@ export const CONTACT = {
    * or route every stranger into one clinician's personal inbox. Collapse
    * this to a single address when the client supplies one.
    */
+  /**
+   * Used ONLY when NEXT_PUBLIC_INTAKE_URL is set, i.e. when the form posts to the
+   * BAA-covered intake handler (automation/edge/intake). With the flag off — the
+   * default, and the only state until the PHI zone is live — `body` and
+   * `unavailable` render exactly as before.
+   */
+  live: {
+    body: 'Send us your details and we’ll reach out about an appointment.',
+    codeHeading: 'Check your phone',
+    codeBody:
+      'We texted a 6-digit code to the number you gave. Enter it here so we know the number is yours.',
+  },
   unavailable: {
     heading: 'Online requests aren’t active yet',
     before: 'Please call',
     between: 'or email',
     after: 'to request an appointment.',
   },
+} as const;
+
+/**
+ * SMS consent, shown beside an UNTICKED checkbox on the live intake form only.
+ *
+ * Must match automation/src/domain/consent/wording.ts word for word, version
+ * included: the intake handler stores that server-side text verbatim as the
+ * consent evidence and refuses a submission made against another version. A
+ * test in automation/ fails if the two drift.
+ *
+ * <!-- CLIENT: placeholder wording (D20). Counsel approves it before the form
+ * goes live; production automation refuses to start until it is approved. -->
+ */
+export const SMS_CONSENT = {
+  version: 0,
+  text: 'I agree that Newpoint Healthcare Services may text this number about my inquiry and appointments. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of care.',
 } as const;
 
 /**

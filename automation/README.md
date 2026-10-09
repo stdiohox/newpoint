@@ -169,6 +169,38 @@ against the embedded Postgres and fakes only.
   callback; clinicians see the patient's name and number, admins don't.
 
 
+## Phase 6: SMS concierge, lead follow-up, web intake (§5.1, §5.5) — built, NOT deployable yet
+
+| Piece | Does |
+|---|---|
+| `edge/twilio-inbound` | Signature checked against the exact public URL first; duplicate `MessageSid` dropped (and re-enqueued with the same key, so a lost enqueue still runs once); unknown numbers become unknown-age contacts; empty TwiML reply. |
+| `edge/intake` | The site form posts here directly. Exact Origin, strict schema (name, email, optional US phone, the site's four reasons, nothing else), Turnstile, rate limits per IP (5/h) and per phone (3/day) keyed by HMAC. Consent recorded only when ticked, against the server's wording version, stored verbatim. 6-digit code, 10 min, 5 tries. |
+| `messaging.inbound-sms` | Crisis (keyword) → event, page, fixed reply awaited before any opt-out in the same message is recorded → STOP/HELP → Haiku 4.5 (HIPAA org, enum only) → a staff ticket and a neutral template. The model is a second crisis detector; a model failure is a ticket, never a default category. |
+| `referrals.lead-follow-up` | Every web inquiry opens a callback ticket. Web **new-patient** inquiries get SMS at +5 min, +24 h, +72 h; each step re-checks open / adult / consent / verified / no crisis. Referral-sourced, existing-patient, billing and other inquiries are never enrolled. |
+| Site form | `components/ui/intake-form.tsx`, rendered by `ContactCrisis` only when `NEXT_PUBLIC_INTAKE_URL` and `NEXT_PUBLIC_TURNSTILE_SITE_KEY` are both set at build. **Unset (the default) the site is unchanged:** same markup, and the intake code is not in the bundle (build-time dead branch via `next.config.ts` `env`). |
+
+- **D5 open:** the edge handlers are host-agnostic fetch handlers (`edge/README.md`); nothing
+  is mounted until Supabase confirms Edge Functions are in its BAA, or a BAA host is chosen.
+- **D18 makes the SMS side inert today.** Inbound texters and intake contacts are
+  `unknown` age, so send-sms refuses every automated text to them, verification codes
+  included. Every inquiry and every inbound message still becomes a staff ticket.
+- `test/phi/consent-drift.test.ts` fails if `SMS_CONSENT` in `lib/content.ts` drifts from
+  `CONSENT_WORDING`, or the site's reasons from the handler's.
+- **Consent is pending until the code is confirmed.** The ticked box rides on the code's row
+  and becomes a `phi.consents` grant only in `/intake/verify`, so typing someone else's
+  number can neither grant consent nor undo their STOP; no code goes to a number whose
+  latest consent event is a STOP. Lead follow-up needs *this inquiry's* code confirmed.
+- **`ops.reconcile`** (every 5 min) re-queues what a lost hand-off left behind: unhandled
+  inbound texts, ticketless web inquiries, unsent live codes. Twilio does not retry inbound
+  webhooks, so this is the safety net, not an optimisation.
+- **The edge role reads ids only** (column grants): never names, bodies, consents or codes.
+  Codes are checked against an HMAC keyed outside the database.
+- **Go-live chore:** `ops.intake_rate` only grows (no runtime role deletes). Schedule a
+  maintenance job outside the runtime roles (e.g. Supabase `pg_cron` as the owner) to delete
+  windows older than a day.
+
+## Setup you must do (Phases 0 and 1)
+
 ### 1. Supabase — project `newpoint-marketing`
 
 This is a **standard** project, not the HIPAA one. It must never hold patient data.
