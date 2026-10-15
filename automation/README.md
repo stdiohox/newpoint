@@ -365,7 +365,7 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 ### 3. Google Search Console
 
 1. Verify the **Domain property** `newpointnp.com` with a DNS TXT record. This needs
-   access to the domain's DNS. A URL-prefix property (`https://newpointnp.com/`)
+   access to the domain's DNS. A URL-prefix property (`https://www.newpointnp.com/`)
    also works if DNS access is not available.
 2. In Google Cloud, create or choose a project (for example `newpoint-marketing`),
    enable the **Google Search Console API**, and create a service account `gsc-reader`
@@ -375,7 +375,7 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 4. In Search Console → Settings → Users and permissions, add the service account's
    email with **Restricted** permission (read-only).
 5. Set the following, in the Trigger.dev dashboard only:
-   - `GSC_SITE_URL` = `sc-domain:newpointnp.com` (or `https://newpointnp.com/`);
+   - `GSC_SITE_URL` = `sc-domain:newpointnp.com` (or `https://www.newpointnp.com/`);
    - `GSC_SERVICE_ACCOUNT_JSON` = the whole key file on one line.
 
    Delete the downloaded key file afterwards.

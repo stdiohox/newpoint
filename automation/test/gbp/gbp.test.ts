@@ -277,7 +277,7 @@ describe("gbp.post-publisher", () => {
     const deps = { db: client(), gbp: () => gbp, logger, now: () => NOW };
     expect(await runGbpPostPublisher(deps)).toEqual({ published: 1 });
     expect(await runGbpPostPublisher(deps)).toEqual({});
-    expect(posts).toEqual([{ summary: "How a telehealth visit works. Learn more at newpointnp.com.", ctaUrl: "https://newpointnp.com/", imageUrl: null }]);
+    expect(posts).toEqual([{ summary: "How a telehealth visit works. Learn more at newpointnp.com.", ctaUrl: "https://www.newpointnp.com/", imageUrl: null }]);
     expect(await status(due)).toMatchObject({ approval_status: "published", published_ref: "localPosts/1" });
     expect(await status(later)).toMatchObject({ approval_status: "approved" });
   });

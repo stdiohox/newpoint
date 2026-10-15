@@ -18,7 +18,7 @@ import { marketingRuntime } from "../runtime.js";
 import { businessProfileFrom, gbpQueue } from "./sync.js";
 
 /** Every GBP post links to the site; no other URL is ever sent. */
-export const GBP_CTA_URL = "https://newpointnp.com/";
+export const GBP_CTA_URL = "https://www.newpointnp.com/";
 const PHONE = /\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/;
 
 export interface GbpPostPublisherDeps {

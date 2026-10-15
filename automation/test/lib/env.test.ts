@@ -116,7 +116,7 @@ describe("loadMarketingEnv", () => {
 
 describe("GEO_SITE_URL", () => {
   it("defaults to the practice's site and accepts only its domain", () => {
-    expect(loadMarketingEnv(valid).GEO_SITE_URL).toBe("https://newpointnp.com/");
+    expect(loadMarketingEnv(valid).GEO_SITE_URL).toBe("https://www.newpointnp.com/");
     expect(loadMarketingEnv({ ...valid, GEO_SITE_URL: "https://staging.newpointnp.com/" }).GEO_SITE_URL).toBe(
       "https://staging.newpointnp.com/",
     );

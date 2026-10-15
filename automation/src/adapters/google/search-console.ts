@@ -60,7 +60,7 @@ import type { FetchLike } from "../../lib/http.js";
 export type { FetchLike };
 
 export interface SearchConsoleOptions {
-  /** `sc-domain:newpointnp.com` or `https://newpointnp.com/`. */
+  /** `sc-domain:newpointnp.com` or `https://www.newpointnp.com/`. */
   readonly siteUrl: string;
   readonly fetch: FetchLike;
   readonly accessToken: () => Promise<string>;

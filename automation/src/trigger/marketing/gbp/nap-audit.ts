@@ -56,7 +56,7 @@ export async function runGbpNapAudit(deps: NapAuditDeps): Promise<{ readonly sta
     { field: "name", shown: listing.title, confirmed: legalName, same: norm(listing.title) === norm(legalName) },
     { field: "phone", shown: listing.primaryPhone, confirmed: phone, same: digits(listing.primaryPhone) === digits(phone) },
     { field: "address", shown: listing.address, confirmed: address, same: norm(listing.address) === norm(address) },
-    { field: "website", shown: listing.websiteUri, confirmed: "https://newpointnp.com/", same: host(listing.websiteUri) === "newpointnp.com" },
+    { field: "website", shown: listing.websiteUri, confirmed: "https://www.newpointnp.com/", same: host(listing.websiteUri) === "newpointnp.com" },
   ];
   const items: BacklogItem[] = checks
     .filter((c) => !c.same)

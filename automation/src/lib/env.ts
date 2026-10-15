@@ -52,8 +52,8 @@ export const marketingEnvSchema = z.object({
    */
   GEO_SITE_URL: z
     .string()
-    .regex(/^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\/$/, "must be https://newpointnp.com/ or a subdomain, ending in /")
-    .default("https://newpointnp.com/"),
+    .regex(/^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\/$/, "must be https://www.newpointnp.com/ or another newpointnp.com host, ending in /")
+    .default("https://www.newpointnp.com/"),
   // --- Phase 3, social (§5.7). Optional here so SEO and GEO run before Meta is set up;
   // each social task demands what it needs through socialEnv() / approvalEnv().
   /** Graph API version, pinned (for example v24.0). Never defaulted: Meta retires versions. */
@@ -88,7 +88,7 @@ export const marketingEnvSchema = z.object({
    * also refuses unless those facts are confirmed in public.practice_facts.
    */
   GBP_NAP_AUDIT_ENABLED: z.enum(["true", "false"]).optional(),
-  /** Search Console property: `sc-domain:newpointnp.com` or `https://newpointnp.com/`. */
+  /** Search Console property: `sc-domain:newpointnp.com` or `https://www.newpointnp.com/`. */
   GSC_SITE_URL: z.string().regex(/^(sc-domain:[a-z0-9.-]+|https:\/\/[^\s]+\/)$/),
   /** Service-account key JSON; the account is added as a restricted user on the property. */
   GSC_SERVICE_ACCOUNT_JSON: googleServiceAccount,

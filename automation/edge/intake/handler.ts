@@ -86,7 +86,7 @@ const NON_US_NPA = new Set([
 ]);
 
 export interface IntakeConfig {
-  /** The site's origin, exactly: https://newpointnp.com */
+  /** The site's origin, exactly: https://www.newpointnp.com */
   readonly siteOrigin: string;
   readonly turnstile: Turnstile;
   /** HMAC key for rate-limit keys, code hashes and the IP hash in consent evidence. Never stored in the database. */
