@@ -175,6 +175,14 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* The holding page (app/holding/page.tsx) renders without the site navbar.
+     The root layout still emits the header, so it is hidden here, keyed on that
+     page's own <main> and nothing else. display:none also takes it out of the
+     accessibility tree. */
+  body:has(> main[data-holding]) > header {
+    display: none;
+  }
+
   h1,
   h2,
   h3 {
