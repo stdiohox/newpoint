@@ -12,9 +12,11 @@ import { NextResponse, type NextRequest } from 'next/server';
  * variables to a deployment: changing it in the dashboard takes effect on the
  * next deploy, not on the current one.
  *
- * Holding responses carry X-Robots-Tag: noindex, nofollow, and robots.txt on
- * those hosts disallows everything, so nothing the domain serves while it holds
- * is indexed — /holding's own metadata says the same in the HTML.
+ * Holding responses carry X-Robots-Tag: noindex, nofollow, and /holding's own
+ * metadata says the same in the HTML. robots.txt on those hosts deliberately
+ * does NOT disallow anything: a crawler barred from a URL never fetches it, so
+ * it never sees the noindex, and pages already indexed linger as bare URLs.
+ * sitemap.xml 404s there, so the domain advertises no URLs while it holds.
  */
 const HOLDING_HOSTS = new Set(['newpointnp.com', 'www.newpointnp.com']);
 const NOINDEX = 'noindex, nofollow';
@@ -27,10 +29,15 @@ export function middleware(request: NextRequest) {
   const host = (request.headers.get('host') ?? '').toLowerCase().split(':')[0].replace(/\.$/, '');
   if (!HOLDING_HOSTS.has(host)) return NextResponse.next();
 
+  // Allow, not Disallow — see above. No Sitemap line, because it 404s here.
   if (request.nextUrl.pathname === '/robots.txt') {
-    return new NextResponse('User-agent: *\nDisallow: /\n', {
+    return new NextResponse('User-agent: *\nAllow: /\n', {
       headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Robots-Tag': NOINDEX },
     });
+  }
+
+  if (request.nextUrl.pathname === '/sitemap.xml') {
+    return new NextResponse(null, { status: 404, headers: { 'X-Robots-Tag': NOINDEX } });
   }
 
   const response = NextResponse.rewrite(new URL('/holding', request.url));
@@ -40,9 +47,10 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /* robots.txt has an extension, so the second pattern skips it; it is listed
-       on its own so the holding hosts can answer it. */
+    /* These two have an extension, so the last pattern skips them; they are
+       listed on their own so the holding hosts can answer them. */
     '/robots.txt',
+    '/sitemap.xml',
     /* Everything except: Next's own assets (_next/), API routes (api/), any
        path with a file extension (public/ files, icon.png, sitemap.xml,
        favicon.ico), and /opengraph-image — the one extensionless asset route.
