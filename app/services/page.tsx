@@ -8,7 +8,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { SERVICE_PAGES, WHAT_WE_TREAT, PROVIDERS, cardPosterFor, DELIVERY_LINE } from '@/lib/content';
+import {
+  CARE_GUIDE,
+  SERVICE_PAGES,
+  WHAT_WE_TREAT,
+  PROVIDERS,
+  cardPosterFor,
+  DELIVERY_LINE,
+} from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef, serviceSchemaFor } from '@/lib/schema';
 
@@ -383,6 +390,49 @@ export default function ServicesIndex() {
                 );
               })}
             </ul>
+
+            {/* THERAPY, PSYCHIATRIC CARE, OR BOTH. A "which is right for me"
+                guide, the idea taken from SonderMind's therapy and psychiatry
+                pages (client, 2026-10-19), the wording and every fact
+                Newpoint's own: see the note on CARE_GUIDE in lib/content.ts
+                for what each line rests on and what is deliberately left out.
+
+                A <dl> per column, not a <table>: on a phone the two columns
+                stack, and a table read cell by cell would lose which column a
+                value belongs to. Each card names its own column in its <h3>,
+                and every row repeats its label, so either card stands alone. */}
+            <div className="border-np-neutral-200 mt-20 border-t pt-12">
+              <Reveal>
+                <h2 className="text-h2 max-w-[22ch]">{CARE_GUIDE.heading}</h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
+                  {CARE_GUIDE.intro}
+                </p>
+              </Reveal>
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                {CARE_GUIDE.columns.map((column, i) => (
+                  <Reveal key={column.title} delay={stagger(i, 0.08)}>
+                    <div className="bg-np-surface rounded-card h-full p-7 ring-1 ring-[var(--np-alpha-ink-08)] sm:p-8">
+                      <h3 className="text-h3 text-np-ink">{column.title}</h3>
+                      <dl className="mt-6 space-y-5">
+                        {column.rows.map((row) => (
+                          <div key={row.label}>
+                            <dt className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
+                              {row.label}
+                            </dt>
+                            <dd className="text-body text-np-neutral-700 mt-1.5">{row.value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+              <Reveal delay={0.16}>
+                <p className="text-body-l text-np-ink mt-8 max-w-[62ch]">{CARE_GUIDE.together}</p>
+              </Reveal>
+            </div>
 
             {/* Treatment options named on the live Services page but not built out
                 as pages of their own, because the source material describes them

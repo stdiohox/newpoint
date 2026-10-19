@@ -2121,6 +2121,72 @@ export const SERVICE_PAGES: ServicePage[] = [
   },
 ];
 
+/**
+ * "Therapy, psychiatric care, or both?" on /services. The IDEA comes from
+ * SonderMind's therapy and psychiatry pages (client, 2026-10-19: "ideas for
+ * the site"); NONE OF THE WORDING DOES, and none of their facts do.
+ *
+ * Every line is something Newpoint has confirmed:
+ *   - psychotherapy and counseling as a service, and "emotional, behavioral,
+ *     and mental health challenges": the practice's brochure, 2026-10-19;
+ *   - prescribing by the providers: both are PMHNP-BC (PROVIDERS[].credentials);
+ *   - "where both are indicated, your plan combines them": the owners,
+ *     2026-09-29 (see CLAUDE.md, Terminology);
+ *   - care starting with the assessment: WHAT_TO_EXPECT.body (worded as
+ *     "you start with", not "every new patient", while weight-management
+ *     intake is open).
+ *   - who delivers therapy is NOT stated, and the prescribing line beside it
+ *     must not be read as an answer; see the psychotherapy OPEN_CLIENT_ITEMS
+ *     entry. (healthcare-reviewer, 2026-10-19)
+ *
+ * DELIBERATELY ABSENT, because nobody has said: who delivers therapy, which
+ * modalities (CBT, DBT, ...), session length and frequency. SonderMind states
+ * all three for itself; copying their numbers would be inventing ours. Add a
+ * row only when the client answers the matching OPEN_CLIENT_ITEMS entry.
+ */
+export const CARE_GUIDE = {
+  heading: 'Therapy, psychiatric care, or both?',
+  intro:
+    'They help in different ways, and many people benefit from both. Here’s how they differ, so you can tell us, in general terms, what you’re looking for.',
+  columns: [
+    {
+      title: 'Psychotherapy and counseling',
+      rows: [
+        {
+          label: 'What it is',
+          value: 'Talk-based care for emotional, behavioral, and mental health challenges.',
+        },
+        {
+          label: 'What it helps with',
+          value: 'Working through what you’re facing, understanding it better, and building ways to cope.',
+        },
+        { label: 'Medication', value: 'Not part of therapy itself.' },
+      ],
+    },
+    {
+      title: 'Psychiatric care',
+      rows: [
+        {
+          label: 'What it is',
+          value: 'Clinical care for mental health conditions, from assessment and diagnosis to medication management.',
+        },
+        {
+          label: 'What it helps with',
+          value: 'Understanding what’s going on, deciding whether medication could help, and managing a condition over time.',
+        },
+        {
+          label: 'Medication',
+          value: 'Prescribed by our psychiatric-mental health nurse practitioners, where appropriate.',
+        },
+      ],
+    },
+  ],
+  together:
+    // "You start with", not "every new patient": whether weight management
+    // intake is the same assessment is still open (OPEN_CLIENT_ITEMS, item 8).
+    'Where both are indicated, your treatment plan combines them. For therapy, psychiatric care, or both, you start with a comprehensive psychiatric assessment.',
+} as const;
+
 export const GETTING_STARTED = {
   heading: 'Getting started',
   body: 'Three steps from first contact to ongoing care.',
@@ -2393,6 +2459,19 @@ export const FAQ = {
              telehealth, as everywhere else on the site. */
           q: 'Do you see patients in person or by telehealth?',
           a: 'Both. We see patients in person and also by telehealth. Telehealth is available on an expanded schedule, including weekends, evenings, and holidays by request.',
+        },
+        /* Two questions patients commonly ask (seen on SonderMind's psychiatry
+           page, 2026-10-19), answered only with Newpoint's own confirmed
+           facts: the assessment comes first (WHAT_TO_EXPECT.body), and the
+           plan combines psychotherapy and medication where indicated (owners,
+           2026-09-29). Placed after the homepage's four-item preview. */
+        {
+          q: 'Can I get medication only?',
+          a: 'Care starts with a comprehensive psychiatric assessment. If medication is appropriate, it can be part of your plan with or without psychotherapy. We don’t prescribe without that assessment.',
+        },
+        {
+          q: 'Do I need to be in therapy first?',
+          a: 'No. You can contact us directly. Care starts with a comprehensive psychiatric assessment, and we build your plan from there.',
         },
         {
           q: 'Do I need a referral?',
@@ -2947,6 +3026,7 @@ function assertTitlesQualified() {
     ['SERVICE_PAGES', SERVICE_PAGES],
     ['GETTING_STARTED', GETTING_STARTED],
     ['WHAT_TO_EXPECT', WHAT_TO_EXPECT],
+    ['CARE_GUIDE', CARE_GUIDE],
     ['FEATURED_SERVICES', FEATURED_SERVICES],
     ['FAQ', FAQ],
     ['CONTACT', CONTACT],
