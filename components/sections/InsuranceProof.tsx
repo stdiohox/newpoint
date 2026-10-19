@@ -14,10 +14,11 @@ import { INSURANCE } from '@/lib/content';
  * will see and what happens first, and raises cost and coverage once the
  * visitor has a reason to care about it.
  *
- * WIDTH AND GUTTERS are <WhatToExpect />'s, which are <Providers />'s:
- * px-6 / md:px-12 / lg:px-16 and no max-width. This section used <Container>
- * (max-w-[1200px] + px-4/md:px-8), so its content edges did not line up with
- * the section above it.
+ * WIDTH AND GUTTERS are <WhatToExpect />'s, which are <Providers />'s: the
+ * services/providers column, 1200px max with 20px side padding. Not
+ * <Container>, whose 32px padding puts the edges 12px inside the sections
+ * around it. (Until 2026-10-19 all three ran on the uncapped navbar gutters;
+ * the client asked for them to match the services column.)
  *
  * NO INVENTED NAMES OR FACTS. The commercial list is INSURANCE.payers with the
  * two government plans filtered out, so the names cannot drift from the source
@@ -104,7 +105,7 @@ const CARDS = [
 export function InsuranceProof() {
   return (
     <section id="insurance" className="bg-np-surface py-20 md:py-28">
-      <div className="px-6 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-[1200px] px-5">
         <div className="md:max-w-[46ch]">
           <Reveal>
             <h2 className="text-h2">{INSURANCE.heading}</h2>
@@ -117,7 +118,11 @@ export function InsuranceProof() {
         {/* Four cards, four cells. role="list" for the reason globals.css
             documents: Preflight strips list-style and WebKit then drops the
             list role. */}
-        <ul role="list" className="mt-12 grid gap-6 md:grid-cols-2">
+        {/* grid-cols-[minmax(0,1fr)] below md: a bare `grid` column is
+            `auto`, which grows to the card's min-content. The self-pay card's
+            CTA could not wrap, so on a 390px phone that column came out 381px
+            in a 350px box and every card ran 11-15px off the screen. */}
+        <ul role="list" className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
           {CARDS.map((card, i) => (
             <Reveal as="li" key={card.title} delay={stagger(i, 0.08)} className="h-full">
               <GradientCard

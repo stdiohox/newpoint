@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { FaqSections, type FaqItem } from '@/components/ui/faq-sections';
-import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { FAQ } from '@/lib/content';
 
@@ -71,7 +70,10 @@ export function Faq() {
         imageHeight={1493}
       />
 
-      <Container>
+      {/* The section's own column, not <Container>: <FaqSections /> above runs
+          on 20px side padding, and Container's 32px would set this link 12px
+          in from everything over it. */}
+      <div className="mx-auto max-w-[1200px] px-5">
         {/* The link out. It names the destination rather than saying "read
             more", so its accessible name says where it goes when read out of
             context. */}
@@ -88,7 +90,7 @@ export function Faq() {
             <span aria-hidden="true">→</span>
           </Link>
         </Reveal>
-      </Container>
+      </div>
     </section>
   );
 }

@@ -69,10 +69,11 @@ export function FaqSections({
   const baseId = useId();
 
   return (
-    /* Width and gutters are <WhatToExpect />'s, which are <Providers />'s:
-       px-6 / md:px-12 / lg:px-16 and no max-width, so this section's content
-       edges line up with every other section on the page. */
-    <div className="px-6 md:px-12 lg:px-16">
+    /* Width and gutters are <Providers />'s: the services/providers column,
+       1200px max with 20px side padding, so this section's content edges line
+       up with the sections above it (client request, 2026-10-19; it used to run
+       on the uncapped navbar gutters). */
+    <div className="mx-auto max-w-[1200px] px-5">
       <div className="grid gap-8 md:grid-cols-12 md:gap-16">
         <div className="md:col-span-5">
           {/* --nav-h is the sticky bar's height and also drives

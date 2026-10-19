@@ -165,7 +165,11 @@ export function FeatureBentoGrid({
    */
   return (
     <div className="w-full pt-9 pb-20 md:pt-14 lg:pb-40">
-      <div className="px-6 md:px-12 lg:px-16">
+      {/* The services/providers column: 1200px max, 20px side padding, the
+          same edges as <FeaturedServices /> and <Providers /> above it. It ran
+          on the uncapped navbar gutters until 2026-10-19 and was ~190px wider a
+          side at 1680px (client request). */}
+      <div className="mx-auto max-w-[1200px] px-5">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-start gap-4">
             <div>
