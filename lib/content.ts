@@ -829,10 +829,12 @@ export const PROVIDERS: Provider[] = [
      */
     knowsLanguage: ['English', 'Igbo'],
     /**
-     * Verbatim from Headway, as one paragraph, with two typo fixes and one
-     * spelling change: her "My name is Anastasia. Ofoegbu" loses its stray full
-     * stop, "reading an most of all" becomes "reading and, most of all", and
-     * "travelling" is Americanised.
+     * Verbatim from Headway, as one paragraph, with one typo fix: her "My name
+     * is Anastasia. Ofoegbu" loses its stray full stop.
+     *
+     * Her closing personal sentence ("I enjoy traveling, reading and, most of
+     * all, love spending time with my family.") was REMOVED at the client's
+     * request on 2026-10-19. Do not restore it from the Headway capture.
      *
      * She states her own Pennsylvania licensure here, in her own words, and the
      * client confirmed it on 2026-09-29. See `licensed` above.
@@ -842,7 +844,7 @@ export const PROVIDERS: Provider[] = [
      * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
     bio: [
-      'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania. I enjoy traveling, reading and, most of all, love spending time with my family.',
+      'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania.',
     ],
     /**
      * Verbatim except: "evaluations" becomes "assessments" per the owners'
