@@ -226,9 +226,14 @@ export function Footer() {
             </div>
 
             <div className="md:pt-1">
-              {/* The default filled variant, not `on-ink`: that one lightens for
-                  a dark ground and would wash out on this card. */}
-              <ButtonWithIcon href={CTA.href}>{CTA.label}</ButtonWithIcon>
+              {/* `navy`, the navbar CTA's colour, so the same action looks the
+                  same in the page's top and bottom frames. Not the default
+                  `sky` (it read as a different colour from every other CTA on
+                  this white card), and not `on-ink`, which lightens for a dark
+                  ground and would wash out here. */}
+              <ButtonWithIcon href={CTA.href} variant="navy">
+                {CTA.label}
+              </ButtonWithIcon>
             </div>
           </div>
 

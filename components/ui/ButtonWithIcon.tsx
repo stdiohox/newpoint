@@ -106,6 +106,24 @@ const variants = {
     root: 'bg-white/10 ring-1 ring-white/40 hover:bg-white/20 focus-visible:outline-white',
     disc: 'bg-white text-np-blue-900',
   },
+  /**
+   * Solid np-blue-900 on a LIGHT surface: the navbar CTA's colours with this
+   * component's sliding disc. The footer uses it, so the "Request an
+   * appointment" pills in the page's top and bottom frames (navbar pill and
+   * footer card, both white) are the same navy. Added 2026-10-19: the footer
+   * had fallen back to `sky` when its ground turned white, and read as a
+   * different colour from every other CTA.
+   *
+   *   label   white on np-blue-900 = 16.1:1
+   *   hover   np-blue-700, label still well over 4.5:1
+   *   disc    white, arrow np-blue-900 on it at 16.1:1
+   *   ring    none needed: the navy fill is itself 16.1:1 against white, which
+   *           carries the component boundary for SC 1.4.11
+   */
+  navy: {
+    root: 'bg-np-blue-900 hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
+    disc: 'bg-white text-np-blue-900',
+  },
 } as const;
 
 export function ButtonWithIcon({
