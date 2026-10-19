@@ -25,7 +25,7 @@ export const metadata = pageMetadata({
   // services" as its head term, so the two are not arbitrating the same query.
   title: 'Psychiatric Services in NJ and PA',
   description:
-    'Psychiatric assessment and medication management, in person or by telehealth, in New Jersey and Pennsylvania. What each involves and how to start.',
+    'Psychiatric assessment, medication management, and behavioral health management in New Jersey and Pennsylvania. What each involves and how to start.',
   path: '/services',
 });
 
@@ -352,7 +352,12 @@ export default function ServicesIndex() {
                               without binding either to a named service.
                               CLIENT: confirm whether both providers perform
                               initial psychiatric assessments, and this becomes
-                              a per-service field. */}
+                              a per-service field.
+
+                              PSYCHOTHERAPY IS IN THE SAME POSITION, since
+                              2026-10-19: the brochure lists it as a service,
+                              but not who delivers it. Do not bind a provider
+                              to it either. */}
 
                           <div>
                             <dt className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
@@ -397,6 +402,9 @@ export default function ServicesIndex() {
               </Reveal>
               <ul role="list" className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
+                  /* CLIENT: not the free 15-minute consultation advertised
+                     elsewhere since 2026-10-19, and easy to read as it. See
+                     OPEN_CLIENT_ITEMS. */
                   'Psychiatric consultation',
                   'Individual counseling',
                   'Skill-building groups',

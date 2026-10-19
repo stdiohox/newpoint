@@ -144,15 +144,24 @@ export const HERO = {
    * neither has been asked for.
    */
   headlineLines: 'Mental and behavioral care across\nNew Jersey and Pennsylvania',
+  /**
+   * CLIENT WORDING, 2026-10-19. "Remove (and telehealth), insert (and
+   * behavioral health management from two doctorate-prepared psychiatric and
+   * family nurse practitioners serving…)". The "serving New Jersey and
+   * Pennsylvania" tail is dropped here only because the headline directly above
+   * already says it; the link-preview description in app/layout.tsx carries the
+   * full sentence. "We see patients in person and also by telehealth" is the
+   * client's own sentence too: telehealth is a delivery mode, stated as one.
+   */
   subtext:
-    'Assessment and medication management, in person or by telehealth, with two doctorate-prepared psychiatric nurse practitioners. We accept most major insurance plans.',
+    'Psychiatric assessment, medication management, and behavioral health management from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
   /**
    * The service names for the hero's glass tag, word-for-word as `subtext`
    * already names them. No new service is claimed here. Telehealth left the
    * tag on 2026-10-19 with the telehealth service page: it is a delivery mode,
    * which `subtext` states, not a service.
    */
-  tag: 'Assessment. Medication management.',
+  tag: 'Assessment. Medication management. Behavioral health management.',
 } as const;
 
 /**
@@ -905,7 +914,14 @@ export const PROVIDERS: Provider[] = [
 
 export const WHAT_WE_TREAT = {
   heading: 'What we treat, and how',
-  body: 'Your care starts with a comprehensive psychiatric assessment and a treatment plan built around it. From there, we manage your medication, track your progress with standardized clinical measures, and adjust as your needs change.',
+  /**
+   * Reflects the practice's brochure (client, 2026-10-19: "we can use this but
+   * cannot display it word for word"): assessment and diagnosis, medication
+   * management, psychotherapy and counseling, for emotional, behavioral and
+   * mental health challenges. Paraphrased, and "assessment" rather than the
+   * brochure's "evaluation", per the owners' terminology rule.
+   */
+  body: 'Your care starts with a comprehensive psychiatric assessment and a treatment plan built around it. From there, we offer medication management, psychotherapy, and supportive counseling for emotional, behavioral, and mental health challenges, and we track your progress with standardized clinical measures.',
   /**
    * Conditions aggregated in /research/services-analysis.md, plus three added
    * on 2026-09-29 from /research/provider-directories.md.
@@ -965,8 +981,10 @@ export const WHAT_WE_TREAT = {
       href: '/services/medication-management',
     },
     {
-      title: 'Individual counseling and referral',
-      body: 'Supportive counseling alongside your medication care, plus referrals to follow-up services and coordination with your other clinicians.',
+      // Renamed 2026-10-19: the practice's brochure lists "Psychotherapy &
+      // Counseling" as a service in its own right.
+      title: 'Psychotherapy and counseling',
+      body: 'Psychotherapy and supportive counseling for emotional, behavioral, and mental health concerns, plus referrals to follow-up services and coordination with your other clinicians.',
       href: null,
     },
   ],
@@ -2109,7 +2127,7 @@ export const GETTING_STARTED = {
   steps: [
     {
       title: 'Reach out',
-      body: 'Call or email us. Calling is the fastest way to reach us. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t include health details in any message.',
+      body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t include health details in any message.',
     },
     {
       title: 'Comprehensive psychiatric assessment',
@@ -2185,7 +2203,7 @@ export const WHAT_TO_EXPECT = {
        * already had this right, and carries NEW_PATIENTS_PAGE.privacyBody's
        * reassurance clause so the patient knows where the detail does go.
        */
-      body: 'Call or email us. Calling is the fastest way to reach us. Tell us how to reach you and why you’re reaching out. Please don’t include health details in any message — we’ll get the clinical details from you directly.',
+      body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and why you’re reaching out. Please don’t include health details in any message — we’ll get the clinical details from you directly.',
     },
     {
       title: 'Comprehensive psychiatric assessment',
@@ -2359,12 +2377,22 @@ export const FAQ = {
           a: 'One of our two providers, Dr. Funmilayo Whitaker or Dr. Anastasia O. Ofoegbu. Both hold a Doctor of Nursing Practice and are dual board-certified as psychiatric mental health and family nurse practitioners, and both are licensed in New Jersey and Pennsylvania.',
         },
         {
+          /* CLIENT, 2026-10-19: "We also offer 15 minutes consultations free
+             of charge." Who takes the call, and in what format, are open
+             items (see OPEN_CLIENT_ITEMS), so this answer commits to neither. */
+          q: 'Do you offer a free consultation?',
+          a: 'Yes. We offer a free 15-minute consultation, so you can ask your questions before you book. Call or email us to set one up, and please don’t include health details in your message.',
+        },
+        {
           q: 'What happens at the first appointment?',
           a: 'A comprehensive psychiatric assessment. We take a full history, identify risk factors, use standardized screening and rating scales where helpful, and finish with a diagnosis and a treatment plan.',
         },
         {
-          q: 'Do you offer telehealth?',
-          a: 'Yes. Telehealth is available on an expanded schedule, including weekends, evenings, and holidays by request.',
+          /* "We see patients in person and also by telehealth" is the
+             client's sentence, 2026-10-19. The schedule claim stays bound to
+             telehealth, as everywhere else on the site. */
+          q: 'Do you see patients in person or by telehealth?',
+          a: 'Both. We see patients in person and also by telehealth. Telehealth is available on an expanded schedule, including weekends, evenings, and holidays by request.',
         },
         {
           q: 'Do I need a referral?',
@@ -2789,6 +2817,7 @@ export const ROUTES: { path: string; priority: number }[] = [
  * licence-numbers item below.
  */
 export const OPEN_CLIENT_ITEMS = [
+  'FREE 15-MINUTE CONSULTATION, added 2026-10-19 on the client\'s instruction ("We also offer 15 minutes consultations free of charge"). It now appears in the FAQ, in step one of "What to expect" and "Getting started", and in the closing band\'s assurance row on nine pages. The site deliberately says nothing about HOW it works, because nobody has said: (1) who takes it, a provider or front-desk staff; (2) by phone, by video, or either; (3) new patients only, or anyone; (4) whether it is clinical (it must not imply an assessment, a diagnosis or a prescription happens in 15 minutes); (5) how to book it, if not the same call or email as an appointment; (6) whether a caller outside New Jersey and Pennsylvania can have one, since both providers are licensed in those two states only; (7) if a provider takes it, whether it starts a clinical relationship (documentation, what happens if a caller is in crisis). ALSO: /services lists "Psychiatric consultation" among treatment options, a different thing with nearly the same name; a reader can take the free one for that clinical one. Confirm what "Psychiatric consultation" is, or rename one of them. The FAQ answer and the band are written so a yes to any of these needs at most one added clause',
   'PRE-LAUNCH — MEDICAL WEIGHT MANAGEMENT: SIX FACTS, AND THE PAGE SHIPS WITHOUT ANY OF THEM. /services/weight-management was built on 2026-10-06 from a one-line brief and a competitor\'s flyer. Everything it asserts is either the client\'s own instruction (semaglutide, tirzepatide, weekly injections) or PROVIDERS[].credentials verbatim; everything below is what it had to refuse to say, and each one is a real question a patient asks before booking. (1) IS THIS OPEN TO NEW PATIENTS, or to existing psychiatric patients only, or both? The page cannot say, and the FAQ that would answer it is deliberately absent. This is the one that decides whether the page earns anything. (2) BRAND OR COMPOUNDED? The page names generic molecules only, which is true either way, and names no brand anywhere. If the practice dispenses or prescribes compounded semaglutide or tirzepatide that is a materially different claim with live FDA exposure, and the page would need to say so. (3) IN-OFFICE OR SELF-ADMINISTERED INJECTIONS? `modality` names no delivery mode because of this. The flyer implies a weekly visit; an at-home pen is the more common arrangement; neither is confirmed. (4) PRICE AND TERMS. The client declined an introductory offer on 2026-10-06, so nothing about money ships. If the flyer\'s "10% off your first month" is ever wanted, it needs the monthly price, the term, the expiry, and whether it applies to insurance-billed patients. (5) INSURANCE OR CASH-PAY. The FAQ answers this with what is true of US coverage generally and commits the practice to nothing. (6) DOES IT HOLD FOR BOTH PROVIDERS? app/providers/[slug]/page.tsx lists every SERVICE_PAGES entry on both provider pages, so adding this service has already asserted that both of them offer it. Both hold FNP-BC, so it is plausible for both — but it is the same practice-wide-versus-per-provider question the payer list and the ADHD line both carry, and nobody has answered it for this service either. (7) STATE PRESCRIPTIVE AUTHORITY, WHICH IS THE ONE THAT PUTS THIS SERVICE INSIDE THE PROVIDERS\' LEGAL SCOPE AT ALL. The page names FNP-BC, which is a BOARD CERTIFICATION and not a state authorization — healthcare-reviewer, 2026-10-06. Pennsylvania ties a CRNP\'s practice and prescriptive authority to the specialty registered WITH THE BOARD and requires a written collaborative agreement plus separately granted prescriptive authority; New Jersey prescribing runs under a joint protocol with a collaborating physician unless the APN qualifies for the practice-hours exemption. This repo holds no evidence either provider\'s NJ APN or PA CRNP credential is registered in the FAMILY specialty — the one candidate number, PA SP016195, carries no specialty, and every directory signal in research/ is psychiatric. Ask the practice to confirm family-specialty registration in both states, and that the PA collaborative agreement and the NJ joint protocol cover weight-management prescribing. Nothing on the page changes if the answers are yes. (8) WHICH APPOINTMENT IS THE INTAKE, AND THIS ONE HAS A CONSENT DIMENSION. The weight-management page says "an appointment" five times and never says which. The homepage says "Every new patient starts with the same comprehensive psychiatric assessment", and /new-patients says it again. Either that is still true — in which case a patient enquiring about weight loss is being psychiatrically assessed and having a psychiatric record created, and the page should say so before they book — or it is no longer true, and the homepage now makes a claim on behalf of a service line that postdates it. There is a billing question underneath: a weight-management intake coded as a comprehensive psychiatric assessment is an exposure of its own. CLOSE THIS ONE FIRST',
   'Exact legal business name from the LLC formation documents ("Newpoint" vs "New Point")',
   'Street address, suite and ZIP for the practice. NOW THE HIGHEST-VALUE OPEN ITEM: the client has confirmed care is delivered in person as well as by telehealth, so the site claims in-person care and the organization is marked up as a MedicalClinic. Google expects an address on that type, a patient told they can be seen in person has nowhere to go, and Local Pack and Maps eligibility are blocked until it exists. The former "or confirm service-area only" alternative is closed — in-person care is confirmed. EVIDENCE NOW EXISTS: 6 Colonial Lake Drive, Suite D, Lawrence Township (Lawrenceville), NJ 08648 — named by Grow Therapy, Headway and U.S. News, across BOTH providers, and U.S. News pairs it with (609) 527-9438, which is already BUSINESS.phonePrimary. Needs the client to confirm in writing, and to confirm the suite format, before it ships',
@@ -2799,7 +2828,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
   'PRE-LAUNCH — AGES SERVED. Confirmed age range (adults only, or across the lifespan as a practice policy). Headway lists CHILDREN AND ADOLESCENTS for Dr. Whitaker, which is the strongest paediatric signal in any Newpoint source and the reason this cannot wait: the site now names ADHD under "Conditions we prescribe for", and a parent reading that has nothing on the page telling them whether their child can be seen. STILL OPEN, AND THE EVIDENCE CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
   'Whether substance use and addiction treatment is an active service line. THE DIRECTORIES SAY YES: Grow lists addiction for Whitaker, and Headway lists "Substance use / addiction" as Ofoegbu\'s FIRST specialty. Her existing bio already says her last 11 years were in mental health and addiction. This also bears on the new "Mental and behavioral care" hero — in US payer language behavioral health includes SUD, so the headline already implies a door the conditions list does not open',
-  'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
+  'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. UPDATED 2026-10-19: the practice\'s brochure now lists "Psychotherapy & Counseling" as a service in its own right, and the homepage says the practice offers psychotherapy and supportive counseling. The brochure does NOT say who delivers it (the only delivery evidence is Whitaker\'s Headway profile; Ofoegbu is listed for medication management only) or which modalities, so no provider may be bound to it and none is named on /services. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   /* The ADHD item was REMOVED on 2026-10-01, closed rather than dropped. It
      asked whether ADHD is treated at all; both providers publish it, it has
      been in WHAT_WE_TREAT.conditions since 2026-09-29, and the client has now

@@ -323,6 +323,27 @@ strip still renders sitewide.
 - Text sits over the photo from `lg` up and **below** the photo under `lg`, where it
   would otherwise cover the face.
 
+### Summary line, consultation and brochure — CLIENT INSTRUCTIONS, 2026-10-19
+
+- **The practice summary line is the client's wording, verbatim:** "Psychiatric
+  assessment, medication management, and behavioral health management from two
+  doctorate-prepared psychiatric and family nurse practitioners serving New
+  Jersey and Pennsylvania." It is the Open Graph and Twitter description
+  (`app/layout.tsx`, the link-preview "second line" the client was looking at)
+  and, minus the "serving…" tail the headline already says, the hero subtext.
+  The plain meta description is the same sentence reordered so the two states
+  come before Google's ~155-character cut, on the SEO review's advice. **Telehealth is not in that list**; it follows as the
+  client's own sentence, "We see patients in person and also by telehealth."
+- **Free 15-minute consultation.** Offered, per the client. How it works is
+  open (see `OPEN_CLIENT_ITEMS`); never describe who takes it or what happens
+  in it until that is answered.
+- **The brochure** ("we can use this but cannot display it word for word")
+  lists: psychiatric evaluation and diagnosis, psychotherapy and counseling,
+  medication management, telehealth, in-person care. Reflect it in paraphrase,
+  never verbatim, and keep "assessment" for the appointment's name. It is the
+  source for psychotherapy and counseling being a service of its own; which
+  modalities, and who delivers them, are still open.
+
 ### Page width — ONE COLUMN, 2026-10-19
 
 Every section's content sits in the page column: `--page-max` (1200px) and

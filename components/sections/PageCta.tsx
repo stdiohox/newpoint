@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { CalendarCheck, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { CalendarCheck, Clock, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
@@ -27,6 +27,8 @@ import { BUSINESS, CTA, DELIVERY_LINE, DELIVERY_SHORT } from '@/lib/content';
  */
 const assurances = [
   { icon: ShieldCheck, label: 'No health details needed' },
+  // Client, 2026-10-19: "We also offer 15 minutes consultations free of charge."
+  { icon: Clock, label: 'Free 15-minute consultation' },
   { icon: MapPin, label: DELIVERY_LINE },
 ];
 
