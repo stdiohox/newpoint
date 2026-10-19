@@ -310,6 +310,18 @@ strip still renders sitewide.
      pre-launch (holding mode), so the URL has no search history to protect. If it was
      ever shared publicly, add a 301 to /services in next.config.ts. -->
 
+### Homepage provider cards — CLIENT REQUEST, 2026-10-19
+
+- **Portrait (4:5) at every width**, with each photo at the **exact pixels supplied**:
+  one lossless WebP per provider, no srcset, no next/image, checked pixel-for-pixel
+  against the original. See `CARD_IMAGE` in `components/sections/Providers.tsx`.
+  Do not "optimise" these into lossy or downsized copies; that is what the client
+  asked to undo.
+- **The panel shares the services column**: 1200px max, 20px side padding, the same
+  edges as `<FeaturedServices />` above it. It used to run on the wider navbar gutters.
+- Text sits over the photo from `lg` up and **below** the photo under `lg`, where it
+  would otherwise cover the face.
+
 ### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29
 
 Agreed in a meeting with the owners. Like the care-modality note above, this

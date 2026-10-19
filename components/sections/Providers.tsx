@@ -18,10 +18,9 @@ import { PROVIDERS } from '@/lib/content';
  * The gradient is built from three existing @theme blues, darkest at the top
  * left through to --color-np-sky at the bottom right.
  *
- * Portraits are the enhanced card crops (matched exposure, white balance and
- * head size; see design-research/enhanced-preview/). The originals under
- * image.webp560 / image.webp1120 are untouched and still serve the provider
- * pages, which frame them square rather than portrait.
+ * Portraits are 4:5 at every width, at the resolution the client supplied:
+ * see CARD_IMAGE. The square crops under image.webp560 / image.webp1120 still
+ * serve the provider pages.
  */
 
 /**
@@ -92,33 +91,44 @@ function assertSourced(slug: string, bio: string[]): string {
 }
 
 /**
- * The enhanced card crops live beside the square portraits under the same slug.
- * Cut at 3:2 to match the card exactly, so the card does no cover-cropping of
- * its own on desktop, with the eye-line placed at 32% of height and head size
- * matched between the two at 26.6% of frame width.
+ * PORTRAIT CARDS, 4:5, SERVED AT NATIVE RESOLUTION (client request, 2026-10-19).
  *
- * The 3:2 recut replaces the earlier 5:4 pair (560/1120). A wider frame at the
- * same width is a SHORTER frame, so the crop keeps the eye-line where it was
- * and loses height off the bottom, not off the face - the chin and mouth sit
- * higher in the frame here than they did at 5:4, which is what lets the scrim
- * clear them entirely.
+ * One file per provider, at exactly the pixels supplied, encoded lossless, so
+ * what the card shows is what the client sent: no crop-and-upscale, no lossy
+ * re-encode, no srcset of smaller copies. Both files were checked
+ * pixel-for-pixel against their originals when they were made.
  *
- * What these crops still CANNOT do is show the top of the head. Measured off a
- * percentage grid on the originals, the crown-to-eye distance is 37% of
- * Funmilayo's whole source frame and 40% of Anastasia's - these are close-range
- * selfies. Framing them to keep the crown drops the eye-line far enough to push
- * the face behind the text block and breaks the matched head size. Not fixable
- * by cropping; it needs the reshoot already listed in OPEN_CLIENT_ITEMS.
+ *   funmilayo-whitaker  1122x1402  the studio portrait as sent, uncropped
+ *   anastasia-ofoegbu    910x1137  her original 1137x1138 selfie cut to 4:5,
+ *                                  native pixels (design-research/assets/
+ *                                  providers/source/)
  *
- * WHITAKER'S IS NOW A STUDIO PORTRAIT (2026-10-19) and has the headroom, but
- * her card is still cut to the same eye-line and head size as Anastasia's so
- * the pair matches. Loosen both together once Anastasia's reshoot lands.
+ * The cost is bytes: about 1.4 MB and 0.7 MB. Both load lazily and the section
+ * sits well below the fold, so neither touches LCP.
+ *
+ * HEAD SIZE IS NOT MATCHED ANY MORE, and cannot be without upscaling: Anastasia's
+ * is a close-range selfie, Funmilayo's a head-and-shoulders studio frame. The
+ * reshoot in OPEN_CLIENT_ITEMS is what closes that gap.
  */
+const CARD_IMAGE: Record<string, { src: string; width: number; height: number }> = {
+  'funmilayo-whitaker': {
+    src: '/images/providers/funmilayo-whitaker-portrait.webp',
+    width: 1122,
+    height: 1402,
+  },
+  'anastasia-ofoegbu': {
+    src: '/images/providers/anastasia-ofoegbu-portrait.webp',
+    width: 910,
+    height: 1137,
+  },
+};
+
 function cardImage(slug: string) {
-  return {
-    w600: `/images/providers/${slug}-card-600.webp`,
-    w1200: `/images/providers/${slug}-card-1200.webp`,
-  };
+  const img = CARD_IMAGE[slug];
+  if (!img) {
+    throw new Error(`Providers: no portrait for "${slug}". Add one to CARD_IMAGE.`);
+  }
+  return img;
 }
 
 /**
@@ -129,8 +139,8 @@ function cardImage(slug: string) {
  * down the card" is the 30% stop here. Above it the photograph is completely
  * untouched: the top 70% of the frame carries no tint of any kind, which is
  * what keeps each provider's mouth and chin fully visible rather than sitting
- * under a wash. At 3:2 the chin lands around 58-62% of the frame, comfortably
- * clear of the 70% line.
+ * under a wash. It only renders from lg, where the text overlays the photo;
+ * below lg the text sits under the photo instead.
  *
  * This gradient is now the COSMETIC half of the treatment only. It no longer
  * has to reach solid before the text, because TEXT_SCRIM below is what actually
@@ -149,13 +159,14 @@ const CARD_SCRIM =
  *
  * CARD_SCRIM is a PERCENTAGE of the card, so it only guarantees solid blue
  * under the text when the text occupies roughly the bottom third. It does not
- * at narrow widths: at 390px the role line sits at about 48% of the card, up in
+ * at narrow widths: at 390px the role line sat at about 48% of the card, up in
  * the fade, over Anastasia's bright white background - measured 2.48:1, under
- * AA, at default text size. Enlarging text makes it worse (1.0:1 at a 20px
+ * AA, at default text size. (Below lg the text now sits under the photo, so
+ * that case no longer arises, but this is still what backs the text at lg.) Enlarging text makes it worse (1.0:1 at a 20px
  * root), because the block grows upward while the scrim stays put.
  *
  * This one is anchored to the TEXT rather than the card: solid everywhere the
- * text actually is, fading out across the 72px of padding above the first line,
+ * text actually is, fading out across the TEXT_FADE_PX of padding above the first line,
  * so it scales with the block at any size. It is the only thing the role and
  * bio contrast figures depend on - CARD_SCRIM above is now purely cosmetic and
  * is transparent across the whole top 70% of the card - so this gradient must
@@ -178,10 +189,10 @@ const TEXT_FADE_PX = 32;
  * row moves from 48.8% to 68.1% of the card at 1440 - i.e. onto the 70% line
  * this section is specified to start at - and from 27.5% to 48.6% at 390.
  *
- * 390 cannot reach 70% and that is geometry, not a bug: the phone card is 4:5
- * portrait and the name, role and two-line bio occupy its bottom ~45%, so
- * "solid behind the text" necessarily begins near halfway. Only the wide 3:2
- * card has the headroom for 70%.
+ * 390 cannot reach 70% and that is geometry, not a bug: the name, role and
+ * two-line bio occupy the bottom ~45% of a phone-width 4:5 card, so "solid
+ * behind the text" necessarily begins near halfway. The desktop card is wide
+ * enough for the text to sit in roughly its bottom quarter.
  */
 const TEXT_SCRIM =
   'linear-gradient(to top,' +
@@ -210,19 +221,12 @@ export function Providers() {
    */
   return (
     <section id="providers" className="bg-np-neutral-50 pt-24 pb-9 md:pt-32 md:pb-14">
-      {/* Site gutters, NOT <Container>. The site header is <Navbar1 />, a
-          floating pill inside px-6 / md:px-12 /
-          lg:px-16 - uncapped, full page width minus the gutter. <Hero />'s own
-          body uses that identical gutter scale. Matching it here is what makes
-          the panel's edges land on the same vertical lines as the wordmark and
-          the header CTA above them.
-
-          This is deliberately NOT the 1200px cap used by <Container> and by
-          FeaturedServices below: the panel is wider than the services block from
-          1328px up, and that is the intended relationship - the panel is the
-          page's one full-bleed-ish colour moment and reads as a band, while the
-          services block stays a measured column. */}
-      <div className="px-6 md:px-12 lg:px-16">
+      {/* SAME COLUMN AS <FeaturedServices /> directly above: 1200px max with
+          20px side padding at every width (FeaturedServices.module.css,
+          .section). Client request, 2026-10-19: the panel used to run on the
+          uncapped navbar gutters and was wider than the services block from
+          1328px up; the two now share both edges. */}
+      <div className="mx-auto max-w-[1200px] px-5">
         {/* on-ink swaps the global focus ring to white, which is what the cards
             inside this panel need. It is scoped to the panel, not the section,
             because the section ground is now light. */}
@@ -266,12 +270,18 @@ export function Providers() {
 
           {/* role="list" is not redundant: Tailwind Preflight sets list-style:
               none, which makes WebKit drop the list semantics entirely. */}
-          <ul role="list" className="mt-8 grid gap-6 min-[960px]:grid-cols-2">
+          {/* Two columns from 1024px, where each 4:5 card is about 450px wide
+              and the name, role and bio sit in its bottom third. Narrower than
+              that the text block buries the face (tried at 640px: it covered
+              most of a 268px card). Below 1024 it is one column, and each card
+              is capped at 480px and centred, so a portrait is never taller
+              than a tablet screen (uncapped it was 820x1025 at 900px). */}
+          <ul role="list" className="mt-8 grid gap-6 lg:grid-cols-2">
             {PROVIDERS.map((p, i) => {
               const img = cardImage(p.slug);
               const bioId = `provider-bio-${p.slug}`;
               return (
-                <Reveal as="li" key={p.slug} delay={stagger(i, 0.1)} className="w-full">
+                <Reveal as="li" key={p.slug} delay={stagger(i, 0.1)} className="mx-auto w-full max-w-[480px] lg:max-w-none">
                   {/* The link wraps the NAME and is stretched over the card by
                       ::after, rather than wrapping the whole card. Same hit
                       area, but it keeps the anchor inside the h3, so a screen
@@ -281,27 +291,30 @@ export function Providers() {
                       The focus ring is moved to the card with has-[], so the
                       indicator outlines the real target and not just the words.
 
-                      The card is 3:2 from 700px up. Below that it goes portrait
-                      instead: 3:2 is a function of the card's WIDTH, so on a
-                      310px-wide phone card it resolves to 207px of height while
-                      the text block alone needs 223px, which would bury the
-                      photo completely - the ratio would not even be the winning
-                      term. 700px is where the card is wide enough (about 620px)
-                      for the text to sit under half the card.
+                      The card is 4:5 PORTRAIT AT EVERY WIDTH (client request,
+                      2026-10-19). It was 3:2 from 700px up; the photographs are
+                      portraits and are now shown as portraits.
 
-                      HEIGHT IS max(ratio, content), not the ratio alone. The
+                      TEXT OVER THE PHOTO ON DESKTOP ONLY. From lg the card is
+                      about 450px wide or more and the name, role and bio fit in
+                      its bottom third. Below lg they need about half of a
+                      310px card, which buried both faces, so there the photo is
+                      its own 4:5 row and the text sits underneath it. The -mt-8
+                      (2rem, which is TEXT_FADE_PX at the default 16px root;
+                      at other root sizes the overlap differs by a few pixels of
+                      matching blue) pulls the text block up so its
+                      fade still runs over the bottom of the photo and the card
+                      reads as one piece. The ratio spacer and CARD_SCRIM are
+                      lg-only for the same reason.
+
+                      FROM lg, HEIGHT IS max(ratio, content), not the ratio alone. The
                       article is a one-cell grid; the ratio spacer and the text
                       block are both placed in that cell, so the taller of the
                       two sets the row height. At default text size the spacer
-                      always wins and the card is exactly its 4:5 / 3:2 size.
-                      When text needs more room - a user font-size setting, a
-                      longer translation, a longer approved sentence - the card
-                      grows instead of clipping.
-
-                      3:2 rather than the previous 5:4 is where most of this
-                      section's height reduction comes from: at the same card
-                      width it is 37px shorter per 560px of width, and the two
-                      cards are side by side, so the saving lands once.
+                      always wins and the card is exactly 4:5. When text needs
+                      more room - a user font-size setting, a longer
+                      translation, a longer approved sentence - the card grows
+                      instead of clipping.
 
                       The previous version put the aspect on the article and the
                       text in `absolute bottom-0`, which meant nothing could
@@ -318,67 +331,44 @@ export function Providers() {
                         and a described portrait here would be concatenated into
                         that name. The provider page renders the same person
                         with real alt text. */}
-                    {/* Plain <img>, same call as ProviderPortrait: these assets
-                        are pre-cropped and pre-optimised at exactly 600 and 1200,
-                        so re-optimising through next/image would only degrade
-                        work already done at a known, capped size.
-
-                        1200w is the LAST tier and there is deliberately no wider
-                        one. The panel is uncapped, so from about 1408px at 2x DPR
-                        the card's slot exceeds 1200 physical px and the browser
-                        upscales. That is not fixable by exporting a bigger file:
-                        the source frames are 1346x1343 and 1137x1138, so the
-                        widest honest 3:2 crops are 1346x897 and 1137x758 - the
-                        shipped 1200x800 is ALREADY a slight upscale of
-                        Anastasia's. A 2000w tier would be invented detail at
-                        several times the bytes. Same root cause as the crown and
-                        chin limits above: it needs the reshoot in
-                        OPEN_CLIENT_ITEMS, not a different export. */}
-                    {/* `sizes` is a vw expression, not a fixed 560px, because the
-                        panel no longer has a max-width - the card grows with the
-                        viewport now, so a fixed descriptor would under-request on
-                        wide screens and ship the 600w file to a 616px slot.
-
-                        The slot is computed, not approximated. Two columns only
-                        from 960px up, so above that a card is half the panel less
-                        half the grid gap: (100vw - 2*gutter - 2*panelPad - gap)/2.
-                        Gutter is 64 from 1024 (lg:px-16) and 48 from 768
-                        (md:px-12); panel padding is 28 from 960 (min-[960px]:px-7)
-                        and 20 below it; the gap is 24 (gap-6). A bare 50vw would
-                        overstate the real slot by 104px at desktop - 17% - which
-                        makes the browser budget for an image it will never paint.
-
-                        The one thing this CANNOT express is a slot wider than the
-                        1200w file: see the note on the srcSet above. */}
+                    {/* Plain <img>, NOT next/image, and no srcSet: the client
+                        asked for the photographs at exactly the quality supplied,
+                        and next/image would re-encode them lossy at whatever width
+                        it picked. One lossless file per provider at its native
+                        size - see CARD_IMAGE. width/height are the real pixel
+                        dimensions, so the browser reserves the right box. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={img.w600}
-                      srcSet={`${img.w600} 600w, ${img.w1200} 1200w`}
-                      sizes="(min-width: 1024px) calc(50vw - 104px), (min-width: 960px) calc(50vw - 88px), (min-width: 768px) calc(100vw - 136px), calc(100vw - 88px)"
+                      src={img.src}
                       alt=""
-                      width={1200}
-                      height={800}
+                      width={img.width}
+                      height={img.height}
                       loading="lazy"
                       decoding="async"
-                      className="ease-np-out absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] group-has-[:focus-visible]:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-has-[:focus-visible]:scale-100"
-                      style={{ objectPosition: 'center 32%' }}
+                      className="ease-np-out col-start-1 row-start-1 aspect-[4/5] w-full object-cover transition-transform lg:absolute lg:inset-0 lg:aspect-auto lg:h-full duration-500 group-hover:scale-[1.04] group-has-[:focus-visible]:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-has-[:focus-visible]:scale-100"
+                      style={{ objectPosition: 'center top' }}
                     />
 
-                    <div className="absolute inset-0" style={{ backgroundImage: CARD_SCRIM }} />
+                    {/* Desktop only: below lg the text no longer sits on the
+                        photo, so there is nothing for this to back. */}
+                    <div
+                      className="absolute inset-0 hidden lg:block"
+                      style={{ backgroundImage: CARD_SCRIM }}
+                    />
 
-                    {/* Ratio spacer. Sets the card's MINIMUM height and nothing
-                        else - it paints nothing and is out of the a11y tree.
-                        The photo and scrim above are absolute against the
-                        article, so they fill whatever height wins: a taller
-                        card shows more photograph, never a blank band. */}
+                    {/* Ratio spacer, lg only. Sets the card's MINIMUM height and
+                        nothing else - it paints nothing and is out of the a11y
+                        tree. From lg the photo and scrim above are absolute
+                        against the article, so they fill whatever height wins:
+                        a taller card shows more photograph, never a blank band.
+                        Below lg the photo is its own in-flow row. */}
                     <div
                       aria-hidden="true"
-                      className="col-start-1 row-start-1 aspect-[4/5] min-[700px]:aspect-[3/2]"
+                      className="col-start-1 row-start-1 hidden aspect-[4/5] lg:block"
                     />
 
-                    {/* Same grid cell as the spacer, pinned to its bottom.
-                        `relative` is load-bearing: the scrim is positioned, so
-                        static content would paint underneath it. */}
+                    {/* From lg: same grid cell as the spacer, pinned to its
+                        bottom. Below lg: the row under the photo. */}
                     {/* z-10, NOT relative. Both lift this above the absolutely
                         positioned scrim, but `relative` also makes this div the
                         containing block for the link's `after:inset-0`, which
@@ -390,7 +380,7 @@ export function Providers() {
                         remains the containing block and the hit area is the
                         card again. */}
                     <div
-                      className="z-10 col-start-1 row-start-1 self-end px-5 pb-5 min-[960px]:px-7 min-[960px]:pb-6"
+                      className="z-10 col-start-1 row-start-2 -mt-8 self-end px-5 pb-5 min-[960px]:px-7 min-[960px]:pb-6 lg:row-start-1 lg:mt-0"
                       style={{ backgroundImage: TEXT_SCRIM, paddingTop: `${TEXT_FADE_PX}px` }}
                     >
                       <h3 className="flex items-center gap-3 text-white">
