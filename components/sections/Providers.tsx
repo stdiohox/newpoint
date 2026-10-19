@@ -109,6 +109,10 @@ function assertSourced(slug: string, bio: string[]): string {
  * selfies. Framing them to keep the crown drops the eye-line far enough to push
  * the face behind the text block and breaks the matched head size. Not fixable
  * by cropping; it needs the reshoot already listed in OPEN_CLIENT_ITEMS.
+ *
+ * WHITAKER'S IS NOW A STUDIO PORTRAIT (2026-10-19) and has the headroom, but
+ * her card is still cut to the same eye-line and head size as Anastasia's so
+ * the pair matches. Loosen both together once Anastasia's reshoot lands.
  */
 function cardImage(slug: string) {
   return {
