@@ -40,37 +40,38 @@ type MediaState = {
 
 const Ctx = createContext<MediaState | null>(null);
 
-/**
- * Read the preference synchronously, before the first paint.
- *
- * Reading it in an effect instead meant the first client render still carried
- * `autoPlay`, so the browser started the videos and only a later `pause()`
- * stopped them — a visible flash of motion for exactly the person who asked for
- * none. A lazy initialiser runs before the video element is ever created.
- * Guarded for SSR, where there is no matchMedia and the server markup is
- * hydrated over anyway.
- */
-function prefersReducedMotion() {
-  if (typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
 export function ServicesMediaProvider({ children }: { children: ReactNode }) {
-  const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
-  // Motion-on is the default, but reduced motion suppresses it from the very
-  // first render rather than after one.
-  const [playing, setPlaying] = useState(() => !prefersReducedMotion());
+  /*
+   * EVERY RENDER STARTS PAUSED, and the preference is read in an effect.
+   *
+   * This used to read prefers-reduced-motion in a lazy useState initialiser so
+   * a reduced-motion visitor never saw a frame of motion. But the server has
+   * no matchMedia, so it rendered `playing: true` (the pause icon) while a
+   * reduced-motion client's first render had `playing: false` (the play icon),
+   * and React threw a hydration mismatch on every such visit.
+   *
+   * Starting paused for everyone fixes that without giving the protection back:
+   * <ServiceVideo> carries no `autoPlay` attribute, so nothing plays until the
+   * effect below calls play(), and that only happens once this effect has
+   * confirmed the visitor has NOT asked for reduced motion. The cost is that
+   * everyone else sees the toggle switch from "Play video" to "Pause video" at
+   * hydration, which is also the truthful label without scripting.
+   */
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const videos = useRef(new Set<HTMLVideoElement>());
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const apply = () => {
+    setReducedMotion(mq.matches);
+    // Motion-on is the default, but only once we know it is wanted.
+    if (!mq.matches) setPlaying(true);
+    const onChange = () => {
       setReducedMotion(mq.matches);
       if (mq.matches) setPlaying(false);
     };
-    apply();
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
 
   const register = useCallback((el: HTMLVideoElement | null) => {

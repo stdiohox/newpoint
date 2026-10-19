@@ -286,6 +286,24 @@
   }
 }
 
+/* Navbar logo entrance. A plain CSS animation rather than a Motion handover:
+   see the note on [data-logo-in] in components/ui/navbar-1.tsx. `backwards`
+   fill, not `both`, so once it ends it stops applying and Motion's hover scale
+   is free to write the transform. */
+@keyframes np-logo-in {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-logo-in] {
+    animation: np-logo-in 0.3s ease-out backwards;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    FAQ panels.
 

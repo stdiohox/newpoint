@@ -64,6 +64,7 @@ export function Navbar1({
   const [isOpen, setIsOpen] = useState(false);
   const reduce = useReducedMotion();
   const hydrated = useHydrated();
+  const logoAnimates = hydrated && !reduce;
   const pathname = usePathname();
   const panelId = useId();
   const submenuId = useId();
@@ -378,10 +379,22 @@ export function Navbar1({
       <div className="relative z-10 flex min-h-[60px] w-full max-w-6xl items-center justify-between rounded-full bg-white px-6 py-3 shadow-lg">
         <div className="flex items-center">
           <motion.div
+            /* THE ENTRANCE IS A CSS ANIMATION, [data-logo-in] in globals.css,
+               gated on .js and prefers-reduced-motion: no-preference.
+
+               It used to be `initial={reduce ? false : { scale: 0.8 }}`, and
+               `reduce` is null on the server and true on a reduced-motion
+               client, so the server HTML carried scale(0.8) and that client did
+               not: a hydration mismatch. Two Motion-based fixes were tried and
+               dropped. `initial={false}` plus a late `animate` never ran (Motion
+               does not read a scale out of the CSS matrix), and remounting with
+               a `key` at hydration replaced the logo link, which drops keyboard
+               focus for anyone who has already tabbed to it. CSS needs neither,
+               and the markup is identical on server and client. */
+            data-logo-in=""
             className="mr-6"
-            initial={reduce ? false : { scale: 0.8 }}
-            animate={reduce ? undefined : { scale: 1 }}
-            whileHover={reduce ? undefined : { scale: 1.03 }}
+            initial={false}
+            whileHover={logoAnimates ? { scale: 1.03 } : undefined}
             transition={{ duration: 0.3 }}
           >
             {logo}
@@ -598,7 +611,10 @@ export function Navbar1({
           aria-controls={panelId}
           className="focus-visible:outline-np-blue-600 flex items-center rounded-full p-1 focus-visible:outline-2 focus-visible:outline-offset-2 min-[70em]:hidden"
           onClick={toggleMenu}
-          whileTap={reduce ? undefined : { scale: 0.9 }}
+          /* Gated on `hydrated`: Motion adds tabindex="0" when whileTap is
+             set, so keying it on `reduce` alone made the server HTML and a
+             reduced-motion client's first render disagree. */
+          whileTap={hydrated && !reduce ? { scale: 0.9 } : undefined}
         >
           <Menu aria-hidden="true" className="text-np-ink h-6 w-6" />
         </motion.button>

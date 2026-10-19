@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { motion, useReducedMotion } from 'motion/react';
+import { useHydrated } from '@/lib/useHydrated';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
@@ -82,15 +83,25 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
     },
     ref
   ) => {
+    /* Gated on hydration as well as the preference. useReducedMotion is null
+       on the server and true on a reduced-motion client, so keying the
+       variants on it alone made Motion write the rest-state style into the
+       server HTML and not on that client: a hydration mismatch. Both
+       animations here are hover-only, so waiting for hydration costs nothing
+       visible. */
+    // Both hooks are called unconditionally: `useHydrated() && !useReducedMotion()`
+    // would skip the second call before hydration and change the hook order.
+    const hydrated = useHydrated();
     const reduce = useReducedMotion();
+    const motionOn = hydrated && !reduce;
     const cardAnimation = { rest: { scale: 1, y: 0 }, hover: { scale: 1.03, y: -4 } };
     const imageAnimation = { rest: { scale: 1, rotate: 0 }, hover: { scale: 1.1, rotate: 3 } };
 
     return (
       <motion.div
-        variants={reduce ? undefined : cardAnimation}
+        variants={motionOn ? cardAnimation : undefined}
         initial="rest"
-        whileHover={reduce ? undefined : 'hover'}
+        whileHover={motionOn ? 'hover' : undefined}
         animate="rest"
         className="h-full"
         ref={ref}
@@ -148,7 +159,7 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
               <motion.img
                 src={imageUrl}
                 alt=""
-                variants={reduce ? undefined : imageAnimation}
+                variants={motionOn ? imageAnimation : undefined}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                 className="pointer-events-none mb-4 h-24 w-24 shrink-0 object-contain min-[30rem]:absolute min-[30rem]:top-1/2 min-[30rem]:right-6 min-[30rem]:mb-0 min-[30rem]:h-[140px] min-[30rem]:w-[140px] min-[30rem]:-translate-y-1/2 sm:h-[176px] sm:w-[176px] md:static md:mb-4 md:h-24 md:w-24 md:translate-y-0 lg:absolute lg:top-1/2 lg:right-6 lg:mb-0 lg:h-[120px] lg:w-[120px] lg:-translate-y-1/2 xl:h-[200px] xl:w-[200px]"
               />
