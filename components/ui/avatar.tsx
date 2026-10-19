@@ -17,13 +17,9 @@ import { cn } from '@/lib/utils';
  * rather than erroring — so a stray `bg-secondary` would look deliberate in the
  * source and render a transparent fallback in the browser.
  *
- * WHY THIS EXISTS ALONGSIDE ProviderPortrait, which also renders a provider's
- * face: they solve different problems and both are still used.
- *
- *   ProviderPortrait is a <picture> with a webp source and a jpg fallback at
- *   two pre-processed sizes. It is the right call at 240px on the provider page
- *   and the homepage grid, where the image IS the content and art direction
- *   matters.
+ * WHY THIS EXISTS ALONGSIDE the large portraits: the provider page and the
+ * homepage show PROVIDERS[].image.portrait, the native-resolution 4:5 photo,
+ * where the image IS the content. This is for the small circular case.
  *
  *   Avatar is for the small circular case. What it adds is a real failure
  *   state: Radix tracks the image's load status and swaps in AvatarFallback if

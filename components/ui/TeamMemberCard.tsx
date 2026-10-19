@@ -1,4 +1,4 @@
-import { ProviderPortrait } from '@/components/ui/ProviderPortrait';
+import { Tilt } from '@/components/ui/Tilt';
 import { Reveal } from '@/components/ui/Reveal';
 import type { Provider } from '@/lib/content';
 
@@ -28,7 +28,7 @@ import type { Provider } from '@/lib/content';
  * `displayName`, and the credentials render as the label directly above it —
  * which is the adjacency CLAUDE.md requires, in the same visual block.
  *
- * Server component. <Reveal /> is the only client code and it is a leaf.
+ * Server component. <Reveal /> and <Tilt /> are the only client code, both leaves.
  */
 export function TeamMemberCard({
   provider,
@@ -65,24 +65,37 @@ export function TeamMemberCard({
         }`}
       >
         <Reveal>
-          <ProviderPortrait
-            provider={provider}
-            /* alt="" — the <h2> beside it says the name, and the h1 above said
-               the name and the credentials. ProviderPortrait's own alt repeats
-               both, so a screen reader would hear them three times on this
-               page. The /services and /providers cards pass "" for the same
-               reason, and `alt ?? image.alt` treats "" correctly. */
-            alt=""
-            /* Fluid, not the source's fixed width.
-               580px, not 560: the card renders the portrait at 568 CSS px at
-               1440, so a 560 declaration under-states the box and a browser
-               sizing a 2x screen against it asks for 1120 when it wants 1136.
-               The masters top out at 1120 either way — see the note in the
-               page — but the declaration should describe the box it is in. */
-            sizes="(min-width: 1024px) 580px, (min-width: 768px) 46vw, 100vw"
-            className="aspect-square w-full"
-            loading="eager"
-          />
+          {/* THE NATIVE PORTRAIT, NOT THE OLD SQUARE (client request,
+              2026-10-19). This used to render image.webp1120, a tight square
+              crop enlarged about 2x from the selfie, so the page's main image
+              was soft. It now shows PROVIDERS[].image.portrait: the 4:5 photo
+              at exactly the pixels supplied, lossless, the same file as the
+              homepage card (often already cached). Plain <img>, never
+              next/image, which would re-encode it lossy.
+
+              alt="" because the <h2> beside it says the name and the h1 above
+              said the name and the credentials; a descriptive alt would have a
+              screen reader hear them three times.
+
+              Eager and high priority: this is the route's likely LCP element.
+              About 1.4 MB for Whitaker, the price of the exact-quality
+              requirement. width/height are the real pixels, so the 4:5 box is
+              reserved before it loads. */}
+          <Tilt>
+            <div className="group rounded-media bg-np-neutral-50 ease-np-out relative overflow-hidden shadow-sm transition-shadow duration-300 hover:shadow-[0_24px_48px_-20px_rgb(19_28_46/0.28)] motion-reduce:transition-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={provider.image.portrait.src}
+                width={provider.image.portrait.width}
+                height={provider.image.portrait.height}
+                alt=""
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                className="ease-np-out block aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              />
+            </div>
+          </Tilt>
         </Reveal>
       </div>
 
@@ -107,36 +120,41 @@ export function TeamMemberCard({
             observer never fires and the card stays at opacity 0 for good. The
             prop's own note in Reveal.tsx carries the measurement. */}
         <Reveal delay={0.08} amount="some">
-          <div className="bg-np-surface rounded-card p-7 ring-1 ring-[var(--np-alpha-ink-08)] sm:p-9 lg:p-11">
-            {/* The label. `credentials` verbatim; the tracking and case are
+          {/* Tilts on its own, so the two boxes respond independently, and
+              deepens its shadow on hover. Both are decoration: the card is not
+              a link and nothing here suggests it is. */}
+          <Tilt>
+            <div className="bg-np-surface rounded-card ease-np-out p-7 ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-300 hover:shadow-[0_24px_48px_-20px_rgb(19_28_46/0.22)] motion-reduce:transition-none sm:p-9 lg:p-11">
+              {/* The label. `credentials` verbatim; the tracking and case are
                 presentation, so the string is unchanged for the build
                 assertion and for schema. */}
-            <p className="text-caption text-np-neutral-600 tracking-[0.14em] uppercase">
-              {provider.credentials}
-            </p>
+              <p className="text-caption text-np-neutral-600 tracking-[0.14em] uppercase">
+                {provider.credentials}
+              </p>
 
-            {/* Two lines, as the pattern has it. One <h2>, so the heading
+              {/* Two lines, as the pattern has it. One <h2>, so the heading
                 outline sees a single heading and a screen reader reads one
                 continuous name — the break is a <span>, not a second heading. */}
-            <h2 className="text-display-l text-np-ink mt-4 leading-[1.05]">
-              {/* The trailing space is deliberate: JSX strips whitespace
+              <h2 className="text-display-l text-np-ink mt-4 leading-[1.05]">
+                {/* The trailing space is deliberate: JSX strips whitespace
                   between the two spans, so without it `textContent` reads
                   "Dr. FunmilayoWhitaker". Browsers insert a break at a block
                   boundary when computing the accessible name, but crawlers,
                   translation tools and some voice matching read textContent. */}
-              <span className="block">{lead}{' '}</span>
-              <span className="block">{family}</span>
-            </h2>
+                <span className="block">{lead} </span>
+                <span className="block">{family}</span>
+              </h2>
 
-            {paragraphs.map((para, i) => (
-              <p
-                key={i}
-                className="text-body-l text-np-neutral-600 mt-6 max-w-[52ch] not-first:mt-4"
-              >
-                {para}
-              </p>
-            ))}
-          </div>
+              {paragraphs.map((para, i) => (
+                <p
+                  key={i}
+                  className="text-body-l text-np-neutral-600 mt-6 max-w-[52ch] not-first:mt-4"
+                >
+                  {para}
+                </p>
+              ))}
+            </div>
+          </Tilt>
         </Reveal>
       </div>
     </div>

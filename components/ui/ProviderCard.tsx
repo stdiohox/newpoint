@@ -25,9 +25,8 @@ import { useHydrated } from '@/lib/useHydrated';
  *
  * A CLIENT COMPONENT, because the tilt needs pointer position. It takes plain
  * props rather than the Provider object so lib/content.ts stays out of the
- * browser bundle — the rule lib/nav.ts's header sets out. It also renders the
- * portrait itself instead of reusing <ProviderPortrait />, which is a server
- * component and cannot be imported across this boundary.
+ * browser bundle — the rule lib/nav.ts's header sets out. It renders its
+ * portrait itself.
  *
  * A STRETCHED LINK, AND IT IS THE BUTTON AT THE FOOT OF THE CARD. The heading is
  * plain text; the "View full profile" button carries `after:absolute

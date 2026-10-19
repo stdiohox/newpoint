@@ -314,7 +314,8 @@ strip still renders sitewide.
 
 - **Portrait (4:5) at every width**, with each photo at the **exact pixels supplied**:
   one lossless WebP per provider, no srcset, no next/image, checked pixel-for-pixel
-  against the original. See `CARD_IMAGE` in `components/sections/Providers.tsx`.
+  against the original. The files and pixel sizes are `PROVIDERS[].image.portrait`
+  in `lib/content.ts`, which the provider pages (`TeamMemberCard`) use as well.
   Do not "optimise" these into lossy or downsized copies; that is what the client
   asked to undo.
 - **The panel shares the services column**: 1200px max, 20px side padding, the same

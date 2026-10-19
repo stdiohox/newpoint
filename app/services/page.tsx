@@ -470,10 +470,10 @@ export default function ServicesIndex() {
 
                             srcSet, not src alone. AvatarImage forwards every
                             <img> prop, so the two pre-processed webp sizes
-                            survive the move; only ProviderPortrait's <picture>
-                            jpg fallback is lost, which webp has not needed for
-                            years. ProviderPortrait still renders the 240px
-                            portraits on the provider page and the homepage.
+                            survive the move; only the old <picture> jpg
+                            fallback is lost, which webp has not needed for
+                            years. The large portraits on the provider pages
+                            and the homepage use PROVIDERS[].image.portrait.
 
                             alt="" because the h3 beside it already says the
                             name: the portrait's own alt repeats the name AND

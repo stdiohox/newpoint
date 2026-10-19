@@ -519,7 +519,22 @@ export type Provider = {
   displayName: string;
   credentials: string;
   role: string;
-  image: { webp560: string; webp1120: string; jpg560: string; jpg1120: string; alt: string };
+  image: {
+    webp560: string;
+    webp1120: string;
+    jpg560: string;
+    jpg1120: string;
+    alt: string;
+    /**
+     * The 4:5 portrait AT EXACTLY THE PIXELS SUPPLIED, lossless, checked
+     * pixel-for-pixel against the original (client request, 2026-10-19). Used
+     * where the photo is shown large: the homepage provider cards and the
+     * provider page. Never route it through next/image or a lossy re-encode;
+     * that is what the client asked to undo. The squares above are the old
+     * tight crops and only serve the small circular avatars.
+     */
+    portrait: { src: string; width: number; height: number };
+  };
   licensed: string;
   experience: string;
   approach: string;
@@ -639,6 +654,8 @@ export const PROVIDERS: Provider[] = [
       webp1120: '/images/providers/funmilayo-whitaker-1120.webp',
       jpg560: '/images/providers/funmilayo-whitaker-560.jpg',
       jpg1120: '/images/providers/funmilayo-whitaker-1120.jpg',
+      // The studio portrait as sent, uncropped.
+      portrait: { src: '/images/providers/funmilayo-whitaker-portrait.webp', width: 1122, height: 1402 },
       alt: 'Funmilayo Whitaker, DNP, FNP-BC, PMHNP-BC, psychiatric mental health nurse practitioner at Newpoint',
     },
     licensed: 'Licensed in New Jersey and Pennsylvania',
@@ -771,6 +788,9 @@ export const PROVIDERS: Provider[] = [
       webp1120: '/images/providers/anastasia-ofoegbu-1120.webp',
       jpg560: '/images/providers/anastasia-ofoegbu-560.jpg',
       jpg1120: '/images/providers/anastasia-ofoegbu-1120.jpg',
+      // Her 1137x1138 original cut to 4:5 at native pixels
+      // (design-research/assets/providers/source/).
+      portrait: { src: '/images/providers/anastasia-ofoegbu-portrait.webp', width: 910, height: 1137 },
       alt: 'Anastasia O. Ofoegbu, DNP, FNP-BC, PMHNP-BC, psychiatric mental health nurse practitioner at Newpoint',
     },
     /**

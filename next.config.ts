@@ -137,6 +137,30 @@ const nextConfig: NextConfig = {
   async redirects() {
     return legacyRedirects;
   },
+  /**
+   * Cache the provider photos. The large portraits are lossless at the exact
+   * pixels supplied (client requirement, 2026-10-19), about 1.4 MB and 0.7 MB,
+   * and the profile page's portrait is its LCP image. Vercel serves public/
+   * with max-age=0, so without this every visit revalidated them, including a
+   * visitor who had just loaded them on the homepage.
+   *
+   * A day, then served stale for a week while it revalidates in the
+   * background. NOT `immutable`: the filenames are not versioned, so a
+   * replaced photo must still show up without renaming the file.
+   */
+  async headers() {
+    return [
+      {
+        source: '/images/providers/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

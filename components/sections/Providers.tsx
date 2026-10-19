@@ -20,8 +20,9 @@ import { PROVIDERS } from '@/lib/content';
  * left through to --color-np-sky at the bottom right.
  *
  * Portraits are 4:5 at every width, at the resolution the client supplied:
- * see CARD_IMAGE. The square crops under image.webp560 / image.webp1120 still
- * serve the provider pages.
+ * see PROVIDERS[].image.portrait, which the provider pages use too. The square
+ * crops under image.webp560 / image.webp1120 now only serve the small circular
+ * avatars.
  */
 
 /**
@@ -110,27 +111,10 @@ function assertSourced(slug: string, bio: string[]): string {
  * HEAD SIZE IS NOT MATCHED ANY MORE, and cannot be without upscaling: Anastasia's
  * is a close-range selfie, Funmilayo's a head-and-shoulders studio frame. The
  * reshoot in OPEN_CLIENT_ITEMS is what closes that gap.
+ *
+ * The files and their pixel sizes live in PROVIDERS[].image.portrait in
+ * lib/content.ts, which the provider pages read too.
  */
-const CARD_IMAGE: Record<string, { src: string; width: number; height: number }> = {
-  'funmilayo-whitaker': {
-    src: '/images/providers/funmilayo-whitaker-portrait.webp',
-    width: 1122,
-    height: 1402,
-  },
-  'anastasia-ofoegbu': {
-    src: '/images/providers/anastasia-ofoegbu-portrait.webp',
-    width: 910,
-    height: 1137,
-  },
-};
-
-function cardImage(slug: string) {
-  const img = CARD_IMAGE[slug];
-  if (!img) {
-    throw new Error(`Providers: no portrait for "${slug}". Add one to CARD_IMAGE.`);
-  }
-  return img;
-}
 
 /**
  * Bottom scrim. Nothing at all until 70% down the card, then ramps to solid
@@ -278,10 +262,15 @@ export function Providers() {
               than a tablet screen (uncapped it was 820x1025 at 900px). */}
           <ul role="list" className="mt-8 grid gap-6 lg:grid-cols-2">
             {PROVIDERS.map((p, i) => {
-              const img = cardImage(p.slug);
+              const img = p.image.portrait;
               const bioId = `provider-bio-${p.slug}`;
               return (
-                <Reveal as="li" key={p.slug} delay={stagger(i, 0.1)} className="mx-auto w-full max-w-[480px] lg:max-w-none">
+                <Reveal
+                  as="li"
+                  key={p.slug}
+                  delay={stagger(i, 0.1)}
+                  className="mx-auto w-full max-w-[480px] lg:max-w-none"
+                >
                   {/* The link wraps the NAME and is stretched over the card by
                       ::after, rather than wrapping the whole card. Same hit
                       area, but it keeps the anchor inside the h3, so a screen
@@ -335,7 +324,7 @@ export function Providers() {
                         asked for the photographs at exactly the quality supplied,
                         and next/image would re-encode them lossy at whatever width
                         it picked. One lossless file per provider at its native
-                        size - see CARD_IMAGE. width/height are the real pixel
+                        size - see PROVIDERS[].image.portrait. width/height are the real pixel
                         dimensions, so the browser reserves the right box. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -345,7 +334,7 @@ export function Providers() {
                       height={img.height}
                       loading="lazy"
                       decoding="async"
-                      className="ease-np-out col-start-1 row-start-1 aspect-[4/5] w-full object-cover transition-transform lg:absolute lg:inset-0 lg:aspect-auto lg:h-full duration-500 group-hover:scale-[1.04] group-has-[:focus-visible]:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-has-[:focus-visible]:scale-100"
+                      className="ease-np-out col-start-1 row-start-1 aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] group-has-[:focus-visible]:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-has-[:focus-visible]:scale-100 lg:absolute lg:inset-0 lg:aspect-auto lg:h-full"
                       style={{ objectPosition: 'center top' }}
                     />
 
