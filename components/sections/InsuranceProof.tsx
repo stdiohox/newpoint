@@ -59,7 +59,19 @@ const COMMERCIAL_SUMMARY =
 const ACCEPTED_DOT = 'var(--color-np-success)';
 const SELF_PAY_DOT = 'var(--color-np-neutral-500)';
 
-const CHECK_COVERAGE = { ctaText: 'Check your coverage', ctaHref: '/contact' } as const;
+/*
+ * ONE SPECIFIC ACTION PER CARD (client feedback, 2026-10-19: three identical
+ * "Check your coverage" buttons). Each label says what happens and each goes
+ * where that happens:
+ *   commercial  -> /insurance, the full list of accepted plans (this card
+ *                  names only five of them)
+ *   Medicare,
+ *   NJ Medicaid -> /contact, to ask, which is what the card's body offers
+ *   self-pay    -> /insurance, which has the payment details
+ * Short enough to stay on one line at every width (the old self-pay label
+ * wrapped on desktop). Distinct labels also give each link its own
+ * accessible name (SC 2.4.4).
+ */
 
 const CARDS = [
   {
@@ -69,7 +81,8 @@ const CARDS = [
     title: 'Commercial insurance',
     imageUrl: '/images/insurance/commercial.webp',
     description: COMMERCIAL_SUMMARY,
-    ...CHECK_COVERAGE,
+    ctaText: 'See all accepted plans',
+    ctaHref: '/insurance',
   },
   {
     gradient: 'sky',
@@ -78,7 +91,8 @@ const CARDS = [
     title: 'Medicare',
     imageUrl: '/images/insurance/medicare.webp',
     description: INSURANCE.coverageCheckNote,
-    ...CHECK_COVERAGE,
+    ctaText: 'Ask about Medicare',
+    ctaHref: '/contact',
   },
   {
     gradient: 'sage',
@@ -87,7 +101,8 @@ const CARDS = [
     title: 'NJ Medicaid',
     imageUrl: '/images/insurance/medicaid.webp',
     description: INSURANCE.coverageCheckNote,
-    ...CHECK_COVERAGE,
+    ctaText: 'Ask about NJ Medicaid',
+    ctaHref: '/contact',
   },
   {
     gradient: 'neutral',
@@ -96,7 +111,7 @@ const CARDS = [
     title: 'Paying without insurance',
     imageUrl: '/images/insurance/self-pay.webp',
     description: INSURANCE.selfPay,
-    ctaText: 'See all insurance and payment details',
+    ctaText: 'See payment options',
     ctaHref: '/insurance',
   },
 ] as const;

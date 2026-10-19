@@ -86,6 +86,14 @@ const variants = {
    */
   sky: 'bg-np-sky text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
   /**
+   * The site's CTA navy (the navbar and footer "Request an appointment"),
+   * for a filled button on a light or tinted ground. White label 16.1:1; the
+   * arrow on the white disc is navy too, at 16.1:1. Added 2026-10-19 for the
+   * homepage insurance cards, which were `sky` and read as a different colour
+   * from every other CTA.
+   */
+  navy: 'bg-np-blue-900 text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
+  /**
    * The secondary action on a dark ground, where `quiet` cannot go: its
    * np-blue-600 label and ring are built for light grounds and both vanish.
    *
@@ -176,7 +184,7 @@ export function Button({
       {withArrow && (
         <span
           aria-hidden="true"
-          className={`text-np-sky ml-1 inline-flex shrink-0 items-center justify-center rounded-full bg-white ${disc.box}`}
+          className={`${variant === 'navy' ? 'text-np-blue-900' : 'text-np-sky'} ml-1 inline-flex shrink-0 items-center justify-center rounded-full bg-white ${disc.box}`}
         >
           <ArrowUpRight size={disc.icon} />
         </span>

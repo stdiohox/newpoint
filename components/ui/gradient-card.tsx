@@ -180,12 +180,13 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
               <p className="text-np-ink/70 max-w-xs">{description}</p>
             </div>
             <div className="mt-6">
-              {/* Allowed to wrap here only. Button is nowrap site-wide, and
-                  "See all insurance and payment details" is 315px on one line,
-                  wider than this card's content box on a phone. `!` because
+              {/* Allowed to wrap here only. Button is nowrap site-wide; the
+                  labels are short now, but a long one, or large text on a
+                  320px phone, must wrap rather than push the card wider than
+                  the screen (it once did by 15px). `!` because
                   the two white-space utilities are otherwise decided by
                   stylesheet order, not by which class comes last. */}
-              <Button href={ctaHref} variant="sky" withArrow className="whitespace-normal!">
+              <Button href={ctaHref} variant="navy" withArrow className="whitespace-normal!">
                 {ctaText}
               </Button>
             </div>
