@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
+import { Container } from '@/components/ui/Container';
 import Image from 'next/image';
 
 /**
@@ -69,11 +70,9 @@ export function FaqSections({
   const baseId = useId();
 
   return (
-    /* Width and gutters are <Providers />'s: the services/providers column,
-       1200px max with 20px side padding, so this section's content edges line
-       up with the sections above it (client request, 2026-10-19; it used to run
-       on the uncapped navbar gutters). */
-    <div className="mx-auto max-w-[1200px] px-5">
+    /* The page column (`page-col`, defined once in globals.css), like every
+       other section. It ran on the uncapped navbar gutters until 2026-10-19. */
+    <Container>
       <div className="grid gap-8 md:grid-cols-12 md:gap-16">
         <div className="md:col-span-5">
           {/* --nav-h is the sticky bar's height and also drives
@@ -168,6 +167,6 @@ export function FaqSections({
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

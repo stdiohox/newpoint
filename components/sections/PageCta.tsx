@@ -135,8 +135,8 @@ export function PageCta({
 
               Lazy, and sized for the panel rather than the viewport: this
               block closes nine pages and is below the fold on every one of
-              them. The panel is the container's full width, which caps at
-              1136px, so 1200px covers a DPR 1 screen and the srcset carries
+              them. The panel is the page column's full content width, which
+              caps at 1136px, so 1200px covers a DPR 1 screen and the srcset carries
               the rest. */}
           <Image
             src="/images/cta/cta-band-2400.webp"

@@ -322,6 +322,23 @@ strip still renders sitewide.
 - Text sits over the photo from `lg` up and **below** the photo under `lg`, where it
   would otherwise cover the face.
 
+### Page width — ONE COLUMN, 2026-10-19
+
+Every section's content sits in the page column: `--page-max` (1200px) and
+`--page-gutter` (`clamp(1.25rem, 4vw, 2rem)`, 20px on phones to 32px) in the
+`@theme static` block of `app/globals.css`, applied by the `page-col` utility,
+which **is** `<Container>`. The navbar pill and the footer card are capped to
+the same column, so the top and bottom frames line up with every section.
+`npm run lint` runs `scripts/check-widths.mjs`, which fails on a hand-written
+page width.
+
+- **New sections use `<Container>`.** Never hand-write a `max-w-[…]` + padding
+  wrapper or the old uncapped `px-6 md:px-12 lg:px-16` gutters: that is how three
+  homepage sections ended up ~200px wider a side than the rest.
+- Full-bleed bands (hero, footer, coloured section grounds) go outside the
+  column and put their content inside it.
+- To change the site's width, change the two tokens. Nothing else.
+
 ### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29
 
 Agreed in a meeting with the owners. Like the care-modality note above, this

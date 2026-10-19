@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Container } from '@/components/ui/Container';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CalendarCheck, ClipboardList, FileText, RefreshCw } from 'lucide-react';
@@ -165,11 +166,10 @@ export function FeatureBentoGrid({
    */
   return (
     <div className="w-full pt-9 pb-20 md:pt-14 lg:pb-40">
-      {/* The services/providers column: 1200px max, 20px side padding, the
-          same edges as <FeaturedServices /> and <Providers /> above it. It ran
-          on the uncapped navbar gutters until 2026-10-19 and was ~190px wider a
-          side at 1680px (client request). */}
-      <div className="mx-auto max-w-[1200px] px-5">
+      {/* The page column (`page-col`, defined once in globals.css). It ran on
+          the uncapped navbar gutters until 2026-10-19 and was ~190px wider a
+          side at 1680px than the sections around it. */}
+      <Container>
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-start gap-4">
             <div>
@@ -286,7 +286,7 @@ export function FeatureBentoGrid({
 
           {children}
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

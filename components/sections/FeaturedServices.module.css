@@ -10,9 +10,11 @@
 
 .section {
   background: #ffffff;
-  max-width: 1200px;
+  /* The page column, read from the tokens in globals.css rather than
+     restated, so this section cannot drift from the rest of the page. */
+  max-width: var(--page-max);
   margin-inline: auto;
-  padding: 60px 20px;
+  padding: 60px var(--page-gutter);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 

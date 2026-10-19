@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Container } from '@/components/ui/Container';
 import { ArrowUpRight } from 'lucide-react';
 import { Reveal } from '@/components/ui/Reveal';
 import { outfit } from '@/app/fonts';
@@ -221,12 +222,11 @@ export function Providers() {
    */
   return (
     <section id="providers" className="bg-np-neutral-50 pt-24 pb-9 md:pt-32 md:pb-14">
-      {/* SAME COLUMN AS <FeaturedServices /> directly above: 1200px max with
-          20px side padding at every width (FeaturedServices.module.css,
-          .section). Client request, 2026-10-19: the panel used to run on the
-          uncapped navbar gutters and was wider than the services block from
-          1328px up; the two now share both edges. */}
-      <div className="mx-auto max-w-[1200px] px-5">
+      {/* The page column (<Container> / `page-col`, defined once in
+          globals.css), the same edges as <FeaturedServices /> above. Client
+          request, 2026-10-19: the panel used to run on the uncapped navbar
+          gutters and was wider than the services block from 1328px up. */}
+      <Container>
         {/* on-ink swaps the global focus ring to white, which is what the cards
             inside this panel need. It is scoped to the panel, not the section,
             because the section ground is now light. */}
@@ -426,7 +426,7 @@ export function Providers() {
             })}
           </ul>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

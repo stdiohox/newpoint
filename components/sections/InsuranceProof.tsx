@@ -1,4 +1,5 @@
 import { Reveal } from '@/components/ui/Reveal';
+import { Container } from '@/components/ui/Container';
 import { GradientCard } from '@/components/ui/gradient-card';
 import { stagger } from '@/lib/motion';
 import { INSURANCE } from '@/lib/content';
@@ -14,11 +15,9 @@ import { INSURANCE } from '@/lib/content';
  * will see and what happens first, and raises cost and coverage once the
  * visitor has a reason to care about it.
  *
- * WIDTH AND GUTTERS are <WhatToExpect />'s, which are <Providers />'s: the
- * services/providers column, 1200px max with 20px side padding. Not
- * <Container>, whose 32px padding puts the edges 12px inside the sections
- * around it. (Until 2026-10-19 all three ran on the uncapped navbar gutters;
- * the client asked for them to match the services column.)
+ * WIDTH AND GUTTERS are the page column, <Container> / `page-col`, defined
+ * once in globals.css. (Until 2026-10-19 this section ran on the uncapped
+ * navbar gutters; the client asked for it to match the rest of the page.)
  *
  * NO INVENTED NAMES OR FACTS. The commercial list is INSURANCE.payers with the
  * two government plans filtered out, so the names cannot drift from the source
@@ -105,7 +104,7 @@ const CARDS = [
 export function InsuranceProof() {
   return (
     <section id="insurance" className="bg-np-surface py-20 md:py-28">
-      <div className="mx-auto max-w-[1200px] px-5">
+      <Container>
         <div className="md:max-w-[46ch]">
           <Reveal>
             <h2 className="text-h2">{INSURANCE.heading}</h2>
@@ -147,7 +146,7 @@ export function InsuranceProof() {
             </Reveal>
           ))}
         </ul>
-      </div>
+      </Container>
     </section>
   );
 }

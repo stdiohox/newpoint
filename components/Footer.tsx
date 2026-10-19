@@ -195,8 +195,13 @@ export function Footer() {
           card's own height cancels out of the comparison. Change one of the
           three (padding, BAND, TRAVEL) and the margin moves; change the
           padding to anything that is not BAND and the proof is gone. */}
-      <div className="relative z-30 px-4 pt-10 pb-[max(280px,38vw)] md:px-8">
-        <FooterCard className="rounded-2xl bg-white/95 p-6 pb-10 shadow-xl backdrop-blur-sm sm:p-8 md:rounded-3xl md:p-10 mx-auto w-full max-w-7xl">
+      {/* Horizontally this is the page column, like the navbar pill: the card
+          spans the column's content width, so the top and bottom frames of
+          every page line up with the content between them. It was max-w-7xl
+          (1280px), wider than everything else. Only the vertical padding takes
+          part in the BAND proof above. */}
+      <div className="relative z-30 px-(--page-gutter) pt-10 pb-[max(280px,38vw)]">
+        <FooterCard className="rounded-2xl bg-white/95 p-6 pb-10 shadow-xl backdrop-blur-sm sm:p-8 md:rounded-3xl md:p-10 mx-auto w-full max-w-[calc(var(--page-max)_-_2_*_var(--page-gutter))]">
           {/* TOP ROW. Identity on the left, the site's single CTA on the right. */}
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10 lg:gap-12">
             <div className="max-w-[46ch]">

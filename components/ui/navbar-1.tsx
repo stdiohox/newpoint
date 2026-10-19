@@ -375,8 +375,12 @@ export function Navbar1({
   );
 
   return (
-    <div className="flex w-full justify-center px-4 py-6">
-      <div className="relative z-10 flex min-h-[60px] w-full max-w-6xl items-center justify-between rounded-full bg-white px-6 py-3 shadow-lg">
+    /* THE PILL IS THE PAGE COLUMN: the outer padding is --page-gutter and the
+       pill caps at the column's content width, so its edges land exactly on
+       the content edges of every section below (they sat ~4px off with
+       px-4 / max-w-6xl). Both values come from globals.css. */
+    <div className="flex w-full justify-center px-(--page-gutter) py-6">
+      <div className="relative z-10 flex min-h-[60px] w-full max-w-[calc(var(--page-max)_-_2_*_var(--page-gutter))] items-center justify-between rounded-full bg-white px-6 py-3 shadow-lg">
         <div className="flex items-center">
           <motion.div
             /* THE ENTRANCE IS A CSS ANIMATION, [data-logo-in] in globals.css,
