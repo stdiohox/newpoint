@@ -230,8 +230,8 @@ export function providersSchema() {
  * One service page, as a service offered by the practice.
  *
  * The type varies per service rather than being MedicalTherapy across the
- * board: an assessment is diagnostic, not therapeutic, and telehealth is a
- * delivery modality rather than a treatment. See `schemaType` in content.ts.
+ * board: an assessment is diagnostic, not therapeutic. See `schemaType` in
+ * content.ts.
  */
 export function serviceSchemaFor(s: ServicePage) {
   return {

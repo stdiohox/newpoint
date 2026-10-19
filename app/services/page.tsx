@@ -25,7 +25,7 @@ export const metadata = pageMetadata({
   // services" as its head term, so the two are not arbitrating the same query.
   title: 'Psychiatric Services in NJ and PA',
   description:
-    'Psychiatric assessment, medication management, and telehealth in New Jersey and Pennsylvania. What each involves and how to get started.',
+    'Psychiatric assessment and medication management, in person or by telehealth, in New Jersey and Pennsylvania. What each involves and how to start.',
   path: '/services',
 });
 
@@ -330,9 +330,7 @@ export default function ServicesIndex() {
                               pages already competing on the same query cluster.
                               Listing the section headings says what the service
                               involves, in the page's own words, without
-                              duplicating a sentence of it. It also fixes the
-                              telehealth block, which led with "An expanded
-                              schedule" simply because that is section one. */}
+                              duplicating a sentence of it. */}
                           <div>
                             <dt className="text-caption text-np-neutral-600 tracking-[0.08em] uppercase">
                               What happens
@@ -345,7 +343,7 @@ export default function ServicesIndex() {
                           {/* NO "Providers you’ll see" HERE, deliberately.
                               Naming both providers under each service asserts
                               that both personally deliver it. That is sourced
-                              for medication management and telehealth, and NOT
+                              for medication management, and NOT
                               for the comprehensive psychiatric assessment:
                               Ofoegbu's bio names assessments, Whitaker's names
                               medication management only. The page-wide

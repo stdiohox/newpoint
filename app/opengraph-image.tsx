@@ -64,7 +64,7 @@ export default function OpengraphImage() {
           Mental and behavioral care across New Jersey and Pennsylvania
         </div>
         <div style={{ fontSize: 30, color: '#8fb0ee', marginTop: 28, letterSpacing: '-0.01em' }}>
-          Assessment. Medication management. Telehealth.
+          Assessment. Medication management.
         </div>
       </div>
 

@@ -107,7 +107,7 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
                       </div>
 
                       {/* THIS LAYOUT KEEPS ITS OWN LIST MARKUP — a check-marked
-                          column, not the chips the card and grid layouts draw —
+                          column, not the chips the card layout draws —
                           because the assessment page's two lists are rendered
                           this way and restyling them is not what this change is
                           for. What it does NOT get to keep is the freedom to

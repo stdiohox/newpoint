@@ -145,12 +145,14 @@ export const HERO = {
    */
   headlineLines: 'Mental and behavioral care across\nNew Jersey and Pennsylvania',
   subtext:
-    'Assessment, medication management, and telehealth with two doctorate-prepared psychiatric nurse practitioners. We accept most major insurance plans.',
+    'Assessment and medication management, in person or by telehealth, with two doctorate-prepared psychiatric nurse practitioners. We accept most major insurance plans.',
   /**
-   * Three service names for the hero's glass tag, word-for-word as `subtext`
-   * already names them. No new service is claimed here.
+   * The service names for the hero's glass tag, word-for-word as `subtext`
+   * already names them. No new service is claimed here. Telehealth left the
+   * tag on 2026-10-19 with the telehealth service page: it is a delivery mode,
+   * which `subtext` states, not a service.
    */
-  tag: 'Assessment. Medication management. Telehealth.',
+  tag: 'Assessment. Medication management.',
 } as const;
 
 /**
@@ -773,8 +775,7 @@ export const PROVIDERS: Provider[] = [
     },
     /**
      * CONFIRMED BY THE CLIENT, 2026-09-29. Both providers are licensed in New
-     * Jersey and Pennsylvania, and the telehealth page may keep reasoning from
-     * it.
+     * Jersey and Pennsylvania, and the site may keep reasoning from it.
      *
      * Kept here because the question was live for a few hours and the reasoning
      * is worth not repeating: Headway's structured licensure field gives her New
@@ -922,9 +923,13 @@ export const WHAT_WE_TREAT = {
   /**
    * Treatment options named on the live site.
    *
-   * `href` points at the service's own page where one exists. The fourth entry
+   * `href` points at the service's own page where one exists. The last entry
    * has none: the source material describes counseling and referral in a single
    * line, which is not enough to carry a page without invention.
+   *
+   * TELEHEALTH IS NOT A SERVICE HERE, by client instruction of 2026-10-19. It
+   * is how the services above are delivered — every patient already has it as
+   * an option — so it lives in DELIVERY_LINE, not in this list.
    */
   services: [
     {
@@ -936,11 +941,6 @@ export const WHAT_WE_TREAT = {
       title: 'Medication management',
       body: 'Ongoing prescribing and check-ins, using standardized rating scales to track your progress and catch changes early.',
       href: '/services/medication-management',
-    },
-    {
-      title: 'Telehealth',
-      body: 'Video appointments on an expanded schedule, including weekends, evenings, and holidays by request.',
-      href: '/services/telehealth',
     },
     {
       title: 'Individual counseling and referral',
@@ -1039,8 +1039,7 @@ export type ServicePage = {
    * replaced that rule on 2026-10-02, and the assessment's value is now
    * DELIVERY_LINE — in-person-first, with both states bound to both modes.
    *
-   * THE OTHER TWO KEEP NARROWER LINES, AND THAT IS NOT AN OVERSIGHT.
-   * Telehealth's says telehealth because that is what the service is.
+   * THE OTHERS KEEP NARROWER LINES, AND THAT IS NOT AN OVERSIGHT.
    * Medication management names no state because nothing in its own content
    * scopes it, and a service page should describe its own service rather than
    * restate the practice. Practice-level claims use the constant; per-service
@@ -1054,8 +1053,8 @@ export type ServicePage = {
    * Which body layout this service's `sections` render in.
    *
    * Absent (the default) is the shared prose layout: a sticky contents rail
-   * beside a single column of headings and paragraphs. Medication management
-   * and telehealth both use it.
+   * beside a single column of headings and paragraphs. Weight management
+   * uses it.
    *
    * `'feature'` is the assessment page's bespoke layout, and it is opt-in
    * because it makes claims the other two cannot support. It renders the first
@@ -1083,13 +1082,7 @@ export type ServicePage = {
    * no photograph. It drops the "On this page" rail; the section ids stay, so
    * existing deep links keep working.
    */
-  /**
-   * `'grid'` is telehealth's layout, in components/sections/ServiceGrid.tsx:
-   * the first section as a featured card with its photograph beside the copy,
-   * and the rest as a three-up grid. Like `'cards'` it drops the "On this page"
-   * rail and keeps the section ids, so deep links still land.
-   */
-  layout?: 'feature' | 'cards' | 'grid';
+  layout?: 'feature' | 'cards';
   /**
    * Drop the appointment button out of this service's hero.
    *
@@ -1374,13 +1367,13 @@ export const SERVICE_PAGES: ServicePage[] = [
       {
         heading: 'What happens after',
         body: 'The plan isn’t the end of it. We keep checking your progress and offer support and education as you go. Follow-up care is usually medication management, in person or by telehealth.',
-        /* Both phrases are already in the sentence above and both name a page
-           of their own, so these are links this copy was asking for rather
-           than links added to it. The anchor text is the service's own name,
-           which is what the removed cards used to supply. */
+        /* The phrase is already in the sentence above and names a page of its
+           own, so this is a link the copy was asking for rather than one added
+           to it. The anchor text is the service's own name, which is what the
+           removed cards used to supply. "telehealth" was linked too until its
+           service page was removed on 2026-10-19. */
         bodyLinks: [
           { phrase: 'medication management', href: '/services/medication-management' },
-          { phrase: 'telehealth', href: '/services/telehealth' },
         ],
       },
     ],
@@ -1457,9 +1450,9 @@ export const SERVICE_PAGES: ServicePage[] = [
        BELOW THE NAV rather than on the header box, which matters because the
        header pulls itself up by --nav-h so the photograph runs behind the bar. */
     heroAlign: 'center',
-    /* Feature73 card grid rather than the shared prose rail. Telehealth is
-       deliberately left on the default: this layout assumes four sections that
-       each want a photograph, plus a list-carrying section to close. */
+    /* Feature73 card grid rather than the shared prose rail. This layout
+       assumes four sections that each want a photograph, plus a list-carrying
+       section to close. */
     layout: 'cards',
     /* No appointment button in this hero. The page keeps the navbar's,
        PageCta's and the footer's, so the booking route is intact — the same
@@ -1585,7 +1578,7 @@ export const SERVICE_PAGES: ServicePage[] = [
           'Medication is one option, not the only one.',
           /* THE HEDGE USED TO BE THE SECOND BULLET HERE. It moved to
              `listNote` on 2026-10-01 so that it travels with the list itself
-             rather than with a field two of the four layouts ignore. Same
+             rather than with a field some layouts ignore. Same
              string, same position on the page, one place it can no longer
              fall out of. */
           /* REWRITTEN AFTER healthcare-reviewer, 2026-10-01. The line read
@@ -1629,7 +1622,7 @@ export const SERVICE_PAGES: ServicePage[] = [
          *
          * THE HEDGE IS IN `listNote`, NOT IN `bullets`, SINCE 2026-10-01, and
          * that is a structural fix rather than a tidy-up. In `bullets` it
-         * reached only the layouts that render bullets — `cards` and `grid` —
+         * reached only the layouts that render bullets — `cards` —
          * so flipping this service's `layout` to the prose fallback would have
          * published the chip list with no hedge at all. `listNote` is rendered
          * by <SectionList />, which is the ONE component every layout now uses
@@ -1680,206 +1673,6 @@ export const SERVICE_PAGES: ServicePage[] = [
        * for paediatric psychiatric prescribing. Removed. Restore a real answer
        * once the client confirms the age range.
        */
-    ],
-  },
-  {
-    slug: 'telehealth',
-    nav: 'Telehealth',
-    /**
-     * This page's own hero master, replacing the 1280x720 video poster it
-     * borrowed from its homepage card — which next/image could not upscale, so
-     * it was soft on any retina screen. 2400px wide, the cap the artwork was
-     * supplied against; next/image resizes down from it.
-     *
-     * OBJECT-POSITION MEASURED OFF THE FRAME. Her hair starts at y 9%, her
-     * eyes sit at y 28% and her chin at y 44%; her face spans x 62-78%,
-     * centred on x 70%.
-     *
-     * The source is 1.79:1 and this header is wider than that at the desktop
-     * widths, so cover crops vertically there. y 30% starts the crop 79px down
-     * at 1440, which puts her eyes at box y 146, and 33px down at 1024, which
-     * puts them at y 127 — both clear of the navbar pill's lower edge at about
-     * y 83. At 390 the box is taller than 1.79:1, cover scales by height, there
-     * is no vertical crop at all and her eyes land at y 158 whatever y says.
-     *
-     * x 70% is for that narrow case, where the crop works horizontally
-     * instead: it holds her face at x 192-353 of 390 rather than letting it run
-     * off the right edge. It does nothing at 1440 or 1024, where the full width
-     * is shown.
-     *
-     * CONTRAST ON THIS MASTER DOES NOT MEET AA, and the overlay was required to
-     * stay unchanged, so it is recorded rather than fixed. Measured on the
-     * rendered page at glyph core pixels only — a whole-box sample reads the
-     * brightest pixel in the box rather than one a letter covers:
-     *
-     *   1440  h1 2.02:1 (floor 3)   intro 2.53:1 (floor 4.5)
-     *   1024  h1 2.03:1 (floor 3)   intro 3.43:1 (floor 4.5)
-     *    390  h1 2.53:1 (floor 3)   intro 6.47:1 PASS
-     *
-     * The worst backdrop under a glyph is the sunlit curtained window behind
-     * her, about rgb(177,183,194). THIS IS THE SAME FAILURE THE SCRIM NOTE IN
-     * components/PageHero.tsx ALREADY RECORDS against the homepage's stops, and
-     * medication-management measures the same way: those ramps are shaped for a
-     * 100vh section whose copy is short, bottom-anchored and in the left column
-     * of a two-column grid, and this header is ~540-610px with centred copy
-     * that fills it. The remedy is not retuning these stops — that is what the
-     * `hero` scrim already is — but scrim="hero", or a master whose copy area
-     * is not a blown window.
-     */
-    heroImage: {
-      src: '/images/services/tele-hero-2400.webp',
-      /* Describes the photograph and stops there: no claim that this is a
-         patient of the practice, and none that this is a Newpoint appointment
-         — the screen is not in frame, so there is no call to describe. */
-      /* Checked against the frame, 2026-10-01, and tightened: "dining table"
-         was an assumption about the room, and there is a stack of books on it
-         as well as the pad. The rest held. */
-      alt: 'A woman sitting at a wooden table at home, smiling at an open laptop, with a mug, a notepad, and a stack of books beside her and a curtained window behind.',
-      objectPosition: '70% 30%',
-    },
-    /* The homepage's overlay verbatim, as on medication-management.
-       UNCHANGED BY THE NEW MASTER: this is set explicitly rather than derived
-       from heroImage, so adding the photograph did not move the page onto the
-       `hero` scrim. Same for heroAlign below. */
-    heroScrim: 'home',
-    /* Centred between the navbar and the hero's bottom edge, matching
-       medication-management and the assessment page. */
-    heroAlign: 'center',
-    /* No appointment button in this hero. The navbar's, PageCta's and the
-       footer's all remain, so the booking route is intact. */
-    hideHeroCta: true,
-    /* The card-18 grid: one featured card and a three-up row. */
-    layout: 'grid',
-    schemaType: 'Service',
-    title: 'Telehealth psychiatry in New Jersey and Pennsylvania',
-    metaTitle: 'Telehealth Psychiatry in NJ and PA',
-    metaDescription:
-      'Psychiatric appointments by video across New Jersey and Pennsylvania, on an expanded schedule including weekends, evenings, and holidays by request.',
-    intro:
-      'Both of our providers are licensed in New Jersey and Pennsylvania, and both see patients by telehealth. For a lot of people, it’s the difference between sticking with psychiatric care and quietly letting it slide.',
-    modality: 'By telehealth across New Jersey and Pennsylvania.',
-    sections: [
-      {
-        heading: 'An expanded schedule',
-        /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
-        body: 'We offer telehealth on an expanded schedule, including weekends, evenings, and holidays by request. If a 9-to-5 schedule is what’s kept you from starting treatment, tell us when you reach out.',
-        bullets: [
-          /* REWRITTEN AFTER healthcare-reviewer, 2026-10-01. The line read "A
-             private space and a steady connection matter more than which
-             device you use." The tail was a capability claim about this
-             practice's telehealth platform — that any device works — and the
-             platform is unnamed in all source material, which is why the FAQ
-             below carries a CLIENT note saying no joining process may be
-             described. The head of the sentence is this page's OWN APPROVED
-             COPY and is what remains.
-
-             CLIENT-REVIEW — SOURCED. The telehealth FAQ in this same entry:
-             "A private space and a device with a camera and a reliable
-             connection." */
-          'A private space and a device with a camera and a reliable internet connection.',
-          /* CLIENT-REVIEW — GENERIC. Says nothing about how long anything
-             takes or how often it happens. */
-          'Test your camera and microphone ahead of time so setup doesn’t eat into your appointment.',
-          /* CLIENT-REVIEW — GENERIC. */
-          'Headphones help if other people are home.',
-          /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was
-             "Telehealth takes the travel out of an appointment, not the
-             appointment out of your week." "Out of your week" implies a
-             recurring weekly slot — a frequency and time-commitment claim,
-             made under the practice's own schedule heading. */
-        ],
-      },
-      {
-        heading: 'Both states, both providers',
-        /* THE ROLE CLAUSE IS ADDED WITH THE TITLE, not decoration. CLAUDE.md's
-           rule is that "Dr." may only appear where the credentials or the words
-           "nurse practitioner" are visible beside it, and this sentence carried
-           neither — it is the one prose mention that needed a qualifier before
-           the prefix could be used at all. The clause states the role already in
-           PROVIDERS[].role and asserts nothing new. */
-        body: 'Dr. Funmilayo Whitaker and Dr. Anastasia O. Ofoegbu, both psychiatric-mental health nurse practitioners, are licensed in New Jersey and Pennsylvania, so telehealth is available across our whole service area, not just one state. At the time of your appointment, you need to be physically located in a state where your provider is licensed.',
-        bullets: [
-          /* REMOVED BY healthcare-reviewer, 2026-10-01. The line was "Which
-             licence applies follows where you are sitting, not where your
-             provider is." The first half is right and the lead already says
-             it. The second half is not: a provider physically in a third state
-             can trigger that state's licensure requirements, and compacts and
-             state-specific telehealth registrations shape the rest. That is a
-             regulated fact stated as an absolute, which CLAUDE.md's rule on
-             never inventing verifiable regulated facts exists to stop — and
-             nothing on a marketing page needs to adjudicate it. */
-          /* CLIENT-REVIEW — GENERIC. No claim that the practice can or cannot
-             accommodate any particular case. */
-          'Being out of state that day — traveling or working somewhere else — can affect whether your appointment can go ahead.',
-          /* CLIENT-REVIEW — GENERIC scheduling advice. */
-          'If you have travel coming up, mention it when you book.',
-        ],
-      },
-      {
-        heading: 'What telehealth is good for',
-        body: 'Follow-up medication management works especially well by video. It’s a structured check-in on how you’re responding, and that doesn’t require being in the same room. Comprehensive psychiatric assessments can also be done by telehealth — ask us, and we’ll confirm what works for you.',
-        bullets: [
-          /* CLIENT-REVIEW — GENERIC. Describes what a structured review covers
-             in general terms. Names no instrument and no medication. */
-          'A structured review — sleep, side effects, what has changed — carries over to video well.',
-          /* CLIENT-REVIEW — GENERIC. */
-          'It’s easier to keep your notes or questions handy when you’re at home.',
-          /* CLIENT-REVIEW — GENERIC. A limitation of the medium, not of this
-             practice, and it sets up the section that follows. */
-          'Video can’t replace a physical exam.',
-        ],
-      },
-      {
-        heading: 'When telehealth is not the right call',
-        body: 'Telehealth is not for emergencies. If you are in crisis, call or text 988 for the Suicide and Crisis Lifeline. If you or someone else is in immediate danger, call 911 or go to your nearest emergency room. This practice is not monitored around the clock.',
-        /* NO BULLETS ON THIS SECTION, AND THAT IS DELIBERATE. All three were
-           removed on healthcare-reviewer's advice, 2026-10-01, and the reason
-           is worth keeping so they are not reinstated:
-
-             "If you are not sure how urgent something is, that is itself a
-             reason to call." — names no number. The nearest competing
-             referents on the rendered page are the practice's own phone in the
-             navbar and footer, two sentences after the body says the practice
-             is NOT monitored around the clock. A distressed reader can read
-             "call" as "call the practice", which is a route to voicemail. It
-             is also triage advice, issued by a provider's site, where the only
-             instruction that belongs is the body's: crisis to 988, immediate
-             danger to 911 or the ER.
-
-             "Saving 988 and 911 in your phone now..." — presents the two as an
-             undifferentiated pair, erasing the distinction the body has just
-             drawn. CRISIS's own note in this file says the difference between
-             them must be checked and not guessed. Flattening them is a step
-             toward 911 as the behavioural-health default.
-
-             "Crisis lines are there whether or not you are anyone's patient."
-             — accurate, and removed on placement rather than content. Bullets
-             render as blue ticks in lighter type, which turns the closing
-             content of the crisis card into a reassurance checklist, and the
-             injected hidden heading would read a screen-reader user three tips
-             while the actual 988 / 911 instruction sits in the body above. A
-             benefit-tick affordance is the wrong register for crisis guidance
-             whatever the words say.
-
-           THE BODY IS THIS SECTION'S WHOLE CONTENT ON PURPOSE. Do not add
-           points here without putting the question to the client first. */
-      },
-    ],
-    faqs: [
-      {
-        q: 'Do you offer evening and weekend telehealth appointments?',
-        a: 'Yes. Telehealth runs on an expanded schedule that includes weekends, evenings, and holidays by request.',
-      },
-      {
-        q: 'Can I be seen if I live in Pennsylvania?',
-        a: 'Yes, by telehealth. Both providers are licensed in Pennsylvania as well as New Jersey.',
-      },
-      {
-        q: 'What do I need for a telehealth appointment?',
-        // CLIENT: the telehealth platform is not named anywhere in the source
-        // material, so no joining process is described here.
-        a: 'A private space and a device with a camera and a reliable internet connection. Ask us how to join when you book.',
-      },
     ],
   },
   {
@@ -1996,15 +1789,16 @@ export const SERVICE_PAGES: ServicePage[] = [
      *
      * CONTRAST IS MEASURED AND RECORDED BELOW, beside the scrim choice. This
      * master is the brightest of the three service heroes — the centre of the
-     * frame is a near-white wall — and that is exactly the case the telehealth
-     * hero fails, so it was measured before shipping rather than after.
+     * frame is a near-white wall — and that is exactly the case the old
+     * telehealth hero failed, so it was measured before shipping rather than
+     * after.
      */
     heroImage: {
       src: '/images/services/weight-hero-2400.webp',
       /* Describes the photograph and stops there. No claim that either woman is
          a patient, a clinician or anyone at this practice, and no claim that
-         this is a Newpoint room — the same restraint the telehealth and
-         assessment alts carry. */
+         this is a Newpoint room — the same restraint the assessment alts
+         carry. */
       alt: 'A woman sitting in a sage-green armchair in a plain, light room, listening to someone seated opposite her whose back is to the camera. A notebook and pen rest on a small wooden table between them.',
       objectPosition: '50% 22%',
     },
@@ -2077,8 +1871,8 @@ export const SERVICE_PAGES: ServicePage[] = [
     /* Names no modality, and that is not an oversight: whether injections are
        given in the office or self-administered at home is unconfirmed, and
        either answer changes this line. It names the two states because both
-       providers are licensed in both, which this file already asserts on
-       /services/telehealth. See OPEN_CLIENT_ITEMS. */
+       providers are licensed in both, which the client confirmed on
+       2026-09-29. See OPEN_CLIENT_ITEMS. */
     modality: 'Prescribed and reviewed by our nurse practitioners in New Jersey and Pennsylvania.',
     /**
      * FOUR CARDS AND A FALL-THROUGH, in that order, which is what the card
@@ -2404,14 +2198,15 @@ export const WHAT_TO_EXPECT = {
  * Featured services, for the homepage services section.
  *
  * Titles and descriptions are the existing service copy — WHAT_WE_TREAT.services
- * for the three service slots. The fourth took GETTING_STARTED.body until
+ * for the two service slots. The last took GETTING_STARTED.body until
  * <WhatToExpect /> arrived above this section with a different step count; it
  * now carries its own literal description, for the reason recorded on that
  * entry. Nothing new is claimed in either case; this is a presentation layer
  * over content that already existed and was already sourced from /research.
  *
  * `footerText` states the care modality exactly as the site states it elsewhere.
- * Telehealth's slot says telehealth only, because that is what that service is.
+ * The telehealth slot was removed on 2026-10-19 with its service page:
+ * telehealth is how both services are delivered, not a service of its own.
  * In-person care is never paired with a state — see CLAUDE.md, "Care modality":
  * telehealth is evidenced in both NJ and PA, but the only place-level evidence
  * anywhere in /research is Lawrence Township, New Jersey.
@@ -2468,23 +2263,6 @@ export const FEATURED_SERVICES: FeaturedService[] = [
   {
     type: 'card',
     badge: null,
-    title: 'Telehealth',
-    description:
-      'Video appointments on an expanded schedule, including weekends, evenings, and holidays by request.',
-    // This slot is telehealth, so it says telehealth. Both providers are
-    // licensed in both states, which is what makes the reach claim safe here.
-    footerText: 'By telehealth across New Jersey and Pennsylvania',
-    category: 'Virtual care',
-    categoryColor: 'var(--color-np-sky)',
-    // This footage depicts a person and must not imply a treatment outcome.
-    video: '/video/services/telehealth.mp4',
-    poster: '/video/services/telehealth-poster.webp',
-    href: '/services/telehealth',
-    displayOrder: 3,
-  },
-  {
-    type: 'card',
-    badge: null,
     title: 'New patients',
     /**
      * A literal string, no longer GETTING_STARTED.body, and deliberately with
@@ -2507,7 +2285,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     description:
       'How to get in touch, what the first appointment covers, and how ongoing care works.',
     /**
-     * No modality line on this slot. The other three describe how CARE is
+     * No modality line on this slot. The other two describe how CARE is
      * delivered; this one is a process, and "In person and by telehealth" next
      * to "New patients" reads as "you can start by walking in" — which, with
      * the street address still an open item, is the exact impression the
@@ -2521,7 +2299,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     video: '/video/services/new-patients.mp4',
     poster: '/video/services/new-patients-poster.webp',
     href: '/new-patients',
-    displayOrder: 4,
+    displayOrder: 3,
   },
 ];
 
@@ -3162,7 +2940,7 @@ assertTitlesQualified();
  * WHY A BUILD CHECK AND NOT A COMMENT. A bare list of diagnoses under
  * "Conditions we prescribe for" reads as a promise about every one of them,
  * and the line that stops it doing so spent three weeks in `bullets` — a field
- * two of the four layouts ignore. A comment saying "do not separate these" is
+ * some layouts ignore. A comment saying "do not separate these" is
  * exactly the kind of thing a later edit does not read.
  *
  * ITS TWIN LIVES IN components/sections/SectionList.tsx and fails on a
@@ -3196,7 +2974,7 @@ function assertPrescribingHedged() {
         `A list of diagnoses under a "we prescribe for" heading reads as a promise about ` +
         `every item on it unless a qualifying line sits with it. Add listNote to the ` +
         `section in lib/content.ts; do not move the line into bullets, which only the ` +
-        `card and grid layouts render.\n` +
+        `card layout renders.\n` +
         offenders.map((o) => `  ${o}`).join('\n')
     );
   }

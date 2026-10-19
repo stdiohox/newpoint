@@ -2,7 +2,7 @@
  * A service section's list and the line that qualifies it.
  *
  * WHY THIS EXISTS. Until 2026-10-01 the qualifying line lived in `bullets`,
- * which only two of the four layouts render — so "Conditions we prescribe for"
+ * which only some layouts render — so "Conditions we prescribe for"
  * would have shipped ten diagnoses with no hedge if that service's `layout`
  * were ever flipped to the prose fallback, which renders `list` and ignores
  * `bullets`. The line now lives in `listNote` beside the list it qualifies,
@@ -11,7 +11,7 @@
  *
  * THREE EXPORTS, AND THE LAYOUTS USE DIFFERENT ONES ON PURPOSE:
  *
- *   SectionList   chips plus the note. The card and grid layouts use it,
+ *   SectionList   chips plus the note. The card layout uses it,
  *                 because both already render a list as chips.
  *   ListNote      the note alone, for a layout with its own list markup —
  *                 ServiceBody draws a check-marked column, and turning that
@@ -61,7 +61,7 @@ export function ListNote({ note }: { note?: string }) {
   return <p className="text-small text-np-neutral-700 mt-4 max-w-[62ch]">{note}</p>;
 }
 
-/** Chips plus the note. The card and grid layouts render lists this way. */
+/** Chips plus the note. The card layout renders lists this way. */
 export function SectionList({
   heading,
   list,

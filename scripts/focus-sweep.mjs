@@ -30,7 +30,6 @@ const ROUTES = [
   '/services',
   '/services/psychiatric-evaluation',
   '/services/medication-management',
-  '/services/telehealth',
   '/insurance',
   '/new-patients',
   '/providers/funmilayo-whitaker',

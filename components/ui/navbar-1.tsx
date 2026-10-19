@@ -436,7 +436,7 @@ export function Navbar1({
                     <div className="flex items-center gap-1">
                       {/* aria-current="true", not "page", when only a CHILD is
                           current. isActive matches by prefix, so on
-                          /services/telehealth both this and the child link
+                          /services/medication-management both this and the child link
                           claimed to be the page and a screen reader announced
                           two current items in one nav. "true" says "in this
                           branch" without claiming to be the destination.

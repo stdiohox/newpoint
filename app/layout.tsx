@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: `%s | ${BUSINESS.shortName}`,
   },
   description:
-    'Psychiatric assessment, medication management, and telehealth for New Jersey and Pennsylvania, from two doctorate-prepared nurse practitioners.',
+    'Psychiatric assessment and medication management, in person or by telehealth, across NJ and PA from two doctorate-prepared nurse practitioners.',
   applicationName: BUSINESS.legalName,
   authors: [{ name: BUSINESS.legalName }],
   /**
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     url: BUSINESS.domain,
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric assessment, medication management, and telehealth from two doctorate-prepared psychiatric nurse practitioners serving New Jersey and Pennsylvania.',
+      'Psychiatric assessment and medication management, in person or by telehealth, from two doctorate-prepared psychiatric nurse practitioners in NJ and PA.',
     locale: 'en_US',
     // The 1200x630 card is generated at app/opengraph-image.tsx and applies to
     // every route. CLIENT: replace it with a supplied asset if one exists.
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric assessment, medication management, and telehealth for New Jersey and Pennsylvania.',
+      'Psychiatric assessment and medication management, in person or by telehealth, for New Jersey and Pennsylvania.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: BUSINESS.domain },
@@ -144,8 +144,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               SERVICE_PAGES there would put every service page's sections, FAQs
               and metaDescription into the browser bundle to render three links.
               `nav` is the short label the footer already uses; `title` is the
-              H1 and runs to "Telehealth psychiatry in New Jersey and
-              Pennsylvania", which is not a menu row. */}
+              H1, which is written for a page header rather than a menu row. */}
           {/* BOTH DROPDOWNS ARE DERIVED, keyed by the parent item's own href.
               A service added to SERVICE_PAGES or a provider added to PROVIDERS
               appears in the navbar with no change here, in lib/nav.ts or in the

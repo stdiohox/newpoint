@@ -28,7 +28,7 @@ Healthcare context does not mean visually dull. It means restrained and trustwor
 
 ## Project
 
-**Newpoint is a two-provider outpatient PSYCHIATRIC / behavioral-health nurse-practitioner practice** serving **New Jersey and Pennsylvania** — psychiatric assessment, medication management, and telehealth. (The appointment is an *assessment*, not an *evaluation* — see "Terminology and service names" below.)
+**Newpoint is a two-provider outpatient PSYCHIATRIC / behavioral-health nurse-practitioner practice** serving **New Jersey and Pennsylvania** — psychiatric assessment and medication management, in person or by telehealth. (The appointment is an *assessment*, not an *evaluation* — see "Terminology and service names" below.)
 
 **It is NOT a home-health agency.** The "Healthcare Services" in the name misleads; do not benchmark against, or write copy for, home health / visiting nurses / elder care. Benchmark against outpatient behavioral-health and psychiatry practices.
 
@@ -146,7 +146,8 @@ carries the qualifier. The FAQ answer that names both providers does; keep it th
 **One prose mention needed a clause before the prefix could be used.** The telehealth
 page's "Both states, both providers" body named both providers with no role nearby, so
 "both psychiatric-mental health nurse practitioners" was added to satisfy the condition.
-It states the role already in `PROVIDERS[].role` and asserts nothing new.
+It states the role already in `PROVIDERS[].role` and asserts nothing new. (That page was
+removed on 2026-10-19; the rule it illustrates still applies to any new prose mention.)
 
 **Neither provider's bio is touched.** `PROVIDERS[].bio` is each provider's own
 first-person text, reproduced verbatim at the client's request; inserting a title into
@@ -276,9 +277,38 @@ Pennsylvania" sends a PA patient to a location that is not known to exist.
 > **A licensure question that file raised is now closed.** Headway's structured licensure
 > field gives Ofoegbu **New Jersey only**, which put the site's two-state claim for her in
 > doubt. **The client confirmed on 2026-09-29 that both providers are licensed in both
-> states**, so the telehealth page may keep reasoning from it and no copy changed. Recorded
+> states**, so the site may keep reasoning from it and no copy changed. Recorded
 > as the client's confirmation, not as a register check — PA's licensee search sits behind
 > reCAPTCHA and was not queried. Her licence numbers are still outstanding.
+
+### Telehealth is a delivery mode, not a service — CLIENT INSTRUCTION, 2026-10-19
+
+**The client asked for telehealth to be removed from the services**, because every
+patient who comes in already has telehealth as an option. Telehealth is **how** the
+services are delivered, not a service of its own. So:
+
+- **Removed:** the `/services/telehealth` page (its `SERVICE_PAGES` entry, the `grid`
+  layout and `components/sections/ServiceGrid.tsx` that only it used, its photographs
+  and its homepage video), the homepage "Telehealth" card, its `WHAT_WE_TREAT.services`
+  row, and its entries in the services menu, footer, sitemap, provider pages and
+  JSON-LD, which all derive from `SERVICE_PAGES`. The hero tag and the meta descriptions
+  no longer list it beside the services.
+- **Kept, unchanged:** `DELIVERY_LINE` and `DELIVERY_SHORT`, and every sentence that
+  says care is "in person or by telehealth". Telehealth is still offered, so the
+  delivery mode still appears wherever the site says how care is delivered.
+- **Kept, unchanged:** the expanded-schedule sentence bound to telehealth (contact page,
+  FAQ). It never depended on the service page.
+
+**Do not re-add a telehealth service page or card** without a new client instruction.
+
+**What went with the page**, kept here so nobody has to rediscover it: the line that a
+patient must be physically located in a state where their provider is licensed at
+the time of the appointment, and that page's own 988 / 911 section. The footer's crisis
+strip still renders sitewide.
+
+<!-- CLIENT: no redirect was added for /services/telehealth because the site is still
+     pre-launch (holding mode), so the URL has no search history to protect. If it was
+     ever shared publicly, add a 301 to /services in next.config.ts. -->
 
 ### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29
 
@@ -380,7 +410,7 @@ Why each was removed:
   an open question, not a fact: the per-service sourcing breakdown and the
   outstanding `CLIENT:` question live at `app/services/page.tsx:313-325`. The
   constraint is specific to that service — the same page records medication
-  management and telehealth as sourced — so cite that note rather than
+  management as sourced — so cite that note rather than
   generalising from this rule.
 
 **The `BreadcrumbList` JSON-LD is a separate thing and stays.** `breadcrumbSchema()`
@@ -447,7 +477,7 @@ not confirmed, and both providers already publish ADHD among what they treat.
   are not prescribing indications.
 - **The hedge stays.** "Appearing on this list does not mean medication is the
   answer in every case" lives in that section's `bullets`, which only the `cards`
-  and `grid` layouts render. Changing that service's `layout` without moving the
+  layout renders. Changing that service's `layout` without moving the
   hedge into `body` ships the chip list unhedged.
 - **It reaches no structured data.** `serviceSchemaFor()` emits the section intro
   only, so the list is page copy and nothing else.
@@ -508,8 +538,7 @@ already asserted that it does, since both provider pages list every entry in
 - Include crisis guidance (988 / 911) where a distressed visitor would plausibly look. This is expected on a behavioral-health site and is currently absent.
   - **The in-page "If you need help now" panel was removed from the assessment and medication-management pages by client decision (2026-09-30 and 2026-10-01). The footer's 988 / 911 strip is the crisis guidance on those routes, and it renders sitewide.** Both pages also drop the "Keep reading" grid, and the two removals are what make each other safe: with no card grid between the CTA and the footer, the strip is the next content a reader meets. What is lost on them is `CRISIS.body` — "not for emergencies and is not monitored around the clock" — which survives only as footer fine print. **If "Keep reading" ever returns to any of these layouts, the crisis panel has to return with it.**
 
-  - **Updated 2026-10-01: `/services/telehealth` dropped both as well, by client decision, so NO service page now renders the in-page crisis panel.** On that route the crisis guidance is the footer strip plus the page's own fourth section, "When telehealth is not the right call", whose body carries the full 988 / 911 instruction in the practice's own words — which is why that section is the one place on the site where the guidance is still above the footer. **Do not add bullet points to that section, and do not reword its body.** A healthcare review of 2026-10-01 rejected three points proposed for it: a bullet saying to call when unsure of urgency has no named number and competes with the navbar's practice phone two sentences after the body says the practice is not monitored around the clock; and a bullet pairing "988 and 911" flattens a distinction `CRISIS` says must be checked rather than guessed.
-  - <!-- CLIENT: on that section the 988 and 911 numbers are plain text, not `tel:` links, where `CRISIS.items` makes them tappable. Now that the in-page panel is gone from every service page, this is the weakest remaining crisis affordance above the footer and is worth making tappable. -->
+  - **The telehealth service page is gone (2026-10-19, see "Telehealth is a delivery mode, not a service" above).** It was the one route whose own body copy carried the 988 / 911 instruction above the footer, in its "When telehealth is not the right call" section. That section went with the page, so on every service route the crisis guidance is now the footer strip alone: all three remaining services name a layout (`feature` or `cards`), and only the prose layout renders the in-page panel.
 
 
 ## Working rule

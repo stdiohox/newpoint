@@ -161,7 +161,9 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* Two cards since the telehealth card was removed on 2026-10-19; three
+     columns would leave an empty slot on desktop. */
+  grid-template-columns: repeat(2, 1fr);
   gap: 25px;
   margin-top: 25px;
 }

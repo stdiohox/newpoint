@@ -6,7 +6,6 @@ import { PageFaq } from '@/components/sections/PageFaq';
 import { PageCta, RelatedLinks } from '@/components/sections/PageCta';
 import { ServiceBody, type RowMedia } from '@/components/sections/ServiceBody';
 import { ServiceCards, type CardMedia } from '@/components/sections/ServiceCards';
-import { ServiceGrid } from '@/components/sections/ServiceGrid';
 import { SectionList } from '@/components/sections/SectionList';
 import { Container } from '@/components/ui/Container';
 import { CrisisPanel } from '@/components/ui/CrisisPanel';
@@ -75,62 +74,17 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      layout; a service with four sections or six gets four or six rows. */
   const useFeatureLayout = service.layout === 'feature';
   const useCardLayout = service.layout === 'cards';
-  const useGridLayout = service.layout === 'grid';
 
-  /* TELEHEALTH'S FEATURED PHOTOGRAPH, keyed by section id so reordering a
-     section cannot hand it another section's picture. The path is reserved
-     ahead of the artwork: ServiceGrid checks it on disk and draws a neutral
-     block at the same shape where the file is not there yet, so the layout can
-     be reviewed without a broken image and nothing moves when it lands. */
-  /* THE ALTS DESCRIBE THE DELIVERED FRAMES. All four were first written
-     against the commissioning note, before the artwork existed, and all four
-     described a different photograph once it landed — a desk that is a sofa, a
-     kitchen worktop with keys that is a dining table with wildflowers, an
-     armchair and tablet that are a desk and a laptop, and a phone on a table
-     that is an empty two-chair room. They were rewritten from the images. An
-     alt that describes the wrong picture is a 1.1.1 failure no automated check
-     catches. */
-  const gridMedia = {
-    'an-expanded-schedule': {
-      src: '/images/services/tele-schedule.webp',
-      /* Dusk outside and a lit lamp are the only things carrying "expanded
-         schedule" here, so they stay in. No claim that the screen shows an
-         appointment — it faces away. */
-      alt: 'A woman sitting on a sofa with a laptop on her lap, smiling at the screen, a lit lamp and a mug on the side table and dusk outside the window.',
-    },
-    'both-states-both-providers': {
-      src: '/images/services/tele-states.webp',
-      alt: 'An open laptop on a wooden table beside a notebook and pen, a mug, and a jar of wildflowers, with a window onto open fields behind.',
-    },
-    'what-telehealth-is-good-for': {
-      src: '/images/services/tele-goodfor.webp',
-      alt: 'A man sitting at a desk looking at an open laptop with his hand to his chin, a glass of water and a notebook beside him.',
-    },
-    'when-telehealth-is-not-the-right-call': {
-      /* NO DISTRESS DEPICTED, and none should be. This card carries the
-         988 / 911 guidance, and a photograph of someone in crisis beside it
-         would be unverifiable and the wrong register.
-
-         WHAT THE FRAME ACTUALLY SHOWS is an empty consulting room — which is
-         apt for a section about the limits of video, because the room is the
-         alternative the copy is pointing at. The alt says "consulting room"
-         and nothing more: not whose room it is, and not that it is Newpoint's,
-         because the practice's in-person locations are still unconfirmed under
-         CLAUDE.md's care-modality rule. */
-      src: '/images/services/tele-inperson.webp',
-      alt: 'An empty consulting room with two armchairs turned toward each other across a small wooden side table holding a tissue box and a glass of water.',
-    },
-  } as const;
-
-  /* THE SHARED PROSE LAYOUT, which is now the only one of the three that still
-     ends with the crisis panel and "Keep reading".
+  /* THE SHARED PROSE LAYOUT, which is now the only one that still ends with
+     the crisis panel and "Keep reading".
 
      Both tail blocks used to be gated on `!useFeatureLayout`, which was the
      same thing while there were only two layouts. Adding the card layout split
      those apart: medication-management had both removed at the client's
      request, so the gate has to name the prose layout rather than "not the
-     feature one". Telehealth is the only service left on it and keeps both. */
-  const useProseLayout = !useFeatureLayout && !useCardLayout && !useGridLayout;
+     feature one". No current service uses it; it is the default for one that
+     names no layout. */
+  const useProseLayout = !useFeatureLayout && !useCardLayout;
 
   /* MEDICATION MANAGEMENT'S CARD PHOTOGRAPHS, keyed by section id rather than
      by position, so reordering a section cannot hand it another section's
@@ -361,9 +315,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              `heroScrim` exists for medication-management, which has a real
              master but was asked to carry the HOMEPAGE's overlay verbatim
              rather than the `hero` treatment a master would otherwise select.
-             The other two services set nothing and are unchanged: the
-             assessment has a master and gets `hero`, telehealth is still on a
-             video poster and gets `poster`.
+             The other services set nothing and are unchanged: a service with a
+             master gets `hero`, one still on a video poster gets `poster`.
 
              MEASURED ON medication-hero-2400.webp, AND IT DOES NOT MEET AA.
              Sampled on the rendered page at glyph core pixels only — the
@@ -456,11 +409,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
              ids travel with the cards, so deep links into this page still
              land. */
           <ServiceCards sections={sectionItems} media={cardsFor[service.slug] ?? {}} />
-        ) : useGridLayout ? (
-          /* The card-18 grid: a featured card and a three-up row. No "On this
-             page" rail and no modality card; the section ids travel with the
-             cards, so deep links into this page still land. */
-          <ServiceGrid sections={sectionItems} media={gridMedia} />
         ) : (
           <div className="py-20 md:py-28">
             <Container>
@@ -647,12 +595,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             is reachable from the navbar, so nothing is orphaned, and the cost
             is internal linking weight rather than indexation.
 
-            NO SERVICE PAGE RENDERS THIS ANY MORE, as of 2026-10-01: telehealth
-            moved to the card-18 grid and dropped it too, so all three services
-            name a layout and `useProseLayout` is false on every one of them.
-            The branch is not dead, though — `layout` is optional, so a service
-            added without one still gets the prose rail, this grid and the
-            crisis panel below. It is the default, not a leftover. */}
+            NO SERVICE PAGE RENDERS THIS ANY MORE: every service names a
+            layout, so `useProseLayout` is false on all of them. The branch is
+            not dead, though — `layout` is optional, so a service added without
+            one still gets the prose rail, this grid and the crisis panel below.
+            It is the default, not a leftover. */}
         {useProseLayout && (
           <RelatedLinks
             heading="Keep reading"

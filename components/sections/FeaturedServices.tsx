@@ -109,8 +109,7 @@ export function FeaturedServices() {
 
               {/* The modality line renders here, not only on the featured card.
                   A disclosure that lives only in the content file is not a
-                  disclosure — and the telehealth card in particular needs its
-                  scope on the page, or it reads as unqualified. */}
+                  disclosure. */}
               {service.footerText && <p className={styles.cardFooterText}>{service.footerText}</p>}
             </article>
           ))}
