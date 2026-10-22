@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     // right before "New Jersey and Pennsylvania". The verbatim sentence is the
     // Open Graph and Twitter description below, which is the "second line" of
     // a link preview the client was looking at.
-    'Psychiatric assessment, medication management, and behavioral health management in New Jersey and Pennsylvania from two doctorate-prepared nurse practitioners.',
+    'Psychiatric assessment, medication management, and weight management in New Jersey and Pennsylvania from two doctorate-prepared nurse practitioners.',
   applicationName: BUSINESS.legalName,
   authors: [{ name: BUSINESS.legalName }],
   /**
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     url: BUSINESS.domain,
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric assessment, medication management, and behavioral health management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
+      'Psychiatric assessment, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
     locale: 'en_US',
     // The 1200x630 card is generated at app/opengraph-image.tsx and applies to
     // every route. CLIENT: replace it with a supplied asset if one exists.
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric assessment, medication management, and behavioral health management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
+      'Psychiatric assessment, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: BUSINESS.domain },

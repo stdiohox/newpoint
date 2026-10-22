@@ -32,7 +32,7 @@ export const metadata = pageMetadata({
   // services" as its head term, so the two are not arbitrating the same query.
   title: 'Psychiatric Services in NJ and PA',
   description:
-    'Psychiatric assessment, medication management, and behavioral health management in New Jersey and Pennsylvania. What each involves and how to start.',
+    'Psychiatric assessment, medication management, and weight management in New Jersey and Pennsylvania. What each involves and how to start.',
   path: '/services',
 });
 
@@ -199,7 +199,7 @@ export default function ServicesIndex() {
              below it, as the assessment's "How it’s delivered" row and in the
              closing band, so the hero disagreed with its own page about
              geography. Caught by healthcare-reviewer. */
-          intro={`Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it’s indicated. ${DELIVERY_LINE}. Each of the three below has its own page.`}
+          intro={`Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it’s indicated. ${DELIVERY_LINE}. Each of the four below has its own page.`}
           image={{
             src: '/images/services/services-consult-2752.webp',
             objectPosition: '70% 25%',
@@ -232,7 +232,7 @@ export default function ServicesIndex() {
                    `cardPosterFor` reads FEATURED_SERVICES, which is the
                    HOMEPAGE's card list — so a service with no homepage card has
                    no poster here and this row drew an empty block beside its
-                   copy. Medical weight management is the first such service and
+                   copy. Weight management is the first such service and
                    it does have a hero master, so the row uses that rather than
                    nothing. Falling back rather than adding the service to
                    FEATURED_SERVICES on purpose: that array decides what appears
@@ -294,7 +294,7 @@ export default function ServicesIndex() {
                           POSTER YET. Until 2026-10-06 every entry in
                           SERVICE_PAGES had a homepage card to borrow a video
                           still from, so the `poster &&` below never failed and
-                          this box never showed. Medical weight management has
+                          this box never showed. Weight management has
                           no card and no artwork, and with nothing drawn and no
                           background the row rendered a transparent hole beside
                           its copy — on the one page where the four services

@@ -152,16 +152,20 @@ export const HERO = {
    * already says it; the link-preview description in app/layout.tsx carries the
    * full sentence. "We see patients in person and also by telehealth" is the
    * client's own sentence too: telehealth is a delivery mode, stated as one.
+   *
+   * CLIENT INSTRUCTION, 2026-10-22: "behavioral health management" is replaced
+   * by "weight management" here, in `tag`, and in the layout and /services
+   * descriptions that carry the same sentence.
    */
   subtext:
-    'Psychiatric assessment, medication management, and behavioral health management from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
+    'Psychiatric assessment, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
   /**
    * The service names for the hero's glass tag, word-for-word as `subtext`
    * already names them. No new service is claimed here. Telehealth left the
    * tag on 2026-10-19 with the telehealth service page: it is a delivery mode,
    * which `subtext` states, not a service.
    */
-  tag: 'Assessment. Medication management. Behavioral health management.',
+  tag: 'Assessment. Medication management. Weight management.',
 } as const;
 
 /**
@@ -657,7 +661,15 @@ export const PROVIDERS: Provider[] = [
     name: 'Funmilayo Whitaker',
     displayName: 'Dr. Funmilayo Whitaker',
     credentials: 'DNP, FNP-BC, PMHNP-BC',
-    role: 'Psychiatric-Mental Health Nurse Practitioner',
+    /* CLIENT INSTRUCTION, 2026-10-22: her role is "psych mental health, family
+       and addiction practitioner". It names all three areas she practises in;
+       "Nurse Practitioner" stays the noun because both NJ and PA protect the
+       title and the "Dr." override needs those words beside the name.
+       THIS IS THE VISIBLE ROLE ONLY. Schema `jobTitle` is PROVIDER_JOB_TITLE in
+       lib/schema.ts and stays the ANCC string per CLAUDE.md: no addictions
+       certification (e.g. CARN-AP) is on file, so no machine-readable claim
+       asserts one. */
+    role: 'Psychiatric-Mental Health, Family and Addiction Nurse Practitioner',
     image: {
       webp560: '/images/providers/funmilayo-whitaker-560.webp',
       webp1120: '/images/providers/funmilayo-whitaker-1120.webp',
@@ -686,8 +698,11 @@ export const PROVIDERS: Provider[] = [
     approach: 'Warm, empathic, non-judgmental, and collaborative',
     /* Doximity, Headway and U.S. News independently give the doctorate as
        University of North Florida, which is as corroborated as anything in the
-       directory capture gets. The master's is Headway only. */
-    education: 'DNP, University of North Florida · MSN, Tennessee State University',
+       directory capture gets. The master's is Headway only.
+       The Liberty University certificate is the client's own addition,
+       2026-10-22: "Family nurse prac cert, Liberty University acute care track". */
+    education:
+      'DNP, University of North Florida · MSN, Tennessee State University · Family Nurse Practitioner certificate, Liberty University (acute care track)',
     /* CONFIRMED BY THE CLIENT, 2026-10-02. Headway listed Yoruba and U.S. News
        recorded "Speaks English"; the practice has now confirmed both. */
     languages: 'English and Yoruba',
@@ -930,6 +945,7 @@ export const WHAT_WE_TREAT = {
    * condition earns a place here when it is in either `PROVIDERS[].treats`.
    * ADHD, sleep and substance use are each published by both providers on their
    * own profiles; see the notes on those arrays above for the sourcing.
+   * Substance use has its own service page since 2026-10-22.
    *
    * ADHD IS THE MOST VALUABLE LINE IN THIS ARRAY. OPEN_CLIENT_ITEMS carried it
    * for weeks as one of the highest-volume queries a psychiatric NP practice
@@ -1875,19 +1891,20 @@ export const SERVICE_PAGES: ServicePage[] = [
        the assessment is a diagnostic procedure and telehealth is a delivery
        mode. Same reasoning as the note on the schemaType field. */
     schemaType: 'MedicalTherapy',
-    title: 'Medical weight management',
+    /* RENAMED BY THE CLIENT, 2026-10-22: "just put weight management", without
+       "medical". The word went from the title, the first section heading, the
+       alternateName, the meta strings and the intro together, so the copy and
+       the structured data still agree on what the service is called. */
+    title: 'Weight management',
     /* Licensed by the intro, which opens on the exact phrase in the page's own
        voice — the field's rule is that this names what the service is actually
        called, not what it could rank for, and an alternateName the copy never
-       uses fails that test. seo-specialist caught the first draft bending it:
-       the intro said "medically supervised weight loss" while this said
-       "medical weight loss". The copy moved, not this. */
-    alternateName: 'Medical weight loss',
+       uses fails that test. Keep the two in step. */
+    alternateName: 'Weight loss care',
     /* "Weight loss" IS IN THE TITLE TAG AND THE H1 IS NOT, deliberately. The H1
-       stays "Medical weight management", which is what the service is called
-       and what the sibling pages' naming supports; the title tag carries the
-       phrase a patient types. 47 characters before the "| Newpoint" suffix. */
-    metaTitle: 'Medical Weight Loss and Management in NJ and PA',
+       stays "Weight management", which is what the service is called; the
+       title tag carries the phrase a patient types. */
+    metaTitle: 'Weight Loss and Weight Management in NJ and PA',
     /* ~155 characters. "After an appointment" is in here because it is the
        gate the page is built on, and a search result that states it filters
        out the reader looking for a prescription without one.
@@ -1899,7 +1916,7 @@ export const SERVICE_PAGES: ServicePage[] = [
        that would qualify it. The intro still carries it because there the
        supervisor is named in the same sentence. */
     metaDescription:
-      'Medical weight loss in NJ and PA. Weekly semaglutide or tirzepatide injections, prescribed and reviewed by our nurse practitioners after an appointment.',
+      'Weight loss care in NJ and PA. Weekly semaglutide or tirzepatide injections, prescribed and reviewed by our nurse practitioners after an appointment.',
     /* THE TRAILING CLAUSE CAME OFF IN THE REDESIGN — it said the appointment
        that decides comes first, which is now a card of its own and a bullet
        inside it, stated twice over. What CANNOT come off is "where a weekly
@@ -1907,7 +1924,7 @@ export const SERVICE_PAGES: ServicePage[] = [
        MedicalTherapy node, which ships on / and /services as well as here, and
        that clause is the only hedge that travels with the drug names. */
     intro:
-      'Medical weight loss, supervised by our own nurse practitioners — not referred out. When a weekly injection is appropriate, semaglutide and tirzepatide are the two we prescribe.',
+      'Weight loss care, supervised by our own nurse practitioners — not referred out. When a weekly injection is appropriate, semaglutide and tirzepatide are the two we prescribe.',
     /* Names no modality, and that is not an oversight: whether injections are
        given in the office or self-administered at home is unconfirmed, and
        either answer changes this line. It names the two states because both
@@ -1930,7 +1947,7 @@ export const SERVICE_PAGES: ServicePage[] = [
      */
     sections: [
       {
-        heading: 'What medical weight management involves',
+        heading: 'What weight management involves',
         /* CLIENT-REVIEW — GENERIC. Describes ongoing prescribing care in
            general terms. No duration, no frequency of review, no price, no
            eligibility threshold, no outcome. */
@@ -2117,6 +2134,117 @@ export const SERVICE_PAGES: ServicePage[] = [
        * turns away business that exists or promises access that does not. See
        * OPEN_CLIENT_ITEMS.
        */
+    ],
+  },
+  {
+    /**
+     * SUBSTANCE USE AND ADDICTION MANAGEMENT — NEW SERVICE LINE, CLIENT
+     * INSTRUCTION 2026-10-22. This closes the OPEN_CLIENT_ITEMS question of
+     * whether substance use is an active service line: the practice says it is.
+     * The directories already said so — Grow lists addiction for Whitaker,
+     * Headway lists "Substance use / addiction" first for Ofoegbu, and both
+     * `PROVIDERS[].treats` arrays carry it.
+     *
+     * WHAT THE PAGE DOES NOT SAY, and why each one is a decision:
+     *
+     * 1. NO MEDICATION IS NAMED, NOT EVEN A CLASS. Medication for opioid use
+     *    disorder means buprenorphine, a Schedule III drug: a DEA registration
+     *    and, by telehealth, the DEA's telemedicine rules. Nobody has confirmed
+     *    either, so the page says medication management treats the mental
+     *    health conditions that come with substance use and says nothing about
+     *    prescribing for addiction itself. See OPEN_CLIENT_ITEMS.
+     * 2. NO LEVEL OF CARE BEYOND OUTPATIENT. No detox, no withdrawal
+     *    management, no residential or intensive outpatient program. Where
+     *    someone needs more, the page says we help them find it, which is the
+     *    live site's own "referral to follow-up services".
+     * 3. NO OUTCOME, NO RECOVERY RATE, NO "SOBRIETY". Same rule as weight
+     *    management, for the same reason.
+     * 4. NOTHING INVITES A HISTORY INTO THE CONTACT FORM. Substance use records
+     *    carry federal confidentiality rules of their own (42 CFR Part 2 where
+     *    it applies), on top of CLAUDE.md's HIPAA rule. The FAQ tells people to
+     *    leave health details out of their message.
+     *
+     * THE PROSE LAYOUT IS DELIBERATE: no `layout` is set. It is the only layout
+     * that renders the in-page crisis panel (988 / 911) above the footer, and
+     * on an addiction page that panel belongs above the fold of the footer, not
+     * in its fine print. It also needs no photographs, and none exist for this
+     * service yet. The /services hub draws its neutral block for the row until
+     * a hero master arrives.
+     */
+    slug: 'substance-use-and-addiction',
+    nav: 'Substance use and addiction',
+    hideHeroCta: true,
+    /* MedicalTherapy: ongoing treatment, as with medication and weight
+       management. */
+    schemaType: 'MedicalTherapy',
+    /* The client's name for the service, verbatim. */
+    title: 'Substance use and addiction management',
+    /* Used in the intro below, which is the condition the field sets. */
+    alternateName: 'Addiction treatment',
+    metaTitle: 'Addiction and Substance Use Treatment in NJ, PA',
+    metaDescription:
+      'Outpatient addiction treatment in NJ and PA from psychiatric nurse practitioners, with substance use and mental health looked at in the same plan.',
+    intro:
+      'Outpatient addiction treatment from our psychiatric nurse practitioners. We look at substance use and your mental health together, in one plan, without judgment.',
+    modality: `${DELIVERY_LINE}.`,
+    sections: [
+      {
+        heading: 'What substance use and addiction care involves',
+        /* GENERIC, plus the practice's own first step: every new patient
+           starts with the comprehensive psychiatric assessment
+           (WHAT_TO_EXPECT). */
+        body: 'This is outpatient care for problems with alcohol, drugs, or other substances. It starts with a comprehensive psychiatric assessment, where we go over your history, what you’re using, what you’ve already tried, and what you want to change. From there, we build a plan with you and review it as you go.',
+      },
+      {
+        heading: 'Substance use and mental health, treated together',
+        /* GENERIC clinical knowledge, plus PROVIDERS[].credentials: both are
+           PMHNP-BC, which is what puts the mental-health half in scope. */
+        body: 'Substance use rarely happens on its own. Depression, anxiety, trauma, and trouble sleeping often sit alongside it, and each can make the other harder to treat. Because our providers are psychiatric nurse practitioners, both are looked at in the same plan.',
+      },
+      /* NO "WHO YOU'LL SEE" SECTION, deliberately. CLAUDE.md's service-page
+         furniture rule bars a providers block under a named service, and the
+         client did not ask for one. Both provider pages already list this
+         service, and both `treats` arrays carry it. */
+      {
+        heading: 'Your treatment plan',
+        /* "medication management for the mental health conditions" IS THE
+           WHOLE MEDICATION CLAIM, and it is scoped on purpose. See note 1
+           above. The referral line is the live site's "referral to
+           follow-up services". */
+        body: 'Your plan is built around your goals. It can combine psychotherapy and counseling with medication management for the mental health conditions that come with substance use, and we adjust it as things change. If you need more support than outpatient care can give, we’ll help you find the right next step.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'What happens at my first appointment for substance use?',
+        a: 'A comprehensive psychiatric assessment, the same first appointment every new patient has. We’ll talk about substance use alongside your mental health, your history, and what you want from treatment.',
+      },
+      {
+        q: 'Do I need a referral for addiction treatment?',
+        a: 'No. You can contact us directly. If your insurance plan requires a referral for behavioral health, check with your plan first. Please don’t include health details in your message.',
+      },
+      {
+        /* PATIENT SAFETY, healthcare-reviewer 2026-10-22. An outpatient page
+           that offers no withdrawal management must not leave a reader to quit
+           alone: stopping alcohol or sedatives abruptly can cause seizures.
+           Names no medication and no class. */
+        q: 'Should I stop using before my first appointment?',
+        a: 'Not on your own. Stopping alcohol or some medications suddenly can be dangerous. Talk to a clinician before you stop, and if you feel unwell after stopping, call 911 or go to the nearest emergency room.',
+      },
+      {
+        /* Answers the question an opioid-use reader arrives with, and commits
+           to nothing: whether the practice prescribes for SUD itself is open
+           (OPEN_CLIENT_ITEMS, item 1 of the substance-use entry). */
+        q: 'Can you prescribe medication for addiction itself?',
+        a: 'Ask us when you reach out. Whether medication for the substance use itself is part of your plan is something we’ll talk through at your assessment.',
+      },
+      {
+        q: 'Is there someone I can talk to right now?',
+        /* Public federal services, stated as they are. 988 and 911 match
+           CRISIS; the SAMHSA National Helpline is free, confidential and
+           open 24/7. */
+        a: 'If you’re in crisis, call or text 988. In an emergency, call 911. For free, confidential treatment referral and information, SAMHSA’s National Helpline is open 24 hours a day at 1-800-662-4357.',
+      },
     ],
   },
 ];
@@ -2906,7 +3034,7 @@ export const OPEN_CLIENT_ITEMS = [
   'PRE-LAUNCH — CERTIFYING BODY for the "board-certified" claim. The post-nominals imply one (PMHNP-BC and FNP-BC both expand to Board Certified) but no body is named anywhere in the source material and none is assumed here, which is why `hasCredential` stays out of the JSON-LD. RAISED TO PRE-LAUNCH ON 2026-10-02, when the client changed every "dual-certified" to "dual board-certified": the claim now ships in both providers\' bios, in the FAQ answer, on the homepage, and inside `description` on both Person nodes. The repo escalates an open item when the claim it guards starts shipping — the nine payers and the ADHD prescribing line were both raised on that trigger. Ask the practice to name the body (ANCC is the expected answer for both certifications, and expected is not confirmed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
   'PRE-LAUNCH — AGES SERVED. Confirmed age range (adults only, or across the lifespan as a practice policy). Headway lists CHILDREN AND ADOLESCENTS for Dr. Whitaker, which is the strongest paediatric signal in any Newpoint source and the reason this cannot wait: the site now names ADHD under "Conditions we prescribe for", and a parent reading that has nothing on the page telling them whether their child can be seen. STILL OPEN, AND THE EVIDENCE CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
-  'Whether substance use and addiction treatment is an active service line. THE DIRECTORIES SAY YES: Grow lists addiction for Whitaker, and Headway lists "Substance use / addiction" as Ofoegbu\'s FIRST specialty. Her existing bio already says her last 11 years were in mental health and addiction. This also bears on the new "Mental and behavioral care" hero — in US payer language behavioral health includes SUD, so the headline already implies a door the conditions list does not open',
+  'SUBSTANCE USE AND ADDICTION MANAGEMENT — what the new page could not say. The service line itself is CONFIRMED (client, 2026-10-22) and /services/substance-use-and-addiction is built; these are the questions it was written around. (1) MEDICATION FOR ADDICTION: does the practice prescribe for substance use disorders themselves (buprenorphine for opioid use disorder, naltrexone, acamprosate and similar), and if so, under whose DEA registration and by telehealth or in person only? Buprenorphine is Schedule III, so the DEA telemedicine rules apply. The page names no medication and claims only medication management for the co-occurring mental health conditions until this is answered. (2) LEVEL OF CARE: confirm the practice offers no detox or withdrawal management, intensive outpatient program or residential care. The page says it helps people find more support when they need it. (3) 42 CFR PART 2: if the practice is a federally assisted program holding itself out as providing SUD treatment, Part 2 confidentiality applies to its records, and advertising this service may be what triggers it. Get the practice\'s view. (4) BOTH PROVIDERS? The page names both, which their own directory profiles support, but the practice has not said so per provider. (5) AGES SERVED, as for every service. (6) A hero photograph for the page and the /services row, which shows a neutral block until one arrives. It must not depict use, paraphernalia, or a before-and-after',
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. UPDATED 2026-10-19: the practice\'s brochure now lists "Psychotherapy & Counseling" as a service in its own right, and the homepage says the practice offers psychotherapy and supportive counseling. The brochure does NOT say who delivers it (the only delivery evidence is Whitaker\'s Headway profile; Ofoegbu is listed for medication management only) or which modalities, so no provider may be bound to it and none is named on /services. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   /* The ADHD item was REMOVED on 2026-10-01, closed rather than dropped. It
      asked whether ADHD is treated at all; both providers publish it, it has

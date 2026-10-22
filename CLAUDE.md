@@ -325,7 +325,10 @@ strip still renders sitewide.
 
 ### Summary line, consultation and brochure — CLIENT INSTRUCTIONS, 2026-10-19
 
-- **The practice summary line is the client's wording, verbatim:** "Psychiatric
+- **The practice summary line is the client's wording, verbatim** (amended by
+  the client on 2026-10-22: "behavioral health management" became **"weight
+  management"** in this sentence, the hero tag and every meta description that
+  carries it): "Psychiatric
   assessment, medication management, and behavioral health management from two
   doctorate-prepared psychiatric and family nurse practitioners serving New
   Jersey and Pennsylvania." It is the Open Graph and Twitter description
@@ -540,6 +543,13 @@ whether it serves children.
 
 ### Medical weight management — CLIENT INSTRUCTION, 2026-10-06
 
+> **RENAMED 2026-10-22: the service is now "Weight management"**, client
+> instruction ("just put weight management"). "Medical" came off the H1, the
+> first section heading (anchor `what-weight-management-involves`), the intro,
+> `alternateName` ("Weight loss care") and the meta strings. Everything below
+> still governs the page; read "medical weight management" as "weight
+> management".
+
 A fourth service line, briefed as "add weight loss" with a competitor's printed
 flyer as the reference: *doctor-supervised, weekly injections (semaglutide &
 tirzepatide), 10% off your first month*. Built as `/services/weight-management`.
@@ -589,7 +599,43 @@ already asserted that it does, since both provider pages list every entry in
 - Include crisis guidance (988 / 911) where a distressed visitor would plausibly look. This is expected on a behavioral-health site and is currently absent.
   - **The in-page "If you need help now" panel was removed from the assessment and medication-management pages by client decision (2026-09-30 and 2026-10-01). The footer's 988 / 911 strip is the crisis guidance on those routes, and it renders sitewide.** Both pages also drop the "Keep reading" grid, and the two removals are what make each other safe: with no card grid between the CTA and the footer, the strip is the next content a reader meets. What is lost on them is `CRISIS.body` — "not for emergencies and is not monitored around the clock" — which survives only as footer fine print. **If "Keep reading" ever returns to any of these layouts, the crisis panel has to return with it.**
 
-  - **The telehealth service page is gone (2026-10-19, see "Telehealth is a delivery mode, not a service" above).** It was the one route whose own body copy carried the 988 / 911 instruction above the footer, in its "When telehealth is not the right call" section. That section went with the page, so on every service route the crisis guidance is now the footer strip alone: all three remaining services name a layout (`feature` or `cards`), and only the prose layout renders the in-page panel.
+  - **The telehealth service page is gone (2026-10-19, see "Telehealth is a delivery mode, not a service" above).** It was the one route whose own body copy carried the 988 / 911 instruction above the footer, in its "When telehealth is not the right call" section. That section went with the page, so on every service route the crisis guidance is now the footer strip alone: all three remaining services name a layout (`feature` or `cards`), and only the prose layout renders the in-page panel. **Updated 2026-10-22:** `/services/substance-use-and-addiction` names no layout, so it is on the prose layout and renders the in-page 988 / 911 panel and "Keep reading". Deliberate; keep it that way.
+
+### Substance use and addiction management — CLIENT INSTRUCTION, 2026-10-22
+
+A new service line, at `/services/substance-use-and-addiction`. It closes the
+open item on whether substance use is an active service line. The note at the
+head of its `SERVICE_PAGES` entry governs edits. In short:
+
+- **No medication and no drug class is named as something the practice
+  prescribes for addiction.** Medication management is claimed only for the
+  co-occurring mental health conditions. Whether the practice prescribes for SUD
+  itself (buprenorphine is Schedule III: DEA registration and telemedicine
+  rules) is open in `OPEN_CLIENT_ITEMS`.
+- **Outpatient only.** No detox, withdrawal management, IOP or residential care
+  is claimed. An FAQ warns against stopping alcohol or some medications suddenly,
+  for patient safety. Keep it.
+- **No outcome claims, and nothing invites a substance history into the contact
+  form.** 42 CFR Part 2 may apply to a practice that holds itself out as
+  providing SUD treatment; that is a counsel question, tracked in
+  `OPEN_CLIENT_ITEMS`.
+- **No providers section on the page** (furniture rule above). No photography
+  yet, so the `/services` row shows its neutral block.
+
+### Dr. Whitaker's role and education — CLIENT INSTRUCTION, 2026-10-22
+
+- **Visible role:** "Psychiatric-Mental Health, Family and Addiction Nurse
+  Practitioner" (client: "psych mental health, family and addiction
+  practitioner"). It is `PROVIDERS[].role`, so it shows on her provider page,
+  her homepage card and `/providers`. **Schema `jobTitle` is unchanged**: no
+  addictions certification (e.g. CARN-AP) is on file, so no machine-readable
+  claim asserts one. Dr. Ofoegbu's role is unchanged.
+- **Education** gained "Family Nurse Practitioner certificate, Liberty
+  University (acute care track)", as given by the client.
+  <!-- CLIENT: confirm the program's exact name. FNP is a primary-care
+       population and acute care is a separate certification, so "acute care
+       track" beside an FNP certificate reads oddly to a clinician. -->
+
 
 
 ## Working rule

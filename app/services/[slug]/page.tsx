@@ -160,7 +160,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      make in words, and the art direction behind the set is recorded in the
      image brief. */
   const weightMedia = {
-    'what-medical-weight-management-involves': {
+    'what-weight-management-involves': {
       src: '/images/services/weight-consult.webp',
       alt: 'A woman in a rust-colored cardigan sitting at a wooden table, looking down at an open handwritten notebook while someone opposite her writes in it.',
     },
