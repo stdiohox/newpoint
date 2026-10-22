@@ -28,6 +28,14 @@ frame, not from these prompts.
 > and quiet mood, candid not posed, shallow depth of field, 35mm lens, eye-level, gentle
 > film grain, muted natural colour grade, no visible text, 16:9 landscape.
 
+## The person across the table is always a woman
+
+Both Newpoint providers are women. In every frame that shows a second person (the one
+listening, taking notes or pointing to the plan), make that person **a woman**. She is
+still shown from behind or out of focus, with no face, no white coat and no badge, so she
+reads as "the person you'd be talking to", not as a portrait of a specific provider. The
+patients can be any gender.
+
 ## Negative prompt (use with every image)
 
 > alcohol, beer, wine, bottles, glasses of liquor, pills, pill bottles, syringes, needles,
@@ -48,9 +56,10 @@ the page sits next to the providers' names.
 > [House style] A man in his early forties with short dark hair and a light beard, wearing
 > an olive-green crew-neck sweater, sits in a sage-green armchair in the RIGHT THIRD of the
 > frame, leaning slightly forward with his forearms resting on his knees and his hands
-> loosely together, listening attentively and calmly to someone opposite him. In the LEFT
-> foreground, out of focus, the shoulder and back of a second person in a slate-blue shirt,
-> seen from behind, no face visible. Between them a small oak side table with a closed
+> loosely together, listening attentively and calmly to the woman seated opposite him. In
+> the LEFT foreground, out of focus, that woman: in her forties, dark hair in a low bun,
+> wearing a slate-blue blouse, seen from behind over her shoulder, her face not visible.
+> Between them a small oak side table with a closed
 > notebook and a pen. The CENTRE of the frame is a wide, plain, softly lit off-white wall
 > with nothing on it. His head sits in the upper-middle of the frame, not near the top
 > edge. Bright, airy, hopeful but understated.
@@ -65,8 +74,9 @@ crisis.
 > [House style] A woman in her early thirties with shoulder-length curly hair, wearing a
 > rust-colored cardigan over a cream top, sits at a light oak table, speaking and gesturing
 > gently with one open hand while she talks. Across the table in the right foreground,
-> slightly out of focus, the shoulder and forearm of a second person in a slate-blue
-> sweater, seen from behind, resting a pen on an open notebook. A clear glass of water on
+> slightly out of focus, the shoulder and forearm of a second woman in a slate-blue
+> sweater, her dark hair just visible, seen from behind, face not visible, resting a pen
+> on an open notebook. A clear glass of water on
 > the table. A window with sheer linen curtains on the left, a potted plant on the sill.
 > First conversation, open and unhurried.
 
@@ -98,8 +108,8 @@ glass.
 > [House style] Over-the-shoulder view at a light oak table: in focus, a young man in his
 > mid-twenties wearing an olive overshirt looks down at a printed single-page sheet on the
 > table, nodding slightly, his hand resting near it. In the left foreground, slightly out
-> of focus, the hand and grey knit sleeve of a second person pointing to a line on the
-> sheet. The text on the sheet is soft and unreadable. A closed laptop and a clear glass of
+> of focus, a woman's hand and grey knit sleeve, a thin gold ring on one finger, pointing
+> to a line on the sheet. The text on the sheet is soft and unreadable. A closed laptop and a clear glass of
 > water at the edge of the table, a window with linen curtains behind. Collaborative,
 > practical, forward-looking.
 
