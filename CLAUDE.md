@@ -599,7 +599,7 @@ already asserted that it does, since both provider pages list every entry in
 - Include crisis guidance (988 / 911) where a distressed visitor would plausibly look. This is expected on a behavioral-health site and is currently absent.
   - **The in-page "If you need help now" panel was removed from the assessment and medication-management pages by client decision (2026-09-30 and 2026-10-01). The footer's 988 / 911 strip is the crisis guidance on those routes, and it renders sitewide.** Both pages also drop the "Keep reading" grid, and the two removals are what make each other safe: with no card grid between the CTA and the footer, the strip is the next content a reader meets. What is lost on them is `CRISIS.body` — "not for emergencies and is not monitored around the clock" — which survives only as footer fine print. **If "Keep reading" ever returns to any of these layouts, the crisis panel has to return with it.**
 
-  - **The telehealth service page is gone (2026-10-19, see "Telehealth is a delivery mode, not a service" above).** It was the one route whose own body copy carried the 988 / 911 instruction above the footer, in its "When telehealth is not the right call" section. That section went with the page, so on every service route the crisis guidance is now the footer strip alone: all three remaining services name a layout (`feature` or `cards`), and only the prose layout renders the in-page panel. **Updated 2026-10-22:** `/services/substance-use-and-addiction` names no layout, so it is on the prose layout and renders the in-page 988 / 911 panel and "Keep reading". Deliberate; keep it that way.
+  - **The telehealth service page is gone (2026-10-19, see "Telehealth is a delivery mode, not a service" above).** It was the one route whose own body copy carried the 988 / 911 instruction above the footer, in its "When telehealth is not the right call" section. That section went with the page, so on every service route the crisis guidance is now the footer strip alone: all three remaining services name a layout (`feature` or `cards`), and only the prose layout renders the in-page panel. **Updated 2026-10-22:** `/services/substance-use-and-addiction` is on the `cards` layout like its siblings (client: "like the other pages"), so it has no in-page crisis panel. Instead its fifth section, "If you need help now", falls through below the cards and carries 988, 911 and the SAMHSA National Helpline above the FAQ. **Keep that section, and keep it fifth.**
 
 ### Substance use and addiction management — CLIENT INSTRUCTION, 2026-10-22
 
@@ -619,8 +619,11 @@ head of its `SERVICE_PAGES` entry governs edits. In short:
   form.** 42 CFR Part 2 may apply to a practice that holds itself out as
   providing SUD treatment; that is a counsel question, tracked in
   `OPEN_CLIENT_ITEMS`.
-- **No providers section on the page** (furniture rule above). No photography
-  yet, so the `/services` row shows its neutral block.
+- **No providers section on the page** (furniture rule above).
+- **Photography is commissioned, not delivered.** The prompts are in
+  `design-research/image-prompts-substance-use.md`. Card paths are reserved and
+  show neutral blocks until the files land; set `heroImage` (and write the alts
+  from the delivered frames) when they arrive.
 
 ### Dr. Whitaker's role and education — CLIENT INSTRUCTION, 2026-10-22
 

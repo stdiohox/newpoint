@@ -2164,16 +2164,28 @@ export const SERVICE_PAGES: ServicePage[] = [
      *    it applies), on top of CLAUDE.md's HIPAA rule. The FAQ tells people to
      *    leave health details out of their message.
      *
-     * THE PROSE LAYOUT IS DELIBERATE: no `layout` is set. It is the only layout
-     * that renders the in-page crisis panel (988 / 911) above the footer, and
-     * on an addiction page that panel belongs above the fold of the footer, not
-     * in its fine print. It also needs no photographs, and none exist for this
-     * service yet. The /services hub draws its neutral block for the row until
-     * a hero master arrives.
+     * THE CARD LAYOUT, as on medication and weight management, since
+     * 2026-10-22: the client asked for this page to look like the others. It
+     * shipped on the prose layout the same day and moved for that reason.
+     *
+     * WHAT THE MOVE COSTS, AND WHAT REPLACES IT. The card layout drops the
+     * in-page crisis panel and "Keep reading", as it does on both siblings.
+     * On an addiction page the crisis lines cannot be left to the footer's
+     * fine print, so the FIFTH SECTION, "If you need help now", carries 988,
+     * 911 and the SAMHSA National Helpline. ServiceCards renders everything
+     * after the fourth section as its own block below the grid, so it sits
+     * directly above the FAQ. Keep it fifth and keep it in this array.
+     *
+     * PHOTOGRAPHS: five are commissioned (hero plus one per card). The card
+     * paths are reserved in app/services/[slug]/page.tsx and draw a neutral
+     * 16:9 block until the files land. `heroImage` is NOT set yet: PageHero
+     * does not check the disk, so a path with no file behind it would render
+     * a broken image. Set it when addiction-hero-2400.webp is delivered.
      */
     slug: 'substance-use-and-addiction',
     nav: 'Substance use and addiction',
     hideHeroCta: true,
+    layout: 'cards',
     /* MedicalTherapy: ongoing treatment, as with medication and weight
        management. */
     schemaType: 'MedicalTherapy',
@@ -2187,31 +2199,73 @@ export const SERVICE_PAGES: ServicePage[] = [
     intro:
       'Outpatient addiction treatment from our psychiatric nurse practitioners. We look at substance use and your mental health together, in one plan, without judgment.',
     modality: `${DELIVERY_LINE}.`,
+    /**
+     * FOUR CARDS AND A FALL-THROUGH, which is what the card layout renders.
+     * Every line is GENERIC patient education or restates something already
+     * established in this file (the assessment as the first appointment, the
+     * PMHNP-BC credential, the live site's referral to follow-up services).
+     * No medication, no drug class, no outcome, no level of care beyond
+     * outpatient.
+     */
     sections: [
       {
         heading: 'What substance use and addiction care involves',
-        /* GENERIC, plus the practice's own first step: every new patient
-           starts with the comprehensive psychiatric assessment
-           (WHAT_TO_EXPECT). */
-        body: 'This is outpatient care for problems with alcohol, drugs, or other substances. It starts with a comprehensive psychiatric assessment, where we go over your history, what you’re using, what you’ve already tried, and what you want to change. From there, we build a plan with you and review it as you go.',
+        /* The first step is the practice's own: every new patient starts with
+           the comprehensive psychiatric assessment (WHAT_TO_EXPECT). */
+        body: 'This is outpatient care for problems with alcohol, drugs, or other substances. It starts with a comprehensive psychiatric assessment, and your plan is built from there.',
+        bullets: [
+          'We go over your history, what you’re using, and what you’ve already tried.',
+          'You decide with us what you want to change.',
+        ],
+        highlight: 'No judgment, at the first appointment or after it.',
       },
       {
         heading: 'Substance use and mental health, treated together',
         /* GENERIC clinical knowledge, plus PROVIDERS[].credentials: both are
            PMHNP-BC, which is what puts the mental-health half in scope. */
-        body: 'Substance use rarely happens on its own. Depression, anxiety, trauma, and trouble sleeping often sit alongside it, and each can make the other harder to treat. Because our providers are psychiatric nurse practitioners, both are looked at in the same plan.',
+        body: 'Substance use rarely happens on its own. Depression, anxiety, trauma, and trouble sleeping often sit alongside it, and each can make the other harder to treat.',
+        bullets: [
+          'Our providers are psychiatric nurse practitioners, so both are looked at in the same plan.',
+          'You don’t have to be sent to two separate places for two parts of the same problem.',
+        ],
       },
       /* NO "WHO YOU'LL SEE" SECTION, deliberately. CLAUDE.md's service-page
          furniture rule bars a providers block under a named service, and the
          client did not ask for one. Both provider pages already list this
          service, and both `treats` arrays carry it. */
       {
-        heading: 'Your treatment plan',
+        /* PATIENT SAFETY, healthcare-reviewer 2026-10-22. An outpatient page
+           that offers no withdrawal management must not leave a reader to quit
+           alone: stopping alcohol or sedatives abruptly can cause seizures.
+           Names no medication and no class. The FAQ below repeats it in
+           question form. */
+        heading: 'Before you cut down or stop',
+        body: 'Stopping alcohol or some medications suddenly can be dangerous. Talk to a clinician before you stop, rather than going it alone.',
+        bullets: [
+          'If you feel unwell after stopping, call 911 or go to the nearest emergency room.',
+          /* Keeps the history out of the contact form (CLAUDE.md, HIPAA). */
+          'Tell us what you’re taking, including anything prescribed elsewhere, when we meet, not on a form.',
+        ],
+      },
+      {
         /* "medication management for the mental health conditions" IS THE
            WHOLE MEDICATION CLAIM, and it is scoped on purpose. See note 1
            above. The referral line is the live site's "referral to
            follow-up services". */
-        body: 'Your plan is built around your goals. It can combine psychotherapy and counseling with medication management for the mental health conditions that come with substance use, and we adjust it as things change. If you need more support than outpatient care can give, we’ll help you find the right next step.',
+        heading: 'Your treatment plan',
+        body: 'Your plan is built around your goals. It can combine psychotherapy and counseling with medication management for the mental health conditions that come with substance use.',
+        bullets: [
+          'We review it with you and adjust it as things change.',
+          'If you need more support than outpatient care can give, we’ll help you find the right next step.',
+        ],
+      },
+      {
+        /* THE FALL-THROUGH BLOCK, and the reason it exists: the card layout
+           has no crisis panel. Public federal services, stated as they are.
+           988 and 911 match CRISIS; the SAMHSA National Helpline is free,
+           confidential and open 24/7. */
+        heading: 'If you need help now',
+        body: 'If you’re in crisis, call or text 988. In an emergency, call 911. For free, confidential treatment referral and information, SAMHSA’s National Helpline is open 24 hours a day at 1-800-662-4357.',
       },
     ],
     faqs: [
@@ -2237,13 +2291,6 @@ export const SERVICE_PAGES: ServicePage[] = [
            (OPEN_CLIENT_ITEMS, item 1 of the substance-use entry). */
         q: 'Can you prescribe medication for addiction itself?',
         a: 'Ask us when you reach out. Whether medication for the substance use itself is part of your plan is something we’ll talk through at your assessment.',
-      },
-      {
-        q: 'Is there someone I can talk to right now?',
-        /* Public federal services, stated as they are. 988 and 911 match
-           CRISIS; the SAMHSA National Helpline is free, confidential and
-           open 24/7. */
-        a: 'If you’re in crisis, call or text 988. In an emergency, call 911. For free, confidential treatment referral and information, SAMHSA’s National Helpline is open 24 hours a day at 1-800-662-4357.',
       },
     ],
   },

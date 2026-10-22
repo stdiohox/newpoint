@@ -179,12 +179,42 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     },
   } as const;
 
+  /* SUBSTANCE USE AND ADDICTION'S FOUR PHOTOGRAPHS, commissioned 2026-10-22.
+     THE PATHS ARE RESERVED AHEAD OF THE ARTWORK, as weight management's were:
+     ServiceCards checks each file on disk and draws a neutral 16:9 block until
+     it lands, so nothing breaks in the meantime.
+
+     THE ALTS ARE EMPTY UNTIL THE FRAMES ARRIVE, and must be written from the
+     delivered photographs, not from the brief. Same rules as above: describe
+     what is visible, name no role ("a person", never "a clinician"), and name
+     no substance, no medication and no paraphernalia, none of which should be
+     in frame anyway. */
+  const addictionMedia = {
+    'what-substance-use-and-addiction-care-involves': {
+      src: '/images/services/addiction-consult.webp',
+      alt: '',
+    },
+    'substance-use-and-mental-health-treated-together': {
+      src: '/images/services/addiction-together.webp',
+      alt: '',
+    },
+    'before-you-cut-down-or-stop': {
+      src: '/images/services/addiction-call.webp',
+      alt: '',
+    },
+    'your-treatment-plan': {
+      src: '/images/services/addiction-plan.webp',
+      alt: '',
+    },
+  } as const;
+
   /* Which map this service's cards draw from. Keyed by slug rather than passed
      down from the content layer because these are page-level art direction,
      not content — lib/content.ts holds no image paths for the card grid. */
   const cardsFor: Record<string, Record<string, CardMedia>> = {
     'medication-management': cardMedia,
     'weight-management': weightMedia,
+    'substance-use-and-addiction': addictionMedia,
   };
 
   /* ONE PHOTOGRAPH PER ROW, in section order. All five are now real assets —
