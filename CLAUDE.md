@@ -659,3 +659,13 @@ The homepage ends (after the contact section, before the footer) with
   portrait). The alt names them without "Dr."; the visible names carry "Dr." with
   the credentials directly beneath, which is the condition on the prefix.
 - The client asked for the picture and the tag only. Nothing else was added.
+- **The same photograph also heads `/providers`** (split header: H1 and intro
+  left, photo right; it replaced the full-bleed waiting-room PageHero, whose
+  white copy failed AA contrast) and **is the site's link-preview image**
+  (`app/opengraph-image.tsx`, reading the JPEG copy in `assets/og/`, because
+  Satori cannot decode WebP). The card shows no names and no "Dr.": it appears
+  in feeds with no credentials beside it.
+  <!-- CLIENT: the /providers photo is the page's main image and weighs ~1 MB
+       because it is lossless at the supplied pixels. On slow mobile data that
+       costs ~2 s of load time. A smaller lossless copy for that page only would
+       be ~4x lighter; ask whether that is acceptable. -->

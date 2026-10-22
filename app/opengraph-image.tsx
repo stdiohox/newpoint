@@ -1,87 +1,118 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { ImageResponse } from 'next/og';
-import { BUSINESS } from '@/lib/content';
+import { BUSINESS, CLOSING_PORTRAIT } from '@/lib/content';
 
 /**
- * Social card, generated rather than supplied.
+ * Social card: the preview WhatsApp, Facebook, LinkedIn and iMessage show when
+ * the site is shared. It cascades to every route because it sits at the root.
  *
- * The live site reuses its logo JPEG as the og:image on all three pages, which
- * renders as a small letterboxed square in every feed that shows it. This is a
- * real 1200x630 card, set in type on the brand ink, and it cascades to every
- * route in the app because it sits at the root.
+ * SINCE 2026-10-22 IT CARRIES THE PROVIDERS' PHOTOGRAPH, the one the client
+ * supplied for the homepage's "Health is wealth." section. A face is what a
+ * feed stops on, and for a two-provider practice the providers ARE the
+ * product. Before that it was type on the brand ink, generated because the
+ * live site's og:image was its logo JPEG letterboxed into a square.
  *
- * CLIENT: this is generated from the wordmark and brand colours, not from a
- * supplied asset. If the practice has photography or a designed card it would
- * rather use, drop it in as app/opengraph-image.jpg and delete this file.
+ * THE PHOTO IS READ FROM assets/og/, NOT public/. Satori does not decode WebP,
+ * so the card uses a JPEG copy sized to the panel (600x658, cover-cropped to
+ * 560x630 here). It is not a public asset and nothing else references it.
+ *
+ * NO "Dr." AND NO NAMES ON THE CARD. It is an image with no credentials beside
+ * it in a feed, which is exactly the surface CLAUDE.md's title condition rules
+ * out, and the alt below is metadata, where "Dr." is never allowed. The
+ * service list was tried under the headline and dropped: at a size that fits
+ * the 640px column it wrapped mid-name.
  */
-export const alt = `${BUSINESS.legalName} — mental and behavioral care in New Jersey and Pennsylvania`;
+export const alt = `The two nurse practitioners at ${BUSINESS.legalName}, standing back to back and smiling — mental and behavioral care in New Jersey and Pennsylvania`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const photo = await readFile(join(process.cwd(), 'assets/og/providers-together.jpg'));
+  const photoSrc = `data:image/jpeg;base64,${photo.toString('base64')}`;
+
   return new ImageResponse(
     <div
       style={{
         width: '100%',
         height: '100%',
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
         backgroundColor: '#131c2e',
-        padding: '72px 80px',
         fontFamily: 'sans-serif',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: 999,
-            backgroundColor: '#3d62b8',
-            marginRight: 16,
-          }}
-        />
-        <div style={{ fontSize: 30, color: '#ffffff', fontWeight: 600, letterSpacing: '-0.01em' }}>
-          {BUSINESS.shortName}
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div
-          style={{
-            // 60/1000, down from 68/900. The headline gained 11 characters when
-            // it became "Mental and behavioral care across …", which wrapped to
-            // three lines in the old measure and crowded the card. This holds it
-            // at two, which is the composition the card was set for.
-            fontSize: 60,
-            lineHeight: 1.08,
-            color: '#ffffff',
-            fontWeight: 600,
-            letterSpacing: '-0.03em',
-            maxWidth: 1000,
-          }}
-        >
-          Mental and behavioral care across New Jersey and Pennsylvania
-        </div>
-        <div style={{ fontSize: 30, color: '#8fb0ee', marginTop: 28, letterSpacing: '-0.01em' }}>
-          Assessment. Medication management.
-        </div>
-      </div>
-
       <div
         style={{
+          width: 640,
+          height: '100%',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: '1px solid rgba(255,255,255,0.16)',
-          paddingTop: 28,
-          fontSize: 24,
-          color: 'rgba(255,255,255,0.65)',
+          padding: '64px 56px 56px 72px',
         }}
       >
-        <div>{BUSINESS.legalName}</div>
-        <div>newpointnp.com</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div
+            style={{
+              width: 18,
+              height: 18,
+              borderRadius: 999,
+              backgroundColor: '#3d62b8',
+              marginRight: 14,
+            }}
+          />
+          <div
+            style={{ fontSize: 28, color: '#ffffff', fontWeight: 600, letterSpacing: '-0.01em' }}
+          >
+            {BUSINESS.shortName}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div
+            style={{
+              fontSize: 64,
+              lineHeight: 1.02,
+              color: '#ffffff',
+              fontWeight: 600,
+              letterSpacing: '-0.035em',
+            }}
+          >
+            {CLOSING_PORTRAIT.tag}
+          </div>
+          <div
+            style={{
+              fontSize: 30,
+              lineHeight: 1.25,
+              color: 'rgba(255,255,255,0.86)',
+              marginTop: 22,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Mental and behavioral care across New Jersey and Pennsylvania
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            borderTop: '1px solid rgba(255,255,255,0.16)',
+            paddingTop: 22,
+            fontSize: 22,
+            color: 'rgba(255,255,255,0.65)',
+          }}
+        >
+          newpointnp.com
+        </div>
       </div>
+
+      <img
+        src={photoSrc}
+        width={560}
+        height={630}
+        alt=""
+        style={{ width: 560, height: 630, objectFit: 'cover', objectPosition: '50% 20%' }}
+      />
     </div>,
     size
   );

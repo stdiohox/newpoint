@@ -1,12 +1,12 @@
+import { preload } from 'react-dom';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
-import { PageHero } from '@/components/PageHero';
 import { PageCta } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { ProviderCard } from '@/components/ui/ProviderCard';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
-import { PROVIDERS, PROVIDERS_PAGE } from '@/lib/content';
+import { CLOSING_PORTRAIT, PROVIDERS, PROVIDERS_PAGE } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbSchema, organizationRef } from '@/lib/schema';
 
@@ -44,68 +44,78 @@ export const metadata = pageMetadata({
 });
 
 export default function ProvidersPage() {
+  /* The header photo is this page's LCP element and a plain <img>, which the
+     browser only finds after parsing the markup. Preloading it starts the
+     download with the document. performance-optimizer, 2026-10-22. */
+  preload(CLOSING_PORTRAIT.image.src, { as: 'image', fetchPriority: 'high' });
+
   return (
     <>
       <JsonLd
-        schemas={[
-          organizationRef(),
-          breadcrumbSchema([{ name: 'Providers', path: '/providers' }]),
-        ]}
+        schemas={[organizationRef(), breadcrumbSchema([{ name: 'Providers', path: '/providers' }])]}
       />
       <main id="main" tabIndex={-1} className="focus:outline-none">
-        {/* The service pages' hero treatment: the homepage's overlay, copy
-            centred on the area below the navbar, centred from lg, and no CTA.
+        {/* THE PROVIDERS' OWN PHOTOGRAPH, SINCE 2026-10-22. This header was a
+            full-bleed PageHero over an empty waiting room, and it never met AA:
+            the pale wall and lit doorway sat behind centred white copy, measured
+            at h1 2.06:1 and intro 2.37:1 at 1440. The client then supplied a
+            photograph of both providers together (CLOSING_PORTRAIT), and this
+            page, the one about the two of them, is where it does the most work.
 
-            THE SCRIM IS scrim="home" NOW, WHICH IT COULD NOT BE BEFORE. The
-            note that stood here said `home` was deliberately absent because all
-            four of PageHero's `home` layers are gated on `image`, and over the
-            np-blue-900 → np-sky gradient this page used to render they emit
-            nothing at all — strictly less overlay than /insurance or /contact
-            carry. That reasoning was correct and is now spent: the page has a
-            photograph, so the layers have something to sit on.
+            A SPLIT HEADER RATHER THAN PageHero, because the photo is a 1123x1231
+            portrait and PageHero is a full-bleed landscape slot: stretched across
+            1440px it would be upscaled and soft, and white copy over two faces
+            is the contrast problem again. Dark text on np-neutral-50 has no
+            backdrop to measure against.
 
-            It is the same pair of gradients the homepage uses, through the same
-            branch the two service heroes go through.
+            -mt-[var(--nav-h)] plus the same padding PageHero uses keeps the page
+            starting under the sticky navbar exactly as every other route does.
 
-            CONTRAST DOES NOT MEET AA AT THE DESKTOP WIDTHS. Measured on the
-            rendered page at glyph core pixels only — a whole-box sample reads
-            the brightest pixel in the box rather than one a letter covers:
+            THE PHOTO IS THE LCP ELEMENT HERE, so it loads eagerly with high
+            fetch priority. It is the lossless file at the exact pixels supplied,
+            the client's rule for provider photographs; if that weight ever needs
+            to come down, it is the client's call, not a silent re-encode.
 
-              1440  h1 2.06:1 (floor 3)   intro 2.37:1 (floor 4.5)
-              1024  h1 2.18:1 (floor 3)   intro 1.69:1 (floor 4.5)
-               390  h1 3.10:1 PASS        intro 6.75:1 PASS
+            NO Reveal ON THE COPY: it is above the fold, and nothing above the
+            fold may ship hidden behind an entrance animation.
 
-            The worst backdrop under a glyph is the room's pale wall and the lit
-            doorway behind the copy, about rgb(181,180,184) at 1440. THIS IS THE
-            THIRD PAGE TO MEASURE THE SAME WAY and the cause is the one
-            PageHero's scrim note records: the homepage ramps are shaped for a
-            100vh section whose copy is short, bottom-anchored and in the left
-            column of a two-column grid, and this header is ~540-610px with
-            centred copy that fills it. At 390 the box is tall enough that the
-            bottom ramp still covers the copy, which is why only that width
-            passes.
+            "Dr." appears in the intro with the role words in the same sentence,
+            which is the condition on the prefix; the H1 names no one. */}
+        <header className="bg-np-neutral-50 relative -mt-[var(--nav-h)] pt-[calc(var(--nav-h)+3rem)] pb-14 md:pt-[calc(var(--nav-h)+4.5rem)] md:pb-20">
+          <Container>
+            <div className="grid items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
+              <div className="md:col-span-6 lg:col-span-6">
+                <h1
+                  className="font-display text-np-ink font-medium"
+                  style={{
+                    fontSize: 'clamp(2.5rem, 1.75rem + 3vw, 4.5rem)',
+                    letterSpacing: '-0.035em',
+                    lineHeight: 1.02,
+                    textWrap: 'balance',
+                  }}
+                >
+                  {PROVIDERS_PAGE.title}
+                </h1>
+                <p className="text-body-l text-np-neutral-600 mt-6 max-w-[46ch]">
+                  {PROVIDERS_PAGE.intro}
+                </p>
+              </div>
 
-            The overlay was required to be the homepage's, copied, so this is
-            reported rather than fixed. The remedy is scrim="hero", whose radial
-            sits behind a centred block, or a master whose centre is not a lit
-            wall. */}
-        <PageHero
-          title={PROVIDERS_PAGE.title}
-          intro={PROVIDERS_PAGE.intro}
-          image={{
-            src: '/images/providers/providers-hero-2400.webp',
-            /* Describes the room and stops there. NOT "our waiting room": the
-               practice's in-person locations are still unconfirmed under
-               CLAUDE.md's care-modality rule, and alt text is where that gets
-               claimed by accident. No people are in frame, so there is no
-               patient or provider to misattribute either. */
-            alt: 'An empty waiting room with upholstered armchairs around a jute rug, a side table holding flowers and books, a potted fig tree, and an open doorway to a desk beyond.',
-          }}
-          scrim="home"
-          align="center"
-          copyAlign="center"
-          showCta={false}
-        />
+              <div className="md:col-span-6 lg:col-span-6">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={CLOSING_PORTRAIT.image.src}
+                  width={CLOSING_PORTRAIT.image.width}
+                  height={CLOSING_PORTRAIT.image.height}
+                  alt={CLOSING_PORTRAIT.image.alt}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="rounded-media mx-auto h-auto w-full max-w-[560px] md:max-w-none"
+                />
+              </div>
+            </div>
+          </Container>
+        </header>
 
         <div className="py-20 md:py-28">
           <Container>

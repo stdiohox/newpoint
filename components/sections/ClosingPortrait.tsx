@@ -62,8 +62,14 @@ export function ClosingPortrait() {
                       href={`/providers/${p.slug}`}
                       className="group block focus-visible:outline-offset-4"
                     >
-                      <span className="text-h3 text-np-ink group-hover:text-np-blue-600 ease-np-out block transition-colors duration-[180ms]">
+                      <span className="text-h3 text-np-ink group-hover:text-np-blue-600 group-focus-visible:text-np-blue-600 ease-np-out inline-flex items-center gap-2 transition-colors duration-[180ms]">
                         {p.displayName}
+                        <span
+                          aria-hidden="true"
+                          className="ease-np-out transition-transform duration-[180ms] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none"
+                        >
+                          →
+                        </span>
                       </span>
                       <span className="sr-only">, </span>
                       <span className="font-display text-small text-np-neutral-600 mt-0.5 block font-medium">
@@ -74,7 +80,6 @@ export function ClosingPortrait() {
                 ))}
               </ul>
             </Reveal>
-
           </div>
         </div>
       </Container>
