@@ -366,8 +366,8 @@ export function Navbar1({
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size
           inline SVG mark; next/image adds no optimisation for SVG. */}
-      <img src="/brand/newpoint-mark-ink.svg" alt="" className="h-8 w-auto" />
-      <span className="text-np-ink text-xl font-semibold tracking-tight">
+      <img src="/brand/newpoint-mark-royal.svg" alt="" className="h-8 w-auto" />
+      <span className="text-np-blue-600 text-xl font-semibold tracking-tight">
         {BRAND.short}
         <span className="sr-only"> {BRAND.legal}, home</span>
       </span>

@@ -674,8 +674,10 @@ The homepage ends (after the contact section, before the footer) with
 
 The client said the navy looked dull and asked for the colour style of Apple's Mail icon
 (a royal-to-cyan gradient). Tokens and rationale: `design-research/design-tokens.md`,
-"Vivid royal family". **`#234598` is untouched** and stays the brand blue for links and type.
+"Vivid royal family". **Later the same day the client made royal dominant everywhere**: the
+whole `np-blue` scale and `np-sky` were remapped onto it (table in the same doc), the photo-hero
+scrims went from navy to deep royal, and the "Newpoint" wordmark turned royal. `#234598` is
+no longer the brand blue.
 Cyan never sits behind text (1.91:1 with white). Every surface was re-measured; the numbers
-are in the comments beside each one (`PageCta.tsx`, `Providers.tsx`). The homepage and
-interior photo heroes still use navy scrims on purpose: their contrast was measured
-against those photographs, and recolouring them is a separate decision.
+are in the comments beside each one (`PageCta.tsx`, `Providers.tsx`). The photo-hero scrims are deep royal now and were re-measured route by route.
+The client's colour logo PNG (footer, favicon) is their artwork and was not recoloured.

@@ -217,7 +217,7 @@ export function Footer() {
                   height={36}
                   className="h-9 w-auto"
                 />
-                <span className="font-display text-np-ink text-xl font-semibold tracking-tight">
+                <span className="font-display text-np-blue-600 text-xl font-semibold tracking-tight">
                   {BUSINESS.shortName}
                   <span className="sr-only"> {BUSINESS.legalName}, home</span>
                 </span>

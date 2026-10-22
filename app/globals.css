@@ -19,19 +19,25 @@
    --------------------------------------------------------------------------- */
 
 @theme {
-  /* Brand blue. #234598 is preserved brand equity, do not alter. */
-  --color-np-blue-900: #101f45;
+  /* BRAND BLUE, REMAPPED TO ROYAL BY CLIENT INSTRUCTION, 2026-10-22: "I want
+     this new colour to be dominant everywhere on the website." The note that
+     stood here ("#234598 is preserved brand equity, do not alter") is
+     superseded by the client, who owns that equity. The scale is the Mail-icon
+     royal family (see the vivid-royal block below and
+     design-research/design-tokens.md); every step keeps its old role. White on
+     each: 900 12.56, 800 9.90, 700 8.26, 600 6.37, 500 5.10. */
+  --color-np-blue-900: #142a80;
   /* Sits between 900 and 700, for a raised panel ON a 900 ground: the footer's
      crisis strip. It measures only 1.22:1 against 900, which is deliberate for
      a surface rather than a component, so anything using it carries a
      white/15 hairline to define its edge. White on it measures 13.2:1. */
-  --color-np-blue-800: #172d63;
-  --color-np-blue-700: #1b3576;
-  --color-np-blue-600: #234598;
-  --color-np-blue-500: #3d62b8;
-  --color-np-blue-300: #8fb0ee; /* on-ink use only */
-  --color-np-blue-100: #e3eaf8;
-  --color-np-blue-50: #f1f5fc;
+  --color-np-blue-800: #1a36a6;
+  --color-np-blue-700: #1d3fc2;
+  --color-np-blue-600: #2450e0;
+  --color-np-blue-500: #3364e7;
+  --color-np-blue-300: #9cbcff; /* on-ink use only: 6.61:1 on 900 */
+  --color-np-blue-100: #dde7fe;
+  --color-np-blue-50: #eef3ff;
 
   /* VIVID ROYAL, CLIENT REQUEST 2026-10-22: the navy surfaces "look dull", and
      the reference was Apple's Mail icon, a vertical gradient from royal blue
@@ -41,9 +47,10 @@
        royal-deep    #1d3fc2  white 8.26:1  panel grounds, hover, text scrims
        cyan          #5ec7f7  white 1.91:1  DECORATIVE ONLY: gradient ends and
                                             glows, never behind type
-     A NEW FAMILY, NOT A RECOLOUR OF np-blue. #234598 above stays the brand
-     blue (links, logo-adjacent type), per its own note. These carry the big
-     colour moments: the providers panel, the closing band, primary buttons. */
+     Introduced as a separate family the same day; np-blue above was then
+     remapped onto it by the client's "dominant everywhere" instruction, so the
+     two now agree (royal = blue-600, royal-deep = blue-700, royal-bright =
+     blue-500). Kept as names because the gradient utilities read them. */
   --color-np-royal-bright: #3364e7;
   --color-np-royal: #2450e0;
   --color-np-royal-deep: #1d3fc2;
@@ -67,7 +74,9 @@
      Chosen for contrast: a white label on this measures 4.75:1, clearing the
      4.5:1 WCAG AA asks for at 14px. Lightening it past roughly #4d79a7 drops
      the label back under AA. */
-  --color-np-sky: #4a76a4;
+  /* Remapped 2026-10-22 from the slate #4a76a4 to a bright royal, same role:
+     a white label measures 4.78:1 (AA at 14px). */
+  --color-np-sky: #2f6be8;
 
   /* AMBER RETIRED 2026-09-25. --color-np-amber-500 (#e9a93c) and its tint
      --color-np-amber-100 (#fbeed5) are gone. This is the one part of

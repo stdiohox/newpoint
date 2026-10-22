@@ -50,7 +50,7 @@ export default function Holding() {
             className="h-9 w-auto"
             priority
           />
-          <span className="font-display text-np-ink text-xl font-semibold tracking-tight">
+          <span className="font-display text-np-blue-600 text-xl font-semibold tracking-tight">
             {BUSINESS.shortName}
             <span className="sr-only"> {BUSINESS.legalName}</span>
           </span>

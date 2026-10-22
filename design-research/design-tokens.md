@@ -294,3 +294,27 @@ Utilities: `bg-np-vivid` (royal-bright to royal, primary buttons) and `bg-np-viv
 (hover). Applied to the providers panel, the closing CTA band, primary/navy buttons, the
 navbar CTA, the crisis panel's filled action and the link-preview card. Photo heroes keep
 their navy scrims, which were measured for contrast against those photographs.
+
+### Royal made dominant everywhere (client instruction, same day)
+
+"I want this new colour to be dominant everywhere on the website." The whole `np-blue`
+scale was remapped onto the royal family, superseding the "#234598 is preserved brand
+equity" note, and `np-sky` moved from slate `#4a76a4` to `#2f6be8`:
+
+| Token | Was | Now | White on it |
+|---|---|---|---|
+| `np-blue-900` | `#101f45` | `#142a80` | 12.56:1 |
+| `np-blue-800` | `#172d63` | `#1a36a6` | 9.90:1 |
+| `np-blue-700` | `#1b3576` | `#1d3fc2` | 8.26:1 |
+| `np-blue-600` | `#234598` | `#2450e0` | 6.37:1 |
+| `np-blue-500` | `#3d62b8` | `#3364e7` | 5.10:1 |
+| `np-blue-300` | `#8fb0ee` | `#9cbcff` | 6.61:1 on 900 |
+| `np-blue-100` | `#e3eaf8` | `#dde7fe` | tint |
+| `np-blue-50` | `#f1f5fc` | `#eef3ff` | tint |
+| `np-sky` | `#4a76a4` | `#2f6be8` | 4.78:1 |
+
+The photo-hero scrims (hardcoded `rgba(16,31,69,…)` in `Hero.tsx` and `PageHero.tsx`) now
+use the new 900, `rgba(20,42,128,…)`, at the same alphas; contrast was re-measured on every
+hero route. The "Newpoint" wordmark is royal (`np-blue-600`) and the navbar mark uses
+`/brand/newpoint-mark-royal.svg`. The client's colour logo PNG (footer, favicon) is their
+artwork and was not recoloured.
