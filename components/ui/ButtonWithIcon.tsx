@@ -121,8 +121,8 @@ const variants = {
    *           carries the component boundary for SC 1.4.11
    */
   navy: {
-    root: 'bg-np-blue-900 hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
-    disc: 'bg-white text-np-blue-900',
+    root: 'bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-royal-deep',
+    disc: 'bg-white text-np-royal-deep',
   },
 } as const;
 

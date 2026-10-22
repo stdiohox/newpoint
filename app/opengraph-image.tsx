@@ -37,7 +37,11 @@ export default async function OpengraphImage() {
         width: '100%',
         height: '100%',
         display: 'flex',
-        backgroundColor: '#131c2e',
+        /* Royal, the vivid family in app/globals.css (client, 2026-10-22).
+           Hex rather than var(): Satori has no access to the stylesheet. White
+           measures 8.26:1 on the deep end and 6.37:1 on the light end. */
+        backgroundColor: '#1d3fc2',
+        backgroundImage: 'linear-gradient(160deg, #1d3fc2 0%, #2450e0 100%)',
         fontFamily: 'sans-serif',
       }}
     >
@@ -57,7 +61,7 @@ export default async function OpengraphImage() {
               width: 18,
               height: 18,
               borderRadius: 999,
-              backgroundColor: '#3d62b8',
+              backgroundColor: '#5ec7f7',
               marginRight: 14,
             }}
           />
@@ -96,10 +100,10 @@ export default async function OpengraphImage() {
         <div
           style={{
             display: 'flex',
-            borderTop: '1px solid rgba(255,255,255,0.16)',
+            borderTop: '1px solid rgba(255,255,255,0.24)',
             paddingTop: 22,
             fontSize: 22,
-            color: 'rgba(255,255,255,0.65)',
+            color: 'rgba(255,255,255,0.85)',
           }}
         >
           newpointnp.com

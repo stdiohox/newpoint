@@ -276,3 +276,21 @@ Consequences for the build, all provisional:
 1. **Type pairing** is a recommendation. If the client has a brand guide, per the redesign protocol it wins over this proposal.
 2. **The logo is not redesigned.** The existing mark (blue medical cross with a white human figure, plus the "Your Health is our Priority" tagline) carries forward unchanged until the client explicitly asks otherwise. The original vector file is still an open request.
 3. ~~**`--np-amber-500` is the one accent.**~~ **Resolved 2026-09-25: amber is retired and `--np-blue-600` is the one accent.** The rule it carried still stands — if the client's brand guide names a different secondary, replace it globally rather than adding a second accent.
+
+## Vivid royal family (client request, 2026-10-22)
+
+The client found the navy surfaces dull and pointed to Apple's Mail icon: a vertical
+gradient from royal blue into bright cyan. Sampled from that icon and held to contrast.
+A new family, not a recolour of `np-blue` (`#234598` stays the brand blue).
+
+| Token | Hex | White on it | Use |
+|---|---|---|---|
+| `--color-np-royal-bright` | `#3364e7` | 5.10:1 | top of button gradients |
+| `--color-np-royal` | `#2450e0` | 6.37:1 | the working royal |
+| `--color-np-royal-deep` | `#1d3fc2` | 8.26:1 | panel grounds, hover, text scrims |
+| `--color-np-cyan` | `#5ec7f7` | 1.91:1 | decorative only: gradient ends, glows; never behind type |
+
+Utilities: `bg-np-vivid` (royal-bright to royal, primary buttons) and `bg-np-vivid-deep`
+(hover). Applied to the providers panel, the closing CTA band, primary/navy buttons, the
+navbar CTA, the crisis panel's filled action and the link-preview card. Photo heroes keep
+their navy scrims, which were measured for contrast against those photographs.

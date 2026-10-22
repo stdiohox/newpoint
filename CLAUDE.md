@@ -669,3 +669,13 @@ The homepage ends (after the contact section, before the footer) with
        because it is lossless at the supplied pixels. On slow mobile data that
        costs ~2 s of load time. A smaller lossless copy for that page only would
        be ~4x lighter; ask whether that is acceptable. -->
+
+### Vivid royal colour — CLIENT REQUEST, 2026-10-22
+
+The client said the navy looked dull and asked for the colour style of Apple's Mail icon
+(a royal-to-cyan gradient). Tokens and rationale: `design-research/design-tokens.md`,
+"Vivid royal family". **`#234598` is untouched** and stays the brand blue for links and type.
+Cyan never sits behind text (1.91:1 with white). Every surface was re-measured; the numbers
+are in the comments beside each one (`PageCta.tsx`, `Providers.tsx`). The homepage and
+interior photo heroes still use navy scrims on purpose: their contrast was measured
+against those photographs, and recolouring them is a separate decision.

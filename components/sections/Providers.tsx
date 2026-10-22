@@ -134,9 +134,9 @@ function assertSourced(slug: string, bio: string[]): string {
  */
 const CARD_SCRIM =
   'linear-gradient(to top,' +
-  ' var(--color-np-blue-700) 0%,' +
-  ' var(--color-np-blue-700) 18%,' +
-  ' color-mix(in srgb, var(--color-np-blue-700) 70%, transparent) 24%,' +
+  ' var(--color-np-royal-deep) 0%,' +
+  ' var(--color-np-royal-deep) 18%,' +
+  ' color-mix(in srgb, var(--color-np-royal-deep) 70%, transparent) 24%,' +
   ' transparent 30%)';
 
 /**
@@ -181,16 +181,24 @@ const TEXT_FADE_PX = 32;
  */
 const TEXT_SCRIM =
   'linear-gradient(to top,' +
-  ' var(--color-np-blue-700) 0%,' +
-  ` var(--color-np-blue-700) calc(100% - ${TEXT_FADE_PX}px),` +
+  ' var(--color-np-royal-deep) 0%,' +
+  ` var(--color-np-royal-deep) calc(100% - ${TEXT_FADE_PX}px),` +
   ' transparent 100%)';
 
-/** Soft diagonal, dark top-left to --color-np-sky bottom-right. All tokens. */
+/**
+ * Royal into cyan, the Mail-icon gradient (client request, 2026-10-22; it was
+ * navy into a grey slate and read as dull). 160deg rather than straight down so
+ * the heading and intro at the top sit on royal-deep (8.26:1 for white) and the
+ * cyan only reaches the bottom-right corner, below the cards, where no type is.
+ * Every card carries its own royal-deep scrim behind its text, so the
+ * lighter end of the panel never sits behind a glyph.
+ */
 const PANEL_GRADIENT =
-  'linear-gradient(135deg,' +
-  ' var(--color-np-blue-900) 0%,' +
-  ' var(--color-np-blue-700) 52%,' +
-  ' var(--color-np-sky) 100%)';
+  'linear-gradient(160deg,' +
+  ' var(--color-np-royal-deep) 0%,' +
+  ' var(--color-np-royal) 45%,' +
+  ' var(--color-np-royal-bright) 72%,' +
+  ' var(--color-np-cyan) 100%)';
 
 export function Providers() {
   /*
@@ -314,7 +322,7 @@ export function Providers() {
                       screen reader while being invisible on screen. */}
                   <article
                     id={`provider-${p.slug}`}
-                    className="group bg-np-blue-900 relative grid w-full grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white"
+                    className="group bg-np-royal-deep relative grid w-full grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white"
                   >
                     {/* Decorative: the link already carries the name and role,
                         and a described portrait here would be concatenated into

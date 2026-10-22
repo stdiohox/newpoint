@@ -33,6 +33,22 @@
   --color-np-blue-100: #e3eaf8;
   --color-np-blue-50: #f1f5fc;
 
+  /* VIVID ROYAL, CLIENT REQUEST 2026-10-22: the navy surfaces "look dull", and
+     the reference was Apple's Mail icon, a vertical gradient from royal blue
+     into bright cyan. Sampled from that icon, then held to contrast:
+       royal-bright  #3364e7  white 5.10:1  top of buttons
+       royal         #2450e0  white 6.37:1  the working royal
+       royal-deep    #1d3fc2  white 8.26:1  panel grounds, hover, text scrims
+       cyan          #5ec7f7  white 1.91:1  DECORATIVE ONLY: gradient ends and
+                                            glows, never behind type
+     A NEW FAMILY, NOT A RECOLOUR OF np-blue. #234598 above stays the brand
+     blue (links, logo-adjacent type), per its own note. These carry the big
+     colour moments: the providers panel, the closing band, primary buttons. */
+  --color-np-royal-bright: #3364e7;
+  --color-np-royal: #2450e0;
+  --color-np-royal-deep: #1d3fc2;
+  --color-np-cyan: #5ec7f7;
+
   /* Ink and warm neutrals */
   --color-np-ink: #131c2e;
   --color-np-neutral-900: #2a2822;
@@ -144,6 +160,28 @@
      The two tokens live in their own `@theme static` block below so they are
      always emitted: FeaturedServices.module.css reads them and Tailwind does
      not scan CSS modules. */
+}
+
+/* VIVID ROYAL FILL for primary actions (client request, 2026-10-22). A short
+   vertical gradient, lighter at the top, the way the Mail icon is lit. Both
+   ends hold white labels above 4.5:1 (5.10 and 6.37); the hover state shifts
+   one step deeper (6.37 and 8.26). Gradients do not transition, so hover is an
+   instant swap, matching the old colour change at 180ms closely enough. */
+@utility bg-np-vivid {
+  background-color: var(--color-np-royal);
+  background-image: linear-gradient(
+    180deg,
+    var(--color-np-royal-bright) 0%,
+    var(--color-np-royal) 100%
+  );
+}
+@utility bg-np-vivid-deep {
+  background-color: var(--color-np-royal-deep);
+  background-image: linear-gradient(
+    180deg,
+    var(--color-np-royal) 0%,
+    var(--color-np-royal-deep) 100%
+  );
 }
 
 @theme static {
@@ -365,7 +403,6 @@
     scroll-behavior: auto !important;
   }
 }
-
 
 /* ---------------------------------------------------------------------------
    Hero glass material. Verbatim from the hero spec. This is a web glassmorphism

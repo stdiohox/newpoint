@@ -132,6 +132,6 @@ const actionBase =
   'transition-colors duration-[180ms] ease-np-out active:scale-[0.98] motion-reduce:transition-none ' +
   'focus-visible:outline-np-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2';
 
-const actionFilled = 'bg-np-blue-900 text-white hover:bg-np-blue-700';
+const actionFilled = 'bg-np-vivid text-white hover:bg-np-vivid-deep';
 const actionOutlined =
   'text-np-blue-900 hover:bg-np-blue-50 ring-np-blue-900 bg-transparent ring-1';

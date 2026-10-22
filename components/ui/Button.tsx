@@ -41,7 +41,7 @@ const arrowSizes = {
 };
 
 const variants = {
-  primary: 'bg-np-blue-600 text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
+  primary: 'bg-np-vivid text-white hover:bg-np-vivid-deep focus-visible:outline-np-royal-deep',
   /**
    * The filled action on a dark ground.
    *
@@ -92,7 +92,7 @@ const variants = {
    * homepage insurance cards, which were `sky` and read as a different colour
    * from every other CTA.
    */
-  navy: 'bg-np-blue-900 text-white hover:bg-np-blue-700 focus-visible:outline-np-blue-900',
+  navy: 'bg-np-vivid text-white hover:bg-np-vivid-deep focus-visible:outline-np-royal-deep',
   /**
    * The secondary action on a dark ground, where `quiet` cannot go: its
    * np-blue-600 label and ring are built for light grounds and both vanish.

@@ -122,7 +122,7 @@ export function PageCta({
             use. Deliberate: this panel is several times their area, and a 14px
             radius on something 1136px wide reads as a square with the corners
             filed off rather than as a rounded object. */}
-        <div className="rounded-3xl relative overflow-hidden border border-transparent bg-np-blue-900 px-6 py-16 md:px-12 md:py-20">
+        <div className="bg-np-royal-deep relative overflow-hidden rounded-3xl border border-transparent px-6 py-16 md:px-12 md:py-20">
           {/* THE PHOTOGRAPH, FULL-BLEED INSIDE THE PANEL. A dusk meadow, and
               it is decorative: alt="" because the heading and body say
               everything this block means, and a description of a field read
@@ -175,7 +175,7 @@ export function PageCta({
               the curve rather than hand-editing, as the note above says. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(27,53,118,0.45)_0%,rgba(26,52,115,0.45)_14.3%,rgba(25,49,108,0.45)_28.6%,rgba(23,44,99,0.45)_42.9%,rgba(20,40,88,0.45)_57.1%,rgba(18,35,79,0.45)_71.4%,rgba(17,32,72,0.45)_85.7%,rgba(16,31,69,0.45)_100%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(36,80,224,0.5)_0%,rgba(29,63,194,0.5)_100%)]"
           />
 
           {/* LAYER TWO: THE COPY RADIAL, and it is the layer that carries the
@@ -217,10 +217,32 @@ export function PageCta({
               corners, where the old single layer was 0.86 everywhere.
 
               DO NOT HAND-EDIT THE STOPS. They are 3t^2-2t^3 sampled at eight
-              points; regenerate from the curve. */}
+              points; regenerate from the curve.
+
+              RECOLOURED 2026-10-22, AND THE TABLE ABOVE IS NOW HISTORY. The
+              client asked for the Mail-icon royal instead of navy, so the
+              panel, the veil and this scrim are royal-deep (#1d3fc2) and a
+              cyan glow sits in the bottom-right corner from md up. Royal is
+              lighter than navy, so the scrim was strengthened to hold the
+              floors: core 0.86, flat to 62%, ellipse 92% x 104%, and the meta
+              row went from white/80 to white/95. Re-measured, worst backdrop
+              pixel per text box, 1440 / 390:
+                heading 7.63 / 7.84   body 5.75 / 6.51   meta 6.44 / 6.92+
+              and the appointment label at glyph-core pixels, rest / hover:
+                1440 5.76 / 5.48      390 5.83 / 5.54
+              The glow is hidden below md because at 390 the meta row runs the
+              panel's full width and the corner is under it. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_86%_96%_at_50%_52%,rgba(16,31,69,0.68)_0%,rgba(16,31,69,0.68)_50%,rgba(16,31,69,0.651)_56.2%,rgba(16,31,69,0.574)_62.5%,rgba(16,31,69,0.465)_68.8%,rgba(16,31,69,0.34)_75.0%,rgba(16,31,69,0.215)_81.2%,rgba(16,31,69,0.106)_87.5%,rgba(16,31,69,0.029)_93.8%,rgba(16,31,69,0.0)_100.0%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(29,63,194,0.86)_0%,rgba(29,63,194,0.86)_62.0%,rgba(29,63,194,0.796)_68.3%,rgba(29,63,194,0.637)_74.7%,rgba(29,63,194,0.430)_81.0%,rgba(29,63,194,0.223)_87.3%,rgba(29,63,194,0.064)_93.7%,rgba(29,63,194,0.000)_100.0%)]"
+          />
+          {/* THE CYAN END OF THE MAIL-ICON GRADIENT, client request 2026-10-22.
+              A glow in the bottom-right corner only, outside the text scrim's
+              ellipse, so it brightens the panel without sitting behind type.
+              Cyan measures 1.91:1 against white; it must never reach a glyph. */}
+          <div
+            aria-hidden="true"
+            className="cta-overlay pointer-events-none absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_100%_100%,rgba(94,199,247,0.6)_0%,rgba(94,199,247,0.22)_18%,rgba(94,199,247,0)_32%)]"
           />
 
           <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -233,10 +255,7 @@ export function PageCta({
                   aria-hidden="true"
                   className="rounded-card absolute inset-0 bg-white/10 ring-1 ring-white/25"
                 />
-                <div
-                  aria-hidden="true"
-                  className="bg-np-blue-600 absolute inset-1 rounded-[10px]"
-                />
+                <div aria-hidden="true" className="bg-np-vivid absolute inset-1 rounded-[10px]" />
                 <CalendarCheck
                   aria-hidden="true"
                   size={30}
@@ -275,7 +294,7 @@ export function PageCta({
               border width with a transparent colour, so forced-colors repaints
               an edge rather than dissolving the chip into the panel. */}
             <Reveal delay={0.06}>
-              <Badge className="rounded-2xl bg-np-surface text-np-blue-700 mt-6 border-transparent py-1">
+              <Badge className="bg-np-surface text-np-blue-700 mt-6 rounded-2xl border-transparent py-1">
                 {DELIVERY_SHORT}
               </Badge>
             </Reveal>
@@ -372,7 +391,7 @@ export function PageCta({
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
               >
                 {assurances.map(({ icon: Icon, label }) => (
-                  <li key={label} className="text-small flex items-center gap-2 text-white/80">
+                  <li key={label} className="text-small flex items-center gap-2 text-white/95">
                     <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
                     {label}
                   </li>
