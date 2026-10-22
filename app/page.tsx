@@ -6,6 +6,7 @@ import { WhatToExpect } from '@/components/sections/WhatToExpect';
 import { FeaturedServices } from '@/components/sections/FeaturedServices';
 import { Faq } from '@/components/sections/Faq';
 import { ContactCrisis } from '@/components/sections/ContactCrisis';
+import { ClosingPortrait } from '@/components/sections/ClosingPortrait';
 import { JsonLd } from '@/components/JsonLd';
 import { medicalClinicSchema, providersSchema, serviceSchemaFor } from '@/lib/schema';
 import { SERVICE_PAGES } from '@/lib/content';
@@ -73,6 +74,7 @@ export default function Home() {
         <InsuranceProof />
         <Faq />
         <ContactCrisis />
+        <ClosingPortrait />
       </main>
       <Footer />
     </>

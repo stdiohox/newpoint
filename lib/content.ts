@@ -2611,6 +2611,31 @@ export function cardPosterFor(href: string): string | undefined {
   return FEATURED_SERVICES.find((service) => service.href === href)?.poster;
 }
 
+/**
+ * The homepage sign-off: both providers together, with the client's tag.
+ * CLIENT REQUEST, 2026-10-22: "at the end of the home page their picture and
+ * with the tag health is wealth". Rendered by <ClosingPortrait />.
+ *
+ * THE PHOTO IS AT THE EXACT PIXELS SUPPLIED, lossless, on the same rule the
+ * client set for the provider portraits (2026-10-19): no next/image, no lossy
+ * re-encode. It is lazy and last on the page, so its ~1 MB does not touch the
+ * first paint.
+ *
+ * LEFT IS WHITAKER, RIGHT IS OFOEGBU: the left figure wears the same black
+ * blazer and polka-dot blouse as Whitaker's studio portrait. The alt carries no
+ * "Dr." (CLAUDE.md: never in alt text); the visible caption does, beside the
+ * credentials, which is the condition on the prefix.
+ */
+export const CLOSING_PORTRAIT = {
+  tag: 'Health is wealth.',
+  image: {
+    src: '/images/providers/providers-together.webp',
+    width: 1123,
+    height: 1231,
+    alt: 'Funmilayo Whitaker and Anastasia O. Ofoegbu standing back to back with their arms folded, smiling, against a blue studio backdrop.',
+  },
+} as const;
+
 export const FAQ = {
   /**
    * The section's eyebrow. A label for the block, not a claim.
@@ -3220,6 +3245,7 @@ function assertTitlesQualified() {
     ['CARE_GUIDE', CARE_GUIDE],
     ['FEATURED_SERVICES', FEATURED_SERVICES],
     ['FAQ', FAQ],
+    ['CLOSING_PORTRAIT', CLOSING_PORTRAIT],
     ['CONTACT', CONTACT],
     ['CRISIS', CRISIS],
     ['INSURANCE_PAGE', INSURANCE_PAGE],

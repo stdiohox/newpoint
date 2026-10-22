@@ -645,3 +645,17 @@ head of its `SERVICE_PAGES` entry governs edits. In short:
 ## Working rule
 
 **End every task by committing and pushing with a clear message.**
+
+### Closing portrait, "Health is wealth" — CLIENT REQUEST, 2026-10-22
+
+The homepage ends (after the contact section, before the footer) with
+`<ClosingPortrait />`: both providers in one photograph under the client's tag,
+"Health is wealth." Content is `CLOSING_PORTRAIT` in `lib/content.ts`.
+
+- **The photo is served at the exact pixels supplied, lossless**
+  (`public/images/providers/providers-together.webp`, 1123x1231), the same rule
+  as the provider portraits. Plain `<img>`, lazy, no next/image.
+- **Whitaker is on the left, Ofoegbu on the right** (matched to Whitaker's studio
+  portrait). The alt names them without "Dr."; the visible names carry "Dr." with
+  the credentials directly beneath, which is the condition on the prefix.
+- The client asked for the picture and the tag only. Nothing else was added.
