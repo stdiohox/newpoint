@@ -184,27 +184,30 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
      ServiceCards checks each file on disk and draws a neutral 16:9 block until
      it lands, so nothing breaks in the meantime.
 
-     THE ALTS ARE EMPTY UNTIL THE FRAMES ARRIVE, and must be written from the
-     delivered photographs, not from the brief. Same rules as above: describe
+     DELIVERED 2026-10-22 AND THE ALTS ARE WRITTEN FROM THE FRAMES, not from
+     the brief in design-research/image-prompts-substance-use.md.
+     addiction-call.webp IS CROPPED: the delivered frame had a dark green bottle
+     on the counter at the left edge that reads as wine, which this page must
+     not show. The left 380px were cut, so it is about 1.79:1, not exactly 16:9. Same rules as above: describe
      what is visible, name no role ("a person", never "a clinician"), and name
      no substance, no medication and no paraphernalia, none of which should be
      in frame anyway. */
   const addictionMedia = {
     'what-substance-use-and-addiction-care-involves': {
       src: '/images/services/addiction-consult.webp',
-      alt: '',
+      alt: 'A woman in a rust-colored cardigan sitting at a wooden table, talking and gesturing with an open hand, while a woman opposite her, seen from behind, writes in an open notebook. A glass of water stands on the table between them.',
     },
     'substance-use-and-mental-health-treated-together': {
       src: '/images/services/addiction-together.webp',
-      alt: '',
+      alt: 'A grey-haired man in a knit cardigan sitting in a sage-green armchair beside a window, a closed book on his lap, looking out with a calm expression. A lamp and a trailing plant stand on the side table next to him.',
     },
     'before-you-cut-down-or-stop': {
       src: '/images/services/addiction-call.webp',
-      alt: '',
+      alt: 'A woman in a grey-blue sweater sitting at a wooden kitchen table, talking on a phone held to her ear, her other hand resting on the table beside a ceramic mug.',
     },
     'your-treatment-plan': {
       src: '/images/services/addiction-plan.webp',
-      alt: '',
+      alt: 'A young man in an olive shirt at a wooden table looking down at a printed page, while a woman beside him, seen from behind, points to a line on it.',
     },
   } as const;
 

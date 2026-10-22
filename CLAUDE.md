@@ -620,10 +620,11 @@ head of its `SERVICE_PAGES` entry governs edits. In short:
   providing SUD treatment; that is a counsel question, tracked in
   `OPEN_CLIENT_ITEMS`.
 - **No providers section on the page** (furniture rule above).
-- **Photography is commissioned, not delivered.** The prompts are in
-  `design-research/image-prompts-substance-use.md`. Card paths are reserved and
-  show neutral blocks until the files land; set `heroImage` (and write the alts
-  from the delivered frames) when they arrive.
+- **Photography delivered 2026-10-22** from the prompts in
+  `design-research/image-prompts-substance-use.md`. No alcohol, medication or
+  paraphernalia may appear in any frame. `addiction-call.webp` was cropped to
+  remove a bottle that read as wine. In every Newpoint photo, the person across
+  from the patient is a woman (both providers are women).
 
 ### Dr. Whitaker's role and education — CLIENT INSTRUCTION, 2026-10-22
 

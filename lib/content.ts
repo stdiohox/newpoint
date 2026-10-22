@@ -2176,14 +2176,30 @@ export const SERVICE_PAGES: ServicePage[] = [
      * after the fourth section as its own block below the grid, so it sits
      * directly above the FAQ. Keep it fifth and keep it in this array.
      *
-     * PHOTOGRAPHS: five are commissioned (hero plus one per card). The card
-     * paths are reserved in app/services/[slug]/page.tsx and draw a neutral
-     * 16:9 block until the files land. `heroImage` is NOT set yet: PageHero
-     * does not check the disk, so a path with no file behind it would render
-     * a broken image. Set it when addiction-hero-2400.webp is delivered.
+     * PHOTOGRAPHS: five, delivered 2026-10-22 from the prompts in
+     * design-research/image-prompts-substance-use.md (hero below, cards in
+     * app/services/[slug]/page.tsx).
      */
     slug: 'substance-use-and-addiction',
     nav: 'Substance use and addiction',
+    /**
+     * The hero master, delivered 2026-10-22: 2752x1536, served at 2400x1340
+     * like the sibling heroes. He sits in the right third (face at about
+     * x 68-78%, y 18-35%), the woman opposite is at the far left with her back
+     * to the camera, and the middle is plain wall for the centred copy.
+     *
+     * y 10%: the header is wider than 1.79:1 at desktop, so cover crops
+     * vertically, and a low value keeps his head clear of the navbar pill.
+     * x 70%: below lg the box is narrower than the frame and crops
+     * horizontally, and 70% keeps him in the window, as on /services.
+     */
+    heroImage: {
+      src: '/images/services/addiction-hero-2400.webp',
+      /* Describes the photograph and stops there: no claim that either person
+         is a patient, a provider or anyone at this practice. */
+      alt: 'A man in an olive sweater sitting forward in a sage-green armchair, listening to a woman seated opposite him with her back to the camera. A notebook and pen rest on a small wooden table between them.',
+      objectPosition: '70% 10%',
+    },
     hideHeroCta: true,
     layout: 'cards',
     /* MedicalTherapy: ongoing treatment, as with medication and weight
@@ -3081,7 +3097,7 @@ export const OPEN_CLIENT_ITEMS = [
   'PRE-LAUNCH — CERTIFYING BODY for the "board-certified" claim. The post-nominals imply one (PMHNP-BC and FNP-BC both expand to Board Certified) but no body is named anywhere in the source material and none is assumed here, which is why `hasCredential` stays out of the JSON-LD. RAISED TO PRE-LAUNCH ON 2026-10-02, when the client changed every "dual-certified" to "dual board-certified": the claim now ships in both providers\' bios, in the FAQ answer, on the homepage, and inside `description` on both Person nodes. The repo escalates an open item when the claim it guards starts shipping — the nine payers and the ADHD prescribing line were both raised on that trigger. Ask the practice to name the body (ANCC is the expected answer for both certifications, and expected is not confirmed)',
   'Hours of operation, including what the "expanded schedule" for telehealth actually covers. Still nothing: the directories repeat "weekends, evenings and holidays by request" verbatim and name no actual hours',
   'PRE-LAUNCH — AGES SERVED. Confirmed age range (adults only, or across the lifespan as a practice policy). Headway lists CHILDREN AND ADOLESCENTS for Dr. Whitaker, which is the strongest paediatric signal in any Newpoint source and the reason this cannot wait: the site now names ADHD under "Conditions we prescribe for", and a parent reading that has nothing on the page telling them whether their child can be seen. STILL OPEN, AND THE EVIDENCE CONFLICTS: Grow Therapy says Whitaker serves adults 18-64 and elders 65+ with NO children, while Headway says she serves adults, adolescents AND children. Same clinician, two platforms, opposite answers. Paediatric psychiatric prescribing is not a claim to resolve from a directory field. RAISED TO PRE-LAUNCH ON 2026-10-01, when ADHD was added to "Conditions we prescribe for": it is the highest-paediatric-volume condition on that list, so a parent can now read a prescribing claim on a page that says nothing about age, and the one FAQ answer that addressed it was removed for being an extrapolation. See the ADHD prescribing-scope item below',
-  'SUBSTANCE USE AND ADDICTION MANAGEMENT — what the new page could not say. The service line itself is CONFIRMED (client, 2026-10-22) and /services/substance-use-and-addiction is built; these are the questions it was written around. (1) MEDICATION FOR ADDICTION: does the practice prescribe for substance use disorders themselves (buprenorphine for opioid use disorder, naltrexone, acamprosate and similar), and if so, under whose DEA registration and by telehealth or in person only? Buprenorphine is Schedule III, so the DEA telemedicine rules apply. The page names no medication and claims only medication management for the co-occurring mental health conditions until this is answered. (2) LEVEL OF CARE: confirm the practice offers no detox or withdrawal management, intensive outpatient program or residential care. The page says it helps people find more support when they need it. (3) 42 CFR PART 2: if the practice is a federally assisted program holding itself out as providing SUD treatment, Part 2 confidentiality applies to its records, and advertising this service may be what triggers it. Get the practice\'s view. (4) BOTH PROVIDERS? The page names both, which their own directory profiles support, but the practice has not said so per provider. (5) AGES SERVED, as for every service. (6) A hero photograph for the page and the /services row, which shows a neutral block until one arrives. It must not depict use, paraphernalia, or a before-and-after',
+  'SUBSTANCE USE AND ADDICTION MANAGEMENT — what the new page could not say. The service line itself is CONFIRMED (client, 2026-10-22) and /services/substance-use-and-addiction is built; these are the questions it was written around. (1) MEDICATION FOR ADDICTION: does the practice prescribe for substance use disorders themselves (buprenorphine for opioid use disorder, naltrexone, acamprosate and similar), and if so, under whose DEA registration and by telehealth or in person only? Buprenorphine is Schedule III, so the DEA telemedicine rules apply. The page names no medication and claims only medication management for the co-occurring mental health conditions until this is answered. (2) LEVEL OF CARE: confirm the practice offers no detox or withdrawal management, intensive outpatient program or residential care. The page says it helps people find more support when they need it. (3) 42 CFR PART 2: if the practice is a federally assisted program holding itself out as providing SUD treatment, Part 2 confidentiality applies to its records, and advertising this service may be what triggers it. Get the practice\'s view. (4) BOTH PROVIDERS? The page names both, which their own directory profiles support, but the practice has not said so per provider. (5) AGES SERVED, as for every service.',
   'Named therapy modalities offered (CBT, DBT, EMDR, and similar), if any. UPDATED 2026-10-19: the practice\'s brochure now lists "Psychotherapy & Counseling" as a service in its own right, and the homepage says the practice offers psychotherapy and supportive counseling. The brochure does NOT say who delivers it (the only delivery evidence is Whitaker\'s Headway profile; Ofoegbu is listed for medication management only) or which modalities, so no provider may be bound to it and none is named on /services. RAISED IN PRIORITY: the owners confirmed on 2026-09-29 that medication management is delivered combined with psychotherapy, and /services now names that as a way visits run — so the site asserts psychotherapy happens while still being unable to say what kind, who delivers it, or whether it is a visit of its own. It is also the obvious fourth service page. FOUR CANDIDATES NOW EXIST AND THEY DISAGREE: Grow says Compassion Focused for Whitaker; Headway says Motivational Interviewing, Behavior Modification and Cognitive Behavioral Family Therapy for her. Headway does corroborate the owners on delivery — it lists "individual therapy" and "family therapy" as care types — but ONLY for Whitaker. Ofoegbu\'s care type there is medication management alone, which is directly relevant to the CLIENT question in app/services/page.tsx about binding providers to services',
   /* The ADHD item was REMOVED on 2026-10-01, closed rather than dropped. It
      asked whether ADHD is treated at all; both providers publish it, it has
