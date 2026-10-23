@@ -318,3 +318,11 @@ use the new 900, `rgba(20,42,128,…)`, at the same alphas; contrast was re-meas
 hero route. The "Newpoint" wordmark is royal (`np-blue-600`) and the navbar mark uses
 `/brand/newpoint-mark-royal.svg`. The client's colour logo PNG (footer, favicon) is their
 artwork and was not recoloured.
+
+### Colour logo recoloured (client instruction, same day)
+
+`public/brand/newpoint-mark-color.png` (footer, holding page) and `app/icon.png` (favicon)
+were recoloured onto the royal family at the client's request: every blue pixel's hue
+shifted +4° and capped at 226° (royal, no drift toward violet), saturation x1.09, value
+x1.46. The white figure is untouched and the vertical bar keeps its gradient, now bright
+sky into royal. Same 124x123 pixels as the original.
