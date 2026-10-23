@@ -806,7 +806,13 @@ export const PROVIDERS: Provider[] = [
     name: 'Anastasia O. Ofoegbu',
     displayName: 'Dr. Anastasia O. Ofoegbu',
     credentials: 'DNP, FNP-BC, PMHNP-BC',
-    role: 'Psychiatric-Mental Health Nurse Practitioner',
+    /* MATCHED TO WHITAKER'S, 2026-10-23, so neither card reads as the more
+       qualified provider. Sourced from her own record, not invented: she holds
+       FNP-BC (family) as well as PMHNP-BC, and her bio says her last 11 years
+       were "in Mental Health and Addiction". Visible role only; schema
+       `jobTitle` stays PROVIDER_JOB_TITLE. CLIENT: confirm she is happy with
+       the same wording as Dr. Whitaker. */
+    role: 'Psychiatric-Mental Health, Family and Addiction Nurse Practitioner',
     image: {
       webp560: '/images/providers/anastasia-ofoegbu-560.webp',
       webp1120: '/images/providers/anastasia-ofoegbu-1120.webp',

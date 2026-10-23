@@ -37,16 +37,19 @@ import { PROVIDERS } from '@/lib/content';
  * have quietly committed the practice to treating children on the busiest page
  * of the site. assertSourced() below turns any such drift into a build failure.
  *
- * Funmilayo's is her first sentence. Anastasia's is her second, not her first:
- * her first is near word-for-word identical to Funmilayo's, and the two cards
- * sit side by side under a role line that already says Psychiatric-Mental
- * Health Nurse Practitioner.
+ * BOTH CARDS NOW CARRY CREDENTIALS AND YEARS, since 2026-10-23. Anastasia's
+ * used to be her second sentence only ("I have been a nurse for 14 years…"),
+ * chosen because her first reads close to Funmilayo's. Side by side, that left
+ * one card stating dual board certification and the other not, which read as
+ * one provider being more qualified than the other; the client flagged it.
+ * Both hold DNP, FNP-BC, PMHNP-BC, so the cards now say so in each provider's
+ * own words: Funmilayo's first sentence, and Anastasia's first two.
  */
 const CARD_SENTENCE: Record<string, string> = {
   'funmilayo-whitaker':
     'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 15 years of direct patient care experience.',
   'anastasia-ofoegbu':
-    'I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction.',
+    'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction.',
 };
 
 /**
