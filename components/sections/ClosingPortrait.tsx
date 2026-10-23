@@ -62,7 +62,7 @@ export function ClosingPortrait() {
                       href={`/providers/${p.slug}`}
                       className="group block focus-visible:outline-offset-4"
                     >
-                      <span className="text-h3 text-np-ink group-hover:text-np-blue-600 group-focus-visible:text-np-blue-600 ease-np-out inline-flex items-center gap-2 transition-colors duration-[180ms]">
+                      <span className="text-h3 text-np-blue-600 group-hover:text-np-blue-800 group-focus-visible:text-np-blue-800 ease-np-out inline-flex items-center gap-2 transition-colors duration-[180ms]">
                         {p.displayName}
                         <span
                           aria-hidden="true"

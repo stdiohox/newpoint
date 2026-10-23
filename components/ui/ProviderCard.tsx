@@ -152,7 +152,7 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
 
           {/* THE HEADING IS NO LONGER THE LINK — the button at the foot of the
               card is. One link and one tab stop per card either way. */}
-          <h2 className="text-h3 text-np-ink mt-5">{provider.displayName}</h2>
+          <h2 className="text-h3 text-np-blue-600 mt-5">{provider.displayName}</h2>
 
           {/* The credentials pill. A span, not a Badge import — the treatment is
               this repo's existing chip token. */}

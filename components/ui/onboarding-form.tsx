@@ -314,7 +314,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
             {/* The only centred block. Everything below it is a form, and centred
               labels above left-aligned fields read as a ransom note. */}
             <motion.div {...item} className="space-y-2 text-center">
-              <h2 className="text-np-ink text-2xl font-bold">{title}</h2>
+              <h2 className="text-np-blue-600 text-2xl font-bold">{title}</h2>
               {/* The invitation goes once the form is sent. Leaving it up put
                 "Send us your contact details" directly above "Thank you",
                 which reads as though the submission had not registered. The

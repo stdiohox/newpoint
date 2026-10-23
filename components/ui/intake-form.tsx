@@ -284,7 +284,7 @@ export function IntakeForm({
       />
       <div className="space-y-6 p-8">
         <div className="space-y-2 text-center">
-          <h2 className="text-np-ink text-2xl font-bold">{title}</h2>
+          <h2 className="text-np-blue-600 text-2xl font-bold">{title}</h2>
           {stage === 'form' && <p className="text-np-neutral-600">{description}</p>}
         </div>
 

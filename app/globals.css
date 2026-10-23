@@ -265,7 +265,10 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    color: var(--color-np-ink);
+    /* Royal, not ink, by client instruction 2026-10-22 ("royal dominant
+       everywhere"). 6.37:1 on white, 5.73:1 on np-blue-50. Headings on dark
+       or photographic grounds set text-white explicitly, which wins. */
+    color: var(--color-np-blue-600);
     text-wrap: balance;
   }
 

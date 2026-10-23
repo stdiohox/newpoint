@@ -272,7 +272,7 @@ export default function ContactPage() {
                   strokeWidth={1.75}
                   className="text-np-blue-600"
                 />
-                <h3 className="text-h3 text-np-ink mt-4">Call us</h3>
+                <h3 className="text-h3 text-np-blue-600 mt-4">Call us</h3>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
                   {CONTACT_PAGE.phoneNote}
                 </p>
@@ -316,7 +316,7 @@ export default function ContactPage() {
                   strokeWidth={1.75}
                   className="text-np-blue-600"
                 />
-                <h3 className="text-h3 text-np-ink mt-4">Email a provider</h3>
+                <h3 className="text-h3 text-np-blue-600 mt-4">Email a provider</h3>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
                   {CONTACT_PAGE.emailNote}
                 </p>
@@ -354,7 +354,7 @@ export default function ContactPage() {
                   strokeWidth={1.75}
                   className="text-np-blue-600"
                 />
-                <h3 className="text-h3 text-np-ink mt-4">Where we see patients</h3>
+                <h3 className="text-h3 text-np-blue-600 mt-4">Where we see patients</h3>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
                   {CONTACT_PAGE.areaNote}
                 </p>

@@ -175,7 +175,7 @@ export function PageCta({
               the curve rather than hand-editing, as the note above says. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(36,80,224,0.5)_0%,rgba(29,63,194,0.5)_100%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(36,80,224,0.2)_0%,rgba(29,63,194,0.2)_100%)]"
           />
 
           {/* LAYER TWO: THE COPY RADIAL, and it is the layer that carries the
@@ -223,18 +223,22 @@ export function PageCta({
               client asked for the Mail-icon royal instead of navy, so the
               panel, the veil and this scrim are royal-deep (#1d3fc2) and a
               cyan glow sits in the bottom-right corner from md up. Royal is
-              lighter than navy, so the scrim was strengthened to hold the
-              floors: core 0.86, flat to 62%, ellipse 92% x 104%, and the meta
-              row went from white/80 to white/95. Re-measured, worst backdrop
-              pixel per text box, 1440 / 390:
-                heading 7.63 / 7.84   body 5.75 / 6.51   meta 6.44 / 6.92+
+              lighter than navy; the meta row went from white/80 to white/95.
+
+              THEN MADE MORE SEE-THROUGH, same day: the client asked for the
+              box's opacity to come down so the meadow shows. Veil 0.5 -> 0.2,
+              scrim core 0.86 -> 0.72 (flat to 62%, ellipse 92% x 104%). That
+              is close to the floor and was set by measurement, so do not lower
+              either again without re-measuring. Worst backdrop pixel per text
+              box, 1440 / 390:
+                heading 6.68 / 7.36   body 4.87 / 5.63   meta 4.91 / 5.48+
               and the appointment label at glyph-core pixels, rest / hover:
-                1440 5.76 / 5.48      390 5.83 / 5.54
+                1440 4.84 / 4.66      390 4.86 / 4.68   (floor 4.5)
               The glow is hidden below md because at 390 the meta row runs the
               panel's full width and the corner is under it. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(29,63,194,0.86)_0%,rgba(29,63,194,0.86)_62.0%,rgba(29,63,194,0.796)_68.3%,rgba(29,63,194,0.637)_74.7%,rgba(29,63,194,0.430)_81.0%,rgba(29,63,194,0.223)_87.3%,rgba(29,63,194,0.064)_93.7%,rgba(29,63,194,0.000)_100.0%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(29,63,194,0.72)_0%,rgba(29,63,194,0.72)_62%,rgba(29,63,194,0.667)_68.3%,rgba(29,63,194,0.533)_74.7%,rgba(29,63,194,0.360)_81.0%,rgba(29,63,194,0.187)_87.3%,rgba(29,63,194,0.053)_93.7%,rgba(29,63,194,0.000)_100.0%)]"
           />
           {/* THE CYAN END OF THE MAIL-ICON GRADIENT, client request 2026-10-22.
               A glow in the bottom-right corner only, outside the text scrim's

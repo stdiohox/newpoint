@@ -78,7 +78,7 @@ export function ExpectCards({
                     />
                   </span>
                 )}
-                <h3 className="text-h3 text-np-ink mt-6">{item.heading}</h3>
+                <h3 className="text-h3 text-np-blue-600 mt-6">{item.heading}</h3>
                 <p className="text-body text-np-neutral-600 mt-3">{item.body}</p>
               </div>
             </Reveal>
