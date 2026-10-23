@@ -416,9 +416,34 @@ export function Providers() {
                           sentence that actually differentiates the two cards
                           still reaches a screen reader even though the link's
                           accessible name is fixed at name + role. */}
-                      <p id={bioId} className="mt-2 text-[0.9375rem] leading-[1.5] text-white/90">
-                        {assertSourced(p.slug, p.bio)}
-                      </p>
+                      {/* THE TWO CARDS' TEXT BLOCKS ARE THE SAME HEIGHT FROM lg, so
+                          the names, role lines and sentences line up side by
+                          side (client, 2026-10-23: the cards "looked
+                          unbalanced" once Anastasia's sentence ran a line
+                          longer). The block is bottom-anchored, so a longer
+                          sentence pushed that card's name higher.
+
+                          Each bio cell stacks the OTHER providers' sentences in
+                          the same grid cell, invisible, so every cell is as tall
+                          as the longest sentence at whatever width the card is.
+                          No measured heights, no JS. The copies are `invisible`
+                          (not read, not focusable) and aria-hidden. Below lg the
+                          cards stack, alignment does not apply, and the copies
+                          are display:none so they cost no height there. */}
+                      <div className="mt-2 grid text-[0.9375rem] leading-[1.5] text-white/90">
+                        <p id={bioId} className="col-start-1 row-start-1">
+                          {assertSourced(p.slug, p.bio)}
+                        </p>
+                        {PROVIDERS.filter((o) => o.slug !== p.slug).map((o) => (
+                          <p
+                            key={o.slug}
+                            aria-hidden="true"
+                            className="invisible col-start-1 row-start-1 hidden lg:block"
+                          >
+                            {assertSourced(o.slug, o.bio)}
+                          </p>
+                        ))}
+                      </div>
                     </div>
                   </article>
                 </Reveal>
