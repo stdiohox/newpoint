@@ -247,7 +247,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                         an ordinary mailbox. */}
                     <p className="text-caption text-np-neutral-600 mt-2 max-w-[46ch]">
                       Please don’t include symptoms, diagnoses, medications, or insurance ID
-                      numbers in an email. Email isn’t secure.
+                      numbers in an email. Email is not secure.
                     </p>
                   </div>
                 </Reveal>

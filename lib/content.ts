@@ -502,7 +502,7 @@ export const FOOTER = {
   },
   /** Not a disclaimer the practice invented; it is the one the old footer had. */
   legalNote:
-    'This website is for general information only. It isn’t medical advice, and it isn’t monitored around the clock.',
+    'This website is for general information only. It is not medical advice, and it is not monitored around the clock.',
 } as const;
 
 export type Provider = {
@@ -1341,7 +1341,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Reaching a diagnosis',
-        body: 'We reach a diagnosis through assessment, not assumption. We’ll tell you what we found and what it means, in plain language. If the picture isn’t clear yet, we’ll say so instead of reaching for a label that might not fit.',
+        body: 'We reach a diagnosis through assessment, not assumption. We’ll tell you what we found and what it means, in plain language. If the picture is not clear yet, we’ll say so instead of reaching for a label that might not fit.',
         /* ONE SENTENCE, AND IT IS THE ONLY ONE THIS SECTION HAD LEFT TO SAY.
            Sourced from research/content/services.md: "diagnoses of mental
            illness are made based on assessments, and then an effective plan of
@@ -1428,7 +1428,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'What happens after',
-        body: 'The plan isn’t the end of it. We keep checking your progress and offer support and education as you go. Follow-up care is usually medication management, in person or by telehealth.',
+        body: 'The plan is not the end of it. We keep checking your progress and offer support and education as you go. Follow-up care is usually medication management, in person or by telehealth.',
         /* The phrase is already in the sentence above and names a page of its
            own, so this is a link the copy was asking for rather than one added
            to it. The anchor text is the service's own name, which is what the
@@ -1604,7 +1604,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              once) would contradict. Do not reinstate it without the client. */
           /* CLIENT-REVIEW — SOURCED. research/content/home.md:28: "Together, we
              can identify what works and what isn't working". */
-          'Figuring out what’s helping and what isn’t is something we do together.',
+          'Figuring out what’s helping and what is not is something we do together.',
         ],
         /* CLIENT-REVIEW — GENERIC. Reassurance, not an outcome claim: it says
            adjustment is normal, not that treatment will succeed. */
@@ -2049,7 +2049,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         bullets: [
           /* Both are the standard caveat on these drugs' own labelling, stated
              about the drugs rather than about this practice. */
-          'Response varies from person to person, and these medications aren’t right for everyone.',
+          'Response varies from person to person, and these medications are not right for everyone.',
           'If one is prescribed, it’s part of a plan, not the whole plan.',
         ],
       },
@@ -2096,7 +2096,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            finding that the page was precise about what it would not promise
            and silent on harm — the asymmetry a nursing board notices first on
            a page that names two molecules beside an indication. */
-        body: 'Both are weekly injections, and both require a prescription. They’re different medications with different active ingredients, and they aren’t interchangeable. Which one is prescribed, if either, is a clinical decision you make with your provider. Both carry side effects and risks, and your provider will go over them with you before anything is prescribed.',
+        body: 'Both are weekly injections, and both require a prescription. They’re different medications with different active ingredients, and they are not interchangeable. Which one is prescribed, if either, is a clinical decision you make with your provider. Both carry side effects and risks, and your provider will go over them with you before anything is prescribed.',
         list: ['Semaglutide — a weekly injection', 'Tirzepatide — a weekly injection'],
         /* The hedge. It renders immediately after the chips, in every layout,
            via <SectionList />. Two clauses doing two different jobs: the first
@@ -2112,7 +2112,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         q: 'Are semaglutide and tirzepatide the same thing?',
-        a: 'No. Both are weekly injections, but they’re different medications and aren’t interchangeable. You and your provider decide which one, if either, is right for you.',
+        a: 'No. Both are weekly injections, but they’re different medications and are not interchangeable. You and your provider decide which one, if either, is right for you.',
       },
       {
         // CLIENT: whether the practice bills insurance for weight-management
@@ -2717,7 +2717,7 @@ export const FAQ = {
       items: [
         {
           q: 'Which insurance do you accept?',
-          a: 'Aetna, Optum, Cigna Evernorth, United Healthcare, Medicare, NJ Medicaid, and Blue Cross Blue Shield Horizon NJ. If your plan isn’t listed, ask us, and we’ll check.',
+          a: 'Aetna, Optum, Cigna Evernorth, United Healthcare, Medicare, NJ Medicaid, and Blue Cross Blue Shield Horizon NJ. If your plan is not listed, ask us, and we’ll check.',
         },
         {
           q: 'What if I don’t have insurance?',
@@ -2734,14 +2734,14 @@ export const FAQ = {
 
 export const CONTACT = {
   heading: 'Get in touch',
-  body: 'Online requests aren’t connected yet, so for now, call or email us to request an appointment.',
+  body: 'Online requests are not connected yet, so for now, call or email us to request an appointment.',
   /**
    * HIPAA-aware v1 per CLAUDE.md: name, email, phone, and a constrained
    * reason-for-contact only. No symptoms, diagnoses, medications, insurance ID,
    * date of birth, free-text clinical prompt, or file upload.
    */
   privacyNote:
-    'Please don’t include any health information, medical history, or insurance ID numbers. This form isn’t secure for medical details, and it isn’t monitored around the clock.',
+    'Please don’t include any health information, medical history, or insurance ID numbers. This form is not secure for medical details, and it is not monitored around the clock.',
   reasons: [
     'New patient inquiry',
     'Existing patient',
@@ -2793,7 +2793,7 @@ export const CONTACT = {
     ageQuestion: 'Are you 18 or older?',
   },
   unavailable: {
-    heading: 'Online requests aren’t active yet',
+    heading: 'Online requests are not active yet',
     before: 'Please call',
     between: 'or email',
     after: 'to request an appointment.',
@@ -2872,7 +2872,7 @@ export const INSURANCE_PAGE = {
   sections: [
     {
       heading: 'Plans we accept',
-      body: 'Don’t see your plan? Ask us anyway. We can check your coverage before your first appointment, so you aren’t surprised later.',
+      body: 'Don’t see your plan? Ask us anyway. We can check your coverage before your first appointment, so you are not surprised later.',
     },
     {
       heading: 'Paying without insurance',
@@ -2887,7 +2887,7 @@ export const INSURANCE_PAGE = {
     },
     {
       heading: 'Before your first appointment',
-      body: 'Have your insurance info handy when you reach out so we can verify your coverage. Please don’t send insurance ID or member numbers through the contact form — it isn’t secure. We’ll get those details from you directly.',
+      body: 'Have your insurance info handy when you reach out so we can verify your coverage. Please don’t send insurance ID or member numbers through the contact form — it is not secure. We’ll get those details from you directly.',
     },
   ],
   faqs: [
@@ -2896,7 +2896,7 @@ export const INSURANCE_PAGE = {
       a: 'Yes. We accept Medicare and NJ Medicaid.',
     },
     {
-      q: 'What if my plan isn’t listed?',
+      q: 'What if my plan is not listed?',
       a: 'Ask us. We’ll check your coverage before your first appointment and tell you what it would cost if you’re out of network.',
     },
     {
@@ -2952,7 +2952,7 @@ export const NEW_PATIENTS_PAGE = {
   // what the practice actually asks for before adding it.
   privacyHeading: 'What not to send us',
   privacyBody:
-    'Please keep health details out of the contact form and out of email. Symptoms, diagnoses, medications, insurance ID numbers, and dates of birth aren’t safe to send that way, and the form isn’t monitored around the clock. Just tell us how to reach you, and we’ll get the clinical details from you directly.',
+    'Please keep health details out of the contact form and out of email. Symptoms, diagnoses, medications, insurance ID numbers, and dates of birth are not safe to send that way, and the form is not monitored around the clock. Just tell us how to reach you, and we’ll get the clinical details from you directly.',
   /**
    * This aside is exactly where someone realising they cannot get help through
    * the form is looking, so the crisis numbers belong in it rather than only in
@@ -2993,7 +2993,7 @@ export const CONTACT_PAGE = {
   // Same prohibition set as CONTACT.privacyNote and NEW_PATIENTS_PAGE.privacyBody,
   // including date of birth. /contact may be a patient's only read.
   emailNote:
-    'Email goes straight to the providers. Please keep symptoms, diagnoses, medications, insurance ID numbers, and dates of birth out of it — email isn’t secure.',
+    'Email goes straight to the providers. Please keep symptoms, diagnoses, medications, insurance ID numbers, and dates of birth out of it — email is not secure.',
   /**
    * BOTH MODES, BOTH STATES, matching DELIVERY_LINE. This paragraph used to
    * bind the two states to telehealth and leave in-person attached to neither,
