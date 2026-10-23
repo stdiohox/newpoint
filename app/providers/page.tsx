@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { PageCta } from '@/components/sections/PageCta';
 import { Container } from '@/components/ui/Container';
 import { ProviderCard } from '@/components/ui/ProviderCard';
+import { assertSourced } from '@/components/sections/Providers';
 import { Reveal } from '@/components/ui/Reveal';
 import { stagger } from '@/lib/motion';
 import { CLOSING_PORTRAIT, PROVIDERS, PROVIDERS_PAGE } from '@/lib/content';
@@ -140,7 +141,15 @@ export default function ProvidersPage() {
                       credentials: p.credentials,
                       licensed: p.licensed,
                       knowsLanguage: p.knowsLanguage,
-                      bio: p.bio[0],
+                      /* The same approved sentence as the homepage card,
+                         not the whole first paragraph: Ofoegbu's ran three
+                         sentences against Whitaker's one, and its last
+                         repeated the licence line printed just above it
+                         (client, 2026-10-23: the bios looked unbalanced). */
+                      bio: assertSourced(p.slug, p.bio),
+                      bioAlign: PROVIDERS.filter((o) => o.slug !== p.slug).map((o) =>
+                        assertSourced(o.slug, o.bio)
+                      ),
                       treats: p.treats,
                       image: { webp1120: p.image.webp1120 },
                     }}

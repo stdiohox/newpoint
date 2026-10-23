@@ -63,6 +63,14 @@ export type ProviderCardData = {
    */
   knowsLanguage?: readonly string[];
   bio: string;
+  /**
+   * The OTHER cards' sentences, used only to size this card's bio cell: they
+   * are stacked invisibly in the same grid cell so every card's bio is as tall
+   * as the longest, and the pills below start on the same line in both
+   * columns. Optional; aria-hidden; md and up only, where the cards sit side
+   * by side.
+   */
+  bioAlign?: readonly string[];
   treats: readonly string[];
   image: { webp1120: string };
 };
@@ -195,7 +203,18 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
             </p>
           )}
 
-          <p className="text-body text-np-neutral-600 mt-5 max-w-[46ch]">{provider.bio}</p>
+          <div className="text-body text-np-neutral-600 mt-5 grid max-w-[46ch]">
+            <p className="col-start-1 row-start-1">{provider.bio}</p>
+            {provider.bioAlign?.map((other) => (
+              <p
+                key={other}
+                aria-hidden="true"
+                className="invisible col-start-1 row-start-1 hidden md:block"
+              >
+                {other}
+              </p>
+            ))}
+          </div>
 
           {/* SPECIALTY PILLS, from PROVIDERS[].treats — the data already exists,
               which is the condition for showing them at all.

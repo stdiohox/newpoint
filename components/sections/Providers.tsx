@@ -73,7 +73,10 @@ const BANNED = /lifespan|child|adolescent|p(a?)ediatric|geriatric/i;
  * Fails the build rather than the compliance review. These are server
  * components rendered at build time, so a throw here stops `next build`.
  */
-function assertSourced(slug: string, bio: string[]): string {
+/* EXPORTED, since 2026-10-23: /providers uses the same approved sentence per
+   provider, so the two pages cannot drift apart and the verbatim check covers
+   both. */
+export function assertSourced(slug: string, bio: string[]): string {
   const sentence = CARD_SENTENCE[slug];
   if (!sentence) {
     throw new Error(
