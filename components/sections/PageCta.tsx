@@ -122,7 +122,7 @@ export function PageCta({
             use. Deliberate: this panel is several times their area, and a 14px
             radius on something 1136px wide reads as a square with the corners
             filed off rather than as a rounded object. */}
-        <div className="bg-np-royal-deep relative overflow-hidden rounded-3xl border border-transparent px-6 py-16 md:px-12 md:py-20">
+        <div className="cta-band bg-np-royal-deep relative overflow-hidden rounded-3xl border border-transparent px-6 py-16 md:px-12 md:py-20">
           {/* THE PHOTOGRAPH, FULL-BLEED INSIDE THE PANEL. A dusk meadow, and
               it is decorative: alt="" because the heading and body say
               everything this block means, and a description of a field read
@@ -175,7 +175,7 @@ export function PageCta({
               the curve rather than hand-editing, as the note above says. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(36,80,224,0.2)_0%,rgba(29,63,194,0.2)_100%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(36,80,224,0.08)_0%,rgba(29,63,194,0.08)_100%)]"
           />
 
           {/* LAYER TWO: THE COPY RADIAL, and it is the layer that carries the
@@ -234,11 +234,24 @@ export function PageCta({
                 heading 6.68 / 7.36   body 4.87 / 5.63   meta 4.91 / 5.48+
               and the appointment label at glyph-core pixels, rest / hover:
                 1440 4.84 / 4.66      390 4.86 / 4.68   (floor 4.5)
+
+              AND LIGHTER AGAIN, 2026-10-23 (client: "reduce the opacity of
+              this one too"). Veil 0.2 -> 0.08, core 0.72 -> 0.66, flat to 70%.
+              That only became possible by moving contrast off the panel and
+              onto the type: the body and meta lines went to full white, and
+              the glass buttons in this band are tinted royal instead of white
+              (.cta-band rules in globals.css). Measured at glyph-core pixels,
+              the method that counts only what the letters cover:
+                1440  heading 6.33  body 5.63  meta 4.74 / 5.00 / 6.58
+                1024  heading 6.42  body 5.63  meta 5.00 / 5.59 / 6.44
+                 390  heading 7.19  body 6.01  meta 6.43 / 7.73 / 8.09
+                appointment label  1440 6.68 / 7.10 hover, 390 6.97 / 7.31
+              The binding case is "No health details needed" at 1440 (4.74).
               The glow is hidden below md because at 390 the meta row runs the
               panel's full width and the corner is under it. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(29,63,194,0.72)_0%,rgba(29,63,194,0.72)_62%,rgba(29,63,194,0.667)_68.3%,rgba(29,63,194,0.533)_74.7%,rgba(29,63,194,0.360)_81.0%,rgba(29,63,194,0.187)_87.3%,rgba(29,63,194,0.053)_93.7%,rgba(29,63,194,0.000)_100.0%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(29,63,194,0.66)_0%,rgba(29,63,194,0.66)_70%,rgba(29,63,194,0.611)_75.0%,rgba(29,63,194,0.489)_80.0%,rgba(29,63,194,0.330)_85.0%,rgba(29,63,194,0.171)_90.0%,rgba(29,63,194,0.049)_95.0%,rgba(29,63,194,0.000)_100.0%)]"
           />
           {/* THE CYAN END OF THE MAIL-ICON GRADIENT, client request 2026-10-22.
               A glow in the bottom-right corner only, outside the text scrim's
@@ -308,7 +321,7 @@ export function PageCta({
             </Reveal>
 
             <Reveal delay={0.16}>
-              <p className="text-body-l mt-4 text-white/90">{body}</p>
+              <p className="text-body-l mt-4 text-white">{body}</p>
             </Reveal>
 
             <Reveal delay={0.22}>
@@ -395,7 +408,7 @@ export function PageCta({
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
               >
                 {assurances.map(({ icon: Icon, label }) => (
-                  <li key={label} className="text-small flex items-center gap-2 text-white/95">
+                  <li key={label} className="text-small flex items-center gap-2 text-white">
                     <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
                     {label}
                   </li>

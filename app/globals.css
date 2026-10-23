@@ -534,6 +534,25 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
+/* INSIDE THE CLOSING CTA BAND THE GLASS IS TINTED ROYAL, NOT WHITE (client,
+   2026-10-23: lower the band's opacity again). A white film lightens whatever
+   is behind the label, so the band could only get more see-through once the
+   buttons carried their own contrast. The edge hierarchy (bright has the
+   permanent ring, quiet does not) is unchanged. Scoped to .cta-band so the
+   hero's glass buttons, measured against their own photographs, are untouched. */
+.cta-band .liquid-glass-bright {
+  background: rgba(29, 63, 194, 0.55);
+}
+.cta-band .liquid-glass-bright:hover {
+  background: rgba(29, 63, 194, 0.68);
+}
+.cta-band .liquid-glass-quiet {
+  background: rgba(29, 63, 194, 0.4);
+}
+.cta-band .liquid-glass-quiet:hover {
+  background: rgba(29, 63, 194, 0.52);
+}
+
 /* ---------------------------------------------------------------------------
    Honour a request for less transparency: swap the glass for a solid ink panel
    and drop the blur. No WCAG criterion covers this yet, but the material is
