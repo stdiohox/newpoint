@@ -42,7 +42,7 @@ export function ClosingPortrait() {
             <Reveal>
               <h2
                 id="closing-portrait-heading"
-                className="font-display text-np-ink font-medium"
+                className="font-display text-np-blue-800 font-medium"
                 style={{
                   fontSize: 'clamp(2.5rem, 1.75rem + 3vw, 4.5rem)',
                   letterSpacing: '-0.035em',
@@ -62,7 +62,7 @@ export function ClosingPortrait() {
                       href={`/providers/${p.slug}`}
                       className="group block focus-visible:outline-offset-4"
                     >
-                      <span className="text-h3 text-np-blue-600 group-hover:text-np-blue-800 group-focus-visible:text-np-blue-800 ease-np-out inline-flex items-center gap-2 transition-colors duration-[180ms]">
+                      <span className="text-h3 text-np-blue-800 group-hover:text-np-blue-600 group-focus-visible:text-np-blue-600 ease-np-out inline-flex items-center gap-2 transition-colors duration-[180ms]">
                         {p.displayName}
                         <span
                           aria-hidden="true"

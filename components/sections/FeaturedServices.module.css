@@ -36,7 +36,7 @@
   font-weight: 500;
   letter-spacing: -2.5px;
   line-height: 1.05;
-  color: var(--color-np-blue-600); /* royal, client 2026-10-22: 6.37:1 on white */
+  color: var(--color-np-blue-800); /* deep royal, client 2026-10-22: 9.90:1 on white */
   margin: 24px 0 0;
   text-wrap: balance;
 }
@@ -133,7 +133,7 @@
   font-weight: 500;
   letter-spacing: -1.5px;
   line-height: 1.08;
-  color: var(--color-np-blue-600); /* royal, client 2026-10-22: 6.37:1 on white */
+  color: var(--color-np-blue-800); /* deep royal, client 2026-10-22: 9.90:1 on white */
   margin: 24px 0 0;
   text-wrap: balance;
 }
@@ -198,7 +198,7 @@
   font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   font-size: 17px;
   font-weight: 600;
-  color: var(--color-np-blue-600); /* royal, client 2026-10-22: 6.37:1 on white */
+  color: var(--color-np-blue-800); /* deep royal, client 2026-10-22: 9.90:1 on white */
   margin: 0;
   letter-spacing: -0.2px;
 }
@@ -491,7 +491,7 @@
   font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   font-size: 17px;
   font-weight: 600;
-  color: var(--color-np-blue-600); /* royal, client 2026-10-22: 6.37:1 on white */
+  color: var(--color-np-blue-800); /* deep royal, client 2026-10-22: 9.90:1 on white */
   margin: 0;
 }
 

@@ -326,3 +326,11 @@ were recoloured onto the royal family at the client's request: every blue pixel'
 shifted +4° and capped at 226° (royal, no drift toward violet), saturation x1.09, value
 x1.46. The white figure is untouched and the vertical bar keeps its gradient, now bright
 sky into royal. Same 124x123 pixels as the original.
+
+### Headings step down to deep royal (2026-10-23)
+
+Bright royal (`np-blue-600`) on every heading read as too loud and competed with the buttons.
+Headings (h1–h3 base rule, the services section, card and FAQ titles) now use `np-blue-800`
+`#1a36a6` (9.90:1 on white). Bright royal stays on what should be clicked: buttons, links,
+pills, hover states, the step numbers. Gradient text was compared and declined: its light end
+fails contrast ("and how" fades to cyan) and it is a decorative pattern the design skill bans.

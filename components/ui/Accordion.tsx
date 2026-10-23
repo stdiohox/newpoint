@@ -68,7 +68,7 @@ export function Accordion({
                 id={`${idPrefix}-trigger-${i}`}
                 className="ease-np-out hover:text-np-blue-600 flex w-full items-start justify-between gap-6 py-5 text-left transition-colors duration-[180ms]"
               >
-                <span className="font-display text-h3 text-np-blue-600">{item.q}</span>
+                <span className="font-display text-h3 text-np-blue-800">{item.q}</span>
                 <span
                   aria-hidden="true"
                   className="font-body text-body-l text-np-blue-600 mt-1 shrink-0 leading-none select-none"

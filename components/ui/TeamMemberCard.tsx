@@ -135,7 +135,7 @@ export function TeamMemberCard({
               {/* Two lines, as the pattern has it. One <h2>, so the heading
                 outline sees a single heading and a screen reader reads one
                 continuous name — the break is a <span>, not a second heading. */}
-              <h2 className="text-display-l text-np-blue-600 mt-4 leading-[1.05]">
+              <h2 className="text-display-l text-np-blue-800 mt-4 leading-[1.05]">
                 {/* The trailing space is deliberate: JSX strips whitespace
                   between the two spans, so without it `textContent` reads
                   "Dr. FunmilayoWhitaker". Browsers insert a break at a block

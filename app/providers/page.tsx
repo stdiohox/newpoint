@@ -86,7 +86,7 @@ export default function ProvidersPage() {
             <div className="grid items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
               <div className="md:col-span-6 lg:col-span-6">
                 <h1
-                  className="font-display text-np-ink font-medium"
+                  className="font-display text-np-blue-800 font-medium"
                   style={{
                     fontSize: 'clamp(2.5rem, 1.75rem + 3vw, 4.5rem)',
                     letterSpacing: '-0.035em',

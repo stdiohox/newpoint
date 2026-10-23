@@ -176,7 +176,7 @@ const GradientCard = React.forwardRef<HTMLDivElement, GradientCardProps>(
               {badgeText}
             </div>
             <div className="flex-grow">
-              <h3 className="text-np-blue-600 mb-2 text-2xl font-bold">{title}</h3>
+              <h3 className="text-np-blue-800 mb-2 text-2xl font-bold">{title}</h3>
               <p className="text-np-ink/70 max-w-xs">{description}</p>
             </div>
             <div className="mt-6">

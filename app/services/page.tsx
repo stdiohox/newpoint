@@ -414,7 +414,7 @@ export default function ServicesIndex() {
                 {CARE_GUIDE.columns.map((column, i) => (
                   <Reveal key={column.title} delay={stagger(i, 0.08)}>
                     <div className="bg-np-surface rounded-card h-full p-7 ring-1 ring-[var(--np-alpha-ink-08)] sm:p-8">
-                      <h3 className="text-h3 text-np-blue-600">{column.title}</h3>
+                      <h3 className="text-h3 text-np-blue-800">{column.title}</h3>
                       <dl className="mt-6 space-y-5">
                         {column.rows.map((row) => (
                           <div key={row.label}>

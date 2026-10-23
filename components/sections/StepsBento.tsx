@@ -172,7 +172,7 @@ export function StepsBento({
                 )}
               </div>
 
-              <h3 className="text-h3 text-np-blue-600 mt-6">{step.title}</h3>
+              <h3 className="text-h3 text-np-blue-800 mt-6">{step.title}</h3>
               <p className="text-body text-np-neutral-600 mt-3 max-w-[52ch]">{step.body}</p>
 
               {/* THE PHOTOGRAPH FILLS WHAT IS LEFT OF THE TALL CARD. Only the

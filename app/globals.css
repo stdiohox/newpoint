@@ -265,10 +265,14 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    /* Royal, not ink, by client instruction 2026-10-22 ("royal dominant
-       everywhere"). 6.37:1 on white, 5.73:1 on np-blue-50. Headings on dark
-       or photographic grounds set text-white explicitly, which wins. */
-    color: var(--color-np-blue-600);
+    /* DEEP ROYAL, np-blue-800 (#1a36a6, 9.90:1 on white). Royal rather than
+       ink by client instruction, 2026-10-22 ("royal dominant everywhere"); it
+       was the bright np-blue-600 for one day and read as too loud, so headings
+       stepped down to 800 and the bright royal is kept for what should be
+       clicked: buttons, links, the active nav. Gradient text was considered
+       and declined: its light end fails contrast and it competes with the
+       buttons. Headings on dark or photographic grounds set text-white. */
+    color: var(--color-np-blue-800);
     text-wrap: balance;
   }
 
