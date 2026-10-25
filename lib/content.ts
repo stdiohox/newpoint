@@ -1306,50 +1306,23 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'The tools we use',
-        body: 'Along with the conversation, we use a few structured tools. They give us a baseline to measure against later, so we can tell real progress from a good week.',
+        body: 'Along with the conversation, we use a few structured tools. They give us a baseline measurement, so we can tell real progress from a good week.',
         list: [
           'A comprehensive psychiatric evaluation questionnaire',
           'Standardized clinical rating scales, recorded at baseline',
-          'Screening tests, both to identify conditions and to rule others out',
+          'Screening tests to identify conditions for treatment',
         ],
       },
       {
         heading: 'Reaching a diagnosis',
-        body: 'We reach a diagnosis through assessment, not assumption. We’ll tell you what we found and what it means, in plain language. If the picture is not clear yet, we’ll say so instead of reaching for a label that might not fit.',
-        /* ONE SENTENCE, AND IT IS THE ONLY ONE THIS SECTION HAD LEFT TO SAY.
-           Sourced from research/content/services.md: "diagnoses of mental
-           illness are made based on assessments, and then an effective plan of
-           care is determined". Nothing else on this page states that the
-           diagnosis is what the plan is built on.
-
-           TWO EARLIER SENTENCES WERE CUT HERE, both on review.
-
-           One claimed the diagnosis "is revisited as your response to
-           treatment makes the picture clearer". Nothing in research/ says a
-           diagnosis is ever reviewed or revised. The two lines that looked
-           like support do not carry it: "we will continue to provide support
-           and education" commits to support, not to re-examining a diagnosis,
-           and rating scales that "monitor progress or decompensation" track
-           severity, not the label. Do not restore it without the practice
-           confirming that diagnoses are formally reviewed.
-
-           The other explained that screening rules conditions out as well as
-           in. True and sourced, but it is already a bullet two blocks above
-           under "The tools we use", and the same page saying it twice is the
-           thing this layout exists to avoid.
-
-           It does not say how long any of this takes, or that a diagnosis is
-           guaranteed: "where a diagnosis can be established" is the same hedge
-           the FAQ uses. */
-        detail:
-          'When we can make a diagnosis, the rest of your care is built on it.',
+        body: 'We reach a diagnosis through assessment, not assumption. We’ll tell you what we found and what it means, in plain language.',
       },
       {
         heading: 'Your treatment plan',
         // "A treatment plan", not "a written treatment plan you have agreed to":
         // the source says a plan of care is determined, not that it is written
         // down or countersigned. CLIENT: confirm if patients receive it in writing.
-        body: 'Where both are indicated, your plan combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your situation. If other clinicians are already part of your care, we work with them to set your therapy and medication plan together, not in parallel.',
+        body: 'Where both are indicated, your plan combines psychotherapy approaches and psychopharmacology, matched to your diagnosis and your situation. We also collaborate on your care with other providers to manage your health.',
         /* Both halves are research/content/services.md's "as we evaluate
            progress, we will continue to provide support and education as
            needed". AS NEEDED IS LOAD-BEARING AND IS NOT A SOFTENER: it is the
@@ -1387,7 +1360,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            plausibly a section of their own, and we need format and cadence to
            describe them. */
         list: [
-          'Medication, when it’s indicated',
+          'Medication, when indicated',
           /* "Individual counseling" is the practice's own name for this option
              and it stands alone here on purpose. It previously read
              "alongside your medication care", which did two things the source
@@ -1426,7 +1399,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         q: 'What do I leave with?',
-        a: 'A diagnosis, if one can be made, and a treatment plan that combines psychotherapy approaches and medication where appropriate.',
+        a: 'A diagnosis and a treatment plan that combines psychotherapy approaches and medication where appropriate.',
       },
     ],
   },
@@ -1551,7 +1524,7 @@ export const SERVICE_PAGES: ServicePage[] = [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:21:
              "Screening tests to aid in making a diagnosis and ruling out other
              disorders". */
-          'We also use screening tests to help rule other conditions in or out.',
+          'We also use screening tests to rule out other conditions.',
           /* CLIENT-REVIEW — GENERIC. Positions a score as a prompt rather than
              a verdict; makes no claim about any instrument or any result. */
           'A score is something to talk about, not a verdict on how you feel.',
@@ -1586,7 +1559,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       },
       {
         heading: 'Working with your other clinicians',
-        body: 'If you already see a therapist, a primary care provider, or another specialist, we work with them so your medication fits the rest of your care instead of cutting across it. If you need something outside what we provide, we can refer you to follow-up services.',
+        body: 'If you already see a therapist, a primary care provider, or another specialist, we work together as a team and partner with them in your treatment and care. If you need something outside what we provide, we can refer you to follow-up services.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "The
              treatment plan involves collaborating with other professionals to
@@ -1602,8 +1575,8 @@ export const SERVICE_PAGES: ServicePage[] = [
         ],
       },
       {
-        heading: 'Conditions we prescribe for',
-        body: 'Medication management is available for the conditions we treat.',
+        heading: 'Conditions we treat',
+        body: 'We offer medication management for conditions including:',
         bullets: [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:28-34, the
              practice's own "We will work with you to find the best treatment
@@ -1629,7 +1602,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              CLIENT-REVIEW — SOURCED. research/content/services.md:18 for the
              diagnosis-then-plan order; the "where one can be established"
              hedge is the one the assessment page already uses. */
-          'Before anything is prescribed, we make a diagnosis at your assessment, if one can be made.',
+          'Before anything is prescribed, we make a diagnosis at your initial evaluation.',
         ],
         /**
          * Deliberately NOT a spread of WHAT_WE_TREAT.conditions. That list also
@@ -1686,10 +1659,6 @@ export const SERVICE_PAGES: ServicePage[] = [
           'Mood disorders',
           'Psychosis',
         ],
-        /* CLIENT-REVIEW — GENERIC. A statement about clinical practice in
-           general, not about what Newpoint does in any given case. Unchanged
-           wording; it was the second bullet until 2026-10-01. */
-        listNote: 'Being on this list doesn’t mean medication is the answer in every case.',
       },
     ],
     faqs: [

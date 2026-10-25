@@ -199,7 +199,7 @@ export default function ServicesIndex() {
              below it, as the assessment's "How it’s delivered" row and in the
              closing band, so the hero disagreed with its own page about
              geography. Caught by healthcare-reviewer. */
-          intro={`Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management visits, with psychotherapy alongside them where it’s indicated. ${DELIVERY_LINE}. Each of the four below has its own page.`}
+          intro={`Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management visits, with psychotherapy. ${DELIVERY_LINE}. See services to learn more.`}
           image={{
             src: '/images/services/services-consult-2752.webp',
             objectPosition: '70% 25%',
