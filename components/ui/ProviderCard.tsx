@@ -166,8 +166,16 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
               {provider.credentials}
             </span>
 
-            <p className="text-small text-np-neutral-600 mt-3 flex items-center gap-1.5">
-              <MapPin aria-hidden="true" size={15} strokeWidth={1.75} className="shrink-0" />
+            {/* INLINE, NOT FLEX. As a flex row the text wrapped on phones and
+                the pin stayed pinned to the box's left edge, far from the
+                centred words. Inline, the pin travels with "Licensed". */}
+            <p className="text-small text-np-neutral-600 mt-3">
+              <MapPin
+                aria-hidden="true"
+                size={15}
+                strokeWidth={1.75}
+                className="mr-1.5 inline-block align-[-2px]"
+              />
               {provider.licensed}
             </p>
 
