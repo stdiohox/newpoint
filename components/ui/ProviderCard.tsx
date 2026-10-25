@@ -15,7 +15,8 @@ import { useHydrated } from '@/lib/useHydrated';
  * defines, and Tailwind v4 emits nothing for an unknown utility, so pasting it
  * would have shipped an unstyled card wired to three dependencies that are not
  * here. components/ui/badge.tsx records the same trap. What is taken is the
- * composition: centred circular portrait, name, a credentials pill, a location
+ * composition: circular portrait (centred on phones, beside the details from
+ * md), name, a credentials pill, a location
  * line, the bio, and specialty pills.
  *
  * DROPPED FROM THE SOURCE, by instruction and on merit: the sparkles, the
@@ -49,7 +50,10 @@ import { useHydrated } from '@/lib/useHydrated';
  * descriptive alt would have the name and credentials announced twice.
  */
 
-const MAX_TILT = 4;
+/* 1.5, not the 4 it was when the cards sat two-up: the cards are now full
+   width, and the same angle on a card three times as wide throws its far edge
+   three times as far. */
+const MAX_TILT = 1.5;
 
 export type ProviderCardData = {
   slug: string;
@@ -63,14 +67,6 @@ export type ProviderCardData = {
    */
   knowsLanguage?: readonly string[];
   bio: string;
-  /**
-   * The OTHER cards' sentences, used only to size this card's bio cell: they
-   * are stacked invisibly in the same grid cell so every card's bio is as tall
-   * as the longest, and the pills below start on the same line in both
-   * columns. Optional; aria-hidden; md and up only, where the cards sit side
-   * by side.
-   */
-  bioAlign?: readonly string[];
   treats: readonly string[];
   image: { webp1120: string };
 };
@@ -95,7 +91,7 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
   const sx = useSpring(px, { stiffness: 220, damping: 22, mass: 0.4 });
   const sy = useSpring(py, { stiffness: 220, damping: 22, mass: 0.4 });
 
-  /* MAX 4 DEGREES, and the sign is inverted on rotateX so the card leans TOWARD
+  /* MAX_TILT DEGREES, and the sign is inverted on rotateX so the card leans TOWARD
      the pointer: moving down the card should tip its bottom edge away, which is
      a positive rotateX for a negative y offset. */
   const rotateY = useTransform(sx, [-0.5, 0.5], [-MAX_TILT, MAX_TILT]);
@@ -124,10 +120,9 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
        skew rather than a tilt. transform-gpu keeps the text off the CPU raster
        path, which is where a rotated card goes soft. */
     <div
-      /* h-full, or the chain breaks. The grid stretches the <li>, but this
-         wrapper would otherwise shrink-wrap its content — and the motion div
-         and the Link below both resolve their own h-full against it, so the
-         two cards ended up at their own content heights inside equal cells. */
+      /* h-full so the card fills its <li>. Harmless now the cards are
+         stacked one per row; it mattered when they sat two-up at equal
+         height. */
       className="h-full"
       style={{ perspective: 900 }}
       onPointerMove={onMove}
@@ -141,7 +136,7 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
             by has-[a:focus-visible] so it lands on the CARD, matching the hit
             area the ::after creates, rather than drawing a 2px box around the
             name alone. */}
-        <div className="rounded-card bg-np-surface ease-np-out has-[a:focus-visible]:outline-np-blue-600 relative flex h-full flex-col items-center p-8 text-center ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 motion-reduce:transition-none">
+        <div className="rounded-card bg-np-surface ease-np-out has-[a:focus-visible]:outline-np-blue-600 relative flex h-full flex-col items-center p-8 text-center ring-1 ring-[var(--np-alpha-ink-08)] transition-shadow duration-[180ms] hover:shadow-[var(--shadow-np-card)] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 motion-reduce:transition-none md:flex-row md:items-start md:gap-10 md:p-10 md:text-left">
           {/* THE 1120 MASTER, NOT THE 560, and next/image builds the srcset.
               It will not accept a hand-written srcSet — it generates one from
               `sizes` and deviceSizes — so the source has to be the larger of
@@ -152,28 +147,31 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
             alt=""
             width={128}
             height={128}
-            sizes="128px"
+            sizes="(min-width: 768px) 176px, 128px"
             quality={82}
             loading="lazy"
-            className="size-32 rounded-full object-cover"
+            className="size-32 shrink-0 rounded-full object-cover md:size-44"
           />
 
-          {/* THE HEADING IS NO LONGER THE LINK — the button at the foot of the
+          {/* THE DETAILS COLUMN. Centred under the portrait on phones; from md
+              it sits beside the portrait and everything in it aligns left. */}
+          <div className="flex flex-1 flex-col items-center md:items-start">
+            {/* THE HEADING IS NO LONGER THE LINK — the button at the foot of the
               card is. One link and one tab stop per card either way. */}
-          <h2 className="text-h3 text-np-blue-800 mt-5">{provider.displayName}</h2>
+            <h2 className="text-h3 text-np-blue-800 mt-5 md:mt-1">{provider.displayName}</h2>
 
-          {/* The credentials pill. A span, not a Badge import — the treatment is
+            {/* The credentials pill. A span, not a Badge import — the treatment is
               this repo's existing chip token. */}
-          <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 mt-3 px-3 py-1 font-medium">
-            {provider.credentials}
-          </span>
+            <span className="rounded-chip bg-np-blue-50 text-small text-np-blue-700 mt-3 px-3 py-1 font-medium">
+              {provider.credentials}
+            </span>
 
-          <p className="text-small text-np-neutral-600 mt-3 flex items-center gap-1.5">
-            <MapPin aria-hidden="true" size={15} strokeWidth={1.75} className="shrink-0" />
-            {provider.licensed}
-          </p>
+            <p className="text-small text-np-neutral-600 mt-3 flex items-center gap-1.5">
+              <MapPin aria-hidden="true" size={15} strokeWidth={1.75} className="shrink-0" />
+              {provider.licensed}
+            </p>
 
-          {/* LANGUAGES, in the licence line's treatment and directly under it,
+            {/* LANGUAGES, in the licence line's treatment and directly under it,
               because both answer the same question: can this clinician see me.
 
               THE LABEL IS VISIBLE TEXT, not a decorative icon with a title.
@@ -191,32 +189,21 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
               Yoruba- or Igbo-speaking patient comparing them read her as
               English only. The check stays because the field is optional, not
               because either provider is a special case. */}
-          {provider.knowsLanguage && provider.knowsLanguage.length > 0 && (
-            <p className="text-small text-np-neutral-600 mt-2">
-              <span className="text-np-ink font-medium">Languages: </span>
-              {/* Intl, not join(', '), so two entries read "English and
+            {provider.knowsLanguage && provider.knowsLanguage.length > 0 && (
+              <p className="text-small text-np-neutral-600 mt-2">
+                <span className="text-np-ink font-medium">Languages: </span>
+                {/* Intl, not join(', '), so two entries read "English and
                   Yoruba" — the same sentence the provider page's Languages row
                   already prints — and three would read "A, B, and C". */}
-              {new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format([
-                ...provider.knowsLanguage,
-              ])}
-            </p>
-          )}
-
-          <div className="text-body text-np-neutral-600 mt-5 grid max-w-[46ch]">
-            <p className="col-start-1 row-start-1">{provider.bio}</p>
-            {provider.bioAlign?.map((other) => (
-              <p
-                key={other}
-                aria-hidden="true"
-                className="invisible col-start-1 row-start-1 hidden md:block"
-              >
-                {other}
+                {new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format([
+                  ...provider.knowsLanguage,
+                ])}
               </p>
-            ))}
-          </div>
+            )}
 
-          {/* SPECIALTY PILLS, from PROVIDERS[].treats — the data already exists,
+            <p className="text-body text-np-neutral-600 mt-5 max-w-[60ch]">{provider.bio}</p>
+
+            {/* SPECIALTY PILLS, from PROVIDERS[].treats — the data already exists,
               which is the condition for showing them at all.
 
               EVERY ITEM IS RENDERED, not a first-few slice. A truncated list of
@@ -225,25 +212,24 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
               appear outside the provider's own page. Ten or eleven short pills
               wrap to three lines, which is the cost of not implying an
               exclusion. No count or "and more" label, which would be new copy. */}
-          <ul role="list" className="mt-6 flex flex-wrap justify-center gap-2">
-            {provider.treats.map((item) => (
-              <li
-                key={item}
-                className="rounded-chip bg-np-neutral-100 text-small text-np-neutral-700 px-2.5 py-1"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+            <ul role="list" className="mt-6 flex flex-wrap justify-center gap-2 md:justify-start">
+              {provider.treats.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-chip bg-np-neutral-100 text-small text-np-neutral-700 px-2.5 py-1"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
 
-          {/* THE BUTTON IS THE STRETCHED LINK. `after:absolute after:inset-0`
+            {/* THE BUTTON IS THE STRETCHED LINK. `after:absolute after:inset-0`
               pins its hit area to the card, so the whole card is still one
               target and one tab stop while the visible affordance is a real
               button at the foot of the card rather than an underlined name.
 
-              mt-auto pins it to the bottom whatever the bio and pill list above
-              run to, which is what keeps the two buttons on one line when the
-              cards are stretched to equal height.
+              mt-auto pins it to the bottom of the column on phones; from md
+              the row is items-start, so it simply follows the pills.
 
               THE ACCESSIBLE NAME IS THE aria-label, not the visible text. "View
               full profile" repeated on both cards tells a screen-reader user
@@ -251,17 +237,17 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
               provider fixes that. SC 2.5.3 is satisfied because the visible
               label — "View full profile" — is contained in the accessible name,
               in that order, which is what Label in Name requires. */}
-          <div className="mt-auto pt-7">
-            <Button
-              href={`/providers/${provider.slug}`}
-              variant="quiet"
-              /* THE CREDENTIALS ARE IN THE ACCESSIBLE NAME, not just beside it
+            <div className="mt-auto pt-7 md:pt-6">
+              <Button
+                href={`/providers/${provider.slug}`}
+                variant="quiet"
+                /* THE CREDENTIALS ARE IN THE ACCESSIBLE NAME, not just beside it
                  on screen. An accessible name is a serialised string — there is
                  no "beside" in a links list — so a bare "Dr. Funmilayo
                  Whitaker" here would be the one unqualified title on the site.
                  components/sections/Providers.tsx does the same with `role`. */
-              ariaLabel={`View full profile for ${provider.displayName}, ${provider.credentials}`}
-              /* THE PRESS SCALE MUST NOT APPLY TO THIS INSTANCE.
+                ariaLabel={`View full profile for ${provider.displayName}, ${provider.credentials}`}
+                /* THE PRESS SCALE MUST NOT APPLY TO THIS INSTANCE.
                  Button's base carries `active:scale-[0.98]`, and in Tailwind v4
                  that sets the `scale` property. Any non-`none` scale makes the
                  element a containing block for its own absolutely positioned
@@ -283,10 +269,11 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
                  matches the hit area, so the button's is suppressed. Transparent
                  rather than none so forced-colors mode still has an outline to
                  repaint. */
-              className="after:absolute after:inset-0 active:[scale:none]! focus-visible:outline-transparent"
-            >
-              View full profile
-            </Button>
+                className="after:absolute after:inset-0 focus-visible:outline-transparent active:[scale:none]!"
+              >
+                View full profile
+              </Button>
+            </div>
           </div>
         </div>
       </motion.div>

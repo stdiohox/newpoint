@@ -120,11 +120,12 @@ export default function ProvidersPage() {
 
         <div className="py-20 md:py-28">
           <Container>
-            {/* Two columns from md, one below it. items-stretch so the pair
-                are the same height whatever their bio and specialty list run
-                to — Ofoegbu's bio is twice Whitaker's and her list one item
-                longer. */}
-            <ul role="list" className="grid items-stretch gap-6 md:grid-cols-2 md:gap-8">
+            {/* STACKED, ONE CARD PER ROW, Whitaker first (client, 2026-10-25).
+                Each card turns horizontal from md (portrait left, details
+                right), so a full-width row reads as a profile rather than a
+                stretched centred column. Capped at max-w-5xl so the bio keeps
+                a readable measure. */}
+            <ul role="list" className="mx-auto grid max-w-5xl gap-6 md:gap-8">
               {PROVIDERS.map((p, i) => (
                 <Reveal as="li" key={p.slug} delay={stagger(i, 0.08)} className="h-full">
                   {/* Plain props rather than the Provider object: ProviderCard
@@ -147,9 +148,6 @@ export default function ProvidersPage() {
                          repeated the licence line printed just above it
                          (client, 2026-10-23: the bios looked unbalanced). */
                       bio: assertSourced(p.slug, p.bio),
-                      bioAlign: PROVIDERS.filter((o) => o.slug !== p.slug).map((o) =>
-                        assertSourced(o.slug, o.bio)
-                      ),
                       treats: p.treats,
                       image: { webp1120: p.image.webp1120 },
                     }}
