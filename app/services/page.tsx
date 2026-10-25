@@ -32,7 +32,7 @@ export const metadata = pageMetadata({
   // services" as its head term, so the two are not arbitrating the same query.
   title: 'Psychiatric Services in NJ and PA',
   description:
-    'Psychiatric assessment, medication management, and weight management in New Jersey and Pennsylvania. What each involves and how to start.',
+    'Psychiatric evaluation, medication management, and weight management in New Jersey and Pennsylvania. What each involves and how to start.',
   path: '/services',
 });
 
@@ -199,7 +199,7 @@ export default function ServicesIndex() {
              below it, as the assessment's "How it’s delivered" row and in the
              closing band, so the hero disagreed with its own page about
              geography. Caught by healthcare-reviewer. */
-          intro={`Care at Newpoint starts with a comprehensive psychiatric assessment and continues as medication management visits, with psychotherapy alongside them where it’s indicated. ${DELIVERY_LINE}. Each of the four below has its own page.`}
+          intro={`Care at Newpoint starts with a comprehensive psychiatric evaluation and continues as medication management visits, with psychotherapy alongside them where it’s indicated. ${DELIVERY_LINE}. Each of the four below has its own page.`}
           image={{
             src: '/images/services/services-consult-2752.webp',
             objectPosition: '70% 25%',
@@ -351,14 +351,14 @@ export default function ServicesIndex() {
                               Naming both providers under each service asserts
                               that both personally deliver it. That is sourced
                               for medication management, and NOT
-                              for the comprehensive psychiatric assessment:
+                              for the comprehensive psychiatric evaluation:
                               Ofoegbu's bio names assessments, Whitaker's names
                               medication management only. The page-wide
                               "Providers you’ll see" section below says what is
                               actually sourced — these are the two clinicians —
                               without binding either to a named service.
                               CLIENT: confirm whether both providers perform
-                              initial psychiatric assessments, and this becomes
+                              initial psychiatric evaluations, and this becomes
                               a per-service field.
 
                               PSYCHOTHERAPY IS IN THE SAME POSITION, since

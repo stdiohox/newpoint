@@ -28,7 +28,7 @@ Healthcare context does not mean visually dull. It means restrained and trustwor
 
 ## Project
 
-**Newpoint is a two-provider outpatient PSYCHIATRIC / behavioral-health nurse-practitioner practice** serving **New Jersey and Pennsylvania** — psychiatric assessment and medication management, in person or by telehealth. (The appointment is an *assessment*, not an *evaluation* — see "Terminology and service names" below.)
+**Newpoint is a two-provider outpatient PSYCHIATRIC / behavioral-health nurse-practitioner practice** serving **New Jersey and Pennsylvania** — psychiatric evaluation and medication management, in person or by telehealth. (The appointment is a *psychiatric evaluation* — see "Terminology and service names" below.)
 
 **It is NOT a home-health agency.** The "Healthcare Services" in the name misleads; do not benchmark against, or write copy for, home health / visiting nurses / elder care. Benchmark against outpatient behavioral-health and psychiatry practices.
 
@@ -364,7 +364,7 @@ page width.
   column and put their content inside it.
 - To change the site's width, change the two tokens. Nothing else.
 
-### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29
+### Terminology and service names — CONFIRMED BY OWNERS, 2026-09-29; APPOINTMENT NAME REVERSED 2026-10-25
 
 Agreed in a meeting with the owners. Like the care-modality note above, this
 postdates `research/` and supersedes it on wording. **Do not edit the crawl
@@ -372,38 +372,24 @@ findings** — they remain an accurate record of the site as it stood 2026-08-27
 
 | Say this | Not this |
 |---|---|
-| **assessment** — "comprehensive psychiatric assessment" | "evaluation" as the name of the appointment |
+| **evaluation** — "comprehensive psychiatric evaluation" | "psychiatric assessment" as the name of the appointment |
 | **mental and behavioral care** in the homepage hero | "psychiatric care" as the hero headline |
 | "from the first contact" | "from the first message" |
 
-Three things this does **not** change, all deliberate:
+Notes on the terminology, all deliberate:
 
 - **"Psychiatric" is not banned.** It is still the practice's clinical head term
   and still carries the title tags, the provider role strings and the service
   page H1s. Only the hero headline widened.
-- **"Evaluation" survives in exactly four places**, none of them as the
-  appointment's name. In descending order of value:
-  1. the assessment page's **`metaDescription`** ("also called a psychiatric
-     evaluation") — the only one a patient actually reads, in the search result
-     that brought them;
-  2. one sentence of **body copy** on that page, telling a referred patient the
-     two words mean the same appointment;
-  3. the **`/services/psychiatric-evaluation` slug**;
-  4. one **`keywords`** entry in `app/layout.tsx`, which ranks for nothing and
-     is kept only to document the vocabulary.
-
-  It is the higher-volume US query, so the site answers to it without using it.
-  Each of the four carries a comment saying so — read that comment before
-  removing one. **1 and 2 are the ones with patient-facing value**; deleting
-  either to satisfy a "no evaluation anywhere" sweep is the mistake this list
-  exists to prevent.
-- **The slug did not change**, and the reason is query coverage, not URL history.
-  The site has not launched, so `/services/psychiatric-evaluation` has no equity
-  to protect and a pre-launch rename would need no redirect at all. It is kept
-  because it is the one high-weight slot where the older, higher-volume term can
-  sit without contradicting the owners' copy. **Decide this before launch** — a
-  rename afterwards is the expensive one, and would then need a 301 in
-  `next.config.ts`.
+- **The appointment is a psychiatric evaluation (client instruction, 2026-10-25).**
+  This reverses the 2026-09-29 "assessment" rule. Every "psychiatric assessment"
+  in site copy, metadata and the automation prompts became "psychiatric
+  evaluation", and the social/SEO content rule that flagged "evaluation" was
+  removed. "Psychiatric assessment" survives only as the evaluation page's
+  `alternateName` and a `keywords` entry in `app/layout.tsx`, as the synonym.
+  Bare "assessment" (e.g. "The assessment follows a set structure") was not
+  swept and still appears in body copy.
+- **The slug is `/services/psychiatric-evaluation`** and now matches the page name.
 
 **New service line confirmed: medication management combined with
 psychotherapy.** Previously the site could only say a *plan* may combine
@@ -460,7 +446,7 @@ Why each was removed:
   `components/PageHero.tsx:29-33`. It was rebuilt on the assessment page on
   2026-10-01 and removed again, so this is the second time.
 - **A providers block under a named service** reads as "these are the people who
-  deliver this service". For the **comprehensive psychiatric assessment** that is
+  deliver this service". For the **comprehensive psychiatric evaluation** that is
   an open question, not a fact: the per-service sourcing breakdown and the
   outstanding `CLIENT:` question live at `app/services/page.tsx:313-325`. The
   constraint is specific to that service — the same page records medication

@@ -158,7 +158,7 @@ export const HERO = {
    * descriptions that carry the same sentence.
    */
   subtext:
-    'Psychiatric assessment, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
+    'Psychiatric evaluation, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
   /**
    * The service names for the hero's glass tag, word-for-word as `subtext`
    * already names them. No new service is claimed here. Telehealth left the
@@ -630,12 +630,10 @@ export type Provider = {
  * expect from me" blocks. They are reproduced as written, in the first person,
  * with four classes of exception and no others:
  *
- * 1. THE APPOINTMENT IS AN ASSESSMENT, NOT AN EVALUATION. Both providers wrote
- *    "evaluation"; the owners instructed on the same day that the site says
- *    "assessment". The owners' rule is the more recent and the more specific to
- *    this site, so it wins here — but it IS a deviation from verbatim, it is
- *    the only one that changes meaning, and CLAUDE.md's terminology section is
- *    where to reverse it if the client would rather keep their own word.
+ * 1. THE APPOINTMENT IS A PSYCHIATRIC EVALUATION. Both providers wrote
+ *    "evaluation". From 2026-09-29 the site said "assessment" instead; the
+ *    client reversed that on 2026-10-25, so their own word is back and this is
+ *    no longer a deviation from verbatim. See CLAUDE.md's terminology section.
  * 2. Objective typos are fixed: a stray full stop in "My name is Anastasia.
  *    Ofoegbu", and "reading an most of all".
  * 3. British spellings are Americanised ("travelling"), matching the rest of
@@ -751,16 +749,14 @@ export const PROVIDERS: Provider[] = [
     approachFull:
       'I use a warm, empathic, non-judgmental, and collaborative approach in treating individuals with mental illness.',
     /**
-     * Verbatim except for ONE word: she wrote "comprehensive psychiatric
-     * evaluation" and this says "assessment", per the owners' 2026-09-29
-     * terminology rule. See the block comment above PROVIDERS.
+     * Verbatim. See the block comment above PROVIDERS on "evaluation".
      *
      * This passage is also the origin of WHAT_TO_EXPECT on the homepage — the
      * live practice site carries a near-identical version, recorded verbatim at
      * research/content/services.md. The two should stay in step.
      */
     expect:
-      'The initial visit consists of completing a comprehensive psychiatric assessment and identifying risk factors that might affect an individual’s mental health. Diagnoses of mental illness are made based on assessment, and then the most effective care plan for the individual is determined. The treatment plan consists of psychotherapy modalities and psychopharmacology to improve the person’s mental health. As we evaluate progress, we will continue to provide support and education as needed.',
+      'The initial visit consists of completing a comprehensive psychiatric evaluation and identifying risk factors that might affect an individual’s mental health. Diagnoses of mental illness are made based on assessment, and then the most effective care plan for the individual is determined. The treatment plan consists of psychotherapy modalities and psychopharmacology to improve the person’s mental health. As we evaluate progress, we will continue to provide support and education as needed.',
     /**
      * The last three are new on 2026-09-29, from her own directory profiles.
      * ADHD and substance use are each published by her on BOTH Grow Therapy
@@ -897,13 +893,12 @@ export const PROVIDERS: Provider[] = [
       'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania.',
     ],
     /**
-     * Verbatim except: "evaluations" becomes "assessments" per the owners'
-     * terminology rule, the missing article in "I utilize Evidence-based ...
+     * Verbatim except: the missing article in "I utilize Evidence-based ...
      * approach" is restored, and her mid-sentence capitals on common nouns are
      * lowered. Her sentence structure and word choices are untouched.
      */
     approachFull:
-      'I utilize an evidence-based and patient-centered therapeutic approach to provide psychiatric assessments, medication management and supportive counseling for patients with depression, anxiety and panic attacks, bipolar disorder, and other psychotic and mood disorders.',
+      'I utilize an evidence-based and patient-centered therapeutic approach to provide psychiatric evaluations, medication management and supportive counseling for patients with depression, anxiety and panic attacks, bipolar disorder, and other psychotic and mood disorders.',
     /* Verbatim, unedited. */
     expect:
       'I am passionate about working with patients with mental health disorders to manage symptoms and improve their quality of life.',
@@ -939,10 +934,9 @@ export const WHAT_WE_TREAT = {
    * Reflects the practice's brochure (client, 2026-10-19: "we can use this but
    * cannot display it word for word"): assessment and diagnosis, medication
    * management, psychotherapy and counseling, for emotional, behavioral and
-   * mental health challenges. Paraphrased, and "assessment" rather than the
-   * brochure's "evaluation", per the owners' terminology rule.
+   * mental health challenges. Paraphrased; "evaluation" is the brochure's own word.
    */
-  body: 'Your care starts with a comprehensive psychiatric assessment and a treatment plan built around it. From there, we offer medication management, psychotherapy, and supportive counseling for emotional, behavioral, and mental health challenges, and we track your progress with standardized clinical measures.',
+  body: 'Your care starts with a comprehensive psychiatric evaluation and a treatment plan built around it. From there, we offer medication management, psychotherapy, and supportive counseling for emotional, behavioral, and mental health challenges, and we track your progress with standardized clinical measures.',
   /**
    * Conditions aggregated in /research/services-analysis.md, plus three added
    * on 2026-09-29 from /research/provider-directories.md.
@@ -993,7 +987,7 @@ export const WHAT_WE_TREAT = {
    */
   services: [
     {
-      title: 'Comprehensive psychiatric assessment',
+      title: 'Comprehensive psychiatric evaluation',
       body: 'A structured first appointment where we identify risk factors, reach a diagnosis, and build your treatment plan.',
       href: '/services/psychiatric-evaluation',
     },
@@ -1148,7 +1142,7 @@ export type ServicePage = {
   /**
    * Drop the appointment button out of this service's hero.
    *
-   * Client request, 2026-09-30, for the psychiatric assessment page only. It is
+   * Client request, 2026-09-30, for the psychiatric evaluation page only. It is
    * a flag rather than a deletion in PageHero because that header is shared by
    * six routes and the other five were not part of the request.
    *
@@ -1238,15 +1232,10 @@ export type ServicePage = {
 export const SERVICE_PAGES: ServicePage[] = [
   {
     /**
-     * The URL keeps "evaluation" while every visible string on the page says
-     * "assessment", and that mismatch is deliberate.
-     *
-     * The practice's own word is assessment (owners, 2026-09-29), so that is
-     * what patients read. But "psychiatric evaluation" is the far higher-volume
-     * query of the two in US search, and the slug is the one high-weight slot
-     * where it can sit without contradicting the owners' copy. The synonym is
-     * also stated in `metaDescription` and once in the body below, so the page
-     * answers to both words.
+     * The page is named "psychiatric evaluation" (client, 2026-10-25, reversing
+     * the owners' 2026-09-29 "assessment" rule), and so is the slug. It is also
+     * the far higher-volume query of the two in US search. "Psychiatric
+     * assessment" is kept as `alternateName` so the page still answers to it.
      *
      * NOT kept for its history — it has none. The site has not launched, so
      * this path has never been indexed and a rename now would need no redirect.
@@ -1254,7 +1243,7 @@ export const SERVICE_PAGES: ServicePage[] = [
      * when it would need a 301 from the old path in next.config.ts.
      */
     slug: 'psychiatric-evaluation',
-    nav: 'Psychiatric assessment',
+    nav: 'Psychiatric evaluation',
     /**
      * OBJECT-POSITION READS OFF THE FRAME, not off taste. Measured on the
      * master: the patient occupies x 0-48%, the clinician's hands, pen and
@@ -1297,21 +1286,13 @@ export const SERVICE_PAGES: ServicePage[] = [
       quality: 82,
     },
     schemaType: 'MedicalProcedure',
-    title: 'Comprehensive psychiatric assessment',
-    alternateName: 'Psychiatric evaluation',
-    metaTitle: 'Psychiatric Assessment in NJ and PA',
-    /**
-     * "also called a psychiatric evaluation" is the highest-value of the four
-     * retained uses of the old word, and the one most at risk from a later
-     * "remove every evaluation" sweep — it is the only one a patient reads, in
-     * the search result that brought them. It survives mobile truncation: it
-     * lands around characters 65-77, well inside the ~120 shown. See the slug
-     * note above and CLAUDE.md's terminology section before touching it.
-     */
+    title: 'Comprehensive psychiatric evaluation',
+    alternateName: 'Psychiatric assessment',
+    metaTitle: 'Psychiatric Evaluation in NJ and PA',
     metaDescription:
-      'A comprehensive psychiatric assessment, also called a psychiatric evaluation, in NJ and PA: full history, rating scales, a diagnosis, and a treatment plan.',
+      'A comprehensive psychiatric evaluation in NJ and PA: full history, rating scales, a diagnosis, and a treatment plan.',
     intro:
-      'Every patient at Newpoint starts here. In a comprehensive psychiatric assessment, we take your full history, get a clear picture of what brought you in, and finish with a diagnosis and a treatment plan built around it. Everything else builds on this visit.',
+      'Every patient at Newpoint starts here. In a comprehensive psychiatric evaluation, we take your full history, get a clear picture of what brought you in, and finish with a diagnosis and a treatment plan built around it. Everything else builds on this visit.',
     modality: DELIVERY_LINE,
     /* The one service on the bespoke layout. See the field's own comment on
        the type for the shape it assumes. */
@@ -1321,20 +1302,13 @@ export const SERVICE_PAGES: ServicePage[] = [
     sections: [
       {
         heading: 'What the assessment covers',
-        /**
-         * The closing sentence is the page's one deliberate use of the older
-         * word. A patient referred here by a GP or a plan will almost always
-         * have been told "psychiatric evaluation", and the two names for one
-         * appointment is exactly the thing that makes someone hesitate to book.
-         * It doubles as the page's synonym coverage — see the slug note above.
-         */
-        body: 'The assessment follows a set structure, not just a conversation, so nothing important gets missed. We go through your history and current symptoms and look for the risk factors that may be affecting your mental health — the things that make a condition harder to manage or easier to miss. If you were referred for a psychiatric evaluation, this is the same appointment. We just call it an assessment.',
+        body: 'The assessment follows a set structure, not just a conversation, so nothing important gets missed. We go through your history and current symptoms and look for the risk factors that may be affecting your mental health — the things that make a condition harder to manage or easier to miss.',
       },
       {
         heading: 'The tools we use',
         body: 'Along with the conversation, we use a few structured tools. They give us a baseline to measure against later, so we can tell real progress from a good week.',
         list: [
-          'A comprehensive psychiatric assessment questionnaire',
+          'A comprehensive psychiatric evaluation questionnaire',
           'Standardized clinical rating scales, recorded at baseline',
           'Screening tests, both to identify conditions and to rule others out',
         ],
@@ -1442,7 +1416,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     faqs: [
       {
         q: 'Is the first appointment always an assessment?',
-        a: 'Yes. Every new patient starts with a comprehensive psychiatric assessment, because your treatment plan depends on it.',
+        a: 'Yes. Every new patient starts with a comprehensive psychiatric evaluation, because your treatment plan depends on it.',
       },
       {
         q: 'Can the assessment be done by telehealth?',
@@ -1532,7 +1506,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       {
         heading: 'Prescribing that follows the plan',
         /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
-        body: 'We prescribe medication as part of the treatment plan from your comprehensive psychiatric assessment, not on its own. When both are indicated, we combine medication with psychotherapy approaches.',
+        body: 'We prescribe medication as part of the treatment plan from your comprehensive psychiatric evaluation, not on its own. When both are indicated, we combine medication with psychotherapy approaches.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "Mental
              illness diagnoses are made based on assessments, and then an
@@ -1721,7 +1695,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     faqs: [
       {
         q: 'Can I get medication management without an assessment first?',
-        a: 'No. Medication management depends on the diagnosis and baseline measurements from your comprehensive psychiatric assessment.',
+        a: 'No. Medication management depends on the diagnosis and baseline measurements from your comprehensive psychiatric evaluation.',
       },
       {
         q: 'How often are follow-up appointments?',
@@ -1764,7 +1738,7 @@ export const SERVICE_PAGES: ServicePage[] = [
      *    Adopting a direct competitor's name in its own market is not a
      *    copy decision. "Medical weight management" is also the term the rest
      *    of this file would have chosen anyway: the sibling services are
-     *    "Comprehensive psychiatric assessment" and "Medication management".
+     *    "Comprehensive psychiatric evaluation" and "Medication management".
      *
      * 3. THERE IS NO OFFER AND NO PRICE, by the client's decision of
      *    2026-10-06. The flyer's "10% off your first month" implies a monthly
@@ -2233,8 +2207,8 @@ export const SERVICE_PAGES: ServicePage[] = [
       {
         heading: 'What substance use and addiction care involves',
         /* The first step is the practice's own: every new patient starts with
-           the comprehensive psychiatric assessment (WHAT_TO_EXPECT). */
-        body: 'This is outpatient care for problems with alcohol, drugs, or other substances. It starts with a comprehensive psychiatric assessment, and your plan is built from there.',
+           the comprehensive psychiatric evaluation (WHAT_TO_EXPECT). */
+        body: 'This is outpatient care for problems with alcohol, drugs, or other substances. It starts with a comprehensive psychiatric evaluation, and your plan is built from there.',
         bullets: [
           'We go over your history, what you’re using, and what you’ve already tried.',
           'You decide with us what you want to change.',
@@ -2293,7 +2267,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     faqs: [
       {
         q: 'What happens at my first appointment for substance use?',
-        a: 'A comprehensive psychiatric assessment, the same first appointment every new patient has. We’ll talk about substance use alongside your mental health, your history, and what you want from treatment.',
+        a: 'A comprehensive psychiatric evaluation, the same first appointment every new patient has. We’ll talk about substance use alongside your mental health, your history, and what you want from treatment.',
       },
       {
         q: 'Do I need a referral for addiction treatment?',
@@ -2381,7 +2355,7 @@ export const CARE_GUIDE = {
   together:
     // "You start with", not "every new patient": whether weight management
     // intake is the same assessment is still open (OPEN_CLIENT_ITEMS, item 8).
-    'Where both are indicated, your treatment plan combines them. For therapy, psychiatric care, or both, you start with a comprehensive psychiatric assessment.',
+    'Where both are indicated, your treatment plan combines them. For therapy, psychiatric care, or both, you start with a comprehensive psychiatric evaluation.',
 } as const;
 
 export const GETTING_STARTED = {
@@ -2393,8 +2367,8 @@ export const GETTING_STARTED = {
       body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t include health details in any message.',
     },
     {
-      title: 'Comprehensive psychiatric assessment',
-      body: 'Your first appointment is a full psychiatric assessment. We review your history, identify risk factors, reach a diagnosis, and build a treatment plan with you.',
+      title: 'Comprehensive psychiatric evaluation',
+      body: 'Your first appointment is a full psychiatric evaluation. We review your history, identify risk factors, reach a diagnosis, and build a treatment plan with you.',
     },
     {
       title: 'Ongoing care',
@@ -2447,7 +2421,7 @@ export const WHAT_TO_EXPECT = {
    */
   badge: 'How it works',
   heading: 'What to expect',
-  body: 'Four steps, from the first contact to ongoing care. Every new patient starts with the same comprehensive psychiatric assessment.',
+  body: 'Four steps, from the first contact to ongoing care. Every new patient starts with the same comprehensive psychiatric evaluation.',
   steps: [
     {
       title: 'Request an appointment',
@@ -2469,7 +2443,7 @@ export const WHAT_TO_EXPECT = {
       body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and why you’re reaching out. Please don’t include health details in any message — we’ll get the clinical details from you directly.',
     },
     {
-      title: 'Comprehensive psychiatric assessment',
+      title: 'Comprehensive psychiatric evaluation',
       /**
        * "may be affecting", matching SERVICE_PAGES and the source verbatim
        * ("identifies risk factors that MAY impact a patient's mental health").
@@ -2536,7 +2510,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
   {
     type: 'featured',
     badge: 'Start here',
-    title: 'Comprehensive psychiatric assessment',
+    title: 'Comprehensive psychiatric evaluation',
     description:
       'A structured first appointment where we identify risk factors, reach a diagnosis, and build your treatment plan.',
     footerText: 'In person and by telehealth',
@@ -2673,7 +2647,7 @@ export const FAQ = {
         },
         {
           q: 'What happens at the first appointment?',
-          a: 'A comprehensive psychiatric assessment. We take a full history, identify risk factors, use standardized screening and rating scales where helpful, and finish with a diagnosis and a treatment plan.',
+          a: 'A comprehensive psychiatric evaluation. We take a full history, identify risk factors, use standardized screening and rating scales where helpful, and finish with a diagnosis and a treatment plan.',
         },
         {
           /* "We see patients in person and also by telehealth" is the
@@ -2689,11 +2663,11 @@ export const FAQ = {
            2026-09-29). Placed after the homepage's four-item preview. */
         {
           q: 'Can I get medication only?',
-          a: 'Care starts with a comprehensive psychiatric assessment. If medication is appropriate, it can be part of your plan with or without psychotherapy. We don’t prescribe without that assessment.',
+          a: 'Care starts with a comprehensive psychiatric evaluation. If medication is appropriate, it can be part of your plan with or without psychotherapy. We don’t prescribe without that assessment.',
         },
         {
           q: 'Do I need to be in therapy first?',
-          a: 'No. You can contact us directly. Care starts with a comprehensive psychiatric assessment, and we build your plan from there.',
+          a: 'No. You can contact us directly. Care starts with a comprehensive psychiatric evaluation, and we build your plan from there.',
         },
         {
           q: 'Do I need a referral?',
@@ -2919,7 +2893,7 @@ export const NEW_PATIENTS_PAGE = {
   title: 'Starting care at Newpoint',
   metaTitle: 'New Patients | Starting Psychiatric Care',
   metaDescription:
-    'What to expect as a new patient at Newpoint: how to get in touch, your first psychiatric assessment, and how ongoing care works in NJ and PA.',
+    'What to expect as a new patient at Newpoint: how to get in touch, your first psychiatric evaluation, and how ongoing care works in NJ and PA.',
   intro:
     'Starting psychiatric care can feel like a big step, so here’s the whole process, start to finish. Three steps, no surprises.',
   expectations: [
@@ -2931,7 +2905,7 @@ export const NEW_PATIENTS_PAGE = {
       // Scope, not duration: session length is not published anywhere, so no
       // relative claim about appointment length is made.
       heading: 'Your first appointment covers more ground than the ones after it',
-      body: 'It’s a comprehensive psychiatric assessment: a full history, a look at risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end.',
+      body: 'It’s a comprehensive psychiatric evaluation: a full history, a look at risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end.',
     },
     {
       heading: 'Follow-up appointments can be in person or by video',
@@ -3119,7 +3093,7 @@ export const ROUTES: { path: string; priority: number }[] = [
  */
 export const OPEN_CLIENT_ITEMS = [
   'FREE 15-MINUTE CONSULTATION, added 2026-10-19 on the client\'s instruction ("We also offer 15 minutes consultations free of charge"). It now appears in the FAQ, in step one of "What to expect" and "Getting started", and in the closing band\'s assurance row on nine pages. The site deliberately says nothing about HOW it works, because nobody has said: (1) who takes it, a provider or front-desk staff; (2) by phone, by video, or either; (3) new patients only, or anyone; (4) whether it is clinical (it must not imply an assessment, a diagnosis or a prescription happens in 15 minutes); (5) how to book it, if not the same call or email as an appointment; (6) whether a caller outside New Jersey and Pennsylvania can have one, since both providers are licensed in those two states only; (7) if a provider takes it, whether it starts a clinical relationship (documentation, what happens if a caller is in crisis). ALSO: /services lists "Psychiatric consultation" among treatment options, a different thing with nearly the same name; a reader can take the free one for that clinical one. Confirm what "Psychiatric consultation" is, or rename one of them. The FAQ answer and the band are written so a yes to any of these needs at most one added clause',
-  'PRE-LAUNCH — MEDICAL WEIGHT MANAGEMENT: SIX FACTS, AND THE PAGE SHIPS WITHOUT ANY OF THEM. /services/weight-management was built on 2026-10-06 from a one-line brief and a competitor\'s flyer. Everything it asserts is either the client\'s own instruction (semaglutide, tirzepatide, weekly injections) or PROVIDERS[].credentials verbatim; everything below is what it had to refuse to say, and each one is a real question a patient asks before booking. (1) IS THIS OPEN TO NEW PATIENTS, or to existing psychiatric patients only, or both? The page cannot say, and the FAQ that would answer it is deliberately absent. This is the one that decides whether the page earns anything. (2) BRAND OR COMPOUNDED? The page names generic molecules only, which is true either way, and names no brand anywhere. If the practice dispenses or prescribes compounded semaglutide or tirzepatide that is a materially different claim with live FDA exposure, and the page would need to say so. (3) IN-OFFICE OR SELF-ADMINISTERED INJECTIONS? `modality` names no delivery mode because of this. The flyer implies a weekly visit; an at-home pen is the more common arrangement; neither is confirmed. (4) PRICE AND TERMS. The client declined an introductory offer on 2026-10-06, so nothing about money ships. If the flyer\'s "10% off your first month" is ever wanted, it needs the monthly price, the term, the expiry, and whether it applies to insurance-billed patients. (5) INSURANCE OR CASH-PAY. The FAQ answers this with what is true of US coverage generally and commits the practice to nothing. (6) DOES IT HOLD FOR BOTH PROVIDERS? app/providers/[slug]/page.tsx lists every SERVICE_PAGES entry on both provider pages, so adding this service has already asserted that both of them offer it. Both hold FNP-BC, so it is plausible for both — but it is the same practice-wide-versus-per-provider question the payer list and the ADHD line both carry, and nobody has answered it for this service either. (7) STATE PRESCRIPTIVE AUTHORITY, WHICH IS THE ONE THAT PUTS THIS SERVICE INSIDE THE PROVIDERS\' LEGAL SCOPE AT ALL. The page names FNP-BC, which is a BOARD CERTIFICATION and not a state authorization — healthcare-reviewer, 2026-10-06. Pennsylvania ties a CRNP\'s practice and prescriptive authority to the specialty registered WITH THE BOARD and requires a written collaborative agreement plus separately granted prescriptive authority; New Jersey prescribing runs under a joint protocol with a collaborating physician unless the APN qualifies for the practice-hours exemption. This repo holds no evidence either provider\'s NJ APN or PA CRNP credential is registered in the FAMILY specialty — the one candidate number, PA SP016195, carries no specialty, and every directory signal in research/ is psychiatric. Ask the practice to confirm family-specialty registration in both states, and that the PA collaborative agreement and the NJ joint protocol cover weight-management prescribing. Nothing on the page changes if the answers are yes. (8) WHICH APPOINTMENT IS THE INTAKE, AND THIS ONE HAS A CONSENT DIMENSION. The weight-management page says "an appointment" five times and never says which. The homepage says "Every new patient starts with the same comprehensive psychiatric assessment", and /new-patients says it again. Either that is still true — in which case a patient enquiring about weight loss is being psychiatrically assessed and having a psychiatric record created, and the page should say so before they book — or it is no longer true, and the homepage now makes a claim on behalf of a service line that postdates it. There is a billing question underneath: a weight-management intake coded as a comprehensive psychiatric assessment is an exposure of its own. CLOSE THIS ONE FIRST',
+  'PRE-LAUNCH — MEDICAL WEIGHT MANAGEMENT: SIX FACTS, AND THE PAGE SHIPS WITHOUT ANY OF THEM. /services/weight-management was built on 2026-10-06 from a one-line brief and a competitor\'s flyer. Everything it asserts is either the client\'s own instruction (semaglutide, tirzepatide, weekly injections) or PROVIDERS[].credentials verbatim; everything below is what it had to refuse to say, and each one is a real question a patient asks before booking. (1) IS THIS OPEN TO NEW PATIENTS, or to existing psychiatric patients only, or both? The page cannot say, and the FAQ that would answer it is deliberately absent. This is the one that decides whether the page earns anything. (2) BRAND OR COMPOUNDED? The page names generic molecules only, which is true either way, and names no brand anywhere. If the practice dispenses or prescribes compounded semaglutide or tirzepatide that is a materially different claim with live FDA exposure, and the page would need to say so. (3) IN-OFFICE OR SELF-ADMINISTERED INJECTIONS? `modality` names no delivery mode because of this. The flyer implies a weekly visit; an at-home pen is the more common arrangement; neither is confirmed. (4) PRICE AND TERMS. The client declined an introductory offer on 2026-10-06, so nothing about money ships. If the flyer\'s "10% off your first month" is ever wanted, it needs the monthly price, the term, the expiry, and whether it applies to insurance-billed patients. (5) INSURANCE OR CASH-PAY. The FAQ answers this with what is true of US coverage generally and commits the practice to nothing. (6) DOES IT HOLD FOR BOTH PROVIDERS? app/providers/[slug]/page.tsx lists every SERVICE_PAGES entry on both provider pages, so adding this service has already asserted that both of them offer it. Both hold FNP-BC, so it is plausible for both — but it is the same practice-wide-versus-per-provider question the payer list and the ADHD line both carry, and nobody has answered it for this service either. (7) STATE PRESCRIPTIVE AUTHORITY, WHICH IS THE ONE THAT PUTS THIS SERVICE INSIDE THE PROVIDERS\' LEGAL SCOPE AT ALL. The page names FNP-BC, which is a BOARD CERTIFICATION and not a state authorization — healthcare-reviewer, 2026-10-06. Pennsylvania ties a CRNP\'s practice and prescriptive authority to the specialty registered WITH THE BOARD and requires a written collaborative agreement plus separately granted prescriptive authority; New Jersey prescribing runs under a joint protocol with a collaborating physician unless the APN qualifies for the practice-hours exemption. This repo holds no evidence either provider\'s NJ APN or PA CRNP credential is registered in the FAMILY specialty — the one candidate number, PA SP016195, carries no specialty, and every directory signal in research/ is psychiatric. Ask the practice to confirm family-specialty registration in both states, and that the PA collaborative agreement and the NJ joint protocol cover weight-management prescribing. Nothing on the page changes if the answers are yes. (8) WHICH APPOINTMENT IS THE INTAKE, AND THIS ONE HAS A CONSENT DIMENSION. The weight-management page says "an appointment" five times and never says which. The homepage says "Every new patient starts with the same comprehensive psychiatric evaluation", and /new-patients says it again. Either that is still true — in which case a patient enquiring about weight loss is being psychiatrically assessed and having a psychiatric record created, and the page should say so before they book — or it is no longer true, and the homepage now makes a claim on behalf of a service line that postdates it. There is a billing question underneath: a weight-management intake coded as a comprehensive psychiatric evaluation is an exposure of its own. CLOSE THIS ONE FIRST',
   'Exact legal business name from the LLC formation documents ("Newpoint" vs "New Point")',
   'Street address, suite and ZIP for the practice. NOW THE HIGHEST-VALUE OPEN ITEM: the client has confirmed care is delivered in person as well as by telehealth, so the site claims in-person care and the organization is marked up as a MedicalClinic. Google expects an address on that type, a patient told they can be seen in person has nowhere to go, and Local Pack and Maps eligibility are blocked until it exists. The former "or confirm service-area only" alternative is closed — in-person care is confirmed. EVIDENCE NOW EXISTS: 6 Colonial Lake Drive, Suite D, Lawrence Township (Lawrenceville), NJ 08648 — named by Grow Therapy, Headway and U.S. News, across BOTH providers, and U.S. News pairs it with (609) 527-9438, which is already BUSINESS.phonePrimary. Needs the client to confirm in writing, and to confirm the suite format, before it ships',
   'Which states in-person care covers. A SECOND ADDRESS HAS SURFACED: Headway lists 803 West Trenton Avenue Ste 3, Morrisville, PA 19067 for Whitaker as "Location 1 of 2". This is the first Pennsylvania place-level signal in any Newpoint research and would relax CLAUDE.md\'s rule that in-person care is stated without a state. One platform, one provider, unconfirmed — it may be a Headway location rather than a Newpoint office',

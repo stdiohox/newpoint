@@ -6,7 +6,6 @@ describe("content rules", () => {
     ["psychiatrist near me", ["clinician_title"]],
     ["dr whitaker reviews", ["clinician_title"]],
     ["doctor-supervised weight loss", ["clinician_title"]],
-    ["psychiatric evaluation nj", ["evaluation"]],
     ["ozempic prescription new jersey", ["drug_brand"]],
     ["can newpoint prescribe adderall", ["medication_or_class"]],
     ["are ssris prescribed by nurse practitioners", ["medication_or_class"]],

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     // right before "New Jersey and Pennsylvania". The verbatim sentence is the
     // Open Graph and Twitter description below, which is the "second line" of
     // a link preview the client was looking at.
-    'Psychiatric assessment, medication management, and weight management in New Jersey and Pennsylvania from two doctorate-prepared nurse practitioners.',
+    'Psychiatric evaluation, medication management, and weight management in New Jersey and Pennsylvania from two doctorate-prepared nurse practitioners.',
   applicationName: BUSINESS.legalName,
   authors: [{ name: BUSINESS.legalName }],
   /**
@@ -25,9 +25,8 @@ export const metadata: Metadata = {
    * DO NOT COUNT THIS AS SEARCH COVERAGE. Google has ignored meta keywords for
    * years and Bing gives it no useful weight; it is kept because it is free and
    * because it documents the vocabulary, not because it ranks for anything. The
-   * real carriers of "psychiatric evaluation" are the /services slug, the
-   * assessment page's meta description, and the one sentence of body copy that
-   * names the synonym. See the slug note in lib/content.ts.
+   * real carriers of "psychiatric evaluation" are the page's visible copy and
+   * its /services slug. See the slug note in lib/content.ts.
    */
   keywords: [
     'psychiatric nurse practitioner',
@@ -46,7 +45,7 @@ export const metadata: Metadata = {
     url: BUSINESS.domain,
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric assessment, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
+      'Psychiatric evaluation, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
     locale: 'en_US',
     // The 1200x630 card is generated at app/opengraph-image.tsx and applies to
     // every route. CLIENT: replace it with a supplied asset if one exists.
@@ -55,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Psychiatric Nurse Practitioners in NJ and PA | Newpoint',
     description:
-      'Psychiatric assessment, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
+      'Psychiatric evaluation, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners serving New Jersey and Pennsylvania.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: BUSINESS.domain },

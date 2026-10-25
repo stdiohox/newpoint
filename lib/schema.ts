@@ -56,7 +56,7 @@ export function medicalClinicSchema() {
     url: BUSINESS.domain,
     slogan: BUSINESS.tagline,
     description:
-      `Outpatient psychiatric and behavioral health nurse practitioner practice. ${DELIVERY_LINE}. Psychiatric assessment and medication management.`,
+      `Outpatient psychiatric and behavioral health nurse practitioner practice. ${DELIVERY_LINE}. Psychiatric evaluation and medication management.`,
     medicalSpecialty: 'Psychiatric',
     telephone: BUSINESS.phonePrimary,
     faxNumber: BUSINESS.fax,
@@ -242,7 +242,7 @@ export function serviceSchemaFor(s: ServicePage) {
     name: s.title,
     /* Only where the service has a second name that the page itself uses in
        visible copy. `alternateName` is valid on any schema.org Thing, and it is
-       how the assessment page tells an engine that "psychiatric evaluation"
+       how the evaluation page tells an engine that "psychiatric assessment"
        names the same procedure without the H1 having to say it. Omitted rather
        than emitted empty when a service has no synonym. */
     ...(s.alternateName ? { alternateName: s.alternateName } : {}),

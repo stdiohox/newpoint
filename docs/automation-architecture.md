@@ -437,7 +437,7 @@ adapter:
 - **Licensure:** only providers licensed in the patient's state are offered.
 - **Modality:** the patient's choice of in-person or telehealth must be one the
   provider offers.
-- **New patients:** the first visit is the comprehensive psychiatric assessment.
+- **New patients:** the first visit is the comprehensive psychiatric evaluation.
 - **Minors:** guardian flow (D18).
 
 ### 5.2 Google Business Profile — public zone
@@ -466,7 +466,7 @@ adapter:
 | **`seo.keyword-research`** | Cron, plus manual run from the Trigger.dev dashboard (never from n8n, which holds no Trigger.dev key, §2) | Seed matrix (services × towns × NJ/PA × intent), Search Console queries, volume source (D8) | Clustered `marketing.keywords`, plus `content_backlog` items such as page gaps, FAQ candidates and GBP categories | Monthly |
 | **`seo.rank-tracker`** | Cron | Search Console API | `keyword_snapshots`, and movers in the weekly report | Weekly, Monday 06:00 ET |
 
-Seed terms use the owners' vocabulary ("psychiatric assessment", "mental and
+Seed terms use the owners' vocabulary ("psychiatric evaluation", "mental and
 behavioral care"). They keep "psychiatric evaluation" as a tracked query because the
 brief keeps it for query coverage. Output feeds three consumers: the site backlog
 (applied by a human), the social planner and GEO prompts.

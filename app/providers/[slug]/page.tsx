@@ -332,7 +332,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     {/* "New patients at Newpoint start with", practice-voiced,
                         NOT a second clause about this provider. Sitting under a
                         named clinician's photograph, "New patients start with a
-                        comprehensive psychiatric assessment" reads as a claim
+                        comprehensive psychiatric evaluation" reads as a claim
                         that SHE performs it. That is sourced for Ofoegbu, whose
                         bio names assessments, and not for Whitaker, whose names
                         medication management only — which is exactly why
@@ -343,7 +343,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                     <p className="text-body-l text-np-neutral-600 mt-4 max-w-[58ch]">
                       {provider.name.split(' ')[0]} sees patients at {BUSINESS.shortName}.{' '}
                       {DELIVERY_LINE}. New patients start with a comprehensive psychiatric
-                      assessment. After that, care continues as medication management on a schedule
+                      evaluation. After that, care continues as medication management on a schedule
                       you set together.
                     </p>
                   </Reveal>

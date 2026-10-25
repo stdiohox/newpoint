@@ -17,7 +17,6 @@
 
 export type ContentRule =
   | "clinician_title"
-  | "evaluation"
   | "drug_brand"
   | "medication_or_class"
   | "weight_outcome"
@@ -28,8 +27,6 @@ export type ContentRule =
 const RULES: readonly (readonly [ContentRule, RegExp])[] = [
   // "Clinician titles": never psychiatrist, physician or Dr.; "doctor" only as the degree.
   ["clinician_title", /\b(psychiatrists?|physicians?|doctors?|dr)\b|doctor-supervised/i],
-  // "Terminology": the appointment is an assessment; "evaluation" survives in four places only.
-  ["evaluation", /\b(evaluations?|evals?)\b/i],
   // "Medical weight management": no brand names anywhere on the site.
   ["drug_brand", /\b(ozempic|wegovy|zepbound|mounjaro|saxenda|rybelsus)\b/i],
   // "ADHD prescribing line": no medication and no drug class named; DEA scope is open.
@@ -70,7 +67,6 @@ export function blockingRulesTouched(text: string): ContentRule[] {
 
 const GUIDANCE: Readonly<Record<ContentRule, string>> = {
   clinician_title: "no psychiatrist, physician or Dr. (CLAUDE.md: Clinician titles)",
-  evaluation: 'say "assessment" (CLAUDE.md: Terminology)',
   drug_brand: "no drug brand names (CLAUDE.md: Medical weight management)",
   medication_or_class: "no medication or drug class, DEA scope is open (CLAUDE.md: ADHD prescribing line)",
   weight_outcome: "no weight-loss outcome (CLAUDE.md: Medical weight management)",
@@ -97,7 +93,6 @@ export type PostRule =
   | "medication_or_class"
   | "testimonial"
   | "pricing"
-  | "evaluation"
   | "crisis_without_988_911"
   | "unconfirmed_fact"
   | "off_site_link"
@@ -163,7 +158,6 @@ const POST_RULES: readonly (readonly [PostRule, (text: string) => boolean, strin
       /\bfree (consult\w*|\d+[- ]minute|visits?|sessions?|screenings?|assessments?|calls?)\b/i.test(t),
     "No prices, costs, discounts or free offers.",
   ],
-  ["evaluation", (t) => matches("evaluation", t), 'Call the appointment a "psychiatric assessment", not an evaluation or "eval".'],
   [
     "crisis_without_988_911",
     (t) => matches("crisis", t) && !(/\b988\b/.test(t) && /\b911\b/.test(t)),

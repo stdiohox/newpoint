@@ -20,7 +20,7 @@ import { breadcrumbSchema, faqSchemaFlat, organizationRef, serviceSchemaFor } fr
  *
  * The homepage's services cards summarise each service in two sentences
  * each, which is the right density for an overview and far too thin to rank for
- * "psychiatric assessment new jersey". These pages carry that weight instead,
+ * "psychiatric evaluation new jersey". These pages carry that weight instead,
  * each targeting a single query cluster, each with its own title, description,
  * its own schema.org node, and FAQ block.
  *
@@ -249,7 +249,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
          THE SECOND FIGURE IS "a person", NOT "a clinician", AND THE BINDING
          REASON IS THE PER-SERVICE SOURCING CONSTRAINT, not the care-modality
          rule. Whether both providers perform the comprehensive psychiatric
-         assessment is an open client item — see app/services/page.tsx:313-325,
+         evaluation is an open client item — see app/services/page.tsx:313-325,
          which carries the sourcing breakdown. Naming a clinician in the alt of
          the photograph heading "What the assessment covers" is a quiet way of
          asserting it.

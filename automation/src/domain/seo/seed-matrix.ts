@@ -3,9 +3,8 @@
  * §5.3): services × places × NJ/PA × intent.
  *
  * Vocabulary is the owners' (CLAUDE.md "Terminology and service names"):
- * "psychiatric assessment" and "mental and behavioral care". "Psychiatric
- * evaluation" stays a tracked query because the brief keeps it for query
- * coverage. "Psychiatrist" is not seeded: neither provider is one (CLAUDE.md
+ * "psychiatric evaluation" and "mental and behavioral care". "Psychiatric
+ * assessment" stays a tracked query as the synonym. "Psychiatrist" is not seeded: neither provider is one (CLAUDE.md
  * "Clinician titles"), and a seed becomes a backlog suggestion. Search Console
  * still reports it if people search it.
  *

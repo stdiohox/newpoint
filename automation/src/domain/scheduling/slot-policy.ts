@@ -7,7 +7,7 @@
  *   - State unknown or outside NJ/PA → callback (licensure cannot be checked).
  *   - Only providers licensed in the patient's state, offering the requested modality
  *     there, and matching a stated preference are eligible; none → callback.
- *   - New patients: the first visit is the comprehensive psychiatric assessment.
+ *   - New patients: the first visit is the comprehensive psychiatric evaluation.
  */
 import { PROVIDERS, type Modality, type Provider, type ProviderId, type State } from "./providers.js";
 

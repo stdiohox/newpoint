@@ -10,11 +10,11 @@ import { joinPublic, publicText, withoutTags, type PublicText } from "../lib/phi
 
 export const SOCIAL_PROMPTS_VERSION = 2;
 
-const PRACTICE = `Newpoint Healthcare Services is an outpatient psychiatric nurse-practitioner practice with two providers, serving New Jersey and Pennsylvania in person and by telehealth. Its services are psychiatric assessment, medication management, telehealth and medical weight management.`;
+const PRACTICE = `Newpoint Healthcare Services is an outpatient psychiatric nurse-practitioner practice with two providers, serving New Jersey and Pennsylvania in person and by telehealth. Its services are psychiatric evaluation, medication management, telehealth and medical weight management.`;
 
 const RULES = `Rules that every post follows, without exception:
 - The providers are psychiatric-mental health nurse practitioners. Never call them psychiatrists, physicians, doctors or MD. "Dr." only when it is immediately followed by "DNP, FNP-BC, PMHNP-BC" or the words "nurse practitioner", and never in alt text.
-- Call the appointment a "psychiatric assessment", never an evaluation.
+- Call the appointment a "psychiatric evaluation".
 - No outcome claims: no results, percentages, timeframes, cures or guarantees, for weight or anything else.
 - No medication names, no drug classes and no brand names.
 - No testimonials and no patient stories, real or invented.
