@@ -656,7 +656,16 @@ The homepage ends (after the contact section, before the footer) with
        costs ~2 s of load time. A smaller lossless copy for that page only would
        be ~4x lighter; ask whether that is acceptable. -->
 
-### Vivid royal colour — CLIENT REQUEST, 2026-10-22
+### Turquoise palette — CLIENT INSTRUCTION, 2026-10-26 (supersedes the royal section below)
+
+The royal blue "seems dark and is not good for the practice"; the brand colour is now
+**Turquoise Blue #00EDE1**, site-wide. The `np-blue-*` / `np-royal*` token names are kept and
+remapped in `app/globals.css` to the turquoise hue at the same white-contrast per step, so the
+ratios in component comments still hold. `#00EDE1` measures 1.48:1 on white: it is decorative
+(`np-cyan`: gradient ends, glows) and never carries or sits behind white text. Hero washes are
+700 (`#025854`), not 900. The logo mark PNG is unchanged (still the client's blue cross).
+
+### Vivid royal colour — CLIENT REQUEST, 2026-10-22 (superseded 2026-10-26)
 
 The client said the navy looked dull and asked for the colour style of Apple's Mail icon
 (a royal-to-cyan gradient). Tokens and rationale: `design-research/design-tokens.md`,
