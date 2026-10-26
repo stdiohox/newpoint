@@ -146,7 +146,7 @@ export function Footer() {
       </div>
 
       {/* THE OVERLAY, between the photograph and the flowers. White at the top
-          where the card sits, easing into np-blue-100 (#d2f9f7) at the foot
+          where the card sits, easing into np-blue-100 (#d2f8f9) at the foot
           where the flowers are — so the scene reads as light sky above and
           brand-tinted meadow below, and the card is never floating on a busy
           patch of photograph.
@@ -160,7 +160,7 @@ export function Footer() {
           over it and a tint strong enough to matter there would haze them. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.28)_45%,rgba(210,249,247,0.18)_100%)]"
+        className="absolute inset-0 z-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.28)_45%,rgba(210,248,249,0.18)_100%)]"
       />
 
       {/* THE CUT-OUT BAND. The parallax layer, at z-20: above the photograph

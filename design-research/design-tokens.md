@@ -19,8 +19,8 @@ All contrast ratios below were **calculated, not estimated**, using the WCAG rel
 | `--np-blue-600` | `#234598` | **Preserved brand primary.** Do not alter. Primary CTA, links, logo lockup |
 | `--np-blue-500` | `#3D62B8` | Lighter interactive, borders on tint |
 | `--np-blue-300` | `#8FB0EE` | **On-ink use only.** Links and CTAs inside the dark section |
-| `--np-blue-100` | `#d2f9f7` | Tint wash, selected states |
-| `--np-blue-50` | `#ebfcfb` | Faintest wash, table stripes |
+| `--np-blue-100` | `#d2f8f9` | Tint wash, selected states |
+| `--np-blue-50` | `#ebfbfc` | Faintest wash, table stripes |
 
 `#1F9DD6`, the current site's cyan accent, is **retired**. It is the element most responsible for the generic-medical read.
 
@@ -285,10 +285,10 @@ A new family, not a recolour of `np-blue` (`#234598` stays the brand blue).
 
 | Token | Hex | White on it | Use |
 |---|---|---|---|
-| `--color-np-royal-bright` | `#007b75` | 5.10:1 | top of button gradients |
-| `--color-np-royal` | `#006b66` | 6.37:1 | the working royal |
-| `--color-np-royal-deep` | `#025854` | 8.26:1 | panel grounds, hover, text scrims |
-| `--color-np-cyan` | `#00ede1` | 1.91:1 | decorative only: gradient ends, glows; never behind type |
+| `--color-np-royal-bright` | `#007a7c` | 5.10:1 | top of button gradients |
+| `--color-np-royal` | `#006a6c` | 6.37:1 | the working royal |
+| `--color-np-royal-deep` | `#025759` | 8.26:1 | panel grounds, hover, text scrims |
+| `--color-np-cyan` | `#00ced1` | 1.91:1 | decorative only: gradient ends, glows; never behind type |
 
 Utilities: `bg-np-vivid` (royal-bright to royal, primary buttons) and `bg-np-vivid-deep`
 (hover). Applied to the providers panel, the closing CTA band, primary/navy buttons, the
@@ -299,22 +299,22 @@ their navy scrims, which were measured for contrast against those photographs.
 
 "I want this new colour to be dominant everywhere on the website." The whole `np-blue`
 scale was remapped onto the royal family, superseding the "#234598 is preserved brand
-equity" note, and `np-sky` moved from slate `#4a76a4` to `#00807a`:
+equity" note, and `np-sky` moved from slate `#4a76a4` to `#007f81`:
 
 | Token | Was | Now | White on it |
 |---|---|---|---|
-| `np-blue-900` | `#101f45` | `#053a38` | 12.56:1 |
-| `np-blue-800` | `#172d63` | `#044b47` | 9.90:1 |
-| `np-blue-700` | `#1b3576` | `#025854` | 8.26:1 |
-| `np-blue-600` | `#234598` | `#006b66` | 6.37:1 |
-| `np-blue-500` | `#3d62b8` | `#007b75` | 5.10:1 |
-| `np-blue-300` | `#8fb0ee` | `#75f0e9` | 6.61:1 on 900 |
-| `np-blue-100` | `#d2f9f7` | `#d2f9f7` | tint |
-| `np-blue-50` | `#ebfcfb` | `#ebfcfb` | tint |
-| `np-sky` | `#4a76a4` | `#00807a` | 4.78:1 |
+| `np-blue-900` | `#101f45` | `#05393a` | 12.56:1 |
+| `np-blue-800` | `#172d63` | `#044b4c` | 9.90:1 |
+| `np-blue-700` | `#1b3576` | `#025759` | 8.26:1 |
+| `np-blue-600` | `#234598` | `#006a6c` | 6.37:1 |
+| `np-blue-500` | `#3d62b8` | `#007a7c` | 5.10:1 |
+| `np-blue-300` | `#8fb0ee` | `#75eef0` | 6.61:1 on 900 |
+| `np-blue-100` | `#d2f8f9` | `#d2f8f9` | tint |
+| `np-blue-50` | `#ebfbfc` | `#ebfbfc` | tint |
+| `np-sky` | `#4a76a4` | `#007f81` | 4.78:1 |
 
 The photo-hero scrims (hardcoded `rgba(16,31,69,…)` in `Hero.tsx` and `PageHero.tsx`) now
-use the new 900, `rgba(0,107,102,…)`, at the same alphas; contrast was re-measured on every
+use the new 900, `rgba(0,106,108,…)`, at the same alphas; contrast was re-measured on every
 hero route. The "Newpoint" wordmark is royal (`np-blue-600`) and the navbar mark uses
 `/brand/newpoint-mark-royal.svg`. The client's colour logo PNG (footer, favicon) is their
 artwork and was not recoloured.
@@ -331,6 +331,6 @@ sky into royal. Same 124x123 pixels as the original.
 
 Bright royal (`np-blue-600`) on every heading read as too loud and competed with the buttons.
 Headings (h1–h3 base rule, the services section, card and FAQ titles) now use `np-blue-800`
-`#044b47` (9.90:1 on white). Bright royal stays on what should be clicked: buttons, links,
+`#044b4c` (9.90:1 on white). Bright royal stays on what should be clicked: buttons, links,
 pills, hover states, the step numbers. Gradient text was compared and declined: its light end
 fails contrast ("and how" fades to cyan) and it is a decorative pattern the design skill bans.

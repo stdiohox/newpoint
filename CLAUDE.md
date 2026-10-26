@@ -659,11 +659,11 @@ The homepage ends (after the contact section, before the footer) with
 ### Turquoise palette — CLIENT INSTRUCTION, 2026-10-26 (supersedes the royal section below)
 
 The royal blue "seems dark and is not good for the practice"; the brand colour is now
-**Turquoise Blue #00EDE1**, site-wide. The `np-blue-*` / `np-royal*` token names are kept and
+**Turquoise Blue #00CED1**, site-wide. The `np-blue-*` / `np-royal*` token names are kept and
 remapped in `app/globals.css` to the turquoise hue at the same white-contrast per step, so the
-ratios in component comments still hold. `#00EDE1` measures 1.48:1 on white: it is decorative
+ratios in component comments still hold. `#00CED1` measures 1.95:1 on white: it is decorative
 (`np-cyan`: gradient ends, glows) and never carries or sits behind white text. Hero washes are
-700 (`#025854`), not 900. The logo mark PNG is unchanged (still the client's blue cross).
+700 (`#025759`), not 900. The logo mark PNG is unchanged (still the client's blue cross).
 
 ### Vivid royal colour — CLIENT REQUEST, 2026-10-22 (superseded 2026-10-26)
 
