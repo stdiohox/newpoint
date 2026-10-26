@@ -421,8 +421,15 @@ export function PageCta({
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
               >
                 {assurances.map(({ icon: Icon, label }) => (
-                  <li key={label} className="text-small flex items-center gap-2 text-white">
-                    <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
+                  /* Inline, not flex: as a flex row a wrapped label left the icon
+                     stranded at the box's left edge on phones. */
+                  <li key={label} className="text-small text-white">
+                    <Icon
+                      aria-hidden="true"
+                      size={16}
+                      strokeWidth={1.75}
+                      className="mr-2 inline-block align-[-3px]"
+                    />
                     {label}
                   </li>
                 ))}
