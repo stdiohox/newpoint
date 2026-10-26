@@ -235,6 +235,9 @@ export function PageCta({
               and the appointment label at glyph-core pixels, rest / hover:
                 1440 4.84 / 4.66      390 4.86 / 4.68   (floor 4.5)
 
+              LIGHTER STILL, 2026-10-26 (client: "reduce the opacity here"): the
+              scrim and the corner glow below were scaled to 0.55x, core 0.66 -> 0.36.
+
               AND LIGHTER AGAIN, 2026-10-23 (client: "reduce the opacity of
               this one too"). Veil 0.2 -> 0.08, core 0.72 -> 0.66, flat to 70%.
               That only became possible by moving contrast off the panel and
@@ -251,7 +254,7 @@ export function PageCta({
               panel's full width and the corner is under it. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(0,206,209,0.66)_0%,rgba(0,206,209,0.66)_70%,rgba(0,206,209,0.611)_75.0%,rgba(0,206,209,0.489)_80.0%,rgba(0,206,209,0.330)_85.0%,rgba(0,206,209,0.171)_90.0%,rgba(0,206,209,0.049)_95.0%,rgba(0,206,209,0.000)_100.0%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(0,206,209,0.363)_0%,rgba(0,206,209,0.363)_70%,rgba(0,206,209,0.336)_75.0%,rgba(0,206,209,0.269)_80.0%,rgba(0,206,209,0.182)_85.0%,rgba(0,206,209,0.094)_90.0%,rgba(0,206,209,0.027)_95.0%,rgba(0,206,209,0)_100.0%)]"
           />
           {/* THE CYAN END OF THE MAIL-ICON GRADIENT, client request 2026-10-22.
               A glow in the bottom-right corner only, outside the text scrim's
@@ -259,7 +262,7 @@ export function PageCta({
               Cyan measures 1.91:1 against white; it must never reach a glyph. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_100%_100%,rgba(0,206,209,0.6)_0%,rgba(0,206,209,0.22)_18%,rgba(0,206,209,0)_32%)] md:block"
+            className="cta-overlay pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_100%_100%,rgba(0,206,209,0.33)_0%,rgba(0,206,209,0.121)_18%,rgba(0,206,209,0)_32%)] md:block"
           />
 
           <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
