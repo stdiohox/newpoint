@@ -518,7 +518,7 @@ export function PageHero({
                 and a top margin there would only pad the block against the
                 navbar clearance above it. */}
             <h1
-              className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
+              className={`text-display-l max-w-[18ch] text-white ${
                 centred ? 'lg:mx-auto' : ''
               } ${eyebrow ? 'mt-4' : ''}`}
               style={{ maxWidth: copyMaxWidth?.title }}
