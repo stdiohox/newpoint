@@ -668,7 +668,7 @@ body/heading/link text on white — those are ink. Exception:
 the "Newpoint" wordmark is `#00CED1` (logotype, exempt). Token names (`np-blue-*`, `np-royal*`,
 `np-sky`, `np-cyan`) are kept and remapped in `app/globals.css`; `bg-np-turquoise` /
 `np-turquoise-deep` (hover) are the explicit names. Older ratio comments in components describe
-the royal/white pairing and are stale. The logo mark PNG is unchanged (the client's blue cross).
+the royal/white pairing and are stale. The logo mark PNG (`public/brand/newpoint-mark-color.png`, also `app/icon.png`) was recoloured to flat #00CED1 with the white figure kept, at the client's request (2026-10-26); the blue original is in git history.
 
 ### Vivid royal colour — CLIENT REQUEST, 2026-10-22 (superseded 2026-10-26)
 
