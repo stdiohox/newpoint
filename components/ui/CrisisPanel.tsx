@@ -43,7 +43,7 @@ export function CrisisPanel({
       className={`bg-np-surface border-np-neutral-200 rounded-2xl border p-8 ${className}`}
     >
       <div className="flex items-start gap-4">
-        <span className="bg-np-blue-50 text-np-blue-900 flex size-10 shrink-0 items-center justify-center rounded-full">
+        <span className="bg-np-blue-50 text-np-turquoise flex size-10 shrink-0 items-center justify-center rounded-full">
           <LifeBuoy aria-hidden="true" size={20} strokeWidth={1.75} />
         </span>
         <div>
@@ -134,4 +134,4 @@ const actionBase =
 
 const actionFilled = 'bg-np-vivid text-white hover:bg-np-vivid-deep';
 const actionOutlined =
-  'text-np-blue-900 hover:bg-np-blue-50 ring-np-blue-900 bg-transparent ring-1';
+  'text-np-blue-900 hover:bg-np-blue-50 ring-np-turquoise bg-transparent ring-1';

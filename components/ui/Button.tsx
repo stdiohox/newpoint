@@ -73,7 +73,7 @@ const variants = {
    * that PageCta is back on a dark ground and uses `onInkQuiet`.
    */
   quiet:
-    'bg-transparent text-np-blue-600 ring-1 ring-np-blue-600 hover:bg-np-blue-50 focus-visible:outline-np-blue-900',
+    'bg-transparent text-np-blue-600 ring-1 ring-np-turquoise hover:bg-np-blue-50 focus-visible:outline-np-blue-900',
   /**
    * The hero CTA's colour, so a page can carry that button without reaching for
    * <ButtonWithIcon />, which is a separate component with its own hover

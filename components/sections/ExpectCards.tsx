@@ -74,7 +74,7 @@ export function ExpectCards({
                       aria-hidden="true"
                       size={22}
                       strokeWidth={1.75}
-                      className="text-np-blue-700"
+                      className="text-np-turquoise"
                     />
                   </span>
                 )}

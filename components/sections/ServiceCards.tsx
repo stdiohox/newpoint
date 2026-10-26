@@ -152,7 +152,7 @@ function CardCopy({ section }: { section: CardSection }) {
                   aria-hidden="true"
                   size={17}
                   strokeWidth={1.75}
-                  className="text-np-blue-600 mt-[0.2em] shrink-0"
+                  className="text-np-turquoise mt-[0.2em] shrink-0"
                 />
                 <span className="text-small text-np-neutral-700">{item}</span>
               </li>
@@ -301,7 +301,7 @@ export function ServiceCards({
                           aria-hidden="true"
                           size={17}
                           strokeWidth={1.75}
-                          className="text-np-blue-600 mt-[0.2em] shrink-0"
+                          className="text-np-turquoise mt-[0.2em] shrink-0"
                         />
                         <span className="text-small text-np-neutral-700">{item}</span>
                       </li>

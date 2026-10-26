@@ -71,7 +71,7 @@ export function Accordion({
                 <span className="font-display text-h3 text-np-blue-800">{item.q}</span>
                 <span
                   aria-hidden="true"
-                  className="font-body text-body-l text-np-blue-600 mt-1 shrink-0 leading-none select-none"
+                  className="font-body text-body-l text-np-turquoise mt-1 shrink-0 leading-none select-none"
                 >
                   {isOpen ? '−' : '+'}
                 </span>

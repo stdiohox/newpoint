@@ -151,7 +151,7 @@ export function StepsBento({
                   /* text-display-l, the largest step in this repo's scale below
                      the hero size. There is no display-m; inventing one for a
                      numeral would add a token the design system does not have. */
-                  className="font-display text-display-l text-np-blue-600 leading-none tabular-nums"
+                  className="font-display text-display-l text-np-turquoise leading-none tabular-nums"
                 >
                   {i + 1}
                 </span>
@@ -166,7 +166,7 @@ export function StepsBento({
                       aria-hidden="true"
                       size={20}
                       strokeWidth={1.75}
-                      className="text-np-blue-700"
+                      className="text-np-turquoise"
                     />
                   </span>
                 )}

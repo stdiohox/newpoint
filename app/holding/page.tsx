@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 const linkClass =
   'text-np-blue-600 font-medium underline-offset-4 hover:underline [overflow-wrap:anywhere]';
 const crisisLinkClass =
-  'text-np-blue-700 decoration-np-blue-700/40 hover:decoration-np-blue-700 font-medium underline underline-offset-4';
+  'text-np-blue-700 decoration-np-turquoise/60 hover:decoration-np-turquoise font-medium underline underline-offset-4';
 
 export default function Holding() {
   return (

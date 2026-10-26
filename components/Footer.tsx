@@ -339,7 +339,7 @@ export function Footer() {
               <a
                 href="tel:988"
                 aria-label="988, Suicide and Crisis Lifeline"
-                className="text-np-blue-700 decoration-np-blue-700/40 hover:decoration-np-blue-700 font-medium underline underline-offset-4 transition-colors duration-[180ms] motion-reduce:transition-none"
+                className="text-np-blue-700 decoration-np-turquoise/60 hover:decoration-np-turquoise font-medium underline underline-offset-4 transition-colors duration-[180ms] motion-reduce:transition-none"
               >
                 988
               </a>
@@ -347,7 +347,7 @@ export function Footer() {
               <a
                 href="tel:911"
                 aria-label="911, medical emergency"
-                className="text-np-blue-700 decoration-np-blue-700/40 hover:decoration-np-blue-700 font-medium underline underline-offset-4 transition-colors duration-[180ms] motion-reduce:transition-none"
+                className="text-np-blue-700 decoration-np-turquoise/60 hover:decoration-np-turquoise font-medium underline underline-offset-4 transition-colors duration-[180ms] motion-reduce:transition-none"
               >
                 911
               </a>

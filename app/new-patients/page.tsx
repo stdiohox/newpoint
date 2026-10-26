@@ -219,7 +219,7 @@ export default function NewPatientsPage() {
                   >
                     <LockKeyhole
                       strokeWidth={1.5}
-                      className="text-np-blue-600 h-10 w-10 md:h-16 md:w-16"
+                      className="text-np-turquoise h-10 w-10 md:h-16 md:w-16"
                     />
                   </span>
                 </div>

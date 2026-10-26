@@ -104,7 +104,7 @@ const variants = {
    */
   'on-ink': {
     root: 'bg-white/15 ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-np-ink',
-    disc: 'bg-white text-np-blue-900',
+    disc: 'bg-white text-np-turquoise',
   },
   /**
    * Solid np-blue-900 on a LIGHT surface: the navbar CTA's colours with this

@@ -129,7 +129,7 @@ export function ServiceBody({ sections, media }: { sections: BodySection[]; medi
                                     aria-hidden="true"
                                     size={20}
                                     strokeWidth={1.75}
-                                    className="text-np-blue-600 mt-[0.15em] shrink-0"
+                                    className="text-np-turquoise mt-[0.15em] shrink-0"
                                   />
                                   <span className="text-body text-np-neutral-700">{item}</span>
                                 </li>

@@ -116,7 +116,7 @@ export function ContactCrisis() {
                   aria-hidden="true"
                   size={18}
                   strokeWidth={1.75}
-                  className="text-np-blue-900 mt-0.5 shrink-0"
+                  className="text-np-turquoise mt-0.5 shrink-0"
                 />
                 <div className="space-y-1">
                   <p className="text-small text-np-neutral-600">

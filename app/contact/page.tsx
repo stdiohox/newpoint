@@ -270,7 +270,7 @@ export default function ContactPage() {
                   aria-hidden="true"
                   size={20}
                   strokeWidth={1.75}
-                  className="text-np-blue-600"
+                  className="text-np-turquoise"
                 />
                 <h3 className="text-h3 text-np-blue-800 mt-4">Call us</h3>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
@@ -314,7 +314,7 @@ export default function ContactPage() {
                   aria-hidden="true"
                   size={20}
                   strokeWidth={1.75}
-                  className="text-np-blue-600"
+                  className="text-np-turquoise"
                 />
                 <h3 className="text-h3 text-np-blue-800 mt-4">Email a provider</h3>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
@@ -352,7 +352,7 @@ export default function ContactPage() {
                   aria-hidden="true"
                   size={20}
                   strokeWidth={1.75}
-                  className="text-np-blue-600"
+                  className="text-np-turquoise"
                 />
                 <h3 className="text-h3 text-np-blue-800 mt-4">Where we see patients</h3>
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">

@@ -60,7 +60,7 @@ export default function NotFound() {
               </ul>
             </nav>
 
-            <aside className="rounded-card border-np-blue-600 bg-np-surface mt-14 border-l-2 p-6 ring-1 ring-[var(--np-alpha-ink-08)] md:p-8">
+            <aside className="rounded-card border-np-turquoise bg-np-surface mt-14 border-l-2 p-6 ring-1 ring-[var(--np-alpha-ink-08)] md:p-8">
               <h2 className="text-h3">If you need help now</h2>
               <p className="text-body text-np-neutral-600 mt-3 max-w-[60ch]">
                 This website is not for emergencies and is not monitored around the clock. Call or

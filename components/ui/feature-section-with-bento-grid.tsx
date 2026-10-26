@@ -253,7 +253,7 @@ export function FeatureBentoGrid({
                     </div>
 
                     <div className="flex shrink-0 flex-col p-6">
-                      <Icon aria-hidden="true" className="h-8 w-8 stroke-1" />
+                      <Icon aria-hidden="true" className="text-np-turquoise h-8 w-8 stroke-1" />
                       <div className="mt-4 flex flex-col">
                         {/* h3: the section's h2 is above and nothing nests deeper,
                             so the outline stays h2 -> h3 with no skip. */}
