@@ -656,14 +656,17 @@ The homepage ends (after the contact section, before the footer) with
        costs ~2 s of load time. A smaller lossless copy for that page only would
        be ~4x lighter; ask whether that is acceptable. -->
 
-### Turquoise palette — CLIENT INSTRUCTION, 2026-10-26 (supersedes the royal section below)
+### Turquoise #00CED1, strictly — CLIENT INSTRUCTION, 2026-10-26 (supersedes the royal section below)
 
-The royal blue "seems dark and is not good for the practice"; the brand colour is now
-**Turquoise Blue #00CED1**, site-wide. The `np-blue-*` / `np-royal*` token names are kept and
-remapped in `app/globals.css` to the turquoise hue at the same white-contrast per step, so the
-ratios in component comments still hold. `#00CED1` measures 1.95:1 on white: it is decorative
-(`np-cyan`: gradient ends, glows) and never carries or sits behind white text. Hero washes are
-700 (`#025759`), not 900. The logo mark PNG is unchanged (still the client's blue cross).
+The royal blue "seems dark and is not good for the practice"; the client then asked for
+**#00CED1, strictly**. It is the only brand colour: every coloured surface (buttons, panels,
+badges, photo-hero washes, the CTA band, the share image) is exactly `#00CED1`, with **ink
+text, icons and focus rings on it** (8.7:1). White on `#00CED1` is 1.95:1, so white text never
+sits on it, and `#00CED1` is never body/heading/link text on white — those are ink. Exception:
+the "Newpoint" wordmark is `#00CED1` (logotype, exempt). Token names (`np-blue-*`, `np-royal*`,
+`np-sky`, `np-cyan`) are kept and remapped in `app/globals.css`; `bg-np-turquoise` /
+`np-turquoise-deep` (hover) are the explicit names. Older ratio comments in components describe
+the royal/white pairing and are stale. The logo mark PNG is unchanged (the client's blue cross).
 
 ### Vivid royal colour — CLIENT REQUEST, 2026-10-22 (superseded 2026-10-26)
 

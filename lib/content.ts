@@ -2457,9 +2457,8 @@ export const WHAT_TO_EXPECT = {
  * telehealth is evidenced in both NJ and PA, but the only place-level evidence
  * anywhere in /research is Lawrence Township, New Jersey.
  *
- * `categoryColor` values are existing brand tokens. White 11px/600 on each
- * measures: blue-600 8.84:1, blue-700 11.55:1, sky 4.75:1, success 5.04:1 —
- * all clear of the 4.5:1 WCAG AA asks of small text.
+ * `categoryColor` values are existing brand tokens, and `categoryText` is the
+ * label colour on them: ink on turquoise (8.7:1), white on success (5.04:1).
  */
 export type FeaturedService = {
   type: 'featured' | 'card';
@@ -2469,6 +2468,7 @@ export type FeaturedService = {
   footerText: string | null;
   category: string;
   categoryColor: string;
+  categoryText: string;
   video: string;
   poster: string;
   href: string;
@@ -2484,7 +2484,8 @@ export const FEATURED_SERVICES: FeaturedService[] = [
       'A structured first appointment where we identify risk factors, reach a diagnosis, and build your treatment plan.',
     footerText: 'In person and by telehealth',
     category: 'Assessment',
-    categoryColor: 'var(--color-np-blue-600)',
+    categoryColor: 'var(--color-np-turquoise)',
+    categoryText: 'var(--color-np-ink)',
     // This footage depicts a person and must not imply a treatment outcome.
     video: '/video/services/evaluation.mp4',
     poster: '/video/services/evaluation-poster.webp',
@@ -2499,7 +2500,8 @@ export const FEATURED_SERVICES: FeaturedService[] = [
       'Ongoing prescribing and check-ins, using standardized rating scales to track your progress and catch changes early.',
     footerText: 'In person and by telehealth',
     category: 'Ongoing care',
-    categoryColor: 'var(--color-np-blue-700)',
+    categoryColor: 'var(--color-np-turquoise)',
+    categoryText: 'var(--color-np-ink)',
     // This footage depicts a person and must not imply a treatment outcome.
     video: '/video/services/medication-management.mp4',
     poster: '/video/services/medication-management-poster.webp',
@@ -2541,6 +2543,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: null,
     category: 'Getting started',
     categoryColor: 'var(--color-np-success)',
+    categoryText: '#ffffff',
     // This footage depicts a person and must not imply a treatment outcome.
     video: '/video/services/new-patients.mp4',
     poster: '/video/services/new-patients-poster.webp',

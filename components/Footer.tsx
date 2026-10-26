@@ -160,7 +160,7 @@ export function Footer() {
           over it and a tint strong enough to matter there would haze them. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.28)_45%,rgba(210,248,249,0.18)_100%)]"
+        className="absolute inset-0 z-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.28)_45%,rgba(199,244,245,0.18)_100%)]"
       />
 
       {/* THE CUT-OUT BAND. The parallax layer, at z-20: above the photograph
@@ -217,7 +217,7 @@ export function Footer() {
                   height={36}
                   className="h-9 w-auto"
                 />
-                <span className="font-display text-np-blue-600 text-xl font-semibold tracking-tight">
+                <span className="font-display text-np-turquoise text-xl font-semibold tracking-tight">
                   {BUSINESS.shortName}
                   <span className="sr-only"> {BUSINESS.legalName}, home</span>
                 </span>

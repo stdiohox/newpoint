@@ -367,7 +367,7 @@ export function Navbar1({
       {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size
           inline SVG mark; next/image adds no optimisation for SVG. */}
       <img src="/brand/newpoint-mark-color.png" alt="" width={124} height={123} className="h-8 w-auto" />
-      <span className="text-np-blue-600 text-xl font-semibold tracking-tight">
+      <span className="text-np-turquoise text-xl font-semibold tracking-tight">
         {BRAND.short}
         <span className="sr-only"> {BRAND.legal}, home</span>
       </span>
@@ -601,7 +601,7 @@ export function Navbar1({
           <Link
             href={CTA.href}
             aria-current={isActive(CTA.href) ? 'page' : undefined}
-            className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-royal-deep inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
+            className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium whitespace-nowrap text-np-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
           >
             {CTA.label}
           </Link>
@@ -735,7 +735,7 @@ export function Navbar1({
                 <Link
                   href={CTA.href}
                   aria-current={isActive(CTA.href) ? 'page' : undefined}
-                  className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-royal-deep inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-base font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
+                  className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-base font-medium text-np-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
                   onClick={close}
                 >
                   {CTA.label}

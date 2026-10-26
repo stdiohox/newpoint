@@ -175,7 +175,7 @@ export function PageCta({
               the curve rather than hand-editing, as the note above says. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(0,106,108,0.08)_0%,rgba(2,87,89,0.08)_100%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(0,206,209,0.08)_0%,rgba(0,206,209,0.08)_100%)]"
           />
 
           {/* LAYER TWO: THE COPY RADIAL, and it is the layer that carries the
@@ -251,7 +251,7 @@ export function PageCta({
               panel's full width and the corner is under it. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(2,87,89,0.66)_0%,rgba(2,87,89,0.66)_70%,rgba(2,87,89,0.611)_75.0%,rgba(2,87,89,0.489)_80.0%,rgba(2,87,89,0.330)_85.0%,rgba(2,87,89,0.171)_90.0%,rgba(2,87,89,0.049)_95.0%,rgba(2,87,89,0.000)_100.0%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(0,206,209,0.66)_0%,rgba(0,206,209,0.66)_70%,rgba(0,206,209,0.611)_75.0%,rgba(0,206,209,0.489)_80.0%,rgba(0,206,209,0.330)_85.0%,rgba(0,206,209,0.171)_90.0%,rgba(0,206,209,0.049)_95.0%,rgba(0,206,209,0.000)_100.0%)]"
           />
           {/* THE CYAN END OF THE MAIL-ICON GRADIENT, client request 2026-10-22.
               A glow in the bottom-right corner only, outside the text scrim's
@@ -270,14 +270,14 @@ export function PageCta({
               <div className="relative flex size-20 items-center justify-center">
                 <div
                   aria-hidden="true"
-                  className="rounded-card absolute inset-0 bg-white/10 ring-1 ring-white/25"
+                  className="rounded-card absolute inset-0 bg-white/25 ring-1 ring-np-ink/20"
                 />
                 <div aria-hidden="true" className="bg-np-vivid absolute inset-1 rounded-[10px]" />
                 <CalendarCheck
                   aria-hidden="true"
                   size={30}
                   strokeWidth={1.75}
-                  className="relative text-white"
+                  className="text-np-ink relative"
                 />
               </div>
             </Reveal>
@@ -317,11 +317,11 @@ export function PageCta({
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h2 className="text-h2 mt-5 text-white">{heading}</h2>
+              <h2 className="text-h2 mt-5 text-np-ink">{heading}</h2>
             </Reveal>
 
             <Reveal delay={0.16}>
-              <p className="text-body-l mt-4 text-white">{body}</p>
+              <p className="text-body-l mt-4 text-np-ink">{body}</p>
             </Reveal>
 
             <Reveal delay={0.22}>
@@ -408,7 +408,7 @@ export function PageCta({
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
               >
                 {assurances.map(({ icon: Icon, label }) => (
-                  <li key={label} className="text-small flex items-center gap-2 text-white">
+                  <li key={label} className="text-small flex items-center gap-2 text-np-ink">
                     <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
                     {label}
                   </li>

@@ -39,7 +39,7 @@ const INTER = "'Inter', sans-serif";
 export function Hero() {
   return (
     <section
-      className="relative -mt-[var(--nav-h)] min-h-screen bg-black text-white"
+      className="bg-np-turquoise text-np-ink relative -mt-[var(--nav-h)] min-h-screen"
       style={{
         fontFamily: INTER,
         WebkitFontSmoothing: 'antialiased',
@@ -89,11 +89,11 @@ export function Hero() {
           the extra stop rounds it off. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,87,89,0.78)_0%,rgba(2,87,89,0.78)_52%,rgba(2,87,89,0.45)_64%,rgba(2,87,89,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(2,87,89,0.72)_0%,rgba(2,87,89,0.72)_18%,rgba(2,87,89,0)_42%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.78)_0%,rgba(0,206,209,0.78)_52%,rgba(0,206,209,0.45)_64%,rgba(0,206,209,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(0,206,209,0.72)_0%,rgba(0,206,209,0.72)_18%,rgba(0,206,209,0)_42%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(2,87,89,0.72)_0%,rgba(2,87,89,0.72)_40%,rgba(2,87,89,0.45)_55%,rgba(2,87,89,0)_74%)]"
+        className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(0,206,209,0.72)_0%,rgba(0,206,209,0.72)_40%,rgba(0,206,209,0.45)_55%,rgba(0,206,209,0)_74%)]"
       />
 
       <div className="relative flex min-h-screen flex-col">
@@ -104,19 +104,19 @@ export function Hero() {
         <div className="flex flex-1 flex-col justify-end px-6 pt-[var(--nav-h)] pb-12 md:px-12 lg:grid lg:grid-cols-2 lg:items-end lg:px-16 lg:pb-16">
           <div>
             <FadeIn delay={100} duration={1000} className="mb-4">
-              <span className="inline-block rounded-full border border-white/30 px-4 py-2 text-sm text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)]">
+              <span className="border-np-ink/30 text-np-ink inline-block rounded-full border px-4 py-2 text-sm [text-shadow:0_1px_12px_rgba(255,255,255,0.3)]">
                 {INSURANCE.heading}
               </span>
             </FadeIn>
 
             <AnimatedHeading
               text={HERO.headlineLines}
-              className="mb-4 text-4xl font-normal text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] md:text-5xl lg:text-6xl xl:text-7xl"
+              className="text-np-ink mb-4 text-4xl font-normal [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] md:text-5xl lg:text-6xl xl:text-7xl"
               style={{ letterSpacing: '-0.04em', fontFamily: INTER }}
             />
 
             <FadeIn delay={800} duration={1000}>
-              <p className="mb-5 text-sm text-white/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] md:text-base">
+              <p className="text-np-ink mb-5 text-sm [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] md:text-base">
                 {HERO.subtext}
               </p>
             </FadeIn>
@@ -132,7 +132,7 @@ export function Hero() {
 
           <div className="flex items-end justify-start lg:justify-end">
             <FadeIn delay={1400} duration={1000}>
-              <span className="text-base font-light [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] md:text-lg lg:text-xl">
+              <span className="text-base font-light [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] md:text-lg lg:text-xl">
                 {HERO.tag}
               </span>
             </FadeIn>

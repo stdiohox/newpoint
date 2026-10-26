@@ -19,19 +19,25 @@
    --------------------------------------------------------------------------- */
 
 @theme {
-  /* TURQUOISE, CLIENT INSTRUCTION 2026-10-26: the royal blue "seems dark and
-     is not good for the practice"; use Turquoise Blue, first given as #00EDE1 and confirmed
-     as #00CED1 the same day, site-wide. The
-     np-blue-* NAMES ARE KEPT so no component changes; every step is now the
-     turquoise hue (181deg) at the SAME white-contrast as the royal step it
-     replaced, so every ratio recorded below and across components still holds
-     to within 0.1. #00CED1 itself measures 1.95:1 against white, so it can
-     never carry or sit behind white type: it is np-cyan (decorative: gradient
-     ends, glows) and the ink-on-turquoise pairing (8.7:1) where needed. Text,
-     links and button fills use the darker steps. The hero washes moved from
-     900 to 700 (#025759) so the photography reads lighter: at their 0.78
-     alpha over a white pixel that composites to 4.8:1 under white type. 600
-     was tried and fails (4.0:1).
+  /* STRICT #00CED1, CLIENT INSTRUCTION 2026-10-26: "use this color strictly".
+     #00CED1 is the ONLY brand colour. Every coloured surface (buttons, panels,
+     badges, the photo-hero washes, the CTA band) is exactly #00CED1, and the
+     text, icons and focus rings ON it are ink (#131c2e, 8.7:1). White on
+     #00CED1 measures 1.95:1 and #00CED1 on white the same, so neither is used
+     for text, with one exemption: the "Newpoint" wordmark, which is a brand
+     name (WCAG 1.4.3 exempts logotypes).
+
+     THE np-blue-* NAMES ARE KEPT, BUT 500-900 ARE NOW INK. They were the text,
+     link, focus-ring and outline colours, so headings and links on white read
+     ink. 900 is a touch darker than ink so the 700 -> 900 hover steps still
+     move. 50/100 are #00CED1 tints (10% and 22% on white); 300 and the royal,
+     cyan and sky names all resolve to #00CED1. --color-np-turquoise-deep is
+     the hover/pressed state of a turquoise fill only.
+
+     Ratio notes elsewhere in this file and in components describe the earlier
+     royal/white pairing and are no longer current; the 2026-10-26 pass was
+     re-measured route by route at 1440 and 390 (ink on every photo hero and
+     the CTA band holds >= 4.5:1 for body text, >= 3:1 for display).
 
      Previous note, kept for history: */
   /* BRAND BLUE, REMAPPED TO ROYAL BY CLIENT INSTRUCTION, 2026-10-22: "I want
@@ -41,18 +47,18 @@
      royal family (see the vivid-royal block below and
      design-research/design-tokens.md); every step keeps its old role. White on
      each: 900 12.56, 800 9.90, 700 8.26, 600 6.37, 500 5.10. */
-  --color-np-blue-900: #05393a;
+  --color-np-blue-900: #0a101c;
   /* Sits between 900 and 700, for a raised panel ON a 900 ground: the footer's
      crisis strip. It measures only 1.22:1 against 900, which is deliberate for
      a surface rather than a component, so anything using it carries a
      white/15 hairline to define its edge. White on it measures 13.2:1. */
-  --color-np-blue-800: #044b4c;
-  --color-np-blue-700: #025759;
-  --color-np-blue-600: #006a6c;
-  --color-np-blue-500: #007a7c;
-  --color-np-blue-300: #75eef0; /* on-ink use only: 6.61:1 on 900 */
-  --color-np-blue-100: #d2f8f9;
-  --color-np-blue-50: #ebfbfc;
+  --color-np-blue-800: #131c2e;
+  --color-np-blue-700: #131c2e;
+  --color-np-blue-600: #131c2e;
+  --color-np-blue-500: #131c2e;
+  --color-np-blue-300: #00ced1; /* on-ink use only: 6.61:1 on 900 */
+  --color-np-blue-100: #c7f4f5;
+  --color-np-blue-50: #e6fafb;
 
   /* VIVID ROYAL, CLIENT REQUEST 2026-10-22: the navy surfaces "look dull", and
      the reference was Apple's Mail icon, a vertical gradient from royal blue
@@ -66,10 +72,14 @@
      remapped onto it by the client's "dominant everywhere" instruction, so the
      two now agree (royal = blue-600, royal-deep = blue-700, royal-bright =
      blue-500). Kept as names because the gradient utilities read them. */
-  --color-np-royal-bright: #007a7c;
-  --color-np-royal: #006a6c;
-  --color-np-royal-deep: #025759;
+  --color-np-royal-bright: #00ced1;
+  --color-np-royal: #00ced1;
+  --color-np-royal-deep: #00ced1;
   --color-np-cyan: #00ced1;
+  /* THE ONE BRAND COLOUR, and its hover/pressed state (ink mixed in at 12%,
+     ink text 6.7:1 on it). */
+  --color-np-turquoise: #00ced1;
+  --color-np-turquoise-deep: #00b5b8;
 
   /* Ink and warm neutrals */
   --color-np-ink: #131c2e;
@@ -91,7 +101,7 @@
      the label back under AA. */
   /* Remapped 2026-10-22 from the slate #4a76a4 to a bright royal, same role:
      a white label measures 4.78:1 (AA at 14px). */
-  --color-np-sky: #007f81;
+  --color-np-sky: #00ced1;
 
   /* AMBER RETIRED 2026-09-25. --color-np-amber-500 (#e9a93c) and its tint
      --color-np-amber-100 (#fbeed5) are gone. This is the one part of
@@ -192,20 +202,10 @@
    one step deeper (6.37 and 8.26). Gradients do not transition, so hover is an
    instant swap, matching the old colour change at 180ms closely enough. */
 @utility bg-np-vivid {
-  background-color: var(--color-np-royal);
-  background-image: linear-gradient(
-    180deg,
-    var(--color-np-royal-bright) 0%,
-    var(--color-np-royal) 100%
-  );
+  background-color: var(--color-np-turquoise);
 }
 @utility bg-np-vivid-deep {
-  background-color: var(--color-np-royal-deep);
-  background-image: linear-gradient(
-    180deg,
-    var(--color-np-royal) 0%,
-    var(--color-np-royal-deep) 100%
-  );
+  background-color: var(--color-np-turquoise-deep);
 }
 
 @theme static {
@@ -318,7 +318,9 @@
      The navbar no longer needs it: Navbar1 sits on a white pill rather than
      on the hero image, so the default blue-600 outline applies there. */
   .on-ink :focus-visible {
-    outline-color: #ffffff;
+    /* Ink, not white, since the "on-ink" grounds became #00CED1 (2026-10-26):
+       white measures 1.95:1 on it, ink 8.7:1. */
+    outline-color: var(--color-np-ink);
   }
 
   ::selection {
@@ -525,7 +527,7 @@
      IT HAS TO BE DECLARED HERE, NOT AS A TAILWIND `border-*` UTILITY. The base
      `.liquid-glass` sets `border: none` and is unlayered, so it outranks any
      utility the element carries — the same trap recorded above for the fill. */
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(19, 28, 46, 0.45);
 }
 .liquid-glass-quiet {
   background: rgba(255, 255, 255, 0.05);
@@ -542,11 +544,11 @@
    in the first place. */
 .liquid-glass-bright:hover {
   background: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(19, 28, 46, 0.6);
 }
 .liquid-glass-quiet:hover {
   background: rgba(255, 255, 255, 0.07);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(19, 28, 46, 0.4);
 }
 
 /* INSIDE THE CLOSING CTA BAND THE GLASS IS TINTED ROYAL, NOT WHITE (client,
@@ -556,16 +558,16 @@
    permanent ring, quiet does not) is unchanged. Scoped to .cta-band so the
    hero's glass buttons, measured against their own photographs, are untouched. */
 .cta-band .liquid-glass-bright {
-  background: rgba(2, 87, 89, 0.55);
+  background: rgba(255, 255, 255, 0.35);
 }
 .cta-band .liquid-glass-bright:hover {
-  background: rgba(2, 87, 89, 0.68);
+  background: rgba(255, 255, 255, 0.5);
 }
 .cta-band .liquid-glass-quiet {
-  background: rgba(2, 87, 89, 0.4);
+  background: rgba(255, 255, 255, 0.2);
 }
 .cta-band .liquid-glass-quiet:hover {
-  background: rgba(2, 87, 89, 0.52);
+  background: rgba(255, 255, 255, 0.32);
 }
 
 /* ---------------------------------------------------------------------------
@@ -590,7 +592,7 @@
    --------------------------------------------------------------------------- */
 @media (prefers-reduced-transparency: reduce), (forced-colors: active) {
   .liquid-glass {
-    background: var(--color-np-ink);
+    background: var(--color-np-surface);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border: 1px solid var(--color-np-neutral-400);
@@ -611,7 +613,7 @@
   .liquid-glass-quiet,
   .liquid-glass-bright:hover,
   .liquid-glass-quiet:hover {
-    background: var(--color-np-ink);
+    background: var(--color-np-surface);
   }
   /* THE PRIMARY KEEPS A HEAVIER EDGE THAN THE SECONDARY, because the fallback
      flattens the two tints into one fill and the pair would otherwise be two

@@ -79,7 +79,10 @@ export function FeaturedServices() {
 
               <div className={styles.featuredFooter}>
                 <span className={styles.footerText}>{featured.footerText}</span>
-                <span className={styles.category} style={{ background: featured.categoryColor }}>
+                <span
+                  className={styles.category}
+                  style={{ background: featured.categoryColor, color: featured.categoryText }}
+                >
                   {featured.category}
                 </span>
               </div>
@@ -102,7 +105,10 @@ export function FeaturedServices() {
                     {service.title}
                   </Link>
                 </h3>
-                <span className={styles.category} style={{ background: service.categoryColor }}>
+                <span
+                  className={styles.category}
+                  style={{ background: service.categoryColor, color: service.categoryText }}
+                >
                   {service.category}
                 </span>
               </div>
