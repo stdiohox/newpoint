@@ -265,6 +265,16 @@ export function PageCta({
             className="cta-overlay pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_100%_100%,rgba(0,206,209,0.33)_0%,rgba(0,206,209,0.121)_18%,rgba(0,206,209,0)_32%)] md:block"
           />
 
+          {/* LAYER FOUR: THE FOOT, 2026-10-26. Once the scrim above was lightened
+              the three small meta lines sat on the busiest part of the photo,
+              the flowers. This puts the film back under them only, from the
+              bottom edge up to just above the buttons, and leaves the sky and
+              the rest of the meadow as light as the client asked. */}
+          <div
+            aria-hidden="true"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.62)_0%,rgba(0,206,209,0.55)_22%,rgba(0,206,209,0)_42%)]"
+          />
+
           <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
             <Reveal>
               {/* Two nested plates rather than one filled tile, so the mark reads
