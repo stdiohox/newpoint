@@ -175,7 +175,7 @@ export function PageCta({
               the curve rather than hand-editing, as the note above says. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(36,80,224,0.08)_0%,rgba(29,63,194,0.08)_100%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_110%_at_50%_0%,rgba(0,107,102,0.08)_0%,rgba(2,88,84,0.08)_100%)]"
           />
 
           {/* LAYER TWO: THE COPY RADIAL, and it is the layer that carries the
@@ -221,7 +221,7 @@ export function PageCta({
 
               RECOLOURED 2026-10-22, AND THE TABLE ABOVE IS NOW HISTORY. The
               client asked for the Mail-icon royal instead of navy, so the
-              panel, the veil and this scrim are royal-deep (#1d3fc2) and a
+              panel, the veil and this scrim are royal-deep (#025854) and a
               cyan glow sits in the bottom-right corner from md up. Royal is
               lighter than navy; the meta row went from white/80 to white/95.
 
@@ -251,7 +251,7 @@ export function PageCta({
               panel's full width and the corner is under it. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(29,63,194,0.66)_0%,rgba(29,63,194,0.66)_70%,rgba(29,63,194,0.611)_75.0%,rgba(29,63,194,0.489)_80.0%,rgba(29,63,194,0.330)_85.0%,rgba(29,63,194,0.171)_90.0%,rgba(29,63,194,0.049)_95.0%,rgba(29,63,194,0.000)_100.0%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_92%_104%_at_50%_52%,rgba(2,88,84,0.66)_0%,rgba(2,88,84,0.66)_70%,rgba(2,88,84,0.611)_75.0%,rgba(2,88,84,0.489)_80.0%,rgba(2,88,84,0.330)_85.0%,rgba(2,88,84,0.171)_90.0%,rgba(2,88,84,0.049)_95.0%,rgba(2,88,84,0.000)_100.0%)]"
           />
           {/* THE CYAN END OF THE MAIL-ICON GRADIENT, client request 2026-10-22.
               A glow in the bottom-right corner only, outside the text scrim's
@@ -259,7 +259,7 @@ export function PageCta({
               Cyan measures 1.91:1 against white; it must never reach a glyph. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_100%_100%,rgba(94,199,247,0.6)_0%,rgba(94,199,247,0.22)_18%,rgba(94,199,247,0)_32%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_100%_100%,rgba(0,237,225,0.6)_0%,rgba(0,237,225,0.22)_18%,rgba(0,237,225,0)_32%)]"
           />
 
           <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">

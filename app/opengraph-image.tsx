@@ -40,8 +40,8 @@ export default async function OpengraphImage() {
         /* Royal, the vivid family in app/globals.css (client, 2026-10-22).
            Hex rather than var(): Satori has no access to the stylesheet. White
            measures 8.26:1 on the deep end and 6.37:1 on the light end. */
-        backgroundColor: '#1d3fc2',
-        backgroundImage: 'linear-gradient(160deg, #1d3fc2 0%, #2450e0 100%)',
+        backgroundColor: '#025854',
+        backgroundImage: 'linear-gradient(160deg, #025854 0%, #006b66 100%)',
         fontFamily: 'sans-serif',
       }}
     >
@@ -61,7 +61,7 @@ export default async function OpengraphImage() {
               width: 18,
               height: 18,
               borderRadius: 999,
-              backgroundColor: '#5ec7f7',
+              backgroundColor: '#00ede1',
               marginRight: 14,
             }}
           />

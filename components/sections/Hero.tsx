@@ -89,11 +89,11 @@ export function Hero() {
           the extra stop rounds it off. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,42,128,0.78)_0%,rgba(20,42,128,0.78)_52%,rgba(20,42,128,0.45)_64%,rgba(20,42,128,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(20,42,128,0.72)_0%,rgba(20,42,128,0.72)_18%,rgba(20,42,128,0)_42%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,88,84,0.78)_0%,rgba(2,88,84,0.78)_52%,rgba(2,88,84,0.45)_64%,rgba(2,88,84,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(2,88,84,0.72)_0%,rgba(2,88,84,0.72)_18%,rgba(2,88,84,0)_42%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(20,42,128,0.72)_0%,rgba(20,42,128,0.72)_40%,rgba(20,42,128,0.45)_55%,rgba(20,42,128,0)_74%)]"
+        className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(2,88,84,0.72)_0%,rgba(2,88,84,0.72)_40%,rgba(2,88,84,0.45)_55%,rgba(2,88,84,0)_74%)]"
       />
 
       <div className="relative flex min-h-screen flex-col">

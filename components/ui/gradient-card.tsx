@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
  * shipped with Tailwind's stock orange/gray/purple/green, none of which are
  * Newpoint colours:
  *
- *   orange -> blue     np-blue-50   -> np-blue-100      #f1f5fc -> #e3eaf8
+ *   orange -> blue     np-blue-50   -> np-blue-100      #ebfcfb -> #d2f9f7
  *   gray   -> neutral  np-neutral-100 -> np-neutral-200 #f4f2ed -> #e7e4dd
  *   purple -> sky      np-sky/10    -> np-sky/20        #4a76a4 at 10/20%
  *   green  -> sage     np-success/10 -> np-success/20   #2f7d4f at 10/20%

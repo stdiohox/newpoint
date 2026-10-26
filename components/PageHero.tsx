@@ -338,7 +338,7 @@ export function PageHero({
       {image && scrim === 'hero' && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[rgba(20,42,128,0.1)]"
+          className="pointer-events-none absolute inset-0 bg-[rgba(2,88,84,0.1)]"
         />
       )}
 
@@ -365,11 +365,11 @@ export function PageHero({
         <>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,42,128,0.78)_0%,rgba(20,42,128,0.78)_52%,rgba(20,42,128,0.45)_64%,rgba(20,42,128,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(20,42,128,0.72)_0%,rgba(20,42,128,0.72)_18%,rgba(20,42,128,0)_42%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,88,84,0.78)_0%,rgba(2,88,84,0.78)_52%,rgba(2,88,84,0.45)_64%,rgba(2,88,84,0)_80%)] lg:bg-[linear-gradient(to_top,rgba(2,88,84,0.72)_0%,rgba(2,88,84,0.72)_18%,rgba(2,88,84,0)_42%)]"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(20,42,128,0.72)_0%,rgba(20,42,128,0.72)_40%,rgba(20,42,128,0.45)_55%,rgba(20,42,128,0)_74%)]"
+            className="pointer-events-none absolute inset-0 hidden lg:block lg:bg-[linear-gradient(to_right,rgba(2,88,84,0.72)_0%,rgba(2,88,84,0.72)_40%,rgba(2,88,84,0.45)_55%,rgba(2,88,84,0)_74%)]"
           />
         </>
       )}
@@ -397,7 +397,7 @@ export function PageHero({
       {image && scrim === 'edge' && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(20,42,128,0.84)_0%,rgba(20,42,128,0.84)_40%,rgba(20,42,128,0.832)_47.5%,rgba(20,42,128,0.812)_55%,rgba(20,42,128,0.783)_62.5%,rgba(20,42,128,0.75)_70%,rgba(20,42,128,0.717)_77.5%,rgba(20,42,128,0.688)_85%,rgba(20,42,128,0.668)_92.5%,rgba(20,42,128,0.66)_100%)] lg:bg-[linear-gradient(to_right,rgba(20,42,128,0.8)_0%,rgba(20,42,128,0.8)_46%,rgba(20,42,128,0.773)_52.25%,rgba(20,42,128,0.703)_58.5%,rgba(20,42,128,0.604)_64.75%,rgba(20,42,128,0.49)_71%,rgba(20,42,128,0.376)_77.25%,rgba(20,42,128,0.277)_83.5%,rgba(20,42,128,0.207)_89.75%,rgba(20,42,128,0.18)_96%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(2,88,84,0.84)_0%,rgba(2,88,84,0.84)_40%,rgba(2,88,84,0.832)_47.5%,rgba(2,88,84,0.812)_55%,rgba(2,88,84,0.783)_62.5%,rgba(2,88,84,0.75)_70%,rgba(2,88,84,0.717)_77.5%,rgba(2,88,84,0.688)_85%,rgba(2,88,84,0.668)_92.5%,rgba(2,88,84,0.66)_100%)] lg:bg-[linear-gradient(to_right,rgba(2,88,84,0.8)_0%,rgba(2,88,84,0.8)_46%,rgba(2,88,84,0.773)_52.25%,rgba(2,88,84,0.703)_58.5%,rgba(2,88,84,0.604)_64.75%,rgba(2,88,84,0.49)_71%,rgba(2,88,84,0.376)_77.25%,rgba(2,88,84,0.277)_83.5%,rgba(2,88,84,0.207)_89.75%,rgba(2,88,84,0.18)_96%)]"
         />
       )}
 
@@ -410,9 +410,9 @@ export function PageHero({
         className={
           image
             ? scrim === 'hero'
-              ? 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,42,128,0.62)_0%,rgba(20,42,128,0.593)_11.5%,rgba(20,42,128,0.523)_23%,rgba(20,42,128,0.424)_34.5%,rgba(20,42,128,0.31)_46%,rgba(20,42,128,0.196)_57.5%,rgba(20,42,128,0.097)_69%,rgba(20,42,128,0.027)_80.5%,rgba(20,42,128,0)_92%)] lg:bg-[linear-gradient(to_top,rgba(20,42,128,0.55)_0%,rgba(20,42,128,0.526)_8.75%,rgba(20,42,128,0.464)_17.5%,rgba(20,42,128,0.376)_26.25%,rgba(20,42,128,0.275)_35%,rgba(20,42,128,0.174)_43.75%,rgba(20,42,128,0.086)_52.5%,rgba(20,42,128,0.024)_61.25%,rgba(20,42,128,0)_70%)]'
-              : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,42,128,0.85)_0%,rgba(20,42,128,0.66)_60%,rgba(20,42,128,0.62)_100%)]'
-            : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,42,128,0.78)_0%,rgba(20,42,128,0.78)_52%,rgba(20,42,128,0.45)_64%,rgba(20,42,128,0)_80%)]'
+              ? 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,88,84,0.62)_0%,rgba(2,88,84,0.593)_11.5%,rgba(2,88,84,0.523)_23%,rgba(2,88,84,0.424)_34.5%,rgba(2,88,84,0.31)_46%,rgba(2,88,84,0.196)_57.5%,rgba(2,88,84,0.097)_69%,rgba(2,88,84,0.027)_80.5%,rgba(2,88,84,0)_92%)] lg:bg-[linear-gradient(to_top,rgba(2,88,84,0.55)_0%,rgba(2,88,84,0.526)_8.75%,rgba(2,88,84,0.464)_17.5%,rgba(2,88,84,0.376)_26.25%,rgba(2,88,84,0.275)_35%,rgba(2,88,84,0.174)_43.75%,rgba(2,88,84,0.086)_52.5%,rgba(2,88,84,0.024)_61.25%,rgba(2,88,84,0)_70%)]'
+              : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,88,84,0.85)_0%,rgba(2,88,84,0.66)_60%,rgba(2,88,84,0.62)_100%)]'
+            : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,88,84,0.78)_0%,rgba(2,88,84,0.78)_52%,rgba(2,88,84,0.45)_64%,rgba(2,88,84,0)_80%)]'
         }
       />
       )}
@@ -448,7 +448,7 @@ export function PageHero({
              class list and trims the trailing space, which is almost certainly
              how the bug arrived in the first place. Outside the braces it is
              literal template text and the plugin leaves it alone. */
-          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''} bg-[linear-gradient(to_right,rgba(20,42,128,0.7)_0%,rgba(20,42,128,0.676)_9.38%,rgba(20,42,128,0.614)_18.75%,rgba(20,42,128,0.526)_28.13%,rgba(20,42,128,0.425)_37.5%,rgba(20,42,128,0.324)_46.88%,rgba(20,42,128,0.236)_56.25%,rgba(20,42,128,0.174)_65.63%,rgba(20,42,128,0.15)_75%,rgba(20,42,128,0.15)_100%)]`}
+          className={`pointer-events-none absolute inset-0 ${centred ? 'lg:hidden' : ''} bg-[linear-gradient(to_right,rgba(2,88,84,0.7)_0%,rgba(2,88,84,0.676)_9.38%,rgba(2,88,84,0.614)_18.75%,rgba(2,88,84,0.526)_28.13%,rgba(2,88,84,0.425)_37.5%,rgba(2,88,84,0.324)_46.88%,rgba(2,88,84,0.236)_56.25%,rgba(2,88,84,0.174)_65.63%,rgba(2,88,84,0.15)_75%,rgba(2,88,84,0.15)_100%)]`}
         />
       )}
 
@@ -481,8 +481,8 @@ export function PageHero({
           aria-hidden="true"
           className={`pointer-events-none absolute inset-0 ${
             copyAlign === 'center'
-              ? 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(20,42,128,0.54)_0%,rgba(20,42,128,0.54)_50%,rgba(20,42,128,0.51)_57.1%,rgba(20,42,128,0.433)_64.3%,rgba(20,42,128,0.327)_71.4%,rgba(20,42,128,0.213)_78.6%,rgba(20,42,128,0.107)_85.7%,rgba(20,42,128,0.03)_92.9%,rgba(20,42,128,0)_100.0%)] lg:bg-[radial-gradient(ellipse_58%_64%_at_50%_58%,rgba(20,42,128,0.58)_0%,rgba(20,42,128,0.58)_50.0%,rgba(20,42,128,0.548)_57.1%,rgba(20,42,128,0.465)_64.3%,rgba(20,42,128,0.352)_71.4%,rgba(20,42,128,0.228)_78.6%,rgba(20,42,128,0.115)_85.7%,rgba(20,42,128,0.032)_92.9%,rgba(20,42,128,0)_100.0%)]'
-              : 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(20,42,128,0.48)_0%,rgba(20,42,128,0.48)_50%,rgba(20,42,128,0.453)_57.1%,rgba(20,42,128,0.385)_64.3%,rgba(20,42,128,0.291)_71.4%,rgba(20,42,128,0.189)_78.6%,rgba(20,42,128,0.095)_85.7%,rgba(20,42,128,0.027)_92.9%,rgba(20,42,128,0)_100%)] lg:bg-[radial-gradient(ellipse_62%_70%_at_28%_56%,rgba(20,42,128,0.48)_0%,rgba(20,42,128,0.48)_50%,rgba(20,42,128,0.453)_57.1%,rgba(20,42,128,0.385)_64.3%,rgba(20,42,128,0.291)_71.4%,rgba(20,42,128,0.189)_78.6%,rgba(20,42,128,0.095)_85.7%,rgba(20,42,128,0.027)_92.9%,rgba(20,42,128,0)_100%)]'
+              ? 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(2,88,84,0.54)_0%,rgba(2,88,84,0.54)_50%,rgba(2,88,84,0.51)_57.1%,rgba(2,88,84,0.433)_64.3%,rgba(2,88,84,0.327)_71.4%,rgba(2,88,84,0.213)_78.6%,rgba(2,88,84,0.107)_85.7%,rgba(2,88,84,0.03)_92.9%,rgba(2,88,84,0)_100.0%)] lg:bg-[radial-gradient(ellipse_58%_64%_at_50%_58%,rgba(2,88,84,0.58)_0%,rgba(2,88,84,0.58)_50.0%,rgba(2,88,84,0.548)_57.1%,rgba(2,88,84,0.465)_64.3%,rgba(2,88,84,0.352)_71.4%,rgba(2,88,84,0.228)_78.6%,rgba(2,88,84,0.115)_85.7%,rgba(2,88,84,0.032)_92.9%,rgba(2,88,84,0)_100.0%)]'
+              : 'bg-[radial-gradient(ellipse_95%_72%_at_46%_58%,rgba(2,88,84,0.48)_0%,rgba(2,88,84,0.48)_50%,rgba(2,88,84,0.453)_57.1%,rgba(2,88,84,0.385)_64.3%,rgba(2,88,84,0.291)_71.4%,rgba(2,88,84,0.189)_78.6%,rgba(2,88,84,0.095)_85.7%,rgba(2,88,84,0.027)_92.9%,rgba(2,88,84,0)_100%)] lg:bg-[radial-gradient(ellipse_62%_70%_at_28%_56%,rgba(2,88,84,0.48)_0%,rgba(2,88,84,0.48)_50%,rgba(2,88,84,0.453)_57.1%,rgba(2,88,84,0.385)_64.3%,rgba(2,88,84,0.291)_71.4%,rgba(2,88,84,0.189)_78.6%,rgba(2,88,84,0.095)_85.7%,rgba(2,88,84,0.027)_92.9%,rgba(2,88,84,0)_100%)]'
           }`}
         />
       )}

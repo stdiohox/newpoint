@@ -814,9 +814,9 @@ export const PROVIDERS: Provider[] = [
       webp1120: '/images/providers/anastasia-ofoegbu-1120.webp',
       jpg560: '/images/providers/anastasia-ofoegbu-560.jpg',
       jpg1120: '/images/providers/anastasia-ofoegbu-1120.jpg',
-      // Her 1137x1138 original cut to 4:5 at native pixels
-      // (design-research/assets/providers/source/).
-      portrait: { src: '/images/providers/anastasia-ofoegbu-portrait.webp', width: 910, height: 1137 },
+      // New headshot, client 2026-10-26: the 2400x3000 4:5 original
+      // (design-research/assets/providers/source/) scaled to 1120x1400.
+      portrait: { src: '/images/providers/anastasia-ofoegbu-portrait.webp', width: 1120, height: 1400 },
       alt: 'Anastasia O. Ofoegbu, DNP, FNP-BC, PMHNP-BC, psychiatric mental health nurse practitioner at Newpoint',
     },
     /**

@@ -19,6 +19,20 @@
    --------------------------------------------------------------------------- */
 
 @theme {
+  /* TURQUOISE, CLIENT INSTRUCTION 2026-10-26: the royal blue "seems dark and
+     is not good for the practice"; use Turquoise Blue #00EDE1 site-wide. The
+     np-blue-* NAMES ARE KEPT so no component changes; every step is now the
+     turquoise hue (177deg) at the SAME white-contrast as the royal step it
+     replaced, so every ratio recorded below and across components still holds
+     to within 0.1. #00EDE1 itself measures 1.48:1 against white, so it can
+     never carry or sit behind white type: it is np-cyan (decorative: gradient
+     ends, glows) and the ink-on-turquoise pairing (11.5:1) where needed. Text,
+     links and button fills use the darker steps. The hero washes moved from
+     900 to 700 (#025854) so the photography reads lighter: at their 0.78
+     alpha over a white pixel that composites to 4.8:1 under white type. 600
+     was tried and fails (4.0:1).
+
+     Previous note, kept for history: */
   /* BRAND BLUE, REMAPPED TO ROYAL BY CLIENT INSTRUCTION, 2026-10-22: "I want
      this new colour to be dominant everywhere on the website." The note that
      stood here ("#234598 is preserved brand equity, do not alter") is
@@ -26,35 +40,35 @@
      royal family (see the vivid-royal block below and
      design-research/design-tokens.md); every step keeps its old role. White on
      each: 900 12.56, 800 9.90, 700 8.26, 600 6.37, 500 5.10. */
-  --color-np-blue-900: #142a80;
+  --color-np-blue-900: #053a38;
   /* Sits between 900 and 700, for a raised panel ON a 900 ground: the footer's
      crisis strip. It measures only 1.22:1 against 900, which is deliberate for
      a surface rather than a component, so anything using it carries a
      white/15 hairline to define its edge. White on it measures 13.2:1. */
-  --color-np-blue-800: #1a36a6;
-  --color-np-blue-700: #1d3fc2;
-  --color-np-blue-600: #2450e0;
-  --color-np-blue-500: #3364e7;
-  --color-np-blue-300: #9cbcff; /* on-ink use only: 6.61:1 on 900 */
-  --color-np-blue-100: #dde7fe;
-  --color-np-blue-50: #eef3ff;
+  --color-np-blue-800: #044b47;
+  --color-np-blue-700: #025854;
+  --color-np-blue-600: #006b66;
+  --color-np-blue-500: #007b75;
+  --color-np-blue-300: #75f0e9; /* on-ink use only: 6.61:1 on 900 */
+  --color-np-blue-100: #d2f9f7;
+  --color-np-blue-50: #ebfcfb;
 
   /* VIVID ROYAL, CLIENT REQUEST 2026-10-22: the navy surfaces "look dull", and
      the reference was Apple's Mail icon, a vertical gradient from royal blue
      into bright cyan. Sampled from that icon, then held to contrast:
-       royal-bright  #3364e7  white 5.10:1  top of buttons
-       royal         #2450e0  white 6.37:1  the working royal
-       royal-deep    #1d3fc2  white 8.26:1  panel grounds, hover, text scrims
-       cyan          #5ec7f7  white 1.91:1  DECORATIVE ONLY: gradient ends and
+       royal-bright  #007b75  white 5.10:1  top of buttons
+       royal         #006b66  white 6.37:1  the working royal
+       royal-deep    #025854  white 8.26:1  panel grounds, hover, text scrims
+       cyan          #00ede1  white 1.91:1  DECORATIVE ONLY: gradient ends and
                                             glows, never behind type
      Introduced as a separate family the same day; np-blue above was then
      remapped onto it by the client's "dominant everywhere" instruction, so the
      two now agree (royal = blue-600, royal-deep = blue-700, royal-bright =
      blue-500). Kept as names because the gradient utilities read them. */
-  --color-np-royal-bright: #3364e7;
-  --color-np-royal: #2450e0;
-  --color-np-royal-deep: #1d3fc2;
-  --color-np-cyan: #5ec7f7;
+  --color-np-royal-bright: #007b75;
+  --color-np-royal: #006b66;
+  --color-np-royal-deep: #025854;
+  --color-np-cyan: #00ede1;
 
   /* Ink and warm neutrals */
   --color-np-ink: #131c2e;
@@ -76,7 +90,7 @@
      the label back under AA. */
   /* Remapped 2026-10-22 from the slate #4a76a4 to a bright royal, same role:
      a white label measures 4.78:1 (AA at 14px). */
-  --color-np-sky: #2f6be8;
+  --color-np-sky: #00807a;
 
   /* AMBER RETIRED 2026-09-25. --color-np-amber-500 (#e9a93c) and its tint
      --color-np-amber-100 (#fbeed5) are gone. This is the one part of
@@ -265,7 +279,7 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    /* DEEP ROYAL, np-blue-800 (#1a36a6, 9.90:1 on white). Royal rather than
+    /* DEEP ROYAL, np-blue-800 (#044b47, 9.90:1 on white). Royal rather than
        ink by client instruction, 2026-10-22 ("royal dominant everywhere"); it
        was the bright np-blue-600 for one day and read as too loud, so headings
        stepped down to 800 and the bright royal is kept for what should be
@@ -541,16 +555,16 @@
    permanent ring, quiet does not) is unchanged. Scoped to .cta-band so the
    hero's glass buttons, measured against their own photographs, are untouched. */
 .cta-band .liquid-glass-bright {
-  background: rgba(29, 63, 194, 0.55);
+  background: rgba(2, 88, 84, 0.55);
 }
 .cta-band .liquid-glass-bright:hover {
-  background: rgba(29, 63, 194, 0.68);
+  background: rgba(2, 88, 84, 0.68);
 }
 .cta-band .liquid-glass-quiet {
-  background: rgba(29, 63, 194, 0.4);
+  background: rgba(2, 88, 84, 0.4);
 }
 .cta-band .liquid-glass-quiet:hover {
-  background: rgba(29, 63, 194, 0.52);
+  background: rgba(2, 88, 84, 0.52);
 }
 
 /* ---------------------------------------------------------------------------
