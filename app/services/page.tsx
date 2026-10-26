@@ -564,11 +564,11 @@ export default function ServicesIndex() {
                               have left the paths with the SVG default fill of
                               black — a black blob, not a badge.
                                 fill-background -> fill-np-surface
-                                fill-primary    -> fill-np-blue-600
-                              Measured: the seal is 8.84:1 against the card and
-                              the white tick 8.84:1 against the seal, both well
-                              clear of the 3:1 SC 1.4.11 asks of a graphic that
-                              carries meaning.
+                                fill-primary    -> fill-np-turquoise
+                              The seal is #00CED1 with a white tick (client
+                              palette, 2026-10-26): 1.95:1 each way, under the
+                              3:1 SC 1.4.11 asks of a meaningful graphic; the
+                              sr-only "Verified" carries the meaning regardless.
 
                               THE OUTER np-surface PATH IS NOT DECORATION. The
                               badge is offset onto the avatar's edge, so that
@@ -594,7 +594,7 @@ export default function ServicesIndex() {
                                 d="M3.046 8.277A4.402 4.402 0 0 1 8.303 3.03a4.4 4.4 0 0 1 7.411 0 4.397 4.397 0 0 1 5.19 3.068c.207.713.23 1.466.067 2.19a4.4 4.4 0 0 1 0 7.415 4.403 4.403 0 0 1-3.06 5.187 4.398 4.398 0 0 1-2.186.072 4.398 4.398 0 0 1-7.422 0 4.398 4.398 0 0 1-5.257-5.248 4.4 4.4 0 0 1 0-7.437Z"
                               />
                               <path
-                                className="fill-np-blue-600"
+                                className="fill-np-turquoise"
                                 d="M4.674 8.954a3.602 3.602 0 0 1 4.301-4.293 3.6 3.6 0 0 1 6.064 0 3.598 3.598 0 0 1 4.3 4.302 3.6 3.6 0 0 1 0 6.067 3.6 3.6 0 0 1-4.29 4.302 3.6 3.6 0 0 1-6.074 0 3.598 3.598 0 0 1-4.3-4.293 3.6 3.6 0 0 1 0-6.085Z"
                               />
                               <path
