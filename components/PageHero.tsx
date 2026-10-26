@@ -202,7 +202,7 @@ export function PageHero({
        that beats the base layer `on-ink` lives in anyway. With `showCta` false
        the header has nothing focusable in it, so there is still nothing here
        for `on-ink` to do. */
-    <header className="bg-np-turquoise relative -mt-[var(--nav-h)] flex min-h-[50dvh] flex-col text-np-ink md:min-h-[60vh]">
+    <header className="bg-np-turquoise relative -mt-[var(--nav-h)] flex min-h-[50dvh] flex-col text-white md:min-h-[60vh]">
       {image ? (
         <Image
           src={image.src}
@@ -405,16 +405,16 @@ export function PageHero({
           curve; the other two are the original ramps and are untouched.
           Skipped entirely under `home`, which brings its own pair above. */}
       {scrim !== 'home' && scrim !== 'edge' && (
-      <div
-        aria-hidden="true"
-        className={
-          image
-            ? scrim === 'hero'
-              ? 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.62)_0%,rgba(0,206,209,0.593)_11.5%,rgba(0,206,209,0.523)_23%,rgba(0,206,209,0.424)_34.5%,rgba(0,206,209,0.31)_46%,rgba(0,206,209,0.196)_57.5%,rgba(0,206,209,0.097)_69%,rgba(0,206,209,0.027)_80.5%,rgba(0,206,209,0)_92%)] lg:bg-[linear-gradient(to_top,rgba(0,206,209,0.55)_0%,rgba(0,206,209,0.526)_8.75%,rgba(0,206,209,0.464)_17.5%,rgba(0,206,209,0.376)_26.25%,rgba(0,206,209,0.275)_35%,rgba(0,206,209,0.174)_43.75%,rgba(0,206,209,0.086)_52.5%,rgba(0,206,209,0.024)_61.25%,rgba(0,206,209,0)_70%)]'
-              : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.85)_0%,rgba(0,206,209,0.66)_60%,rgba(0,206,209,0.62)_100%)]'
-            : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.78)_0%,rgba(0,206,209,0.78)_52%,rgba(0,206,209,0.45)_64%,rgba(0,206,209,0)_80%)]'
-        }
-      />
+        <div
+          aria-hidden="true"
+          className={
+            image
+              ? scrim === 'hero'
+                ? 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.62)_0%,rgba(0,206,209,0.593)_11.5%,rgba(0,206,209,0.523)_23%,rgba(0,206,209,0.424)_34.5%,rgba(0,206,209,0.31)_46%,rgba(0,206,209,0.196)_57.5%,rgba(0,206,209,0.097)_69%,rgba(0,206,209,0.027)_80.5%,rgba(0,206,209,0)_92%)] lg:bg-[linear-gradient(to_top,rgba(0,206,209,0.55)_0%,rgba(0,206,209,0.526)_8.75%,rgba(0,206,209,0.464)_17.5%,rgba(0,206,209,0.376)_26.25%,rgba(0,206,209,0.275)_35%,rgba(0,206,209,0.174)_43.75%,rgba(0,206,209,0.086)_52.5%,rgba(0,206,209,0.024)_61.25%,rgba(0,206,209,0)_70%)]'
+                : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.85)_0%,rgba(0,206,209,0.66)_60%,rgba(0,206,209,0.62)_100%)]'
+              : 'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,206,209,0.78)_0%,rgba(0,206,209,0.78)_52%,rgba(0,206,209,0.45)_64%,rgba(0,206,209,0)_80%)]'
+          }
+        />
       )}
 
       {/* LAYER 3: the left gradient, one curve at every width. The final stop
@@ -510,7 +510,7 @@ export function PageHero({
                 85% white came out at 4.41:1, just under the floor for 13px. Full
                 white measures 5.37:1 there. */}
             {eyebrow && (
-              <p className="text-caption tracking-[0.08em] text-np-ink uppercase">{eyebrow}</p>
+              <p className="text-caption tracking-[0.08em] text-white uppercase">{eyebrow}</p>
             )}
 
             {/* mt only under an eyebrow. With the breadcrumb removed the H1 is
@@ -518,7 +518,7 @@ export function PageHero({
                 and a top margin there would only pad the block against the
                 navbar clearance above it. */}
             <h1
-              className={`text-display-l max-w-[18ch] text-np-ink [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] ${
+              className={`text-display-l max-w-[18ch] text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] ${
                 centred ? 'lg:mx-auto' : ''
               } ${eyebrow ? 'mt-4' : ''}`}
               style={{ maxWidth: copyMaxWidth?.title }}
@@ -527,7 +527,7 @@ export function PageHero({
             </h1>
 
             <p
-              className={`text-body-l mt-5 max-w-[56ch] text-np-ink ${centred ? 'lg:mx-auto' : ''}`}
+              className={`text-body-l mt-5 max-w-[56ch] text-white ${centred ? 'lg:mx-auto' : ''}`}
               style={{ maxWidth: copyMaxWidth?.intro }}
             >
               {intro}

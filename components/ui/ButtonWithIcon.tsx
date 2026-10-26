@@ -62,7 +62,7 @@ const sizes = {
 const variants = {
   sky: {
     root: 'bg-np-sky ring-1 ring-white focus-visible:outline-np-ink',
-    disc: 'bg-white text-np-ink',
+    disc: 'bg-white text-np-turquoise',
   },
   /**
    * The fill is np-blue-900/35, NOT white/15 as first specified. White glass
@@ -73,8 +73,8 @@ const variants = {
    * gives the label something to sit on. The disc and arrow are as specified.
    */
   glass: {
-    root: 'bg-white/30 backdrop-blur-md ring-1 ring-np-ink/35 hover:bg-white/45 focus-visible:outline-np-ink',
-    disc: 'bg-white/90 text-np-ink',
+    root: 'bg-white/15 backdrop-blur-md ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-np-ink',
+    disc: 'bg-white/90 text-np-turquoise',
   },
   /**
    * The footer's variant, for a FLAT np-blue-900 ground rather than a
@@ -103,7 +103,7 @@ const variants = {
    * the pill, onto np-blue-900, where white measures about 16:1.
    */
   'on-ink': {
-    root: 'bg-white/25 ring-1 ring-np-ink/35 hover:bg-white/40 focus-visible:outline-np-ink',
+    root: 'bg-white/15 ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-np-ink',
     disc: 'bg-white text-np-blue-900',
   },
   /**
@@ -122,7 +122,7 @@ const variants = {
    */
   navy: {
     root: 'bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink',
-    disc: 'bg-white text-np-ink',
+    disc: 'bg-white text-np-turquoise',
   },
 } as const;
 
@@ -142,7 +142,7 @@ export function ButtonWithIcon({
   return (
     <a
       href={href}
-      className={`group text-np-ink relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] motion-reduce:transition-none ${v.root} ${s.root}`}
+      className={`group relative flex w-fit cursor-pointer items-center overflow-hidden rounded-full p-1 text-sm font-medium text-white transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] motion-reduce:transition-none ${v.root} ${s.root}`}
     >
       <span className="relative z-10 transition-all duration-500 motion-reduce:transition-none">
         {children}

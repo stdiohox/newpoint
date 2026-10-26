@@ -46,7 +46,7 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-np-turquoise text-np-ink',
+        default: 'border-transparent bg-np-turquoise text-white',
         secondary: 'border-transparent bg-np-neutral-200 text-np-ink',
         destructive: 'border-transparent bg-np-error text-white',
         outline: 'text-np-ink',

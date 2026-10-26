@@ -22,9 +22,10 @@
   /* STRICT #00CED1, CLIENT INSTRUCTION 2026-10-26: "use this color strictly".
      #00CED1 is the ONLY brand colour. Every coloured surface (buttons, panels,
      badges, the photo-hero washes, the CTA band) is exactly #00CED1, and the
-     text, icons and focus rings ON it are ink (#131c2e, 8.7:1). White on
-     #00CED1 measures 1.95:1 and #00CED1 on white the same, so neither is used
-     for text, with one exemption: the "Newpoint" wordmark, which is a brand
+     text and icons ON it are WHITE at the client's explicit preference
+     (2026-10-26), knowing white on #00CED1 measures 1.95:1, below WCAG AA's
+     4.5:1. Focus rings on it stay ink (white would be invisible there).
+     #00CED1 is never text on white, except the "Newpoint" wordmark, a brand
      name (WCAG 1.4.3 exempts logotypes).
 
      THE np-blue-* NAMES ARE KEPT, BUT 500-900 ARE NOW INK. They were the text,
@@ -36,8 +37,8 @@
 
      Ratio notes elsewhere in this file and in components describe the earlier
      royal/white pairing and are no longer current; the 2026-10-26 pass was
-     re-measured route by route at 1440 and 390 (ink on every photo hero and
-     the CTA band holds >= 4.5:1 for body text, >= 3:1 for display).
+     first shipped ink-on-turquoise; the client reversed that to white text the
+     same day, trading contrast for their preferred look.
 
      Previous note, kept for history: */
   /* BRAND BLUE, REMAPPED TO ROYAL BY CLIENT INSTRUCTION, 2026-10-22: "I want
@@ -527,7 +528,7 @@
      IT HAS TO BE DECLARED HERE, NOT AS A TAILWIND `border-*` UTILITY. The base
      `.liquid-glass` sets `border: none` and is unlayered, so it outranks any
      utility the element carries — the same trap recorded above for the fill. */
-  border: 1px solid rgba(19, 28, 46, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 .liquid-glass-quiet {
   background: rgba(255, 255, 255, 0.05);
@@ -544,11 +545,11 @@
    in the first place. */
 .liquid-glass-bright:hover {
   background: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(19, 28, 46, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75);
 }
 .liquid-glass-quiet:hover {
   background: rgba(255, 255, 255, 0.07);
-  box-shadow: inset 0 0 0 1px rgba(19, 28, 46, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 /* INSIDE THE CLOSING CTA BAND THE GLASS IS TINTED ROYAL, NOT WHITE (client,
@@ -558,16 +559,16 @@
    permanent ring, quiet does not) is unchanged. Scoped to .cta-band so the
    hero's glass buttons, measured against their own photographs, are untouched. */
 .cta-band .liquid-glass-bright {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
 }
 .cta-band .liquid-glass-bright:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.25);
 }
 .cta-band .liquid-glass-quiet {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
 }
 .cta-band .liquid-glass-quiet:hover {
-  background: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* ---------------------------------------------------------------------------
@@ -592,7 +593,7 @@
    --------------------------------------------------------------------------- */
 @media (prefers-reduced-transparency: reduce), (forced-colors: active) {
   .liquid-glass {
-    background: var(--color-np-surface);
+    background: var(--color-np-turquoise);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border: 1px solid var(--color-np-neutral-400);
@@ -613,7 +614,7 @@
   .liquid-glass-quiet,
   .liquid-glass-bright:hover,
   .liquid-glass-quiet:hover {
-    background: var(--color-np-surface);
+    background: var(--color-np-turquoise);
   }
   /* THE PRIMARY KEEPS A HEAVIER EDGE THAN THE SECONDARY, because the fallback
      flattens the two tints into one fill and the pair would otherwise be two

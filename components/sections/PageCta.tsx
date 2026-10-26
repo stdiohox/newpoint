@@ -259,7 +259,7 @@ export function PageCta({
               Cyan measures 1.91:1 against white; it must never reach a glyph. */}
           <div
             aria-hidden="true"
-            className="cta-overlay pointer-events-none absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_100%_100%,rgba(0,206,209,0.6)_0%,rgba(0,206,209,0.22)_18%,rgba(0,206,209,0)_32%)]"
+            className="cta-overlay pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_100%_100%,rgba(0,206,209,0.6)_0%,rgba(0,206,209,0.22)_18%,rgba(0,206,209,0)_32%)] md:block"
           />
 
           <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -270,14 +270,14 @@ export function PageCta({
               <div className="relative flex size-20 items-center justify-center">
                 <div
                   aria-hidden="true"
-                  className="rounded-card absolute inset-0 bg-white/25 ring-1 ring-np-ink/20"
+                  className="rounded-card absolute inset-0 bg-white/15 ring-1 ring-white/40"
                 />
                 <div aria-hidden="true" className="bg-np-vivid absolute inset-1 rounded-[10px]" />
                 <CalendarCheck
                   aria-hidden="true"
                   size={30}
                   strokeWidth={1.75}
-                  className="text-np-ink relative"
+                  className="relative text-white"
                 />
               </div>
             </Reveal>
@@ -317,11 +317,11 @@ export function PageCta({
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h2 className="text-h2 mt-5 text-np-ink">{heading}</h2>
+              <h2 className="text-h2 mt-5 text-white">{heading}</h2>
             </Reveal>
 
             <Reveal delay={0.16}>
-              <p className="text-body-l mt-4 text-np-ink">{body}</p>
+              <p className="text-body-l mt-4 text-white">{body}</p>
             </Reveal>
 
             <Reveal delay={0.22}>
@@ -408,7 +408,7 @@ export function PageCta({
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
               >
                 {assurances.map(({ icon: Icon, label }) => (
-                  <li key={label} className="text-small flex items-center gap-2 text-np-ink">
+                  <li key={label} className="text-small flex items-center gap-2 text-white">
                     <Icon aria-hidden="true" size={16} strokeWidth={1.75} className="shrink-0" />
                     {label}
                   </li>

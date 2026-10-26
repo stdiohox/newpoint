@@ -660,9 +660,11 @@ The homepage ends (after the contact section, before the footer) with
 
 The royal blue "seems dark and is not good for the practice"; the client then asked for
 **#00CED1, strictly**. It is the only brand colour: every coloured surface (buttons, panels,
-badges, photo-hero washes, the CTA band, the share image) is exactly `#00CED1`, with **ink
-text, icons and focus rings on it** (8.7:1). White on `#00CED1` is 1.95:1, so white text never
-sits on it, and `#00CED1` is never body/heading/link text on white — those are ink. Exception:
+badges, photo-hero washes, the CTA band, the share image) is exactly `#00CED1`, with **white
+text and icons on it — the client's explicit preference (2026-10-26), chosen over ink after
+both were shown and after being told white measures 1.95:1 there, below WCAG AA.** Do not
+"fix" it back to ink without asking. Focus rings on turquoise stay ink. `#00CED1` is never
+body/heading/link text on white — those are ink. Exception:
 the "Newpoint" wordmark is `#00CED1` (logotype, exempt). Token names (`np-blue-*`, `np-royal*`,
 `np-sky`, `np-cyan`) are kept and remapped in `app/globals.css`; `bg-np-turquoise` /
 `np-turquoise-deep` (hover) are the explicit names. Older ratio comments in components describe

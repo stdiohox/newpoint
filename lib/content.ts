@@ -2458,7 +2458,8 @@ export const WHAT_TO_EXPECT = {
  * anywhere in /research is Lawrence Township, New Jersey.
  *
  * `categoryColor` values are existing brand tokens, and `categoryText` is the
- * label colour on them: ink on turquoise (8.7:1), white on success (5.04:1).
+ * label colour on them: white (client preference, 2026-10-26; 1.95:1 on
+ * turquoise, below AA), white on success (5.04:1).
  */
 export type FeaturedService = {
   type: 'featured' | 'card';
@@ -2485,7 +2486,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: 'In person and by telehealth',
     category: 'Assessment',
     categoryColor: 'var(--color-np-turquoise)',
-    categoryText: 'var(--color-np-ink)',
+    categoryText: '#ffffff',
     // This footage depicts a person and must not imply a treatment outcome.
     video: '/video/services/evaluation.mp4',
     poster: '/video/services/evaluation-poster.webp',
@@ -2501,7 +2502,7 @@ export const FEATURED_SERVICES: FeaturedService[] = [
     footerText: 'In person and by telehealth',
     category: 'Ongoing care',
     categoryColor: 'var(--color-np-turquoise)',
-    categoryText: 'var(--color-np-ink)',
+    categoryText: '#ffffff',
     // This footage depicts a person and must not imply a treatment outcome.
     video: '/video/services/medication-management.mp4',
     poster: '/video/services/medication-management-poster.webp',

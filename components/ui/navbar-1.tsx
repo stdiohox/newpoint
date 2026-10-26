@@ -601,7 +601,7 @@ export function Navbar1({
           <Link
             href={CTA.href}
             aria-current={isActive(CTA.href) ? 'page' : undefined}
-            className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium whitespace-nowrap text-np-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
+            className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
           >
             {CTA.label}
           </Link>
@@ -735,7 +735,7 @@ export function Navbar1({
                 <Link
                   href={CTA.href}
                   aria-current={isActive(CTA.href) ? 'page' : undefined}
-                  className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-base font-medium text-np-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
+                  className="bg-np-vivid hover:bg-np-vivid-deep focus-visible:outline-np-ink inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-base font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
                   onClick={close}
                 >
                   {CTA.label}

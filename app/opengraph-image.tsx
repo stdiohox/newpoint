@@ -60,12 +60,12 @@ export default async function OpengraphImage() {
               width: 18,
               height: 18,
               borderRadius: 999,
-              backgroundColor: '#131c2e',
+              backgroundColor: '#ffffff',
               marginRight: 14,
             }}
           />
           <div
-            style={{ fontSize: 28, color: '#131c2e', fontWeight: 600, letterSpacing: '-0.01em' }}
+            style={{ fontSize: 28, color: '#ffffff', fontWeight: 600, letterSpacing: '-0.01em' }}
           >
             {BUSINESS.shortName}
           </div>
@@ -76,7 +76,7 @@ export default async function OpengraphImage() {
             style={{
               fontSize: 64,
               lineHeight: 1.02,
-              color: '#131c2e',
+              color: '#ffffff',
               fontWeight: 600,
               letterSpacing: '-0.035em',
             }}
@@ -87,7 +87,7 @@ export default async function OpengraphImage() {
             style={{
               fontSize: 30,
               lineHeight: 1.25,
-              color: '#131c2e',
+              color: '#ffffff',
               marginTop: 22,
               letterSpacing: '-0.01em',
             }}

@@ -41,7 +41,7 @@ const arrowSizes = {
 };
 
 const variants = {
-  primary: 'bg-np-vivid text-np-ink hover:bg-np-vivid-deep focus-visible:outline-np-ink',
+  primary: 'bg-np-vivid text-white hover:bg-np-vivid-deep focus-visible:outline-np-ink',
   /**
    * The filled action on a dark ground.
    *
@@ -84,7 +84,7 @@ const variants = {
    * blue-600 sits too close to the fill to read. Same call ButtonWithIcon.tsx
    * documents for the same reason.
    */
-  sky: 'bg-np-sky text-np-ink hover:bg-np-turquoise-deep focus-visible:outline-np-ink',
+  sky: 'bg-np-sky text-white hover:bg-np-turquoise-deep focus-visible:outline-np-ink',
   /**
    * The site's CTA navy (the navbar and footer "Request an appointment"),
    * for a filled button on a light or tinted ground. White label 16.1:1; the
@@ -92,7 +92,7 @@ const variants = {
    * homepage insurance cards, which were `sky` and read as a different colour
    * from every other CTA.
    */
-  navy: 'bg-np-vivid text-np-ink hover:bg-np-vivid-deep focus-visible:outline-np-ink',
+  navy: 'bg-np-vivid text-white hover:bg-np-vivid-deep focus-visible:outline-np-ink',
   /**
    * The secondary action on a dark ground, where `quiet` cannot go: its
    * np-blue-600 label and ring are built for light grounds and both vanish.
@@ -112,7 +112,7 @@ const variants = {
    * ground behind the button, where a dark blue outline is nearly the ground.
    */
   onInkQuiet:
-    'bg-transparent text-np-ink ring-1 ring-np-ink/50 hover:bg-white/25 focus-visible:outline-np-ink',
+    'bg-transparent text-white ring-1 ring-white/60 hover:bg-white/15 focus-visible:outline-np-ink',
   /**
    * THE GLASS PAIR, for a button sitting on a photograph rather than on a flat
    * panel. Both carry `.liquid-glass` — the same hero material, unchanged: a
@@ -138,8 +138,8 @@ const variants = {
      hierarchy fix. The weight is the cue that survives when the 1px edge is
      the thing a low-vision reader cannot resolve, and a heavier glyph also
      puts more pixels at full white, which the contrast sampling rewards. */
-  onInkGlass: 'liquid-glass liquid-glass-bright font-semibold text-np-ink focus-visible:outline-np-ink',
-  onInkGlassQuiet: 'liquid-glass liquid-glass-quiet text-np-ink focus-visible:outline-np-ink',
+  onInkGlass: 'liquid-glass liquid-glass-bright font-semibold text-white focus-visible:outline-np-ink',
+  onInkGlassQuiet: 'liquid-glass liquid-glass-quiet text-white focus-visible:outline-np-ink',
 };
 
 const discSizes = {
@@ -184,7 +184,7 @@ export function Button({
       {withArrow && (
         <span
           aria-hidden="true"
-          className={`text-np-ink ml-1 inline-flex shrink-0 items-center justify-center rounded-full bg-white ${disc.box}`}
+          className={`text-np-turquoise ml-1 inline-flex shrink-0 items-center justify-center rounded-full bg-white ${disc.box}`}
         >
           <ArrowUpRight size={disc.icon} />
         </span>

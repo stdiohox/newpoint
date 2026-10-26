@@ -39,7 +39,7 @@ const INTER = "'Inter', sans-serif";
 export function Hero() {
   return (
     <section
-      className="bg-np-turquoise text-np-ink relative -mt-[var(--nav-h)] min-h-screen"
+      className="bg-np-turquoise relative -mt-[var(--nav-h)] min-h-screen text-white"
       style={{
         fontFamily: INTER,
         WebkitFontSmoothing: 'antialiased',
@@ -104,19 +104,19 @@ export function Hero() {
         <div className="flex flex-1 flex-col justify-end px-6 pt-[var(--nav-h)] pb-12 md:px-12 lg:grid lg:grid-cols-2 lg:items-end lg:px-16 lg:pb-16">
           <div>
             <FadeIn delay={100} duration={1000} className="mb-4">
-              <span className="border-np-ink/30 text-np-ink inline-block rounded-full border px-4 py-2 text-sm [text-shadow:0_1px_12px_rgba(255,255,255,0.3)]">
+              <span className="inline-block rounded-full border border-white/40 px-4 py-2 text-sm text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)]">
                 {INSURANCE.heading}
               </span>
             </FadeIn>
 
             <AnimatedHeading
               text={HERO.headlineLines}
-              className="text-np-ink mb-4 text-4xl font-normal [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] md:text-5xl lg:text-6xl xl:text-7xl"
+              className="mb-4 text-4xl font-normal text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] md:text-5xl lg:text-6xl xl:text-7xl"
               style={{ letterSpacing: '-0.04em', fontFamily: INTER }}
             />
 
             <FadeIn delay={800} duration={1000}>
-              <p className="text-np-ink mb-5 text-sm [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] md:text-base">
+              <p className="mb-5 text-sm text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] md:text-base">
                 {HERO.subtext}
               </p>
             </FadeIn>
@@ -132,7 +132,7 @@ export function Hero() {
 
           <div className="flex items-end justify-start lg:justify-end">
             <FadeIn delay={1400} duration={1000}>
-              <span className="text-base font-light [text-shadow:0_1px_12px_rgba(255,255,255,0.3)] md:text-lg lg:text-xl">
+              <span className="text-base font-light [text-shadow:0_1px_12px_rgba(0,0,0,0.25)] md:text-lg lg:text-xl">
                 {HERO.tag}
               </span>
             </FadeIn>

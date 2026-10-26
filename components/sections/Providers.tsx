@@ -234,7 +234,7 @@ export function Providers() {
         >
           <Reveal>
             <h2
-              className="mx-auto max-w-[24ch] text-center font-medium text-np-ink"
+              className="mx-auto max-w-[24ch] text-center font-medium text-white"
               style={{
                 fontFamily: 'var(--font-outfit), ui-sans-serif, system-ui, sans-serif',
                 // A rem term, not pure vw: between about 588 and 1412px the old
@@ -260,7 +260,7 @@ export function Providers() {
               over sky itself would only make 3.9:1, so do not move this copy
               down the panel without re-measuring. */}
           <Reveal delay={0.08}>
-            <p className="text-body-l mx-auto mt-4 max-w-[720px] text-center text-np-ink">
+            <p className="text-body-l mx-auto mt-4 max-w-[720px] text-center text-white">
               Not a directory, and not a rotating roster. Both hold a Doctor of Nursing Practice and
               are dual board-certified in psychiatric mental health and family practice.
             </p>
@@ -328,7 +328,7 @@ export function Providers() {
                       screen reader while being invisible on screen. */}
                   <article
                     id={`provider-${p.slug}`}
-                    className="group bg-np-royal-deep relative grid w-full grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-np-ink"
+                    className="group bg-np-royal-deep has-[:focus-visible]:outline-np-ink relative grid w-full grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[28px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
                   >
                     {/* Decorative: the link already carries the name and role,
                         and a described portrait here would be concatenated into
@@ -386,7 +386,7 @@ export function Providers() {
                       className="z-10 col-start-1 row-start-2 -mt-8 self-end px-5 pb-5 min-[960px]:px-7 min-[960px]:pb-6 lg:row-start-1 lg:mt-0"
                       style={{ backgroundImage: TEXT_SCRIM, paddingTop: `${TEXT_FADE_PX}px` }}
                     >
-                      <h3 className="flex items-center gap-3 text-np-ink">
+                      <h3 className="flex items-center gap-3 text-white">
                         <Link
                           href={`/providers/${p.slug}`}
                           aria-label={`${p.displayName}, ${p.role}`}
@@ -408,13 +408,13 @@ export function Providers() {
                         </Link>
                         <span
                           aria-hidden="true"
-                          className="ease-np-out inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-np-ink/45 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-has-[:focus-visible]:translate-x-0.5 group-has-[:focus-visible]:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 motion-reduce:group-has-[:focus-visible]:translate-x-0 motion-reduce:group-has-[:focus-visible]:translate-y-0"
+                          className="ease-np-out inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-white/60 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-has-[:focus-visible]:translate-x-0.5 group-has-[:focus-visible]:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 motion-reduce:group-has-[:focus-visible]:translate-x-0 motion-reduce:group-has-[:focus-visible]:translate-y-0"
                         >
                           <ArrowUpRight className="size-4" strokeWidth={1.5} />
                         </span>
                       </h3>
 
-                      <p className="mt-1 text-[0.9375rem] leading-[1.5] text-np-ink">{p.role}</p>
+                      <p className="mt-1 text-[0.9375rem] leading-[1.5] text-white">{p.role}</p>
                       {/* aria-describedby on the link points here, so the one
                           sentence that actually differentiates the two cards
                           still reaches a screen reader even though the link's
@@ -433,7 +433,7 @@ export function Providers() {
                           (not read, not focusable) and aria-hidden. Below lg the
                           cards stack, alignment does not apply, and the copies
                           are display:none so they cost no height there. */}
-                      <div className="mt-2 grid text-[0.9375rem] leading-[1.5] text-np-ink">
+                      <div className="mt-2 grid text-[0.9375rem] leading-[1.5] text-white">
                         <p id={bioId} className="col-start-1 row-start-1">
                           {assertSourced(p.slug, p.bio)}
                         </p>
