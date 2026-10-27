@@ -19,26 +19,31 @@
    --------------------------------------------------------------------------- */
 
 @theme {
-  /* STRICT #00CED1, CLIENT INSTRUCTION 2026-10-26: "use this color strictly".
-     #00CED1 is the ONLY brand colour. Every coloured surface (buttons, panels,
-     badges, the photo-hero washes, the CTA band) is exactly #00CED1, and the
-     text and icons ON it are WHITE at the client's explicit preference
-     (2026-10-26), knowing white on #00CED1 measures 1.95:1, below WCAG AA's
-     4.5:1. Focus rings on it stay ink (white would be invisible there).
-     #00CED1 is never text on white, except the "Newpoint" wordmark, a brand
-     name (WCAG 1.4.3 exempts logotypes).
+  /* BACKDROP BLUE #73a8dd, CLIENT INSTRUCTION 2026-10-27: "not the turquoise
+     blue" -- the blue of the studio backdrop in the two-provider portrait
+     (public/images/providers/providers-together.webp). It is the median of the
+     backdrop's pixels; the edges run ~#6da2d5 and the centre ~#77ade2.
 
-     THE np-blue-* NAMES ARE KEPT, BUT 500-900 ARE NOW INK. They were the text,
+     It replaced #00CED1 one-for-one, so everything the 2026-10-26 rule says
+     still holds with the new hex: #73a8dd is the ONLY brand colour; every
+     coloured surface (buttons, panels, badges, the photo-hero washes, the CTA
+     band) is exactly #73a8dd; text and icons ON it are WHITE at the client's
+     explicit preference. White on #73a8dd measures 2.51:1 (below WCAG AA's
+     4.5:1, but up from 1.95:1 on turquoise); ink on it 6.79:1. Focus rings on
+     it stay ink. #73a8dd is never text on white, except the "Newpoint"
+     wordmark, a brand name (WCAG 1.4.3 exempts logotypes).
+
+     THE np-blue-* NAMES ARE KEPT, BUT 500-900 ARE INK. They were the text,
      link, focus-ring and outline colours, so headings and links on white read
      ink. 900 is a touch darker than ink so the 700 -> 900 hover steps still
-     move. 50/100 are #00CED1 tints (10% and 22% on white); 300 and the royal,
-     cyan and sky names all resolve to #00CED1. --color-np-turquoise-deep is
-     the hover/pressed state of a turquoise fill only.
+     move. 50/100 are #73a8dd tints (10% and 22% on white); 300 and the royal,
+     cyan and sky names all resolve to #73a8dd. The np-turquoise names are kept
+     too (renaming them touches every component for no visual change):
+     --color-np-turquoise IS the backdrop blue, and --color-np-turquoise-deep
+     (#6797c8, ink mixed in at 12%, white 3.07:1) is its hover/pressed state.
 
-     Ratio notes elsewhere in this file and in components describe the earlier
-     royal/white pairing and are no longer current; the 2026-10-26 pass was
-     first shipped ink-on-turquoise; the client reversed that to white text the
-     same day, trading contrast for their preferred look.
+     Ratio notes elsewhere in this file and in components describe earlier
+     pairings (royal/white, turquoise/white) and are no longer current.
 
      Previous note, kept for history: */
   /* BRAND BLUE, REMAPPED TO ROYAL BY CLIENT INSTRUCTION, 2026-10-22: "I want
@@ -57,9 +62,9 @@
   --color-np-blue-700: #131c2e;
   --color-np-blue-600: #131c2e;
   --color-np-blue-500: #131c2e;
-  --color-np-blue-300: #00ced1; /* on-ink use only: 6.61:1 on 900 */
-  --color-np-blue-100: #c7f4f5;
-  --color-np-blue-50: #e6fafb;
+  --color-np-blue-300: #73a8dd; /* on-ink use only: 7.59:1 on 900 */
+  --color-np-blue-100: #e0ecf8;
+  --color-np-blue-50: #f1f6fc;
 
   /* VIVID ROYAL, CLIENT REQUEST 2026-10-22: the navy surfaces "look dull", and
      the reference was Apple's Mail icon, a vertical gradient from royal blue
@@ -73,14 +78,14 @@
      remapped onto it by the client's "dominant everywhere" instruction, so the
      two now agree (royal = blue-600, royal-deep = blue-700, royal-bright =
      blue-500). Kept as names because the gradient utilities read them. */
-  --color-np-royal-bright: #00ced1;
-  --color-np-royal: #00ced1;
-  --color-np-royal-deep: #00ced1;
-  --color-np-cyan: #00ced1;
-  /* THE ONE BRAND COLOUR, and its hover/pressed state (ink mixed in at 12%,
-     ink text 6.7:1 on it). */
-  --color-np-turquoise: #00ced1;
-  --color-np-turquoise-deep: #00b5b8;
+  --color-np-royal-bright: #73a8dd;
+  --color-np-royal: #73a8dd;
+  --color-np-royal-deep: #73a8dd;
+  --color-np-cyan: #73a8dd;
+  /* THE ONE BRAND COLOUR (the backdrop blue, 2026-10-27), and its
+     hover/pressed state (ink mixed in at 12%, ink text 5.54:1 on it). */
+  --color-np-turquoise: #73a8dd;
+  --color-np-turquoise-deep: #6797c8;
 
   /* Ink and warm neutrals */
   --color-np-ink: #131c2e;
@@ -102,7 +107,7 @@
      the label back under AA. */
   /* Remapped 2026-10-22 from the slate #4a76a4 to a bright royal, same role:
      a white label measures 4.78:1 (AA at 14px). */
-  --color-np-sky: #00ced1;
+  --color-np-sky: #73a8dd;
 
   /* AMBER RETIRED 2026-09-25. --color-np-amber-500 (#e9a93c) and its tint
      --color-np-amber-100 (#fbeed5) are gone. This is the one part of
@@ -319,8 +324,9 @@
      The navbar no longer needs it: Navbar1 sits on a white pill rather than
      on the hero image, so the default blue-600 outline applies there. */
   .on-ink :focus-visible {
-    /* Ink, not white, since the "on-ink" grounds became #00CED1 (2026-10-26):
-       white measures 1.95:1 on it, ink 8.7:1. */
+    /* Ink, not white, since the "on-ink" grounds became the brand colour
+       (#00CED1 2026-10-26, #73a8dd 2026-10-27): white measures 2.51:1 on it,
+       ink 6.79:1. */
     outline-color: var(--color-np-ink);
   }
 
