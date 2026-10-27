@@ -656,19 +656,22 @@ The homepage ends (after the contact section, before the footer) with
        costs ~2 s of load time. A smaller lossless copy for that page only would
        be ~4x lighter; ask whether that is acceptable. -->
 
-### Backdrop blue #5A99D8 — CLIENT INSTRUCTION, 2026-10-27 (supersedes the turquoise hex below)
+### Brand blue #435BA8 — CLIENT INSTRUCTIONS, 2026-10-27 (supersedes the turquoise hex below)
 
-"Not the turquoise blue": the client wants the blue of the studio backdrop in the
-two-provider portrait (`public/images/providers/providers-together.webp`). The backdrop's
-median is #73A8DD (hsl 210 62% 66%), shipped first; the client then asked for it "a little
-bit deeper", so the brand colour is **#5A99D8** — same hue and saturation, 60% lightness.
-It replaced #00CED1 **one-for-one**: every rule in the turquoise section below still
-applies, read with the new hex — sole brand colour, white text/icons on it (3.01:1: below
-AA for body text, clears 3:1 for large text and UI graphics), ink focus rings, never text
-on white except the wordmark. Hover/pressed is `#528AC4` (ink at 12%); tints `#EFF5FB` /
-`#DBE9F6`. The photo washes in `Hero`, `PageHero` and `PageCta` keep their alphas on
-`rgba(90,153,216,…)`. The logo mark PNG and `app/icon.png` are flat #5A99D8 with the white
-figure kept. Token names (`np-turquoise` etc.) were deliberately not renamed.
+Three steps the same day: "not the turquoise blue" but the blue of the studio backdrop in
+the two-provider portrait (median #73A8DD); "a little bit deeper" (#5A99D8); then "more
+darkened", with a cornflower photo as the sample. **#435BA8** is the median of the
+cornflower's petals. (The client also sent a screenshot of a vivid royal ~#2149D3 panel and
+left the choice to us; the cornflower was chosen because it was the stated sample and the
+vivid royal is the family the client called "dark and not good for the practice" on 10-26.)
+
+It replaced #00CED1 **one-for-one**: sole brand colour on every coloured surface, white
+text/icons on it — which now **passes AA (6.36:1)**. Ink on it is only 2.68:1, so **focus
+outlines on blue grounds are white again** (`.on-ink`, and the `onInk`, `onInkQuiet`,
+`onInkGlass*` and `ButtonWithIcon` glass variants); buttons that sit on white pages keep
+ink outlines. Hover/pressed `#3D5399`; tints `#ECEFF6` / `#D6DBEC`; photo washes keep their
+alphas on `rgba(67,91,168,…)`. Logo mark PNG and `app/icon.png` are flat #435BA8 with the
+white figure kept. Token names (`np-turquoise` etc.) deliberately not renamed.
 
 ### Turquoise #00CED1, strictly — CLIENT INSTRUCTION, 2026-10-26 (supersedes the royal section below; hex superseded 2026-10-27)
 

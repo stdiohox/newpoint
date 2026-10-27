@@ -57,7 +57,7 @@ const variants = {
    * layer, so the utility on this variant wins and the class cannot rescue it.
    * A variant named onInk has to carry its own light ring.
    */
-  onInk: 'bg-white text-np-ink hover:bg-np-neutral-100 focus-visible:outline-np-ink',
+  onInk: 'bg-white text-np-ink hover:bg-np-neutral-100 focus-visible:outline-white',
   /**
    * The secondary action on a light ground.
    *
@@ -112,7 +112,7 @@ const variants = {
    * ground behind the button, where a dark blue outline is nearly the ground.
    */
   onInkQuiet:
-    'bg-transparent text-white ring-1 ring-white/60 hover:bg-white/15 focus-visible:outline-np-ink',
+    'bg-transparent text-white ring-1 ring-white/60 hover:bg-white/15 focus-visible:outline-white',
   /**
    * THE GLASS PAIR, for a button sitting on a photograph rather than on a flat
    * panel. Both carry `.liquid-glass` — the same hero material, unchanged: a
@@ -138,8 +138,8 @@ const variants = {
      hierarchy fix. The weight is the cue that survives when the 1px edge is
      the thing a low-vision reader cannot resolve, and a heavier glyph also
      puts more pixels at full white, which the contrast sampling rewards. */
-  onInkGlass: 'liquid-glass liquid-glass-bright font-semibold text-white focus-visible:outline-np-ink',
-  onInkGlassQuiet: 'liquid-glass liquid-glass-quiet text-white focus-visible:outline-np-ink',
+  onInkGlass: 'liquid-glass liquid-glass-bright font-semibold text-white focus-visible:outline-white',
+  onInkGlassQuiet: 'liquid-glass liquid-glass-quiet text-white focus-visible:outline-white',
 };
 
 const discSizes = {

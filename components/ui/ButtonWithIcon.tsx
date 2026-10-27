@@ -73,7 +73,7 @@ const variants = {
    * gives the label something to sit on. The disc and arrow are as specified.
    */
   glass: {
-    root: 'bg-white/15 backdrop-blur-md ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-np-ink',
+    root: 'bg-white/15 backdrop-blur-md ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-white',
     disc: 'bg-white/90 text-np-turquoise',
   },
   /**
@@ -103,7 +103,7 @@ const variants = {
    * the pill, onto np-blue-900, where white measures about 16:1.
    */
   'on-ink': {
-    root: 'bg-white/15 ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-np-ink',
+    root: 'bg-white/15 ring-1 ring-white/60 hover:bg-white/25 focus-visible:outline-white',
     disc: 'bg-white text-np-turquoise',
   },
   /**
