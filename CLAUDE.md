@@ -656,18 +656,19 @@ The homepage ends (after the contact section, before the footer) with
        costs ~2 s of load time. A smaller lossless copy for that page only would
        be ~4x lighter; ask whether that is acceptable. -->
 
-### Backdrop blue #73A8DD — CLIENT INSTRUCTION, 2026-10-27 (supersedes the turquoise hex below)
+### Backdrop blue #5A99D8 — CLIENT INSTRUCTION, 2026-10-27 (supersedes the turquoise hex below)
 
 "Not the turquoise blue": the client wants the blue of the studio backdrop in the
-two-provider portrait (`public/images/providers/providers-together.webp`). **#73A8DD** is the
-median of that backdrop's pixels (edges ~#6DA2D5, centre ~#77ADE2). It replaced #00CED1
-**one-for-one**: every rule in the turquoise section below still applies, read with the new
-hex — sole brand colour, white text/icons on it (2.51:1, still below AA; up from 1.95:1), ink
-focus rings, never text on white except the wordmark. Hover/pressed is `#6797C8` (ink at 12%);
-tints `#F1F6FC` / `#E0ECF8`. The photo washes in `Hero`, `PageHero` and `PageCta` keep
-their alphas on `rgba(115,168,221,…)`. The logo mark PNG and `app/icon.png` were recoloured to
-flat #73A8DD with the white figure kept. Token names (`np-turquoise` etc.) were deliberately
-not renamed.
+two-provider portrait (`public/images/providers/providers-together.webp`). The backdrop's
+median is #73A8DD (hsl 210 62% 66%), shipped first; the client then asked for it "a little
+bit deeper", so the brand colour is **#5A99D8** — same hue and saturation, 60% lightness.
+It replaced #00CED1 **one-for-one**: every rule in the turquoise section below still
+applies, read with the new hex — sole brand colour, white text/icons on it (3.01:1: below
+AA for body text, clears 3:1 for large text and UI graphics), ink focus rings, never text
+on white except the wordmark. Hover/pressed is `#528AC4` (ink at 12%); tints `#EFF5FB` /
+`#DBE9F6`. The photo washes in `Hero`, `PageHero` and `PageCta` keep their alphas on
+`rgba(90,153,216,…)`. The logo mark PNG and `app/icon.png` are flat #5A99D8 with the white
+figure kept. Token names (`np-turquoise` etc.) were deliberately not renamed.
 
 ### Turquoise #00CED1, strictly — CLIENT INSTRUCTION, 2026-10-26 (supersedes the royal section below; hex superseded 2026-10-27)
 

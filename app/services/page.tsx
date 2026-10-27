@@ -565,8 +565,8 @@ export default function ServicesIndex() {
                               black — a black blob, not a badge.
                                 fill-background -> fill-np-surface
                                 fill-primary    -> fill-np-turquoise
-                              The seal is #73A8DD with a white tick (client
-                              palette, 2026-10-27): 2.51:1 each way, under the
+                              The seal is #5A99D8 with a white tick (client
+                              palette, 2026-10-27): 3.01:1 each way, just over the
                               3:1 SC 1.4.11 asks of a meaningful graphic; the
                               sr-only "Verified" carries the meaning regardless.
 

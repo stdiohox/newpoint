@@ -40,7 +40,7 @@ export default async function OpengraphImage() {
         /* The brand colour, the portrait's backdrop blue (client, 2026-10-27);
            --color-np-turquoise in app/globals.css. Hex rather than var(): Satori
            has no access to the stylesheet. */
-        backgroundColor: '#73a8dd',
+        backgroundColor: '#5a99d8',
         fontFamily: 'sans-serif',
       }}
     >
