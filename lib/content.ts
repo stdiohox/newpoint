@@ -2574,6 +2574,12 @@ export function cardPosterFor(href: string): string | undefined {
  * re-encode. It is lazy and last on the page, so its ~1 MB does not touch the
  * first paint.
  *
+ * CROPPED SQUARE, 2026-10-30 (client request, "crop the providers group
+ * image"): the supplied 1123x1231 frame lost the empty backdrop above
+ * the heads (55px) and 53px off the bottom. A cut, not a resample: the 1123x1123
+ * that remains is pixel-identical to that region of the original, and is still
+ * lossless. The width was kept because both elbows already touch the edges.
+ *
  * LEFT IS WHITAKER, RIGHT IS OFOEGBU: the left figure wears the same black
  * blazer and polka-dot blouse as Whitaker's studio portrait. The alt carries no
  * "Dr." (CLAUDE.md: never in alt text); the visible caption does, beside the
@@ -2584,7 +2590,7 @@ export const CLOSING_PORTRAIT = {
   image: {
     src: '/images/providers/providers-together.webp',
     width: 1123,
-    height: 1231,
+    height: 1123,
     alt: 'Funmilayo Whitaker and Anastasia O. Ofoegbu standing back to back with their arms folded, smiling, against a blue studio backdrop.',
   },
 } as const;

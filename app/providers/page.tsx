@@ -63,8 +63,8 @@ export default function ProvidersPage() {
             photograph of both providers together (CLOSING_PORTRAIT), and this
             page, the one about the two of them, is where it does the most work.
 
-            A SPLIT HEADER RATHER THAN PageHero, because the photo is a 1123x1231
-            portrait and PageHero is a full-bleed landscape slot: stretched across
+            A SPLIT HEADER RATHER THAN PageHero, because the photo is a 1123x1123
+            square and PageHero is a full-bleed landscape slot: stretched across
             1440px it would be upscaled and soft, and white copy over two faces
             is the contrast problem again. Dark text on np-neutral-50 has no
             backdrop to measure against.
