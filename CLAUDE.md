@@ -639,9 +639,10 @@ The homepage ends (after the contact section, before the footer) with
 "Health is wealth." Content is `CLOSING_PORTRAIT` in `lib/content.ts`.
 
 - **The photo is served at the exact pixels supplied, lossless**
-  (`public/images/providers/providers-together.webp`, 1123x1123), the same rule
-  as the provider portraits. **Cropped square on 2026-10-30** (client request):
-  backdrop trimmed above the heads and a little off the bottom, width kept. It is
+  (`public/images/providers/providers-together.webp`, 960x960), the same rule
+  as the provider portraits. **Cropped square on 2026-10-30** (client request,
+  tightened the same day to "crop it more"): a 960x960 cut from x=10, y=70 of
+  the original, closer on the faces and clear of Ofoegbu's watch. It is
   a cut of the supplied pixels, not a resample, so the rule still holds; the
   uncropped 1123x1231 original is in git history (ab2635a). Plain `<img>`, lazy, no next/image.
 - **Whitaker is on the left, Ofoegbu on the right** (matched to Whitaker's studio
