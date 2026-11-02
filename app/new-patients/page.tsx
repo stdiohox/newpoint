@@ -157,7 +157,7 @@ export default function NewPatientsPage() {
                 aria-label="If you’re in a crisis or an emergency"
                 className="bg-np-surface border-np-neutral-200 mt-20 rounded-2xl border p-7 md:p-9"
               >
-                <p className="text-body text-np-ink max-w-[70ch]">
+                <p className="text-body text-np-ink">
                   If you’re in a crisis or an emergency, call{' '}
                   <a
                     href="tel:988"
