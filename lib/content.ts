@@ -975,6 +975,9 @@ export const WHAT_WE_TREAT = {
     'Psychosis',
     'Substance use and addiction',
     'Insomnia',
+    // Client, 2026-11-02: added to medication management's list, and here so
+    // the practice-wide list matches it.
+    'Borderline personality disorder',
     'Irritability and anger',
     'Stress and burnout',
   ],
@@ -3105,6 +3108,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Optional upgrade only, no longer a gap: written permission or brand assets for insurer logos, if the practice ever wants payer marks instead of the typographic wall',
   'Patient testimonials with documented consent, if the practice wants them later',
   'Reshoot of both provider portraits at 2000px or more with headroom, to unlock the deferred hero treatment. HALF DONE, 2026-10-19: a studio portrait of Funmilayo Whitaker arrived and replaced her selfie (the 560/1120 squares and the 600/1200 cards). It has headroom but is 1122x1402, under the 2000px asked for. Since the same day the homepage cards show both portraits at native resolution, uncropped for Whitaker, so head size no longer matches between the two. The 560/1120 squares are still the tight upscaled crops. Still needed: Anastasia Ofoegbu\'s portrait, and Whitaker\'s original at full resolution if one exists',
+  'BORDERLINE PERSONALITY DISORDER ON THE MEDICATION LIST, added 2026-11-02 at the client\'s instruction. /services/medication-management lists it under "We offer medication management for conditions including". No medication is approved for BPD and its first-line treatment is psychotherapy, so confirm the practice wants it on the medication page and not only on the practice-wide "Conditions we treat" list, where it now also appears. The list\'s hedge ("does not mean medication is the answer in every case") covers it meanwhile',
 ] as const;
 
 /* ------------------------------------------------------------------------- *
