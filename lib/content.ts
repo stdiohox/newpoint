@@ -82,7 +82,8 @@ export const BUSINESS = {
   phonePrimary: '(609) 527-9438',
   phonePrimaryHref: '+16095279438',
   phoneAlt: ['(215) 526-4153', '(215) 987-2847'],
-  fax: '(609) 527-9437',
+  // Corrected by the client, 2026-11-02 (was (609) 527-9437, from the crawl).
+  fax: '(609) 527-0937',
 
   /**
    * No practice-wide inbox exists; only the two named provider addresses.
