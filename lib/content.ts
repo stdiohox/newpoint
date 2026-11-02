@@ -2157,7 +2157,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         heading: 'Getting sober',
         body: 'Stopping substances or some medications suddenly can be dangerous. Talk to your providers before you stop, rather than going it alone.',
         bullets: [
-          'If you feel unwell after stopping, call 911 or go to the nearest emergency room.',
+          'If you’re in a crisis or an emergency, call 911 or 988, or go to the nearest hospital.',
         ],
       },
       {
