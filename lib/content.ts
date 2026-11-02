@@ -1095,6 +1095,13 @@ export type ServicePage = {
   metaDescription: string;
   intro: string;
   /**
+   * The structured-data description, when it must differ from `intro`.
+   * serviceSchemaFor() falls back to `intro`. Weight management sets it so
+   * the brand names in its visible intro do not ship in JSON-LD on /, /services
+   * and its own page.
+   */
+  schemaDescription?: string;
+  /**
    * How this service is delivered, in one sentence. Rendered as the "How it is
    * delivered" row on the /services hub.
    *
@@ -1880,11 +1887,20 @@ export const SERVICE_PAGES: ServicePage[] = [
       'Weight management in NJ and PA. Weekly semaglutide or tirzepatide injections, prescribed and reviewed by our nurse practitioners after an appointment.',
     /* REPHRASED BY THE CLIENT, 2026-11-02: "not referred out" and "when a
        weekly injection is appropriate" came off, and "some of the medications
-       we prescribe" replaced "the two we prescribe". This string is also the
-       `description` on the MedicalTherapy node, which ships on / and /services
-       as well as here. */
+       we prescribe" replaced "the two we prescribe".
+       BRAND NAMES, client request 2026-11-02, in the reviewed form: Wegovy and
+       Zepbound only, the two brands approved for weight management. Ozempic
+       and Mounjaro (approved for type 2 diabetes) were asked for and left out
+       on healthcare-reviewer's advice. True only if the practice prescribes
+       the branded products, not compounded ones; see OPEN_CLIENT_ITEMS. The
+       not-affiliated sentence sits here, not in the FAQ, because FAQ answers
+       ship in FAQPage JSON-LD. */
     intro:
-      'Weight management, supervised by our own nurse practitioners. Some of the medications we prescribe are semaglutide and tirzepatide.',
+      'Weight management, supervised by our own nurse practitioners. Some of the medications we prescribe are semaglutide (Wegovy®) and tirzepatide (Zepbound®). We’re not affiliated with their manufacturers.',
+    /* No brands in JSON-LD, and the "when appropriate" hedge travels with the
+       molecule names, since this ships on / and /services too. */
+    schemaDescription:
+      'Weight management, supervised by our own nurse practitioners. When a weekly injection is appropriate, the medications we may prescribe include semaglutide and tirzepatide.',
     /* Names no modality, and that is not an oversight: whether injections are
        given in the office or self-administered at home is unconfirmed, and
        either answer changes this line. It names the two states because both
@@ -2198,7 +2214,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            alone: stopping alcohol or sedatives abruptly can cause seizures.
            Names no medication and no class. */
         q: 'Should I stop using before my first appointment?',
-        a: 'Not on your own. Stopping substances or some medications suddenly can be dangerous. Talk to your providers before you stop, and if you feel unwell after stopping, call 911 or go to the nearest emergency room.',
+        a: 'Not on your own. Stopping substances or some medications suddenly can be dangerous. Talk to your providers before you stop, and if you’re in a crisis or an emergency, call 911 or 988, or go to the nearest hospital.',
       },
       {
         /* Answers the question an opioid-use reader arrives with, and commits
@@ -3055,6 +3071,7 @@ export const OPEN_CLIENT_ITEMS = [
   'Optional upgrade only, no longer a gap: written permission or brand assets for insurer logos, if the practice ever wants payer marks instead of the typographic wall',
   'Patient testimonials with documented consent, if the practice wants them later',
   'Reshoot of both provider portraits at 2000px or more with headroom, to unlock the deferred hero treatment. HALF DONE, 2026-10-19: a studio portrait of Funmilayo Whitaker arrived and replaced her selfie (the 560/1120 squares and the 600/1200 cards). It has headroom but is 1122x1402, under the 2000px asked for. Since the same day the homepage cards show both portraits at native resolution, uncropped for Whitaker, so head size no longer matches between the two. The 560/1120 squares are still the tight upscaled crops. Still needed: Anastasia Ofoegbu\'s portrait, and Whitaker\'s original at full resolution if one exists',
+  'WEIGHT MANAGEMENT BRAND NAMES, added 2026-11-02. The intro now says "semaglutide (Wegovy®) and tirzepatide (Zepbound®)" with a not-affiliated line. CONFIRM THE PRACTICE PRESCRIBES THESE BRANDED PRODUCTS: if it uses compounded semaglutide or tirzepatide, naming a brand implies an FDA-approved product it is not supplying, and the brands must come off. Ozempic and Mounjaro were also requested and were left out: both are approved for type 2 diabetes, not weight management, so naming them on a weight-loss page advertises an unapproved use',
   'BORDERLINE PERSONALITY DISORDER ON THE MEDICATION LIST, added 2026-11-02 at the client\'s instruction. /services/medication-management lists it under "We offer medication management for conditions including". No medication is approved for BPD and its first-line treatment is psychotherapy, so confirm the practice wants it on the medication page and not only on the practice-wide "Conditions we treat" list, where it now also appears. The list\'s hedge ("does not mean medication is the answer in every case") covers it meanwhile',
 ] as const;
 

@@ -246,7 +246,7 @@ export function serviceSchemaFor(s: ServicePage) {
        names the same procedure without the H1 having to say it. Omitted rather
        than emitted empty when a service has no synonym. */
     ...(s.alternateName ? { alternateName: s.alternateName } : {}),
-    description: s.intro,
+    description: s.schemaDescription ?? s.intro,
     /* `provider` AND `availableIn` WERE REMOVED HERE, and they were not doing
        what they looked like they were doing.
 

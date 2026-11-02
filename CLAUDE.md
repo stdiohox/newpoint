@@ -574,6 +574,16 @@ Zepbound and Mounjaro appear nowhere on this site, because naming generic
 molecules is true whether the product is manufactured or compounded and naming
 a brand is not.
 
+> **OVERRIDDEN IN PART BY THE CLIENT, 2026-11-02.** The client asked for the
+> brands in the intro. Applied in the reviewed form only: **Wegovy® and
+> Zepbound®**, the two approved for weight management, plus "We’re not
+> affiliated with their manufacturers." **Ozempic and Mounjaro stay off**
+> (type 2 diabetes approvals, so naming them advertises an unapproved use).
+> Brands stay out of structured data: the service's `schemaDescription` is
+> brand-free and keeps the "when a weekly injection is appropriate" hedge, and
+> the FAQ (which ships as FAQPage JSON-LD) names no brand. The brand-vs-
+> compounded question is now blocking for this wording; see `OPEN_CLIENT_ITEMS`.
+
 **It is the only service page that renders the in-page crisis panel**, because
 it is the only one on the shared prose layout. That is deliberate, not a
 leftover: a behavioural-health practice advertising weight loss will be read by
