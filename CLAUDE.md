@@ -541,6 +541,15 @@ whether it serves children.
 > `alternateName` ("Weight loss care") and the meta strings. Everything below
 > still governs the page; read "medical weight management" as "weight
 > management".
+>
+> **TRIMMED BY THE CLIENT, 2026-11-02.** "Weight loss care" became "Weight
+> management" (`alternateName`, meta description, intro). The intro is now
+> "Weight management, supervised by our own nurse practitioners. Some of the
+> medications we prescribe are semaglutide and tirzepatide." The fifth
+> section ("The medications we prescribe", its chip list and hedge), the
+> "Before medication is prescribed" bullets, and the "part of a plan" bullet were
+> removed. The page still makes no outcome claim and still asks about
+> eating-disorder history.
 
 A fourth service line, briefed as "add weight loss" with a competitor's printed
 flyer as the reference: *doctor-supervised, weekly injections (semaglutide &

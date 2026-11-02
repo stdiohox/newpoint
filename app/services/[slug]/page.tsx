@@ -169,7 +169,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       /* "A woman", not a provider and not a nurse practitioner — see above. */
       alt: 'A woman in a blue blouse writing on a printed form at a light wooden desk, a laptop with a dark screen and a small potted plant beside her.',
     },
-    'before-anything-is-prescribed': {
+    'before-medication-is-prescribed': {
       src: '/images/services/weight-history.webp',
       alt: 'A man in an olive shirt talking, with a blood pressure cuff fastened around his upper arm and another person steadying it, two plain cardboard boxes on the desk in front of him.',
     },
