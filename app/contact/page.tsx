@@ -235,26 +235,12 @@ export default function ContactPage() {
                 Ways to reach us
               </h2>
             </Reveal>
-            {/* THE SECTION'S LEAD, AND IT IS HERE RATHER THAN IN THE CALL
-                COLUMN FOR A CLINICAL REASON. healthcare-reviewer caught it:
-                inside a column whose only contents are three phone numbers,
-                "keep health information out of any message you send" reads as
-                "do not discuss your symptoms when you call" — which is wrong,
-                and which the sentence's own second half contradicts. A phone
-                call is not a message, and it is the channel clinical detail is
-                SUPPOSED to travel over.
-
-                The sentence is unchanged. It introduces all three columns,
-                which is what it did before the redesign, when it led the block
-                that sat above every contact method on the page. The two
-                channel-specific prohibitions are untouched and stay where they
-                belong: emailNote above the mailto: links, and the form's own
-                privacyNote directly above Send. */}
+            {/* The section's lead. "Please keep health information out of any
+                message you send…" was removed by the client, 2026-11-02; the
+                form's own privacyNote above Send is the remaining reminder. */}
             <Reveal delay={0.08}>
               <p className="text-body-l text-np-neutral-600 mt-4 max-w-[62ch]">
-                Calling is the fastest way to reach us. Please keep health information out of any
-                message you send — just tell us how to reach you, and we’ll get the clinical
-                details from you directly.
+                Calling is the fastest way to reach us.
               </p>
             </Reveal>
 
