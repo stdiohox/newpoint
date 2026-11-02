@@ -156,16 +156,20 @@ export const HERO = {
    * CLIENT INSTRUCTION, 2026-10-22: "behavioral health management" is replaced
    * by "weight management" here, in `tag`, and in the layout and /services
    * descriptions that carry the same sentence.
+   *
+   * CLIENT INSTRUCTION, 2026-11-02: "weight management" is replaced by
+   * "wellness services" in the same places. The weight-management service
+   * page itself was not renamed.
    */
   subtext:
-    'Psychiatric evaluation, medication management, and weight management from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
+    'Psychiatric evaluation, medication management, and wellness services from two doctorate-prepared psychiatric and family nurse practitioners. We see patients in person and also by telehealth.',
   /**
    * The service names for the hero's glass tag, word-for-word as `subtext`
    * already names them. No new service is claimed here. Telehealth left the
    * tag on 2026-10-19 with the telehealth service page: it is a delivery mode,
    * which `subtext` states, not a service.
    */
-  tag: 'Assessment. Medication management. Weight management.',
+  tag: 'Assessment. Medication management and Wellness services.',
 } as const;
 
 /**

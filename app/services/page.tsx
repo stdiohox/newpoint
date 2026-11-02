@@ -32,7 +32,7 @@ export const metadata = pageMetadata({
   // services" as its head term, so the two are not arbitrating the same query.
   title: 'Psychiatric Services in NJ and PA',
   description:
-    'Psychiatric evaluation, medication management, and weight management in New Jersey and Pennsylvania. What each involves and how to start.',
+    'Psychiatric evaluation, medication management, and wellness services in New Jersey and Pennsylvania. What each involves and how to start.',
   path: '/services',
 });
 

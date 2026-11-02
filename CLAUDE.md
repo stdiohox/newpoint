@@ -328,7 +328,10 @@ strip still renders sitewide.
 - **The practice summary line is the client's wording, verbatim** (amended by
   the client on 2026-10-22: "behavioral health management" became **"weight
   management"** in this sentence, the hero tag and every meta description that
-  carries it): "Psychiatric
+  carries it; amended again on 2026-11-02: "weight management" became
+  **"wellness services"** in the same places, and the hero tag now reads
+  "Assessment. Medication management and Wellness services." The
+  `/services/weight-management` page was not renamed): "Psychiatric
   assessment, medication management, and behavioral health management from two
   doctorate-prepared psychiatric and family nurse practitioners serving New
   Jersey and Pennsylvania." It is the Open Graph and Twitter description
