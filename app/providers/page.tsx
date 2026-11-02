@@ -111,8 +111,11 @@ export default function ProvidersPage() {
                   alt={CLOSING_PORTRAIT.image.alt}
                   fetchPriority="high"
                   decoding="async"
-                  className="rounded-media mx-auto h-auto w-full max-w-[560px] md:max-w-none"
+                  className="rounded-media mx-auto h-auto w-full max-w-[300px]"
                 />
+                {/* 300px wide at every size, client request 2026-11-02 ("shrink
+                    this image much more"). It used to fill its half of the grid
+                    (~560px). Same file, same pixels; only the display size. */}
               </div>
             </div>
           </Container>

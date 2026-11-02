@@ -814,6 +814,9 @@ export const PROVIDERS: Provider[] = [
        the same wording as Dr. Whitaker. */
     role: 'Psychiatric-Mental Health, Family and Addiction Nurse Practitioner',
     image: {
+      // Round avatars, client 2026-11-02: the supplied 520x564 crop
+      // (design-research/assets/providers/source/) cut square from the top to
+      // 520x520 and not upscaled, so all four "560"/"1120" files are 520x520.
       webp560: '/images/providers/anastasia-ofoegbu-560.webp',
       webp1120: '/images/providers/anastasia-ofoegbu-1120.webp',
       jpg560: '/images/providers/anastasia-ofoegbu-560.jpg',
