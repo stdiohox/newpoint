@@ -2101,7 +2101,7 @@ export const SERVICE_PAGES: ServicePage[] = [
      * WHAT THE MOVE COSTS, AND WHAT REPLACES IT. The card layout drops the
      * in-page crisis panel and "Keep reading", as it does on both siblings.
      * On an addiction page the crisis lines cannot be left to the footer's
-     * fine print, so the FIFTH SECTION, "If you need help now", carries 988,
+     * fine print, so the FIFTH SECTION, "If you’re in a crisis or an emergency", carries 988,
      * 911 and the SAMHSA National Helpline. ServiceCards renders everything
      * after the fourth section as its own block below the grid, so it sits
      * directly above the FAQ. Keep it fifth and keep it in this array.
@@ -2203,7 +2203,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            has no crisis panel. Public federal services, stated as they are.
            988 and 911 match CRISIS; the SAMHSA National Helpline is free,
            confidential and open 24/7. */
-        heading: 'If you need help now',
+        heading: 'If you’re in a crisis or an emergency',
         body: 'If you’re in crisis, call 988. In an emergency, call 911. For free, confidential treatment referral and information, SAMHSA’s National Helpline is open 24 hours a day at 1-800-662-4357.',
       },
     ],
@@ -2751,7 +2751,7 @@ export const SMS_CONSENT = {
  * choice, not because the fact changed. That removes the "Text 988" button.
  */
 export const CRISIS = {
-  heading: 'If you need help now',
+  heading: 'If you’re in a crisis or an emergency',
   items: [
     {
       label: '988',
@@ -2854,7 +2854,7 @@ export const NEW_PATIENTS_PAGE = {
       // Scope, not duration: session length is not published anywhere, so no
       // relative claim about appointment length is made.
       heading: 'Your first appointment',
-      body: 'It’s a comprehensive psychiatric evaluation: a full history, a look at risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end.',
+      body: 'It’s a comprehensive psychiatric evaluation that covers risk factors, structured questionnaires and your symptoms, concluding with a diagnosis and treatment plan.',
     },
     {
       heading: 'Follow-up appointments can be in person or by video',
@@ -2881,7 +2881,7 @@ export const NEW_PATIENTS_PAGE = {
    * the page's closing block.
    */
   privacyCrisis:
-    'If you need help now, call 988 for the Suicide and Crisis Lifeline. In an emergency, call 911 or go to your nearest emergency room.',
+    'If you’re in a crisis or an emergency, call 988 for the Suicide and Crisis Lifeline, or call 911 or go to your nearest emergency room.',
 } as const;
 
 /**

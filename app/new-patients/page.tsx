@@ -154,18 +154,18 @@ export default function NewPatientsPage() {
                   stays: CLAUDE.md requires crisis guidance on this page. Same
                   card treatment as CrisisPanel and the contact cards. */}
               <aside
-                aria-label="If you need help now"
+                aria-label="If you’re in a crisis or an emergency"
                 className="bg-np-surface border-np-neutral-200 mt-20 rounded-2xl border p-7 md:p-9"
               >
                 <p className="text-body text-np-ink max-w-[70ch]">
-                  If you need help now, call{' '}
+                  If you’re in a crisis or an emergency, call{' '}
                   <a
                     href="tel:988"
                     className="text-np-blue-600 font-medium underline underline-offset-4"
                   >
                     988
                   </a>{' '}
-                  for the Suicide and Crisis Lifeline. In an emergency, call{' '}
+                  for the Suicide and Crisis Lifeline, or call{' '}
                   <a
                     href="tel:911"
                     className="text-np-blue-600 font-medium underline underline-offset-4"

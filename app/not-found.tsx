@@ -61,7 +61,7 @@ export default function NotFound() {
             </nav>
 
             <aside className="rounded-card border-np-turquoise bg-np-surface mt-14 border-l-2 p-6 ring-1 ring-[var(--np-alpha-ink-08)] md:p-8">
-              <h2 className="text-h3">If you need help now</h2>
+              <h2 className="text-h3">If you’re in a crisis or an emergency</h2>
               <p className="text-body text-np-neutral-600 mt-3 max-w-[60ch]">
                 Call{' '}
                 <a
