@@ -2291,7 +2291,7 @@ export const GETTING_STARTED = {
     },
     {
       title: 'Ongoing care',
-      body: 'At follow-up appointments, we manage your medication and track your progress, in person or by telehealth, on a schedule that fits your life.',
+      body: 'At follow-up appointments, we manage your medication and track your progress, in person or by telehealth, on a schedule that works for you.',
     },
   ],
 } as const;
