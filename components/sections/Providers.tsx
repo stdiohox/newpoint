@@ -47,9 +47,9 @@ import { PROVIDERS } from '@/lib/content';
  */
 const CARD_SENTENCE: Record<string, string> = {
   'funmilayo-whitaker':
-    'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 15 years of direct patient care experience.',
+    'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 17 years of direct patient care experience.',
   'anastasia-ofoegbu':
-    'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction.',
+    'A dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP) with 16 years of direct patient care experience.',
 };
 
 /**

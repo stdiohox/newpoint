@@ -696,15 +696,17 @@ export const PROVIDERS: Provider[] = [
      * now confirmed rather than inferred; do not raise it again without the
      * practice saying so.
      */
-    experience: 'More than 15 years of direct patient care',
+    experience: 'More than 17 years of direct patient care',
     approach: 'Warm, empathic, non-judgmental, and collaborative',
     /* Doximity, Headway and U.S. News independently give the doctorate as
        University of North Florida, which is as corroborated as anything in the
        directory capture gets. The master's is Headway only.
        The Liberty University certificate is the client's own addition,
        2026-10-22: "Family nurse prac cert, Liberty University acute care track". */
-    education:
-      'DNP, University of North Florida · MSN, Tennessee State University · Family Nurse Practitioner certificate, Liberty University (acute care track)',
+    /* REPLACED BY THE CLIENT, 2026-11-02, in her own form: "DNP/PMHNP-BC,
+       FNP-BC, MSN (acute care track), Liberty University". The North Florida
+       and Tennessee State entries from the directory capture are gone. */
+    education: 'DNP/PMHNP-BC, FNP-BC, MSN (acute care track), Liberty University',
     /* CONFIRMED BY THE CLIENT, 2026-10-02. Headway listed Yoruba and U.S. News
        recorded "Speaks English"; the practice has now confirmed both. */
     languages: 'English and Yoruba',
@@ -744,7 +746,7 @@ export const PROVIDERS: Provider[] = [
      * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
     bio: [
-      'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 15 years of direct patient care experience.',
+      'I am a dual board-certified Mental Health Nurse Practitioner (DNP-PMHNP) and Family Nurse Practitioner (FNP) with over 17 years of direct patient care experience.',
       'I have worked in diverse roles, diagnosing and treating mental health disorders in group practice, community settings, and telehealth. I offer medication management for various mental health conditions for individuals with psychiatric disorders such as depression, anxiety, bipolar disorder, panic attacks, PTSD, schizophrenia, addiction, etc.',
     ],
     /* Verbatim. The short `approach` above is the scannable version of this
@@ -794,10 +796,12 @@ export const PROVIDERS: Provider[] = [
       'Panic attacks',
       'OCD',
       'PTSD',
-      'Schizophrenia',
+      // Swapped with Dr. Ofoegbu's "Schizophrenia", client 2026-11-02.
+      'Psychotic disorders',
       'ADHD',
       'Insomnia',
       'Substance use and addiction',
+      'Weight management',
     ],
     email: BUSINESS.emails.whitaker,
   },
@@ -845,15 +849,14 @@ export const PROVIDERS: Provider[] = [
      * licence-numbers item in OPEN_CLIENT_ITEMS.
      */
     licensed: 'Licensed in New Jersey and Pennsylvania',
-    /* Headway's own field says "8 years of experience", contradicting her bio
-       on the same page. This keeps the bio's framing, which the practice site
-       also uses. CLIENT: confirm. */
-    experience: '14 years in nursing, the last 11 focused on mental health and addiction',
+    /* CONFIRMED BY THE CLIENT, 2026-11-02: 16 years of direct patient care.
+       Replaces "14 years in nursing, the last 11 focused on mental health and
+       addiction". */
+    experience: '16 years of direct patient care',
     approach: 'Evidence-based and patient-centered',
-    /* Headway: DNP at University of North Florida, plus La Salle University
-       with the degree unspecified — so La Salle is deliberately not named here
-       rather than guessed at. CLIENT: which degree, and in what? */
-    education: 'DNP, University of North Florida',
+    /* REPLACED BY THE CLIENT, 2026-11-02: "DNP/PMHNP-BC, FNP-BC, Walden
+       University". The North Florida entry from the directory capture is gone. */
+    education: 'DNP/PMHNP-BC, FNP-BC, Walden University',
     languages: 'English and Igbo',
     /**
      * CONFIRMED BY THE CLIENT, 2026-10-02: English and Igbo. YORUBA IS OFF,
@@ -897,7 +900,10 @@ export const PROVIDERS: Provider[] = [
      * Providers.tsx. Do not reword it without updating CARD_SENTENCE.
      */
     bio: [
-      'My name is Anastasia Ofoegbu, a dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP). I have been a nurse for 14 years with the last 11 years in Mental Health and Addiction. I am licensed in the states of New Jersey and Pennsylvania.',
+      // Client, 2026-11-02: opens "A dual…" instead of "My name is…", and her
+      // years are now 16 of direct patient care (was "a nurse for 14 years with
+      // the last 11 years in Mental Health and Addiction").
+      'A dual board-certified Psychiatric Mental Health (DNP-PMHNP) and Family Nurse Practitioner (FNP) with 16 years of direct patient care experience. I am licensed in the states of New Jersey and Pennsylvania.',
     ],
     /**
      * Verbatim except: the missing article in "I utilize Evidence-based ...
@@ -923,13 +929,15 @@ export const PROVIDERS: Provider[] = [
       'Anxiety and panic attacks',
       'Bipolar disorder',
       'Mood disorders',
-      'Psychotic disorders',
+      // Swapped with Dr. Whitaker's "Psychotic disorders", client 2026-11-02.
+      'Schizophrenia',
       'ADHD',
       'OCD',
       'PTSD',
       'Insomnia',
       'Anger management',
       'Substance use and addiction',
+      'Weight management',
     ],
     email: BUSINESS.emails.ofoegbu,
   },
@@ -3059,7 +3067,7 @@ export const OPEN_CLIENT_ITEMS = [
   "ONE DECISION THE CLIENT STILL OWES ON THE PUBLISHED PLANS: whether /insurance should say, visibly, that some of the plans listed are still being confirmed. As it stands all sixteen names render identically under \"We accept the plans below\", so a patient cannot tell the seven the practice confirmed from the nine it has not. Adding a hedge was NOT done unilaterally — it softens the client's own instruction to publish them, and that is their call to make. The page already owns a string for it if they want one: INSURANCE.unconfirmedScopeNote. This item closes either way, by confirming the nine or by adding the line",
   'Exact payer plan names and any sub-plans, confirmed against the practice records. The list was scraped from an unseparated string on the live site',
   'Whether patients receive their treatment plan in writing',
-  'PRE-LAUNCH — UPDATE DR. WHITAKER\'S HEADWAY PROFILE TO 15 YEARS BEFORE LINKING IT. The practice confirmed 15 on 2026-10-02 and the site now says so in her bio, her Experience row and `description` on her Person node. Her Headway profile still says 10 (research/directories/headway-whitaker.txt). Grow Therapy already says 15 and agrees; the U.S. News capture carries no figure at all, so neither of those is blocked. The claim ships on her bio, her Experience row, `description` on her Person node, AND the provider cards on the homepage and /providers, which are the two highest-traffic surfaces carrying it. HER HEADWAY URL IS DELIBERATELY NOT IN sameAs, and must not be added until the profile is updated: sameAs tells a search engine "this is the same person", so linking a profile that disagrees about her career length publishes the disagreement rather than the fact. DR. OFOEGBU\'S HEADWAY PROFILE IS BLOCKED TOO, on two counts: it says 8 years where her entry says 14 in nursing with the last 11 in mental health, and as of 2026-10-03 it lists Igbo, Yoruba and English where the practice has confirmed English and Igbo',
+  'PRE-LAUNCH — UPDATE DR. WHITAKER\'S HEADWAY PROFILE TO 17 YEARS BEFORE LINKING IT. The practice confirmed 15 on 2026-10-02 and raised it to 17 on 2026-11-02, and the site now says so in her bio, her Experience row and `description` on her Person node. Her Headway profile still says 10 (research/directories/headway-whitaker.txt). Grow Therapy already says 15 and agrees; the U.S. News capture carries no figure at all, so neither of those is blocked. The claim ships on her bio, her Experience row, `description` on her Person node, AND the provider cards on the homepage and /providers, which are the two highest-traffic surfaces carrying it. HER HEADWAY URL IS DELIBERATELY NOT IN sameAs, and must not be added until the profile is updated: sameAs tells a search engine "this is the same person", so linking a profile that disagrees about her career length publishes the disagreement rather than the fact. DR. OFOEGBU\'S HEADWAY PROFILE IS BLOCKED TOO, on two counts: it says 8 years where the practice now gives 16 years of direct patient care (2026-11-02), and as of 2026-10-03 it lists Igbo, Yoruba and English where the practice has confirmed English and Igbo',
   "Public profile URLs for each provider (Psychology Today, LinkedIn, NPI registry, hospital or association listing). These would populate `sameAs` on each provider's Person schema, which is the main signal search engines use to tie a name on this site to the same person elsewhere. Nothing is guessed, so `sameAs` is currently absent. FIVE URLS ARE NOW IN HAND — the Grow Therapy, Headway (both providers), U.S. News and Doximity profiles listed in research/provider-directories.md. This is the cheapest remaining SEO win in the list and needs only the client's okay, since linking to a competing marketplace's profile is a business decision, not a technical one. TWO OF THE FIVE ARE BLOCKED, NOT MERELY UNAPPROVED — both providers' Headway profiles disagree with confirmed facts on this site. See the item directly above",
   'A general practice inbox address for the contact form, since only named provider addresses exist',
   "Self-pay session fee and the sliding scale criteria. Grow Therapy lists $150 per session for Whitaker, but that is the marketplace's rate for her time on that platform and is not Newpoint's fee",
