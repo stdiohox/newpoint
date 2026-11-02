@@ -1477,22 +1477,17 @@ export const SERVICE_PAGES: ServicePage[] = [
     metaDescription:
       'Ongoing psychiatric medication management in New Jersey and Pennsylvania, with standardized rating scales to track how you’re responding.',
     intro:
-      'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting your treatment as we see how you respond. Both of our providers are psychiatric mental health nurse practitioners, so whichever provider you see can both prescribe your medication and track how well it’s working.',
+      'Medication management is the ongoing part of psychiatric care: prescribing, reviewing, and adjusting your treatment as we see how you respond. Both providers are psychiatric mental health nurse practitioners, so whichever provider you see can both prescribe your medication(s) and track your progress.',
     modality: 'By telehealth and in person.',
     sections: [
       {
         heading: 'Prescribing that follows the plan',
-        /* LEAD COPY, UNCHANGED. Everything below it is new and marked. */
-        body: 'We prescribe medication as part of the treatment plan from your comprehensive psychiatric evaluation, not on its own. When both are indicated, we combine medication with psychotherapy approaches.',
+        /* LEAD COPY. "Not on its own" was cut by the client, 2026-11-02. */
+        body: 'We prescribe medication as part of the treatment plan from your comprehensive psychiatric evaluation. When both are indicated, we combine medication with psychotherapy approaches.',
+        /* CLIENT INSTRUCTION, 2026-11-02: the "Diagnosis comes first" and
+           "When therapy and medication are both indicated" bullets, and the
+           "Medication is one part of a plan" highlight, were removed. */
         bullets: [
-          /* CLIENT-REVIEW — SOURCED. research/content/services.md:18: "Mental
-             illness diagnoses are made based on assessments, and then an
-             effective plan of care is determined using psychotherapy modalities
-             and psychopharmacology for the individual." */
-          'Diagnosis comes first, at your assessment. Prescribing decisions follow from it.',
-          /* CLIENT-REVIEW — SOURCED. Same sentence as above: the plan of care
-             names psychotherapy modalities AND psychopharmacology together. */
-          'When therapy and medication are both indicated, we plan them together, not separately.',
           /* CLIENT-REVIEW — GENERIC patient education. No claim about Newpoint,
              no medication named, nothing about how long or how often. */
           'Feel free to ask what a medication is supposed to do and why we chose it.',
@@ -1503,13 +1498,10 @@ export const SERVICE_PAGES: ServicePage[] = [
              the in-person one. Raised by healthcare-reviewer, 2026-10-01. */
           'It helps to have a list of everything you already take, including anything over the counter.',
         ],
-        /* CLIENT-REVIEW — GENERIC. Restates the lead's own framing without
-           adding a claim. */
-        highlight: 'Medication is one part of a plan, not the whole of it.',
       },
       {
         heading: 'Measured, not guessed',
-        body: 'We use standardized clinical rating scales to track your progress against the baseline from your assessment. The same measures help us catch early signs that things are slipping — a change in the wrong direction is easier to act on when it shows up as a number, not just a feeling.',
+        body: 'We use standardized clinical rating scales to track your progress against the baseline from your assessment.',
         bullets: [
           /* CLIENT-REVIEW — SOURCED, across two places, and the split matters.
              research/content/services.md:21 gives the baseline itself: "Use of
@@ -1519,7 +1511,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              from this page's own pre-existing body and FAQ, which already place
              it there — so the line adds no new claim, but services.md:21 alone
              does not carry it. Noted by healthcare-reviewer, 2026-10-01. */
-          'We take a baseline at your assessment, so later visits have something to compare against.',
+          'We take a baseline at your assessment.',
           /* CLIENT-REVIEW — SOURCED. Same line: the same measures are used to
              monitor progress or decompensation over time. NO SCALE IS NAMED,
              here or anywhere — which instruments the practice uses is still an
@@ -1557,9 +1549,8 @@ export const SERVICE_PAGES: ServicePage[] = [
              can identify what works and what isn't working". */
           'Figuring out what’s helping and what is not is something we do together.',
         ],
-        /* CLIENT-REVIEW — GENERIC. Reassurance, not an outcome claim: it says
-           adjustment is normal, not that treatment will succeed. */
-        highlight: 'Needing an adjustment is an ordinary part of treatment, not a setback.',
+        /* The "Needing an adjustment is an ordinary part of treatment" highlight
+           was removed by the client, 2026-11-02. */
       },
       {
         heading: 'Working with your other clinicians',
@@ -2947,7 +2938,7 @@ export const CONTACT_PAGE = {
   // Same prohibition set as CONTACT.privacyNote and NEW_PATIENTS_PAGE.privacyBody,
   // including date of birth. /contact may be a patient's only read.
   emailNote:
-    'Email goes straight to the providers. Please keep symptoms, diagnoses, medications, insurance ID numbers, and dates of birth out of it — email is not secure.',
+    'Email goes straight to the providers.',
   /**
    * BOTH MODES, BOTH STATES, matching DELIVERY_LINE. This paragraph used to
    * bind the two states to telehealth and leave in-person attached to neither,
