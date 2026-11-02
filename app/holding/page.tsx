@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { BUSINESS, CRISIS, FOOTER, PROVIDERS } from '@/lib/content';
+import { BUSINESS, FOOTER, PROVIDERS } from '@/lib/content';
 
 /**
  * The holding page, served in place of every route on the production domain
@@ -14,7 +14,7 @@ import { BUSINESS, CRISIS, FOOTER, PROVIDERS } from '@/lib/content';
  * Losing the footer loses its 988 / 911 strip, which is the crisis guidance on
  * most routes. CLAUDE.md requires it wherever a distressed visitor would
  * plausibly look, and on a behavioral-health domain that is this page, so the
- * one line below carries it from CRISIS.
+ * one line below carries it from FOOTER.crisis.
  *
  * Not in ROUTES, so not in the sitemap.
  */
@@ -83,7 +83,7 @@ export default function Holding() {
             as links (SC 1.4.1). Body size, not small — on this page it is the
             only crisis guidance there is. */}
         <p className="text-body text-np-ink border-np-neutral-200 mt-12 border-t pt-6">
-          {CRISIS.body} {FOOTER.crisis.before}{' '}
+          {FOOTER.crisis.before}{' '}
           <a
             href="tel:988"
             aria-label="988, Suicide and Crisis Lifeline"

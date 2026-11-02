@@ -56,7 +56,6 @@ export function CrisisPanel({
           >
             {CRISIS.heading}
           </Heading>
-          <p className="text-small text-np-neutral-600 mt-2">{CRISIS.body}</p>
         </div>
       </div>
 

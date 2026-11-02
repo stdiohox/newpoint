@@ -5,7 +5,6 @@ import { FooterCard, FooterFlowers } from '@/components/FooterParallax';
 import {
   BUSINESS,
   CONTACT_AND_FAQ,
-  CRISIS,
   CTA,
   DELIVERY_LINE,
   FOOTER,
@@ -353,12 +352,9 @@ export function Footer() {
               </a>
               {FOOTER.crisis.after}
             </p>
-            {/* CRISIS.body verbatim, beside the numbers it qualifies — the
-                pairing is what makes the warning actionable. The long note on
-                the navy version explained why it repeats against legalNote and
-                against CrisisPanel; both arguments still hold and neither is
-                restated here. */}
-            <p className="text-small text-np-neutral-600 mt-2">{CRISIS.body}</p>
+            {/* CRISIS.body ("This website is not for emergencies…") was
+                removed here, from CrisisPanel, /holding and not-found by the
+                client, 2026-11-02. */}
           </div>
 
           {/* BOTTOM BAR. */}

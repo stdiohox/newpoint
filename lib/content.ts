@@ -2744,7 +2744,6 @@ export const SMS_CONSENT = {
  */
 export const CRISIS = {
   heading: 'If you need help now',
-  body: 'This website is not for emergencies and is not monitored around the clock.',
   items: [
     {
       label: '988',
@@ -2846,7 +2845,7 @@ export const NEW_PATIENTS_PAGE = {
     {
       // Scope, not duration: session length is not published anywhere, so no
       // relative claim about appointment length is made.
-      heading: 'Your first appointment covers more ground than the ones after it',
+      heading: 'Your first appointment',
       body: 'It’s a comprehensive psychiatric evaluation: a full history, a look at risk factors, structured questionnaires and rating scales, and a diagnosis and treatment plan at the end.',
     },
     {
@@ -2866,9 +2865,8 @@ export const NEW_PATIENTS_PAGE = {
   // invented here. A short list (photo ID, insurance card, current medication
   // list, pharmacy details) is standard and would strengthen this page — confirm
   // what the practice actually asks for before adding it.
-  privacyHeading: 'What not to send us',
-  privacyBody:
-    'Please keep health details out of the contact form and out of email. Symptoms, diagnoses, medications, insurance ID numbers, and dates of birth are not safe to send that way, and the form is not monitored around the clock. Just tell us how to reach you, and we’ll get the clinical details from you directly.',
+  // "What not to send us" (privacyHeading/privacyBody) removed by the client,
+  // 2026-11-02.
   /**
    * This aside is exactly where someone realising they cannot get help through
    * the form is looking, so the crisis numbers belong in it rather than only in
