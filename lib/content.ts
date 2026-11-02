@@ -2163,13 +2163,12 @@ export const SERVICE_PAGES: ServicePage[] = [
       {
         /* "medication management for the mental health conditions" IS THE
            WHOLE MEDICATION CLAIM, and it is scoped on purpose. See note 1
-           above. The referral line is the live site's "referral to
-           follow-up services". */
+           above. The referral bullet ("If you need more support than
+           outpatient care can give…") was removed by the client, 2026-11-02. */
         heading: 'Your treatment plan',
         body: 'Your plan is built around your goals. It can combine psychotherapy and counseling with medication management for the mental health conditions that come with substance use.',
         bullets: [
-          'We review it with you and adjust it as things change.',
-          'If you need more support than outpatient care can give, we’ll help you find the right next step.',
+          'We review progress with you and adjust medication as needed.',
         ],
       },
       {
