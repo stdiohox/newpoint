@@ -240,15 +240,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                       </a>
                       .
                     </p>
-                    {/* This is the one place on the site that solicits free-text
-                        email directly to a named clinician. Every other contact
-                        surface carries the warning; without it here, someone
-                        arriving from a name search describes their symptoms into
-                        an ordinary mailbox. */}
-                    <p className="text-caption text-np-neutral-600 mt-2 max-w-[46ch]">
-                      Please don’t include symptoms, diagnoses, medications, or insurance ID
-                      numbers in an email. Email is not secure.
-                    </p>
+                    {/* The "email is not secure" warning that sat here was
+                        removed by the client, 2026-11-02. */}
                   </div>
                 </Reveal>
               </div>
