@@ -18,8 +18,9 @@ import { CRISIS } from '@/lib/content';
  * Each number is BOTH a tel: link and a labelled button. The number carries the
  * link because that is what it does everywhere else on this site — Footer,
  * not-found and new-patients all make it tappable — and someone who learned
- * that there will try it here. The buttons carry the explicit actions because
- * "Text 988" has no other way to be reachable.
+ * that there will try it here. The buttons carry the explicit actions. (A
+ * "Text" button renders only for a `textable` line; since 2026-11-02 no line
+ * is, by client instruction — see the note on CRISIS.)
  *
  * PageCta used to be in that list and is not any more: its inline crisis panel
  * was removed at the client's request on 2026-09-30, on the grounds that the

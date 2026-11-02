@@ -568,7 +568,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             each other safe. The distance this panel existed to close was
             created by the six-card grid below the CTA. Remove the grid and
             PageCta becomes the last block before the footer, exactly as it is
-            on the five other routes, so the footer's "In a crisis, call or text
+            on the five other routes, so the footer's "In a crisis, call
             988. In an emergency, call 911." is the next content a reader meets.
             Measured on this page it is now nearer the CTA than it has ever
             been, not further.
@@ -586,7 +586,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             THE CARD LAYOUT DROPS IT TOO, at the client's request, and for the
             same structural reason the feature layout can: it drops RelatedLinks
             as well, so PageCta is the last block before the footer and the
-            footer's "In a crisis, call or text 988. In an emergency, call 911."
+            footer's "In a crisis, call 988. In an emergency, call 911."
             is the next content a reader meets. The distance this panel existed
             to close was created by the six-card grid; remove the grid and the
             distance goes with it.

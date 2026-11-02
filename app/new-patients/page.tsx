@@ -179,7 +179,7 @@ export default function NewPatientsPage() {
                       {NEW_PATIENTS_PAGE.privacyBody}
                     </p>
                     <p className="text-body text-np-ink border-np-neutral-200 mt-5 max-w-[70ch] border-t pt-5">
-                      If you need help now, call or text{' '}
+                      If you need help now, call{' '}
                       <a
                         href="tel:988"
                         className="text-np-blue-600 font-medium underline underline-offset-4"

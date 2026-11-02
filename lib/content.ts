@@ -500,7 +500,7 @@ export const FOOTER = {
     contact: 'Contact',
   },
   crisis: {
-    before: 'In a crisis, call or text',
+    before: 'In a crisis, call',
     between: '. In an emergency, call',
     after: '.',
   },
@@ -2234,7 +2234,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            988 and 911 match CRISIS; the SAMHSA National Helpline is free,
            confidential and open 24/7. */
         heading: 'If you need help now',
-        body: 'If you’re in crisis, call or text 988. In an emergency, call 911. For free, confidential treatment referral and information, SAMHSA’s National Helpline is open 24 hours a day at 1-800-662-4357.',
+        body: 'If you’re in crisis, call 988. In an emergency, call 911. For free, confidential treatment referral and information, SAMHSA’s National Helpline is open 24 hours a day at 1-800-662-4357.',
       },
     ],
     faqs: [
@@ -2782,6 +2782,10 @@ export const SMS_CONSENT = {
  * PSAP supporting it and is not available everywhere, so offering a Text
  * button would promise a route that can silently go nowhere in an emergency.
  * Any line added here must have this checked, not guessed.
+ *
+ * CLIENT INSTRUCTION, 2026-11-02: the site says "call 988", never "call or
+ * text". 988 still accepts text, so `textable` is false on it by the client's
+ * choice, not because the fact changed. That removes the "Text 988" button.
  */
 export const CRISIS = {
   heading: 'If you need help now',
@@ -2790,9 +2794,9 @@ export const CRISIS = {
     {
       label: '988',
       href: 'tel:988',
-      textable: true,
+      textable: false,
       title: 'Suicide and Crisis Lifeline',
-      body: 'Call or text 988, any time, for free and confidential support in a crisis.',
+      body: 'Call 988, any time, for free and confidential support in a crisis.',
     },
     {
       label: '911',
@@ -2916,7 +2920,7 @@ export const NEW_PATIENTS_PAGE = {
    * the page's closing block.
    */
   privacyCrisis:
-    'If you need help now, call or text 988 for the Suicide and Crisis Lifeline. In an emergency, call 911 or go to your nearest emergency room.',
+    'If you need help now, call 988 for the Suicide and Crisis Lifeline. In an emergency, call 911 or go to your nearest emergency room.',
 } as const;
 
 /**
