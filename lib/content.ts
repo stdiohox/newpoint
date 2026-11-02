@@ -1937,9 +1937,8 @@ export const SERVICE_PAGES: ServicePage[] = [
           'Weight, appetite, sleep, and mood often move together.',
           'Some medications used in psychiatry affect weight directly.',
         ],
-        /* CLIENT-REVIEW — GENERIC. Says where the service sits, not what it
-           achieves. */
-        highlight: 'Run by the providers who already handle your psychiatric prescriptions — not referred out.',
+        /* The "Run by the providers who already handle your psychiatric
+           prescriptions" highlight was removed by the client, 2026-11-02. */
       },
       {
         /* "PRESCRIBES AND REVIEWS", NOT "SUPERVISES", since healthcare-reviewer
