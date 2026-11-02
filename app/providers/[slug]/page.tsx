@@ -223,22 +223,31 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                 </Reveal>
                 <Reveal delay={0.12}>
                   <div className="mt-6">
+                    {/* One sentence, two lines (client, 2026-11-02): the call
+                        half sits directly under the email half. Block spans
+                        keep it one <p> for screen readers; nowrap keeps the
+                        number from splitting. */}
                     <p className="text-small text-np-neutral-600">
-                      Email{' '}
-                      <a
-                        href={`mailto:${provider.email}`}
-                        className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
-                      >
-                        {provider.email}
-                      </a>
-                      , or call the practice at{' '}
-                      <a
-                        href={`tel:${BUSINESS.phonePrimaryHref}`}
-                        className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
-                      >
-                        {BUSINESS.phonePrimary}
-                      </a>
-                      .
+                      <span className="block">
+                        Email{' '}
+                        <a
+                          href={`mailto:${provider.email}`}
+                          className="text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                        >
+                          {provider.email}
+                        </a>
+                        ,
+                      </span>{' '}
+                      <span className="block">
+                        call the practice at{' '}
+                        <a
+                          href={`tel:${BUSINESS.phonePrimaryHref}`}
+                          className="text-np-blue-600 font-medium whitespace-nowrap underline-offset-4 hover:underline"
+                        >
+                          {BUSINESS.phonePrimary}
+                        </a>
+                        .
+                      </span>
                     </p>
                     {/* The "email is not secure" warning that sat here was
                         removed by the client, 2026-11-02. */}
