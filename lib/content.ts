@@ -2772,7 +2772,7 @@ export const INSURANCE_PAGE = {
   sections: [
     {
       heading: 'Plans we accept',
-      body: 'Don’t see your plan? Ask us anyway. We can check your coverage before your first appointment, so you are not surprised later.',
+      body: 'Don’t see your plan? Ask us anyway. We can check your coverage before your first appointment.',
     },
     {
       heading: 'Paying without insurance',
@@ -2787,7 +2787,7 @@ export const INSURANCE_PAGE = {
     },
     {
       heading: 'Before your first appointment',
-      body: 'Have your insurance info handy when you reach out so we can verify your coverage. Please don’t send insurance ID or member numbers through the contact form — it is not secure. We’ll get those details from you directly.',
+      body: 'Have your insurance info handy when you reach out so we can verify your coverage.',
     },
   ],
   faqs: [

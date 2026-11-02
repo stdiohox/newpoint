@@ -53,14 +53,16 @@ export function TeamMemberCard({
 
   return (
     <div className="grid items-center gap-8 md:grid-cols-12 md:gap-0">
-      {/* THE PORTRAIT. md:col-span-6 with a negative margin on the type block
-          below is what creates the overlap — the two cells are six columns
-          each, and the type pulls back over the portrait's inner edge.
+      {/* THE PORTRAIT. md:col-span-4 with a negative margin on the type block
+          below is what creates the overlap — the portrait takes four columns
+          and the type eight, and the type pulls back over the portrait's inner
+          edge. Four, not six, since 2026-11-02 (client: "shrink" both
+          portraits); under md it is capped at 320px and centred.
 
           DOM order is portrait-then-type at both positions; `md:order-2` moves
           it visually for `right` so the reading order never changes. */}
       <div
-        className={`md:col-span-6 ${portraitFirst ? '' : 'md:order-2'} ${
+        className={`mx-auto w-full max-w-[320px] md:col-span-4 md:max-w-none ${portraitFirst ? '' : 'md:order-2'} ${
           portraitFirst ? 'md:pr-0' : 'md:pl-0'
         }`}
       >
@@ -110,7 +112,7 @@ export function TeamMemberCard({
            including the ring and the text padding. For `left` the order happens
            to favour the card, which is exactly the kind of accident that holds
            until someone flips a variant. Stated rather than relied on. */
-        className={`relative z-10 md:col-span-6 ${
+        className={`relative z-10 md:col-span-8 ${
           portraitFirst ? 'md:-ml-16 lg:-ml-24' : 'md:-mr-16 lg:-mr-24'
         } ${portraitFirst ? '' : 'md:order-1'}`}
       >
