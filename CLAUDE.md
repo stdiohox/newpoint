@@ -515,6 +515,9 @@ not confirmed, and both providers already publish ADHD among what they treat.
   because of this.
 - **ADHD only.** Insomnia and substance use stay out of the prescribing list.
   They are in `WHAT_WE_TREAT.conditions` as treating claims and were not asked for.
+  **Superseded for insomnia, 2026-11-02:** the client asked for Insomnia and
+  Borderline personality disorder on that page's "Conditions we treat" list, and
+  both were added. Substance use still stays out. No medication is named for either.
 - **The list is not a spread of `WHAT_WE_TREAT.conditions`** and must never become
   one. That list carries "Irritability and anger" and "Stress and burnout", which
   are not prescribing indications.

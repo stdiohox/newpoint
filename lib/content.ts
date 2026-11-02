@@ -1516,7 +1516,7 @@ export const SERVICE_PAGES: ServicePage[] = [
              monitor progress or decompensation over time. NO SCALE IS NAMED,
              here or anywhere — which instruments the practice uses is still an
              open client item. */
-          'We repeat the same measures later, so changes are clear instead of a matter of opinion.',
+          'We repeat the same measures at follow-up.',
           /* CLIENT-REVIEW — SOURCED. research/content/services.md:21:
              "Screening tests to aid in making a diagnosis and ruling out other
              disorders". */
@@ -1653,6 +1653,11 @@ export const SERVICE_PAGES: ServicePage[] = [
           'Schizophrenia',
           'Mood disorders',
           'Psychosis',
+          /* CLIENT INSTRUCTION, 2026-11-02: "add insomnia, borderline
+             personality disorder". No medication is named for either; the
+             listNote hedge covers them like every other entry. */
+          'Insomnia',
+          'Borderline personality disorder',
         ],
       },
     ],
