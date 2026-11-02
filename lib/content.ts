@@ -817,10 +817,10 @@ export const PROVIDERS: Provider[] = [
       // Round avatars, client 2026-11-02: the supplied 520x564 crop
       // (design-research/assets/providers/source/) cut square from the top to
       // 520x520 and not upscaled, so all four "560"/"1120" files are 520x520.
-      webp560: '/images/providers/anastasia-ofoegbu-560.webp',
-      webp1120: '/images/providers/anastasia-ofoegbu-1120.webp',
-      jpg560: '/images/providers/anastasia-ofoegbu-560.jpg',
-      jpg1120: '/images/providers/anastasia-ofoegbu-1120.jpg',
+      webp560: '/images/providers/anastasia-ofoegbu-2026-11-560.webp',
+      webp1120: '/images/providers/anastasia-ofoegbu-2026-11-1120.webp',
+      jpg560: '/images/providers/anastasia-ofoegbu-2026-11-560.jpg',
+      jpg1120: '/images/providers/anastasia-ofoegbu-2026-11-1120.jpg',
       // New headshot, client 2026-10-26: the 2400x3000 4:5 original
       // (design-research/assets/providers/source/) scaled to 1120x1400.
       portrait: { src: '/images/providers/anastasia-ofoegbu-portrait.webp', width: 1120, height: 1400 },
