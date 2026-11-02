@@ -2646,7 +2646,7 @@ export const FAQ = {
            2026-09-29). Placed after the homepage's four-item preview. */
         {
           q: 'Can I get medication only?',
-          a: 'Care starts with a comprehensive psychiatric evaluation. If medication is appropriate, it can be part of your plan with or without psychotherapy. We don’t prescribe without that assessment.',
+          a: 'Care starts with a comprehensive psychiatric evaluation. If medication is appropriate, it can be part of your plan with or without psychotherapy. We don’t prescribe without an initial psychiatric evaluation.',
         },
         {
           q: 'Do I need to be in therapy first?',
