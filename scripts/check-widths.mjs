@@ -22,7 +22,7 @@ const RULES = [
   [/\bmax-w-(?:5xl|6xl|7xl|screen(?:-[a-z0-9]+)?)\b/, 'Tailwind page-scale max-width'],
   [/\bmax-w-\[\d{4,}px\]/, 'hand-written page max-width'],
   [/px-6 md:px-12 lg:px-16/, 'old uncapped navbar gutters'],
-  [/className=["'`][^"'`]*(?<![\w-])container(?![\w-])/, 'bare `container` class'],
+  [/className=["'`][^"'`]*(?<![\w@-])container(?![\w-])/, 'bare `container` class'],
 ];
 
 function* files(dir) {

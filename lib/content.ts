@@ -2337,7 +2337,7 @@ export const GETTING_STARTED = {
   steps: [
     {
       title: 'Reach out',
-      body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and, in general terms, what you’re looking for. Please don’t include health details in any message.',
+      body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and, in general terms, what you’re looking for.',
     },
     {
       title: 'Comprehensive psychiatric evaluation',
@@ -2400,20 +2400,13 @@ export const WHAT_TO_EXPECT = {
       title: 'Request an appointment',
       /**
        * Form or phone, never "book online": /research/services-analysis.md
-       * records that intake is phone, email, or contact form only. The health
-       * details warning is the same HIPAA-aware line as CONTACT.privacyNote.
+       * records that intake is phone, email, or contact form only.
+       *
+       * CLIENT INSTRUCTION, 2026-11-02: "Please don’t include health details
+       * in any message" was removed from this step and from GETTING_STARTED's.
+       * The contact flow itself still collects no health information.
        */
-      /**
-       * "through the form", never a bare "out of it". The sentence before this
-       * one offers two channels, so an unscoped pronoun reads as covering the
-       * phone call too, and telling a psychiatric patient to withhold clinical
-       * detail from a call with the practice is the opposite of the rule. The
-       * v1 no-PHI prohibition in CLAUDE.md is scoped to the contact flow, not
-       * to speaking to a provider. Phrasing matches GETTING_STARTED's, which
-       * already had this right, and carries NEW_PATIENTS_PAGE.privacyBody's
-       * reassurance clause so the patient knows where the detail does go.
-       */
-      body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and why you’re reaching out. Please don’t include health details in any message — we’ll get the clinical details from you directly.',
+      body: 'Call or email us. Calling is the fastest way to reach us, and you can also ask for a free 15-minute consultation. Tell us how to reach you and why you’re reaching out.',
     },
     {
       title: 'Comprehensive psychiatric evaluation',

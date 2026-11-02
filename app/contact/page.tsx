@@ -276,25 +276,30 @@ export default function ContactPage() {
                 <p className="text-body text-np-neutral-600 mt-3 max-w-[46ch]">
                   {CONTACT_PAGE.phoneNote}
                 </p>
-                <ul role="list" className="mt-6 space-y-3">
-                  <li>
-                    <a
-                      href={`tel:${BUSINESS.phonePrimaryHref}`}
-                      className="font-display text-h3 text-np-blue-600 ease-np-out underline-offset-4 transition-colors duration-[180ms] hover:underline"
-                    >
-                      {BUSINESS.phonePrimary}
-                    </a>
-                  </li>
-                  {BUSINESS.phoneAlt.map((phone) => (
-                    <li key={phone}>
+                {/* ALL PHONE NUMBERS ON ONE LINE, client request 2026-11-02.
+                    One size for all three, nowrap so a number never breaks, and
+                    a size tied to this column's width (cqi), not the viewport:
+                    the column is narrowest in the three-up grid at 1024px
+                    (~280px), where the row eases down to ~12px, and the row
+                    reaches 16px once the column is ~365px wide. */}
+                <ul role="list" className="@container mt-6 space-y-3">
+                  <li className="flex flex-nowrap gap-x-2 text-[length:min(1rem,4.4cqi)] leading-normal font-medium whitespace-nowrap">
+                    {[
+                      { label: BUSINESS.phonePrimary, href: `tel:${BUSINESS.phonePrimaryHref}` },
+                      ...BUSINESS.phoneAlt.map((phone) => ({
+                        label: phone,
+                        href: `tel:+1${phone.replace(/\D/g, '')}`,
+                      })),
+                    ].map(({ label, href }) => (
                       <a
-                        href={`tel:+1${phone.replace(/\D/g, '')}`}
-                        className="text-body text-np-blue-600 font-medium underline-offset-4 hover:underline"
+                        key={label}
+                        href={href}
+                        className="text-np-blue-600 underline-offset-4 hover:underline"
                       >
-                        {phone}
+                        {label}
                       </a>
-                    </li>
-                  ))}
+                    ))}
+                  </li>
                   <li className="text-small text-np-neutral-600 pt-1">Fax {BUSINESS.fax}</li>
                 </ul>
                 {/* NO ROUTE TO THE FORM WHILE IT IS NOT CONNECTED. An "Or fill
