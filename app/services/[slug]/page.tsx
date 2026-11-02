@@ -201,7 +201,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       src: '/images/services/addiction-together.webp',
       alt: 'A grey-haired man in a knit cardigan sitting in a sage-green armchair beside a window, a closed book on his lap, looking out with a calm expression. A lamp and a trailing plant stand on the side table next to him.',
     },
-    'before-you-cut-down-or-stop': {
+    'getting-sober': {
       src: '/images/services/addiction-call.webp',
       alt: 'A woman in a grey-blue sweater sitting at a wooden kitchen table, talking on a phone held to her ear, her other hand resting on the table beside a ceramic mug.',
     },

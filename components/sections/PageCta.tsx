@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { CalendarCheck, Clock, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { CalendarCheck, Clock, MapPin, Phone } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
@@ -9,9 +9,8 @@ import { BUSINESS, CTA, DELIVERY_LINE, DELIVERY_SHORT } from '@/lib/content';
 
 /**
  * Two things a patient wants to know at the moment of deciding to make contact,
- * and neither is a new claim. "No health details needed" restates the body copy
- * directly above it, which already asks people to keep health information out of
- * the form; saying it as a reassurance rather than an instruction is the point.
+ * and neither is a new claim. (A third, "No health details needed", was removed
+ * by the client on 2026-11-02.)
  *
  * THE SECOND LINE IS NOW DELIVERY_LINE, the client's own sentence, and the
  * long note that used to sit here is spent. It said that dropping "Telehealth
@@ -26,7 +25,7 @@ import { BUSINESS, CTA, DELIVERY_LINE, DELIVERY_SHORT } from '@/lib/content';
  * All three are the kind of thing a reader would act on and none is sourced.
  */
 const assurances = [
-  { icon: ShieldCheck, label: 'No health details needed' },
+  // "No health details needed" was removed by the client, 2026-11-02.
   // Client, 2026-10-19: "We also offer 15 minutes consultations free of charge."
   { icon: Clock, label: 'Free 15-minute consultation' },
   { icon: MapPin, label: DELIVERY_LINE },

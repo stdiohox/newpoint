@@ -2142,11 +2142,7 @@ export const SERVICE_PAGES: ServicePage[] = [
         heading: 'Substance use and mental health, treated together',
         /* GENERIC clinical knowledge, plus PROVIDERS[].credentials: both are
            PMHNP-BC, which is what puts the mental-health half in scope. */
-        body: 'Substance use rarely happens on its own. Depression, anxiety, trauma, and trouble sleeping often sit alongside it, and each can make the other harder to treat.',
-        bullets: [
-          'Our providers are psychiatric nurse practitioners, so both are looked at in the same plan.',
-          'You don’t have to be sent to two separate places for two parts of the same problem.',
-        ],
+        body: 'Substance use rarely happens on its own. Depression, anxiety, trauma, and trouble sleeping often occur, and each can make the other harder to treat.',
       },
       /* NO "WHO YOU'LL SEE" SECTION, deliberately. CLAUDE.md's service-page
          furniture rule bars a providers block under a named service, and the
@@ -2158,12 +2154,10 @@ export const SERVICE_PAGES: ServicePage[] = [
            alone: stopping alcohol or sedatives abruptly can cause seizures.
            Names no medication and no class. The FAQ below repeats it in
            question form. */
-        heading: 'Before you cut down or stop',
-        body: 'Stopping alcohol or some medications suddenly can be dangerous. Talk to a clinician before you stop, rather than going it alone.',
+        heading: 'Getting sober',
+        body: 'Stopping substances or some medications suddenly can be dangerous. Talk to your providers before you stop, rather than going it alone.',
         bullets: [
           'If you feel unwell after stopping, call 911 or go to the nearest emergency room.',
-          /* Keeps the history out of the contact form (CLAUDE.md, HIPAA). */
-          'Tell us what you’re taking, including anything prescribed elsewhere, when we meet, not on a form.',
         ],
       },
       {
@@ -2202,7 +2196,7 @@ export const SERVICE_PAGES: ServicePage[] = [
            alone: stopping alcohol or sedatives abruptly can cause seizures.
            Names no medication and no class. */
         q: 'Should I stop using before my first appointment?',
-        a: 'Not on your own. Stopping alcohol or some medications suddenly can be dangerous. Talk to a clinician before you stop, and if you feel unwell after stopping, call 911 or go to the nearest emergency room.',
+        a: 'Not on your own. Stopping substances or some medications suddenly can be dangerous. Talk to your providers before you stop, and if you feel unwell after stopping, call 911 or go to the nearest emergency room.',
       },
       {
         /* Answers the question an opioid-use reader arrives with, and commits
