@@ -506,7 +506,7 @@ export const FOOTER = {
   },
   /** Not a disclaimer the practice invented; it is the one the old footer had. */
   legalNote:
-    'This website is for general information only. It is not medical advice, and it is not monitored around the clock.',
+    'This website is for general information only. It is not medical advice.',
 } as const;
 
 export type Provider = {
@@ -2653,7 +2653,7 @@ export const CONTACT = {
    * date of birth, free-text clinical prompt, or file upload.
    */
   privacyNote:
-    'Please don’t include any health information, medical history, or insurance ID numbers. This form is not secure for medical details, and it is not monitored around the clock.',
+    'Please don’t include health information, medical history, or insurance ID numbers in this form.',
   reasons: [
     'New patient inquiry',
     'Existing patient',
