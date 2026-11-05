@@ -665,12 +665,12 @@ The homepage ends (after the contact section, before the footer) with
 "Health is wealth." Content is `CLOSING_PORTRAIT` in `lib/content.ts`.
 
 - **The photo is served at the exact pixels supplied, lossless**
-  (`public/images/providers/providers-together.webp`, 960x960), the same rule
-  as the provider portraits. **Cropped square on 2026-10-30** (client request,
-  tightened the same day to "crop it more"): a 960x960 cut from x=10, y=70 of
-  the original, closer on the faces and clear of Ofoegbu's watch. It is
-  a cut of the supplied pixels, not a resample, so the rule still holds; the
-  uncropped 1123x1231 original is in git history (ab2635a). Plain `<img>`, lazy, no next/image.
+  (`public/images/providers/providers-together.webp`, 1123x1083), the same rule
+  as the provider portraits. **Replaced whole on 2026-11-05** ("change the group
+  picture to this"): the same photograph as the original, 148px shorter at the
+  bottom and tagged Display P3 (tag kept, pixels identical to the JPEG supplied).
+  This reverses the 2026-10-30 960x960 crop, so Ofoegbu's watch is in frame again.
+  The crop is at abe30bc and the 1123x1231 original at ab2635a. Plain `<img>`, lazy, no next/image.
 - **Whitaker is on the left, Ofoegbu on the right** (matched to Whitaker's studio
   portrait). The alt names them without "Dr."; the visible names carry "Dr." with
   the credentials directly beneath, which is the condition on the prefix.

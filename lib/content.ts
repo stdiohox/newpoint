@@ -2541,11 +2541,11 @@ export function cardPosterFor(href: string): string | undefined {
  * re-encode. It is lazy and last on the page, so its ~1 MB does not touch the
  * first paint.
  *
- * CROPPED SQUARE, 2026-10-30 (client request, "crop the providers group
- * image", then "crop it more"): a 960x960 cut of the supplied 1123x1231 frame,
- * from x=10, y=70. That keeps a little air above Ofoegbu's hair, ends below the
- * folded arms, and stops short of her watch on the right edge. A cut, not a
- * resample: pixel-identical to that region of the original, still lossless.
+ * REPLACED, 2026-11-05 (request, "change the group picture to this"): the
+ * supplied 1123x1083 file, whole and uncropped. It is the same photograph as the
+ * 2026-10-22 original with 148px off the bottom, tagged Display P3. The tag is
+ * kept in the WebP and the pixels are identical to the JPEG supplied. This
+ * replaces the 2026-10-30 960x960 crop, so her watch is back in frame.
  *
  * LEFT IS WHITAKER, RIGHT IS OFOEGBU: the left figure wears the same black
  * blazer and polka-dot blouse as Whitaker's studio portrait. The alt carries no
@@ -2556,8 +2556,8 @@ export const CLOSING_PORTRAIT = {
   tag: 'Health is wealth.',
   image: {
     src: '/images/providers/providers-together.webp',
-    width: 960,
-    height: 960,
+    width: 1123,
+    height: 1083,
     alt: 'Funmilayo Whitaker and Anastasia O. Ofoegbu standing back to back with their arms folded, smiling, against a blue studio backdrop.',
   },
 } as const;
