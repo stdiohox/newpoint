@@ -15,9 +15,24 @@ if (!project) {
   );
 }
 
+/**
+ * Tasks NOT deployed yet. Going live with one = delete its line here and redeploy.
+ * The site is in holding mode (middleware.ts) and these lack accounts, so on 2026-11-09
+ * only seo.keyword-research, geo.probe and ops.geo-retention went live.
+ */
+const NOT_YET_LIVE = [
+  "**/seo/rank-tracker.ts", // nothing to rank while the site holds
+  "**/geo/recommendations.ts", // would audit the holding page's schema; enable at launch
+  "**/social/**", // Meta app review + n8n approval webhook
+  "**/gbp/**", // GBP API access + n8n webhooks
+  "**/ops/heartbeat.ts", // n8n ops alert webhook; only watches social/GBP posts
+  "**/approval-gate.ts", // used only by social and GBP
+];
+
 export default defineConfig({
   project,
   dirs: ["./src/trigger/marketing"],
+  ignorePatterns: ["**/*.test.ts", "**/*.spec.ts", ...NOT_YET_LIVE],
   runtime: "node",
   logLevel: "info",
   maxDuration: 300,

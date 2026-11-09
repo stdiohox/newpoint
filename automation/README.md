@@ -344,6 +344,13 @@ This is a **standard** project, not the HIPAA one. It must never hold patient da
 
 ### 2. Trigger.dev — project `newpoint-marketing`
 
+**Only some tasks deploy.** `NOT_YET_LIVE` in `trigger.marketing.config.ts` lists the tasks held
+back (rank tracker, GEO recommendations, social, GBP, heartbeat). To take one live, delete its
+line and redeploy. As of 2026-11-09 the live set is `seo.keyword-research`, `geo.probe` and
+`ops.geo-retention`. `geo.recommendations` waits for the site to leave holding mode, because
+it would otherwise audit the holding page's schema. The config is read before `--env-file`
+loads, so deploy with `TRIGGER_PROJECT_REF_MARKETING=proj_… npm run deploy:marketing`.
+
 1. Create the project `newpoint-marketing`. **Do not** enable the HIPAA add-on here; that
    is for `newpoint-phi` in Phase 5.
 2. Copy its project ref (`proj_…`) into `TRIGGER_PROJECT_REF_MARKETING`. For local use,
