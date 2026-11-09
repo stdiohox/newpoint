@@ -146,6 +146,44 @@ export function loadMarketingEnv(
 }
 
 /**
+ * The lead CRM's alert tasks (`crm.*`, docs/lead-crm.md) need only the database
+ * and an email sender, so they load this instead of the whole marketing schema:
+ * an alert must not wait on the Anthropic or Search Console keys.
+ */
+export const crmEnvSchema = z.object({
+  MARKETING_DATABASE_URL: marketingEnvSchema.shape.MARKETING_DATABASE_URL,
+  MARKETING_DATABASE_CA_CERT: marketingEnvSchema.shape.MARKETING_DATABASE_CA_CERT,
+  SUPABASE_MARKETING_PROJECT_REF: marketingEnvSchema.shape.SUPABASE_MARKETING_PROJECT_REF,
+  /** Resend API key (resend.com → API Keys, "Sending access" only). */
+  RESEND_API_KEY: z.string().regex(/^re_[A-Za-z0-9_]{10,}$/, "must be a Resend API key (re_…)"),
+  /** Sender on the verified domain, e.g. `Newpoint CRM <crm@newpointnp.com>`. */
+  CRM_ALERT_FROM: z.string().regex(/^[^<>\r\n]*<[^@\s<>]+@newpointnp\.com>$|^[^@\s<>]+@newpointnp\.com$/, "must be an @newpointnp.com sender"),
+  /** Where the alert links to. Pinned to the practice's own domain. */
+  CRM_BASE_URL: z
+    .string()
+    .regex(/^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\/crm$/, "must be https://…newpointnp.com/crm")
+    .default("https://www.newpointnp.com/crm"),
+});
+
+export type CrmEnv = Readonly<z.output<typeof crmEnvSchema>>;
+
+export function loadCrmEnv(source: Readonly<Record<string, string | undefined>> = process.env): CrmEnv {
+  const forbidden = findPhiZoneVariables(source);
+  if (forbidden.length > 0) {
+    throw new ConfigError("phi_zone_variable_in_public_runtime", forbidden);
+  }
+  const result = crmEnvSchema.safeParse(source);
+  if (!result.success) {
+    const names = [...new Set(result.error.issues.map((issue) => String(issue.path[0] ?? "(root)")))].sort();
+    throw new ConfigError("invalid_crm_env", names);
+  }
+  if (supabaseProjectRef(result.data.MARKETING_DATABASE_URL) !== result.data.SUPABASE_MARKETING_PROJECT_REF) {
+    throw new ConfigError("marketing_db_host_mismatch", ["MARKETING_DATABASE_URL", "SUPABASE_MARKETING_PROJECT_REF"]);
+  }
+  return Object.freeze(result.data);
+}
+
+/**
  * The Supabase project a connection string points at, or undefined when it is
  * not a Supabase URL at all. Two shapes exist:
  *   - session/transaction pooler: user `<role>.<ref>` at `*.pooler.supabase.com`;

@@ -2654,7 +2654,7 @@ export const FAQ = {
 
 export const CONTACT = {
   heading: 'Get in touch',
-  body: 'Online requests are not connected yet, so for now, call or email us to request an appointment.',
+  body: 'Send us your details and we’ll reach out about an appointment.',
   /**
    * HIPAA-aware v1 per CLAUDE.md: name, email, phone, and a constrained
    * reason-for-contact only. No symptoms, diagnoses, medications, insurance ID,
@@ -2669,40 +2669,19 @@ export const CONTACT = {
     'Something else',
   ],
   /**
-   * NOT RENDERED. Kept for the day a backend is connected.
-   *
-   * This is the real success message, and it is deliberately unused: nothing
-   * receives submissions yet, so showing it would tell a prospective patient
-   * their request had been received when it had not. A psychiatric practice
-   * is the worst place to make that claim — someone who believes they are on
-   * a waiting list does not call. `unavailable` below is what renders instead.
-   *
-   * Restore this as the `submitted` branch in components/ui/onboarding-form.tsx
-   * at the same time as the form's POST target, not before.
+   * Rendered only once /api/leads has stored the lead in the staff CRM (a 201;
+   * docs/lead-crm.md). Never shown for a submission nothing took: someone who
+   * believes they are on a waiting list does not call. The form shows the
+   * practice's phone number as a link beneath it.
    */
   success: {
     heading: 'Thanks, we got it',
     body: 'We have your details and will reach out about an appointment. If you need us sooner, please call the practice.',
   },
   /**
-   * What a valid submit actually shows today.
-   *
-   * The sentence is split around its links rather than stored whole because
-   * the phone and both addresses have to be real `tel:`/`mailto:` targets —
-   * the point of this message is that it hands over a channel that works.
-   *
-   * TWO addresses, not one. There is no practice-wide inbox: BUSINESS.emails
-   * carries only the two named provider addresses, and the CLIENT note there
-   * asks for an info@ or contact@. app/contact/page.tsx already resolved the
-   * same question the same way — list both rather than invent a general one,
-   * or route every stranger into one clinician's personal inbox. Collapse
-   * this to a single address when the client supplies one.
-   */
-  /**
    * Used ONLY when NEXT_PUBLIC_INTAKE_URL is set, i.e. when the form posts to the
-   * BAA-covered intake handler (automation/edge/intake). With the flag off — the
-   * default, and the only state until the PHI zone is live — `body` and
-   * `unavailable` render exactly as before.
+   * BAA-covered intake handler (automation/edge/intake). With the flag off (the
+   * default) the site renders OnboardingForm, which posts to /api/leads.
    */
   live: {
     body: 'Send us your details and we’ll reach out about an appointment.',
@@ -2711,12 +2690,6 @@ export const CONTACT = {
       'We texted a 6-digit code to the number you gave. Enter it here so we know the number is yours.',
     /** Optional. Neutral by design: no reason given, nothing clinical. */
     ageQuestion: 'Are you 18 or older?',
-  },
-  unavailable: {
-    heading: 'Online requests are not active yet',
-    before: 'Please call',
-    between: 'or email',
-    after: 'to request an appointment.',
   },
 } as const;
 

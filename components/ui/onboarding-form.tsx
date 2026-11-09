@@ -102,22 +102,20 @@ interface OnboardingFormProps extends Omit<
   reasons: readonly string[];
   /** The "do not include health information" notice, rendered above the button. */
   privacyNote: string;
-  /**
-   * What a valid submit shows while nothing receives submissions.
-   *
-   * The sentence arrives in pieces because its phone number and addresses are
-   * rendered as real tel:/mailto: links. A caller that one day has a working
-   * backend swaps this branch for CONTACT.success rather than editing it.
-   */
-  unavailable: {
-    heading: string;
-    before: string;
-    between: string;
-    after: string;
-    phone: { label: string; href: string };
-    emails: readonly { label: string; href: string }[];
-  };
+  /** What a stored submission shows (CONTACT.success). */
+  success: { heading: string; body: string };
+  /** The practice's phone, offered whenever a submission does not go through. */
+  phone: { label: string; href: string };
 }
+
+/**
+ * Where the form posts: app/api/leads/route.ts, which stores the lead in the
+ * staff CRM (docs/lead-crm.md) and alerts staff. Same origin, JSON, the four
+ * fields only. `website` is a honeypot people never see.
+ */
+const LEADS_ENDPOINT = '/api/leads';
+
+type SubmitError = 'rate_limited' | 'failed';
 
 const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
   (
@@ -129,7 +127,8 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       buttonText,
       reasons,
       privacyNote,
-      unavailable,
+      success,
+      phone,
       ...props
     },
     ref
@@ -137,7 +136,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
     const [errors, setErrors] = useState<Errors>({});
     const [submitted, setSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState(false);
+    const [submitError, setSubmitError] = useState<SubmitError | null>(null);
     const reduce = useReducedMotion();
     const hydrated = useHydrated();
     const noteId = useId();
@@ -202,29 +201,34 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       }
 
       setIsSubmitting(true);
+      setSubmitError(null);
       try {
         /*
-         * CLIENT: no submission endpoint is wired yet. Needs a BAA-covered
-         * form backend before launch. Before launch, post to a BAA-covered
-         * handler. NOT a plain mail relay: a name arriving alongside reason
-         * "Existing patient", on this domain, identifies someone as receiving
-         * behavioral-health treatment, which makes the payload PHI and the
-         * relay an uncovered disclosure. Do not add PHI fields either.
-         *
-         * Until then this resolves immediately, so the spinner is wired but
-         * never visibly spins, and a valid submit renders CONTACT.unavailable
-         * — the honest "online requests aren't active yet" hand-off to the
-         * phone and the provider addresses — rather than CONTACT.success,
-         * which would claim a receipt that nothing actually took. Restore the
-         * success branch and this POST together, not separately.
+         * Stores the lead in the staff CRM (app/api/leads). CONTACT.success
+         * renders only on a 201, i.e. only once the lead is actually stored:
+         * someone who believes they are on a waiting list does not call, so a
+         * receipt is never claimed for a submission nothing took. Do not add
+         * fields here: name, email, phone and the fixed reason only (CLAUDE.md
+         * "Compliance").
          */
-        await Promise.resolve();
-        setSubmitted(true);
+        const response = await fetch(LEADS_ENDPOINT, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            reason: String(data.get('reason') ?? ''),
+            website: String(data.get('website') ?? ''),
+          }),
+        });
+        if (response.status === 201) setSubmitted(true);
+        else setSubmitError(response.status === 429 ? 'rate_limited' : 'failed');
       } catch {
         /* Not swallowed. try/finally with no catch would leave a rejected
            submission looking exactly like a misclick: spinner stops, form
            unchanged, nothing said. Points at the phone, which always works. */
-        setSubmitError(true);
+        setSubmitError('failed');
       } finally {
         setIsSubmitting(false);
       }
@@ -325,40 +329,22 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
 
             {submitted ? (
               /*
-               * NOT a success message. Nothing receives this form, so the one
-               * useful thing it can do on submit is hand over a channel that
-               * works. role="status" is polite rather than assertive: the focus
-               * move below is what guarantees the announcement, and an alert
-               * would interrupt on top of it.
+               * Shown only after the lead is stored (a 201). role="status" is
+               * polite rather than assertive: the focus move above is what
+               * guarantees the announcement, and an alert would interrupt on
+               * top of it.
                */
               <div role="status" className="py-4">
                 {/* tabIndex={-1} so the effect above can move focus here. It is
                   not in the tab order; it is only a focus destination. */}
                 <h3 ref={noticeRef} tabIndex={-1} className="text-h3 focus:outline-none">
-                  {unavailable.heading}
+                  {success.heading}
                 </h3>
-                <p className="text-body text-np-neutral-600 mt-3">
-                  {unavailable.before}{' '}
-                  <a
-                    href={unavailable.phone.href}
-                    className="text-np-blue-600 underline underline-offset-2"
-                  >
-                    {unavailable.phone.label}
-                  </a>{' '}
-                  {unavailable.between}{' '}
-                  {/* Both provider addresses. There is no practice-wide inbox —
-                    see the note on CONTACT.unavailable. The separator is
-                    rendered between items rather than after each so the
-                    sentence does not trail "or" into its closing clause. */}
-                  {unavailable.emails.map((e, i) => (
-                    <React.Fragment key={e.href}>
-                      {i > 0 && ' or '}
-                      <a href={e.href} className="text-np-blue-600 underline underline-offset-2">
-                        {e.label}
-                      </a>
-                    </React.Fragment>
-                  ))}{' '}
-                  {unavailable.after}
+                <p className="text-body text-np-neutral-600 mt-3">{success.body}</p>
+                <p className="text-body mt-2">
+                  <a href={phone.href} className="text-np-blue-600 underline underline-offset-2">
+                    {phone.label}
+                  </a>
                 </p>
               </div>
             ) : (
@@ -445,6 +431,14 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                   )}
                 </motion.div>
 
+                {/* Honeypot. Off-screen, out of the tab order and hidden from
+                  assistive technology, so only a bot fills it in; the API
+                  then discards the submission. */}
+                <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                  <label htmlFor="website">Website</label>
+                  <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+                </div>
+
                 <motion.div {...item}>
                   <label htmlFor="reason" className={LABEL_CLASS}>
                     Reason for contact
@@ -474,7 +468,13 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                   </p>
                   {submitError && (
                     <p role="alert" className={ERROR_CLASS}>
-                      We couldn’t send that. Please try again, or call the practice.
+                      {submitError === 'rate_limited'
+                        ? 'We’ve already received a few requests from you today. Please call the practice at '
+                        : 'We couldn’t send that. Please try again, or call the practice at '}
+                      <a href={phone.href} className="underline underline-offset-2">
+                        {phone.label}
+                      </a>
+                      .
                     </p>
                   )}
                   <Button type="submit" size="lg" className="w-full">

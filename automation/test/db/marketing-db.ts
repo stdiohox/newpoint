@@ -10,8 +10,11 @@
  *   actually revoke.
  * - pgTAP lives in the `extensions` schema, as on Supabase.
  *
- * What is not: Supabase's other schemas (auth, storage, realtime, …). The
- * marketing migrations do not reference them.
+ * - A minimal `auth` schema: `auth.users (id, email)` and `auth.uid()`, read from
+ *   the JWT claim settings PostgREST sets. The crm migration references both.
+ *
+ * What is not: Supabase's other schemas (storage, realtime, …), and the rest
+ * of `auth`.
  */
 import EmbeddedPostgres from "embedded-postgres";
 import type pg from "pg";
@@ -39,6 +42,14 @@ const SUPABASE_BASELINE = `
   alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
   alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+  create schema auth;
+  grant usage on schema auth to anon, authenticated, service_role;
+  create table auth.users (id uuid primary key, email text);
+  create function auth.uid() returns uuid language sql stable as $fn$
+    select nullif(coalesce(
+      current_setting('request.jwt.claim.sub', true),
+      nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'), '')::uuid
+  $fn$;
 `;
 
 export interface MarketingDb {

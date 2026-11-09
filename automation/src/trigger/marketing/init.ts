@@ -16,12 +16,15 @@
 import { tasks } from "@trigger.dev/sdk";
 import { toSafeTaskError } from "../../lib/errors.js";
 import { createLogger, entityId, type EntityId } from "../../lib/logger.js";
+import { crmRuntime } from "./crm/runtime.js";
 import { marketingRuntime } from "./runtime.js";
 
 const failureLogger = createLogger();
 
-tasks.onStartAttempt(() => {
-  marketingRuntime();
+tasks.onStartAttempt(({ task }) => {
+  // The lead CRM's tasks need only the database and Resend (crm/runtime.ts).
+  if (task.startsWith("crm.")) crmRuntime();
+  else marketingRuntime();
   return Promise.resolve();
 });
 

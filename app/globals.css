@@ -281,6 +281,11 @@
     display: none;
   }
 
+  /* Same for the staff CRM (app/crm/layout.tsx): it has its own header. */
+  body:has(> main[data-crm]) > header {
+    display: none;
+  }
+
   h1,
   h2,
   h3 {

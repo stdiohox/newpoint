@@ -54,7 +54,9 @@ export type Vendor =
   | "twilio"
   | "vapi"
   /** The practice's own public website, read for schema.org coverage (§5.6). */
-  | "newpoint_site";
+  | "newpoint_site"
+  /** Email for the lead CRM's new-lead alerts (docs/lead-crm.md). */
+  | "resend";
 
 export class VendorHttpError extends AppError {
   readonly failureClass: FailureClass;

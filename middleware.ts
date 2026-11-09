@@ -1,4 +1,6 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { CRM_COOKIE_OPTIONS } from '@/lib/crm/cookies';
 
 /**
  * HOLDING-PAGE MODE.
@@ -21,7 +23,41 @@ import { NextResponse, type NextRequest } from 'next/server';
 const HOLDING_HOSTS = new Set(['newpointnp.com', 'www.newpointnp.com']);
 const NOINDEX = 'noindex, nofollow';
 
-export function middleware(request: NextRequest) {
+/**
+ * /crm, the staff lead CRM (docs/lead-crm.md), on every host:
+ * - it is NOT held: staff use it on the production domain while the public
+ *   site shows the holding page;
+ * - it is never indexed (X-Robots-Tag, plus the layout's metadata);
+ * - the Supabase session is refreshed here, the one place a request can still
+ *   set cookies before a Server Component reads them.
+ */
+async function crm(request: NextRequest) {
+  let response = NextResponse.next({ request });
+  const url = process.env.CRM_SUPABASE_URL;
+  const key = process.env.CRM_SUPABASE_PUBLISHABLE_KEY;
+  if (url && key) {
+    const supabase = createServerClient(url, key, {
+      cookieOptions: CRM_COOKIE_OPTIONS,
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (list) => {
+          for (const { name, value } of list) request.cookies.set(name, value);
+          response = NextResponse.next({ request });
+          for (const { name, value, options } of list) response.cookies.set(name, value, options);
+        },
+      },
+    });
+    await supabase.auth.getUser();
+  }
+  response.headers.set('X-Robots-Tag', NOINDEX);
+  response.headers.set('Cache-Control', 'private, no-store');
+  return response;
+}
+
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  if (path === '/crm' || path.startsWith('/crm/')) return crm(request);
+
   if (process.env.MAINTENANCE_MODE !== 'true') return NextResponse.next();
 
   // Lowercased, port and trailing FQDN dot stripped: `newpointnp.com.` is the
