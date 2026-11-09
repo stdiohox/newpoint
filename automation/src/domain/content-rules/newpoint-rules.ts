@@ -161,7 +161,7 @@ const POST_RULES: readonly (readonly [PostRule, (text: string) => boolean, strin
   [
     "crisis_without_988_911",
     (t) => matches("crisis", t) && !(/\b988\b/.test(t) && /\b911\b/.test(t)),
-    "A post on crisis, suicide or self-harm must say: call or text 988, or call 911 in an emergency.",
+    "A post on crisis, suicide or self-harm must say: call 988, or call 911 in an emergency.",
   ],
   [
     "unconfirmed_fact",

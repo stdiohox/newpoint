@@ -13,9 +13,14 @@ import { smsDate, smsTime } from "../../../domain/scheduling/time.js";
 export interface SlotConfig {
   /** PHI_GOOGLE_REVIEW_URL: the only link a review text may carry. null = not configured. */
   readonly reviewUrl: string | null;
+  /**
+   * The task's clock. A verification code's expires_at is written by edge/intake from its
+   * injected clock, so liveness is judged on the same clock, never the database's now().
+   */
+  readonly now: Date;
 }
 
-export async function resolveSlots(q: Queryable, template: TemplateId, entityId: string, config: SlotConfig = { reviewUrl: null }): Promise<Slots> {
+export async function resolveSlots(q: Queryable, template: TemplateId, entityId: string, config: SlotConfig): Promise<Slots> {
   if (template === "review_request") {
     // The entity is a review request just claimed for sending (reviews.request-review); the link is the practice's own.
     const { rows } = await q.query(
@@ -29,8 +34,8 @@ export async function resolveSlots(q: Queryable, template: TemplateId, entityId:
   if (template === "verification_code") {
     // The code row is the entity: a live, unused code only. An expired or used code is never re-sent.
     const { rows } = await q.query<{ code: string }>(
-      `select code from phi.phone_verifications where id = $1 and code is not null and verified_at is null and expires_at > now()`,
-      [entityId],
+      `select code from phi.phone_verifications where id = $1 and code is not null and verified_at is null and expires_at > $2`,
+      [entityId, config.now],
     );
     const code = rows[0]?.code;
     if (code === undefined) throw new ValidationError("verification_expired");

@@ -150,7 +150,7 @@ async function prepare(deps: SendSmsDeps, q: Queryable, payload: SendSmsPayload)
     }
   }
 
-  const body = renderTemplate(payload.template, await resolveSlots(q, payload.template, payload.entityId, { reviewUrl: deps.env.PHI_GOOGLE_REVIEW_URL ?? null }));
+  const body = renderTemplate(payload.template, await resolveSlots(q, payload.template, payload.entityId, { reviewUrl: deps.env.PHI_GOOGLE_REVIEW_URL ?? null, now: deps.now() }));
   const conversationId = await openSmsConversation(q, contact.id);
   const claim = await q.query<{ id: string }>(
     `insert into phi.messages (conversation_id, direction, body, template, idempotency_key)

@@ -101,11 +101,11 @@ describe("SMS templates (§5.0): neutral wording, typed slots", () => {
     expect(() => renderTemplate("verification_code", { code: "12345\nextra" })).toThrow();
   });
 
-  it("the crisis SMS gives 988 and 911 and says the line is not monitored around the clock", () => {
+  it("the crisis SMS gives 988 and 911 in the site's wording: call 988, no 'not monitored'", () => {
     const text = renderTemplate("crisis_response");
-    expect(text).toContain("988");
+    expect(text).toContain("call 988");
     expect(text).toContain("911");
-    expect(text).toMatch(/not monitored around the clock/);
+    expect(text).not.toMatch(/call or text|not monitored/i);
   });
 });
 

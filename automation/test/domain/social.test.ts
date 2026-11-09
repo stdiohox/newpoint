@@ -69,7 +69,7 @@ describe("postViolations", () => {
   });
 
   it("allows a crisis post that carries both numbers", () => {
-    expect(rules("If you are thinking about suicide, call or text 988, or call 911 in an emergency.")).toEqual([]);
+    expect(rules("If you are thinking about suicide, call 988, or call 911 in an emergency.")).toEqual([]);
   });
 
   it("gives a fix written in source for every rule", () => {

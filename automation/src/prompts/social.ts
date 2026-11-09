@@ -8,9 +8,9 @@
 import { z } from "zod";
 import { joinPublic, publicText, withoutTags, type PublicText } from "../lib/phi.js";
 
-export const SOCIAL_PROMPTS_VERSION = 2;
+export const SOCIAL_PROMPTS_VERSION = 3;
 
-const PRACTICE = `Newpoint Healthcare Services is an outpatient psychiatric nurse-practitioner practice with two providers, serving New Jersey and Pennsylvania in person and by telehealth. Its services are psychiatric evaluation, medication management, telehealth and medical weight management.`;
+const PRACTICE = `Newpoint Healthcare Services is an outpatient psychiatric nurse-practitioner practice with two providers, serving New Jersey and Pennsylvania in person and by telehealth. Its services are psychiatric evaluation, medication management, weight management, and substance use and addiction care.`;
 
 const RULES = `Rules that every post follows, without exception:
 - The providers are psychiatric-mental health nurse practitioners. Never call them psychiatrists, physicians, doctors or MD. "Dr." only when it is immediately followed by "DNP, FNP-BC, PMHNP-BC" or the words "nurse practitioner", and never in alt text.
@@ -20,7 +20,7 @@ const RULES = `Rules that every post follows, without exception:
 - No testimonials and no patient stories, real or invented.
 - No prices, costs, discounts or offers.
 - No hours, availability, ages served, insurers or street address: none of these is confirmed.
-- Any post about crisis, suicide or self-harm says: call or text 988, or call 911 in an emergency.
+- Any post about crisis, suicide or self-harm says: call 988, or call 911 in an emergency.
 - Link only to newpointnp.com.
 Tone: calm, plain and warm. A clinic people can trust, not an advert.`;
 

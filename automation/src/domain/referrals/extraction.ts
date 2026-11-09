@@ -21,7 +21,9 @@ export const extractionSchema = z
       })
       .strict(),
     referrer: z.object({ organization: text(200), name: text(200), phone: text(32) }).strict(),
-    requested_service: z.enum(["assessment", "medication_management", "weight_management", "other", "unknown"]),
+    // substance_use: if 42 CFR Part 2 applies (D12, counsel), a referral for SUD care is itself
+    // Part 2 data. Phase 10 stays gated on D12; this value only labels what the document says.
+    requested_service: z.enum(["assessment", "medication_management", "weight_management", "substance_use", "other", "unknown"]),
     /** urgent / high_risk: straight to a clinician, never an automated sequence. */
     urgency: z.enum(["routine", "urgent", "high_risk"]),
     confidence: z.number().min(0).max(1),
