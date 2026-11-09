@@ -1,8 +1,9 @@
 # Newpoint automation layer
 
 Design: [`docs/automation-architecture.md`](../docs/automation-architecture.md).
-This package is **Phases 0 to 4, public zone only** (§7). There is no PHI code here,
-and `trigger.phi.config.ts` is an empty stub until Phase 5.
+This package holds **all ten phases** (§7). Phases 0–4 are the public zone (no patient
+data). Phases 5–10 are the PHI zone, built and tested against mocks only, and **must not
+be deployed until every BAA in §2 is signed**. Nothing in either zone is deployed yet.
 
 npm only (`package-lock.json`). Node 24+.
 

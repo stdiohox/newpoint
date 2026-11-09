@@ -1,14 +1,17 @@
 # Newpoint Automation Layer — Build Architecture
 
-**Status:** plan only. Nothing here is implemented yet.
-**Date:** 2026-10-07
+**Status:** all ten phases are built and tested against mocks (`automation/`, merged
+to `main` 2026-10-09). **Nothing is deployed.** Go-live steps and blockers are listed
+per phase in [`automation/README.md`](../automation/README.md).
+**Date:** 2026-10-07 (plan); status updated 2026-11-09
 **Scope:** seven systems. AI booking, Google Business Profile, local SEO keywords,
 automated patient reviews, the AI referral and follow-up pipeline, AI search
 visibility (GEO), and the AI social media engine.
 
 This plan sits under the [project brief](../CLAUDE.md). Every content rule there
-applies to anything an agent writes, including clinician titles, "assessment" rather
-than "evaluation", no outcome claims, no drug brand names, and crisis guidance. The
+applies to anything an agent writes, including clinician titles, "evaluation" as the
+appointment's name (reversed by the client on 2026-10-25), no outcome claims, no drug
+brand names, and crisis guidance. The
 compliance section of the brief also still governs the website's contact form.
 
 ---
@@ -554,7 +557,7 @@ The pattern is prompt chaining, then evaluator-optimizer, then human-in-the-loop
 - No drug brand names.
 - No testimonials or patient stories.
 - No pricing or discounts.
-- "Assessment", not "evaluation", as the appointment name.
+- "Evaluation", not "assessment", as the appointment name (client, 2026-10-25).
 - Crisis line (988 / 911) on any post about crisis, suicide or self-harm topics.
 - No unconfirmed regulated facts (hours, address, payers not marked `confirmed`).
 - The deterministic checks run first, and an LLM review catches tone and implied
@@ -567,8 +570,8 @@ The pattern is prompt chaining, then evaluator-optimizer, then human-in-the-loop
   false positives are acceptable. The LLM intent classifier is a second detector,
   never the only one.
 - On detection the patient immediately gets a fixed, clinician-approved message with
-  988 and 911. The message also says the practice line is not monitored around the
-  clock, which keeps the brief's `CRISIS` wording.
+  988 and 911, in the site's crisis wording: "call 988" (never "call or text"), and no
+  "not monitored around the clock" sentence (both client instructions, 2026-11-02).
 - A `crisis_events` row is written, and **`ops.crisis-page` pages the on-call
   clinician directly by Twilio SMS and voice call**, inside the PHI zone. The page
   repeats every 10 minutes until acknowledged and escalates to the second provider

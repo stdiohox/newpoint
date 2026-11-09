@@ -16,7 +16,7 @@
 import { publicText, type PublicText } from "../../lib/phi.js";
 
 /** `SERVICE_PAGES[].slug` in the site's lib/content.ts, plus null for the practice as a whole. */
-export const SERVICE_SLUGS = ["psychiatric-evaluation", "medication-management", "weight-management"] as const;
+export const SERVICE_SLUGS = ["psychiatric-evaluation", "medication-management", "weight-management", "substance-use-and-addiction"] as const;
 export type ServiceSlug = (typeof SERVICE_SLUGS)[number];
 
 export type UsState = "NJ" | "PA";
@@ -35,7 +35,11 @@ const SERVICES: readonly Service[] = [
   // Practice-wide since 2026-10-19: /services/telehealth was removed because
   // telehealth is how every service is delivered, not a service of its own.
   { term: publicText("telehealth psychiatric care"), slug: null },
-  { term: publicText("medical weight management"), slug: "weight-management" },
+  // Renamed by the client on 2026-10-22: "Weight management", not "medical weight management".
+  { term: publicText("weight management"), slug: "weight-management" },
+  // Service line added 2026-10-22 (outpatient only; no detox, IOP or residential care).
+  { term: publicText("substance use treatment"), slug: "substance-use-and-addiction" },
+  { term: publicText("addiction care"), slug: "substance-use-and-addiction" },
   { term: publicText("mental and behavioral care"), slug: null },
   { term: publicText("psychiatric nurse practitioner"), slug: null },
 ];
