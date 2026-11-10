@@ -105,10 +105,14 @@ fixed in the second commit and `20261109000002_crm_hardening.sql`. Open, by choi
       pooler; `/api/leads` exercised end to end against it locally (stored, honeypot,
       400s, 403s, 429 on the 6th from one address), test rows deleted.
 - [x] Provider accounts created.
-- [ ] The two dashboard settings above.
-- [ ] Front-desk account (email needed).
-- [ ] Resend: verify `newpointnp.com` (DNS at IONOS), create a key, set the two
-      Trigger.dev variables, remove `**/crm/**` from `NOT_YET_LIVE` and deploy.
+- [x] The two dashboard settings above (2026-11-10; checked: `crm` exposed, sign-ups off).
+- [x] Front-desk account (2026-11-10).
+- [x] Resend key + the two Trigger.dev variables set; `**/crm/**` removed from
+      `NOT_YET_LIVE`; deployed as version 20261110.2 (the first production deploy of
+      the marketing project, so the three SEO/GEO tasks went out with it). Tested: a
+      test lead inserted 16:41 UTC was alerted by the sweep at 16:53 UTC, then deleted.
+- [ ] `ANTHROPIC_API_KEY_PUBLIC` in Trigger prod before geo.probe's first run
+      (Tue 2026-11-17 07:00 ET); without it that run fails at start.
 - [x] Site variables set on the Vercel project `newpoint` (samphicsdigital account),
       which serves `newpoint-brown.vercel.app`.
 - [ ] **newpointnp.com is served by a different Vercel project** (the "new account" in
