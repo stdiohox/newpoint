@@ -27,7 +27,6 @@ const NOT_YET_LIVE = [
   "**/gbp/**", // GBP API access + n8n webhooks
   "**/ops/heartbeat.ts", // n8n ops alert webhook; only watches social/GBP posts
   "**/approval-gate.ts", // used only by social and GBP
-  "**/crm/**", // lead alerts: needs RESEND_API_KEY + CRM_ALERT_FROM (docs/lead-crm.md)
 ];
 
 export default defineConfig({
