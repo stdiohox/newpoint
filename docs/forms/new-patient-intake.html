@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Newpoint Healthcare — New Patient Intake Form</title>
+<style>
+  @page { size: Letter; margin: 0.55in 0.65in 0.7in;
+    @bottom-left { content: "Newpoint Healthcare · New patient intake · Confidential once completed"; font-family: Helvetica, Arial, sans-serif; font-size: 8pt; color: #a8a399; }
+    @bottom-right { content: "(609) 527-9438 · Page " counter(page) " of " counter(pages); font-family: Helvetica, Arial, sans-serif; font-size: 8pt; color: #a8a399; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #2a2822; font-size: 10.5pt; line-height: 1.45; }
+  .ink { color: #131c2e; }
+  header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1.5px solid #435ba8; margin-bottom: 14px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 12pt; color: #131c2e; }
+  .brand img { width: 26px; height: 26px; }
+  .brand span { color: #7c776d; font-weight: 400; font-size: 9.5pt; margin-left: 4px; }
+  .doc { font-size: 9pt; color: #7c776d; text-align: right; line-height: 1.35; }
+  h1 { font-size: 20pt; letter-spacing: -0.01em; margin: 0 0 4px; color: #131c2e; }
+  h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.06em; color: #435ba8; margin: 18px 0 8px; }
+  .lede { color: #5c584f; margin: 0 0 6px; font-size: 10pt; }
+  .note { background: #f4f2ed; border-left: 3px solid #435ba8; padding: 8px 12px; font-size: 9.5pt; color: #403d36; margin: 10px 0 4px; }
+  .row { display: flex; gap: 18px; margin: 0 0 9px; }
+  .f { flex: 1; display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
+  .f label { white-space: nowrap; font-size: 9.5pt; color: #403d36; }
+  .f .line { flex: 1; border-bottom: 1px solid #a8a399; height: 18px; }
+  .yn { display: flex; gap: 16px; align-items: center; font-size: 9.5pt; margin: 2px 0 10px; }
+  .box { display: inline-block; width: 11px; height: 11px; border: 1px solid #5c584f; border-radius: 2px; vertical-align: -1px; margin-right: 5px; }
+  ol.q { margin: 0; padding: 0; list-style: none; counter-reset: q; }
+  ol.q > li { counter-increment: q; margin: 0 0 12px; break-inside: avoid; }
+  ol.q > li > .t::before { content: counter(q) ". "; font-weight: 600; color: #131c2e; }
+  ol.q .t { font-size: 10pt; color: #131c2e; }
+  .lines { margin-top: 2px; }
+  .lines div { border-bottom: 1px solid #d3cfc6; height: 22px; }
+  .page { break-before: page; }
+  table.scale { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-top: 6px; }
+  table.scale th { font-weight: 600; font-size: 8.5pt; color: #403d36; text-align: center; padding: 6px 4px; border-bottom: 1.5px solid #131c2e; vertical-align: bottom; width: 12%; }
+  table.scale th:first-child { text-align: left; width: auto; }
+  table.scale td { padding: 5px 4px; border-bottom: 1px solid #e7e4dd; vertical-align: middle; }
+  table.scale td.c { text-align: center; }
+  table.scale td.c .box { margin: 0; }
+  table.scale tr { break-inside: avoid; }
+  .crisis { margin-top: 12px; break-inside: avoid; padding: 9px 12px; border: 1px solid #b3261e; border-radius: 6px; color: #2a2822; font-size: 9.5pt; }
+  .crisis b { color: #b3261e; }
+  footer { position: fixed; bottom: -0.45in; left: 0; right: 0; font-size: 8pt; color: #a8a399; display: flex; justify-content: space-between; }
+  .namebar { display: flex; gap: 18px; margin: 4px 0 6px; }
+</style>
+</head>
+<body>
+
+
+<header>
+  <div class="brand"><img src="../../public/brand/newpoint-mark-color.png" alt="">Newpoint<span>Healthcare</span></div>
+  <div class="doc">New patient intake<br>Please bring to your first appointment</div>
+</header>
+
+<h1>Intake Form</h1>
+<p class="lede">Please complete every section you can before your first appointment and bring the form with you.</p>
+<div class="note">Please bring the completed form to your first appointment. Don’t send it by email: it asks for personal and medical information.</div>
+
+<h2>Patient demographic information</h2>
+<div class="row"><div class="f"><label>Name:</label><div class="line"></div></div></div>
+<div class="row"><div class="f"><label>Address:</label><div class="line"></div></div></div>
+<div class="row">
+  <div class="f" style="flex:2"><label>City:</label><div class="line"></div></div>
+  <div class="f"><label>State:</label><div class="line"></div></div>
+  <div class="f"><label>Zip Code:</label><div class="line"></div></div>
+</div>
+<div class="row">
+  <div class="f"><label>Cell Phone:</label><div class="line"></div></div>
+  <div class="f"><label>Home Phone:</label><div class="line"></div></div>
+  <div class="f"><label>Work Phone:</label><div class="line"></div></div>
+</div>
+<div class="row"><div class="f"><label>Email address:</label><div class="line"></div></div></div>
+<div class="row">
+  <div class="f"><label>Date of Birth:</label><div class="line"></div></div>
+  <div class="f"><label>Social Security Number:</label><div class="line"></div></div>
+</div>
+<div class="row"><div class="f"><label>Insurance Name:</label><div class="line"></div></div></div>
+<div class="row">
+  <div class="f"><label>Policy Number:</label><div class="line"></div></div>
+  <div class="f"><label>Group Number:</label><div class="line"></div></div>
+</div>
+<div class="row">
+  <div class="f" style="flex:2"><label>Insurance Address:</label><div class="line"></div></div>
+  <div class="f"><label>Phone Number:</label><div class="line"></div></div>
+</div>
+<div class="row">
+  <div class="f" style="flex:2"><label>Primary Care Physician:</label><div class="line"></div></div>
+  <div class="f"><label>Office Phone:</label><div class="line"></div></div>
+</div>
+<div class="row">
+  <div class="f" style="flex:2"><label>PCP Address:</label><div class="line"></div></div>
+  <div class="f"><label>Last Appointment:</label><div class="line"></div></div>
+</div>
+<div class="row" style="margin-bottom:2px"><div class="f"><label style="white-space:normal">Do you give permission for ongoing regular updates to be provided to your PCP?</label></div></div>
+<div class="yn"><span><span class="box"></span>Yes</span><span><span class="box"></span>No</span></div>
+
+<div class="page"></div>
+<h2 style="margin-top:0">About you</h2>
+<p class="lede">The following questions will help your provider better understand you and your goals for starting psychiatric treatment.</p>
+<ol class="q">
+  <li><div class="t">Why are you seeking help now?</div><div class="lines"><div></div><div></div><div></div></div></li>
+  <li><div class="t">Have you seen a mental health professional before? Have you ever been hospitalized for a psychiatric issue?</div><div class="lines"><div></div><div></div><div></div></div></li>
+  <li><div class="t">Has anyone in your family ever sought help for or experienced mental health or substance use issues?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">Do you have any current or prior medical issues?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">Are you currently prescribed any medications? Specify all medications and supplements you are presently taking and for what reason.</div><div class="lines"><div></div><div></div><div></div></div></li>
+  <li><div class="t">Do you now, or have you ever, used alcohol, tobacco, recreational drugs, or prescription medication other than as prescribed?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">Who is in your family? What is your relationship with them like?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">What social activities and relationships do you engage in?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">What spiritual practices and cultural influences are important to you?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">What was life like as you were growing up, both at home and in school?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">What significant education and work/volunteer experiences have you had?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">What is your current occupation? What do you do? How long have you been doing it?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">Describe your current living situation. Do you live alone, with others, with family, …</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">Do you have any current or prior legal issues?</div><div class="lines"><div></div><div></div></div></li>
+  <li><div class="t">What strengths and abilities are you bringing to sessions? What needs or preferences do you have that will help us be successful?</div><div class="lines"><div></div><div></div><div></div></div></li>
+  <li><div class="t">What else would you like me to know?</div><div class="lines"><div></div><div></div><div></div></div></li>
+  <li><div class="t">Please list an emergency contact (name, relationship, and phone number).</div><div class="lines"><div></div></div></li>
+</ol>
+
+<div class="page"></div>
+<div class="namebar"><div class="f"><label>Name:</label><div class="line"></div></div><div class="f" style="flex:0.6"><label>Date:</label><div class="line"></div></div></div>
+
+<h2>Anxiety Assessment Form</h2>
+<p class="lede">Over the last 2 weeks, how often have you been bothered by any of the following problems?</p>
+<table class="scale">
+  <tr><th></th><th>Not at all</th><th>Several days</th><th>More than half the days</th><th>Nearly every day</th></tr>
+  <tr><td>1. Feeling nervous, anxious, or on edge</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>2. Not being able to stop or control worrying</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>3. Worrying too much about different things</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>4. Trouble relaxing</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>5. Being so restless that it is hard to sit still</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>6. Becoming easily annoyed or irritable</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>7. Feeling afraid as if something awful might happen</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+</table>
+
+<h2 style="margin-top:18px">Depression Assessment Form</h2>
+<p class="lede">Over the last 2 weeks, how often have you been bothered by any of the following problems?</p>
+<table class="scale">
+  <tr><th></th><th>Not at all</th><th>Several days</th><th>More than half the days</th><th>Nearly every day</th></tr>
+  <tr><td>1. Little interest or pleasure in doing things</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>2. Feeling down, depressed, or hopeless</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>3. Trouble falling or staying asleep, or sleeping too much</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>4. Feeling tired or having little energy</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>5. Poor appetite or overeating</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>6. Feeling bad about yourself — or that you are a failure or have let yourself or your family down</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>7. Trouble concentrating on things, such as reading the newspaper or watching television</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>8. Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+  <tr><td>9. Thoughts that you would be better off dead or of hurting yourself in some way</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
+</table>
+
+<div class="crisis"><b>If you are having thoughts of hurting yourself, don’t wait for your appointment.</b> Call or text 988 (Suicide &amp; Crisis Lifeline) now, any time. In an emergency, call 911.</div>
+
+</body>
+</html>

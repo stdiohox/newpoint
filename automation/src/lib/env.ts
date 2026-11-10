@@ -158,6 +158,16 @@ export const crmEnvSchema = z.object({
   RESEND_API_KEY: z.string().regex(/^re_[A-Za-z0-9_]{10,}$/, "must be a Resend API key (re_…)"),
   /** Sender on the verified domain, e.g. `Newpoint CRM <crm@newpointnp.com>`. */
   CRM_ALERT_FROM: z.string().regex(/^[^<>\r\n]*<[^@\s<>]+@newpointnp\.com>$|^[^@\s<>]+@newpointnp\.com$/, "must be an @newpointnp.com sender"),
+  /** Sender of the confirmation email to the lead. */
+  CRM_CONFIRM_FROM: z
+    .string()
+    .regex(/^[^<>\r\n]*<[^@\s<>]+@newpointnp\.com>$|^[^@\s<>]+@newpointnp\.com$/, "must be an @newpointnp.com sender")
+    .default("Newpoint Healthcare <frontdesk@newpointnp.com>"),
+  /**
+   * Where a lead's reply to the confirmation goes: an inbox someone reads.
+   * Unset = confirmations are not sent (the staff alert still is).
+   */
+  CRM_CONFIRM_REPLY_TO: z.string().regex(/^[^@\s<>]+@[^@\s<>]+\.[a-z]{2,}$/i, "must be an email address").optional(),
   /** Where the alert links to. Pinned to the practice's own domain. */
   CRM_BASE_URL: z
     .string()

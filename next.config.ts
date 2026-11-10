@@ -159,6 +159,13 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        /* The new-patient intake form linked from the lead confirmation email
+           (docs/lead-crm.md). For patients who asked to be contacted, not a
+           search result. Source: docs/forms/new-patient-intake.html. */
+        source: '/forms/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      },
     ];
   },
 };

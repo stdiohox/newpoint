@@ -16,6 +16,11 @@ export interface Email {
   readonly text: string;
   /** Optional HTML body; `text` is always sent too, as the plain-text alternative. */
   readonly html?: string;
+  /** Overrides the sender's default `from` (still a verified-domain address). */
+  readonly from?: string;
+  readonly replyTo?: string;
+  /** Sent as Resend's Idempotency-Key: a repeat within 24 h is not sent again. */
+  readonly idempotencyKey?: string;
 }
 
 export interface EmailSender {
@@ -34,13 +39,18 @@ export function createResendSender(options: ResendOptions): EmailSender {
     async send(email) {
       const response = await options.fetch(ENDPOINT, {
         method: "POST",
-        headers: { authorization: `Bearer ${options.apiKey}`, "content-type": "application/json" },
+        headers: {
+          authorization: `Bearer ${options.apiKey}`,
+          "content-type": "application/json",
+          ...(email.idempotencyKey ? { "idempotency-key": email.idempotencyKey } : {}),
+        },
         body: JSON.stringify({
-          from: options.from,
+          from: email.from ?? options.from,
           to: email.to,
           subject: email.subject,
           text: email.text,
           ...(email.html ? { html: email.html } : {}),
+          ...(email.replyTo ? { reply_to: email.replyTo } : {}),
         }),
       });
       if (!response.ok) throw new VendorHttpError("resend", response.status);

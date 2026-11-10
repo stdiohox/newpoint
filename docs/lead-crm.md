@@ -118,3 +118,26 @@ fixed in the second commit and `20261109000002_crm_hardening.sql`. Open, by choi
 - [x] (2026-11-10: CRM_* variables added by the owner, `lead-crm` merged to `main` at efbd975, `/crm` live on newpointnp.com.) **newpointnp.com is served by a different Vercel project** (the "new account" in
       `clients/registry.md`), not visible from Koret's CLI login. That project needs
       the same site variables before the form or `/crm` work on newpointnp.com.
+
+## Confirmation email to the lead (2026-11-10)
+
+Every lead gets an email from `Newpoint Healthcare <frontdesk@newpointnp.com>`
+(`CRM_CONFIRM_FROM`) saying their details were received, sent by the same Trigger
+tasks as the staff alert (`processNewLeads`). Only a **New patient inquiry** also
+gets the intake form: a link to `/forms/new-patient-intake.pdf`, to complete and
+bring to the first appointment, never to email back. The crisis line is in the
+body; replies are flagged as not monitored around the clock.
+
+- Off until `CRM_CONFIRM_REPLY_TO` is set in Trigger prod (the inbox replies go to).
+- Database: `20261110000001_crm_lead_confirmation.sql` (claim / mark / release /
+  stuck, 5 attempts, last 2 days only; leads stored before it count as done).
+- A 4xx from Resend spends the attempt; anything else is released for retry. Each
+  send carries an idempotency key, so a lost "mark" cannot send twice.
+- The PDF's source is `docs/forms/new-patient-intake.html` (the practice's intake
+  form; PHQ-9 items 8–9 in the published wording, a 988 box under item 9). Edit
+  the HTML and print it to PDF with Chrome to change it. `/forms/*` is noindex.
+- Instant delivery needs `TRIGGER_SECRET_KEY` on the production Vercel project;
+  without it the 10-minute sweep sends it.
+- Reviewed by healthcare-reviewer and database-reviewer (findings fixed). Open for
+  the practice: the form asks for a Social Security number (consider optional),
+  and the PHQ-9's closing "how difficult" question is not on the form.

@@ -5,8 +5,10 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Email, EmailSender } from "../../src/adapters/email/resend.js";
 import { alertEmail, formatEastern } from "../../src/domain/crm/alert-email.js";
 import { loadCrmEnv } from "../../src/lib/env.js";
+import { VendorHttpError } from "../../src/lib/errors.js";
 import { createLogger, type LogRecord } from "../../src/lib/logger.js";
-import { sendLeadAlerts } from "../../src/trigger/marketing/crm/lead-alerts.js";
+import { confirmationEmail, firstName, INTAKE_FORM_PATH, PRACTICE_PHONE } from "../../src/domain/crm/confirmation-email.js";
+import { processNewLeads, sendLeadAlerts, sendLeadConfirmations } from "../../src/trigger/marketing/crm/lead-alerts.js";
 import { startMarketingDb, type MarketingDb } from "../db/marketing-db.js";
 
 const STAFF = "00000000-0000-4000-8000-0000000000a1";
@@ -73,7 +75,7 @@ describe("crm.new-lead-alert", () => {
     const id = await submit("Grace", "a");
     const email = recordingSender();
     const records: LogRecord[] = [];
-    const deps = { db: client(), email, crmBaseUrl: CRM, logger: createLogger((r) => records.push(r)) };
+    const deps = { db: client(), email, crmBaseUrl: CRM, confirm: null, logger: createLogger((r) => records.push(r)) };
 
     expect(await sendLeadAlerts(deps)).toEqual({ claimed: 1, sent: 1, recipients: 1 });
     expect(email.sent).toHaveLength(1);
@@ -90,7 +92,7 @@ describe("crm.new-lead-alert", () => {
 
   it("a failed send is released, so the task's own retry sends it, without spending the attempt", async () => {
     await submit("Alan", "b");
-    const deps = { db: client(), crmBaseUrl: CRM, logger: createLogger(() => undefined) };
+    const deps = { db: client(), crmBaseUrl: CRM, confirm: null, logger: createLogger(() => undefined) };
 
     await expect(sendLeadAlerts({ ...deps, email: recordingSender(true) })).rejects.toThrow("resend down");
     const again = recordingSender();
@@ -104,7 +106,7 @@ describe("crm.new-lead-alert", () => {
   it("a claim that was never released expires after 5 minutes", async () => {
     await submit("Ruth", "f");
     await asOwner(() => client().query("update crm.leads set alert_claimed_at = now() - interval '4 minutes', alert_attempts = 1"));
-    const deps = { db: client(), email: recordingSender(), crmBaseUrl: CRM, logger: createLogger(() => undefined) };
+    const deps = { db: client(), email: recordingSender(), crmBaseUrl: CRM, confirm: null, logger: createLogger(() => undefined) };
     expect((await sendLeadAlerts(deps)).claimed).toBe(0);
     await asOwner(() => client().query("update crm.leads set alert_claimed_at = now() - interval '6 minutes'"));
     expect((await sendLeadAlerts(deps)).claimed).toBe(1);
@@ -114,7 +116,7 @@ describe("crm.new-lead-alert", () => {
     await submit("Edith", "9");
     await asOwner(() => client().query("update crm.leads set alert_attempts = 5"));
     const records: LogRecord[] = [];
-    const deps = { db: client(), email: recordingSender(), crmBaseUrl: CRM, logger: createLogger((r) => records.push(r)) };
+    const deps = { db: client(), email: recordingSender(), crmBaseUrl: CRM, confirm: null, logger: createLogger((r) => records.push(r)) };
     await sendLeadAlerts(deps);
     expect(records.some((r) => r.event === "crm.lead_alert.gave_up")).toBe(true);
     expect(JSON.stringify(records)).not.toMatch(/edith/i);
@@ -124,7 +126,7 @@ describe("crm.new-lead-alert", () => {
     await submit("Ida", "c");
     await asOwner(() => client().query("update crm.staff set alerts = false"));
     const email = recordingSender();
-    const deps = { db: client(), email, crmBaseUrl: CRM, logger: createLogger(() => undefined) };
+    const deps = { db: client(), email, crmBaseUrl: CRM, confirm: null, logger: createLogger(() => undefined) };
     try {
       // Every sweep in this state gives the claim back without spending an attempt.
       for (let i = 0; i < 7; i++) {
@@ -146,9 +148,91 @@ describe("crm.new-lead-alert", () => {
     await submit("Lin", "d");
     await submit("Kay", "e");
     const email = recordingSender();
-    await sendLeadAlerts({ db: client(), email, crmBaseUrl: CRM, logger: createLogger(() => undefined) });
+    await sendLeadAlerts({ db: client(), email, crmBaseUrl: CRM, confirm: null, logger: createLogger(() => undefined) });
     expect(email.sent).toHaveLength(1);
     expect(email.sent[0]?.subject).toBe("2 new leads in the Newpoint CRM");
+  });
+});
+
+describe("lead confirmation", () => {
+  const confirm = { siteOrigin: "https://www.newpointnp.com", from: "Newpoint Healthcare <frontdesk@newpointnp.com>", replyTo: "desk@example.com" };
+  const quiet = () => createLogger(() => undefined);
+
+  it("emails each new lead once, from the practice, with the intake form and a reply-to", async () => {
+    await submit("Grace", "c");
+    const email = recordingSender();
+    const deps = { db: client(), email, crmBaseUrl: CRM, confirm, logger: quiet() };
+
+    expect(await sendLeadConfirmations(deps)).toEqual({ claimed: 1, sent: 1 });
+    const sent = email.sent[0];
+    expect(sent?.to).toEqual(["grace@example.com"]);
+    expect(sent?.from).toBe(confirm.from);
+    expect(sent?.replyTo).toBe("desk@example.com");
+    expect(sent?.text).toContain("Hi Grace,");
+    expect(sent?.html).toContain(`href="https://www.newpointnp.com${INTAKE_FORM_PATH}"`);
+    expect(sent?.text).toContain("988");
+    expect(sent?.html).toContain('href="tel:988"');
+    expect(sent?.idempotencyKey).toMatch(/^lead-confirmation\//);
+    expect(await sendLeadConfirmations(deps)).toEqual({ claimed: 0, sent: 0 });
+  });
+
+  it("sends the receipt without the intake form for anything but a new-patient inquiry", () => {
+    for (const reason of ["Existing patient", "Insurance or billing question", "Something else"]) {
+      const { html, text } = confirmationEmail({ id: "x", name: "Ada", email: "a@example.com", reason }, confirm);
+      expect(html).not.toContain(INTAKE_FORM_PATH);
+      expect(text).not.toContain("intake form");
+      expect(text).not.toContain("first appointment");
+      expect(text).toContain("988");
+    }
+  });
+
+  it("spends the attempt on a permanent rejection instead of retrying it forever", async () => {
+    await submit("Grace", "f");
+    const rejecting: EmailSender = { send: () => Promise.reject(new VendorHttpError("resend", 422)) };
+    expect(await sendLeadConfirmations({ db: client(), email: rejecting, crmBaseUrl: CRM, confirm, logger: quiet() })).toEqual({
+      claimed: 1,
+      sent: 0,
+    });
+    const attempts = await asOwner(() => client().query<{ a: number; claimed: boolean }>(
+      "select confirm_attempts::int as a, confirm_claimed_at is not null as claimed from crm.leads",
+    ));
+    expect(attempts.rows[0]).toEqual({ a: 1, claimed: true });
+  });
+
+  it("is off while no reply-to inbox is configured", async () => {
+    await submit("Grace", "d");
+    const email = recordingSender();
+    expect(await sendLeadConfirmations({ db: client(), email, crmBaseUrl: CRM, confirm: null, logger: quiet() })).toEqual({
+      claimed: 0,
+      sent: 0,
+    });
+    expect(email.sent).toHaveLength(0);
+  });
+
+  it("releases a failed send so the retry sends it, and still sends the staff alert", async () => {
+    await submit("Grace", "e");
+    const failing = recordingSender(true);
+    await expect(processNewLeads({ db: client(), email: failing, crmBaseUrl: CRM, confirm, logger: quiet() })).rejects.toThrow(
+      "resend down",
+    );
+    const email = recordingSender();
+    const result = await processNewLeads({ db: client(), email, crmBaseUrl: CRM, confirm, logger: quiet() });
+    expect(result.confirmations).toEqual({ claimed: 1, sent: 1 });
+    expect(result.alerts.sent).toBe(1);
+  });
+
+  it("greets by first name only when it looks like one, and escapes it", () => {
+    expect(firstName("  Ada   Obi ")).toBe("Ada");
+    expect(firstName("<script>")).toBeNull();
+    expect(firstName("O'Neil")).toBe("O'Neil");
+    const { html, text } = confirmationEmail({ id: "x", name: "<b>x</b>", email: "a@example.com", reason: "New patient inquiry" }, confirm);
+    expect(text.startsWith("Hello,")).toBe(true);
+    expect(html).not.toContain("<b>x</b>");
+  });
+
+  it("uses the site's phone number", async () => {
+    const content = await readFile(join(import.meta.dirname, "../../../lib/content.ts"), "utf8");
+    expect(content).toContain(`phonePrimary: '${PRACTICE_PHONE}'`);
   });
 });
 

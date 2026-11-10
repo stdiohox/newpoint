@@ -10,13 +10,20 @@
  * minutes (up to 5 attempts, crm.claim_lead_alerts). A duplicate alert is
  * better than a missed lead.
  *
+ * Both also send each new lead their confirmation email (sendLeadConfirmations):
+ * same claim/send/mark shape, one email per lead, skipped entirely while
+ * CRM_CONFIRM_REPLY_TO is unset.
+ *
  * Runs as the trigger_marketing login, which must be a member of crm_alerts.
- * Those functions return a lead's id, reason and time only.
+ * The alert functions return a lead's id, reason and time only; the
+ * confirmation claim also returns name and email, to address the email.
  */
 import { queue } from "@trigger.dev/sdk";
 import { z } from "zod";
 import type { EmailSender } from "../../../adapters/email/resend.js";
+import { VendorHttpError } from "../../../lib/errors.js";
 import { alertEmail, type ClaimedLead } from "../../../domain/crm/alert-email.js";
+import { confirmationEmail, type ConfirmationOptions } from "../../../domain/crm/confirmation-email.js";
 import type { Queryable } from "../../../lib/db-marketing.js";
 import type { Logger } from "../../../lib/logger.js";
 import { marketingSchedule, marketingTask } from "../../../lib/task.js";
@@ -29,6 +36,8 @@ export interface LeadAlertDeps {
   readonly email: EmailSender;
   readonly crmBaseUrl: string;
   readonly logger: Logger;
+  /** null = confirmations off (no reply-to inbox configured). */
+  readonly confirm: ConfirmationOptions | null;
 }
 
 export interface LeadAlertResult {
@@ -77,9 +86,73 @@ export async function sendLeadAlerts(deps: LeadAlertDeps): Promise<LeadAlertResu
   return { claimed: rows.length, sent, recipients: recipients.length };
 }
 
+export interface ConfirmationResult {
+  readonly claimed: number;
+  readonly sent: number;
+}
+
+export async function sendLeadConfirmations(deps: LeadAlertDeps): Promise<ConfirmationResult> {
+  const confirm = deps.confirm;
+  if (!confirm) return { claimed: 0, sent: 0 };
+
+  const stuck = (await deps.db.query<{ n: number }>("select crm.stuck_lead_confirmations() as n")).rows[0]?.n ?? 0;
+  if (stuck > 0) deps.logger.error("crm.lead_confirmation.gave_up", null, { leads: stuck });
+
+  const { rows } = await deps.db.query<{ id: string; name: string; email: string; reason: string }>(
+    "select id, name, email, reason from crm.claim_lead_confirmations(50)",
+  );
+  if (rows.length === 0) return { claimed: 0, sent: 0 };
+
+  let sent = 0;
+  let failed = 0;
+  let retryable: Error | undefined;
+  for (const row of rows) {
+    try {
+      await deps.email.send(confirmationEmail(row, confirm));
+    } catch (error) {
+      failed += 1;
+      // A 4xx (bad address, rejected content) repeats on every retry: keep the
+      // claim so the attempt counts toward the cap of 5. Anything else (429,
+      // 5xx, network) is given back for the task's retry.
+      if (error instanceof VendorHttpError && error.failureClass === "vendor_4xx") continue;
+      retryable ??= error instanceof Error ? error : new Error("lead confirmation send failed");
+      await deps.db.query("select crm.release_lead_confirmations($1::uuid[])", [[row.id]]).catch(() => undefined);
+      continue;
+    }
+    // Marked one at a time, straight after its send, so a task cut short
+    // cannot leave sent emails unmarked (and the idempotency key covers a lost mark).
+    const marked = await deps.db.query<{ marked: number }>("select crm.mark_leads_confirmed($1::uuid[]) as marked", [
+      [row.id],
+    ]);
+    sent += marked.rows[0]?.marked ?? 0;
+  }
+
+  if (failed > 0) deps.logger.warn("crm.lead_confirmation.failed", { failed, sent });
+  if (retryable) throw retryable;
+  deps.logger.info("crm.lead_confirmation.sent", { claimed: rows.length, sent });
+  return { claimed: rows.length, sent };
+}
+
+/** Both jobs, each attempted even if the other fails; the first failure is rethrown so the task retries. */
+export async function processNewLeads(deps: LeadAlertDeps) {
+  const [confirmations, alerts] = await Promise.allSettled([sendLeadConfirmations(deps), sendLeadAlerts(deps)]);
+  if (confirmations.status === "rejected") throw confirmations.reason;
+  if (alerts.status === "rejected") throw alerts.reason;
+  return { confirmations: confirmations.value, alerts: alerts.value };
+}
+
 function deps(): LeadAlertDeps {
   const runtime = crmRuntime();
-  return { db: runtime.db, email: runtime.email, crmBaseUrl: runtime.env.CRM_BASE_URL, logger: runtime.logger };
+  const env = runtime.env;
+  return {
+    db: runtime.db,
+    email: runtime.email,
+    crmBaseUrl: env.CRM_BASE_URL,
+    logger: runtime.logger,
+    confirm: env.CRM_CONFIRM_REPLY_TO
+      ? { siteOrigin: new URL(env.CRM_BASE_URL).origin, from: env.CRM_CONFIRM_FROM, replyTo: env.CRM_CONFIRM_REPLY_TO }
+      : null,
+  };
 }
 
 /** Triggered by the site's /api/leads with an empty payload: the task finds what is unsent. */
@@ -89,7 +162,7 @@ export const newLeadAlert = marketingTask({
   queue: crmQueue,
   maxDuration: 120,
   retry: { maxAttempts: 3, factor: 2, minTimeoutInMs: 5_000, maxTimeoutInMs: 60_000 },
-  run: () => sendLeadAlerts(deps()),
+  run: () => processNewLeads(deps()),
 });
 
 export const newLeadAlertSweep = marketingSchedule({
@@ -98,5 +171,5 @@ export const newLeadAlertSweep = marketingSchedule({
   queue: crmQueue,
   maxDuration: 120,
   retry: { maxAttempts: 2, factor: 2, minTimeoutInMs: 5_000, maxTimeoutInMs: 60_000 },
-  run: () => sendLeadAlerts(deps()),
+  run: () => processNewLeads(deps()),
 });
