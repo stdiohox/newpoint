@@ -115,6 +115,6 @@ fixed in the second commit and `20261109000002_crm_hardening.sql`. Open, by choi
       (Tue 2026-11-17 07:00 ET); without it that run fails at start.
 - [x] Site variables set on the Vercel project `newpoint` (samphicsdigital account),
       which serves `newpoint-brown.vercel.app`.
-- [ ] **newpointnp.com is served by a different Vercel project** (the "new account" in
+- [x] (2026-11-10: CRM_* variables added by the owner, `lead-crm` merged to `main` at efbd975, `/crm` live on newpointnp.com.) **newpointnp.com is served by a different Vercel project** (the "new account" in
       `clients/registry.md`), not visible from Koret's CLI login. That project needs
       the same site variables before the form or `/crm` work on newpointnp.com.
