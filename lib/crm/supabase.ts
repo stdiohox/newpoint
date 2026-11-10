@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { CRM_COOKIE_OPTIONS } from './cookies';
+import { CRM_COOKIE_OPTIONS, withSessionMaxAge } from './cookies';
 
 /**
  * Server-only Supabase access for /crm (docs/lead-crm.md).
@@ -31,7 +31,7 @@ export async function crmSupabase() {
       getAll: () => store.getAll(),
       setAll: (list) => {
         try {
-          for (const { name, value, options } of list) store.set(name, value, options);
+          for (const { name, value, options } of list) store.set(name, value, withSessionMaxAge(options));
         } catch {
           // Server Components cannot set cookies; the middleware refreshes them.
         }

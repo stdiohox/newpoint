@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Container } from '@/components/ui/Container';
 import { CRM_CARD } from '@/components/crm/CrmChrome';
@@ -5,13 +6,20 @@ import { LoginForm } from '@/components/crm/forms';
 import { signOut } from '@/app/crm/actions';
 import { crmAuthEnv, crmSupabase } from '@/lib/crm/supabase';
 
+export const metadata: Metadata = { title: 'Sign in' };
+
 const ERRORS: Record<string, string> = {
   access: 'This account doesn’t have access to the CRM. Ask the practice to add you, or sign out and use another account.',
   config: 'The CRM isn’t configured on this deployment yet.',
 };
 
-export default async function CrmLogin({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+export default async function CrmLogin({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string | string[] }>;
+}) {
+  const raw = (await searchParams).error;
+  const error = Array.isArray(raw) ? raw[0] : raw;
   let signedIn = false;
 
   if (crmAuthEnv()) {
@@ -25,9 +33,10 @@ export default async function CrmLogin({ searchParams }: { searchParams: Promise
     if (user && error !== 'access') redirect('/crm');
   }
 
-  const message = error ? ERRORS[error] : undefined;
+  const message = error && Object.hasOwn(ERRORS, error) ? ERRORS[error] : undefined;
 
   return (
+    <div id="main" tabIndex={-1} className="outline-hidden">
     <Container className="flex min-h-dvh items-center justify-center py-16">
       <div className={`${CRM_CARD} w-full max-w-sm p-8`}>
         <p className="font-display text-np-ink text-lg font-semibold tracking-tight">
@@ -53,5 +62,6 @@ export default async function CrmLogin({ searchParams }: { searchParams: Promise
         </div>
       </div>
     </Container>
+    </div>
   );
 }

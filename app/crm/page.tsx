@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { CRM_BUTTON, CRM_CARD, CRM_FIELD, CrmHeader, StatusChip } from '@/components/crm/CrmChrome';
@@ -5,9 +6,17 @@ import { CONTACT } from '@/lib/content';
 import { formatWhen, isLeadStatus, LEAD_STATUSES, STATUS_LABEL, type Lead, type LeadStatus } from '@/lib/crm/model';
 import { requireStaff } from '@/lib/crm/supabase';
 
+export const metadata: Metadata = { title: 'Leads' };
+
 const PAGE_SIZE = 50;
 
 type Search = { status?: string; reason?: string; q?: string; page?: string };
+type RawSearch = Record<keyof Search, string | string[] | undefined>;
+
+/** A repeated query param (?q=a&q=b) arrives as an array: take the first. */
+function one(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 /** Keeps filter links stable: only the params that are set, in one order. */
 function href(params: Search): string {
@@ -29,9 +38,10 @@ function searchTerm(raw: string | undefined): string {
   return (raw ?? '').replace(/[^\p{L}\p{N}@.+\- ]/gu, '').trim().slice(0, 80);
 }
 
-export default async function CrmLeads({ searchParams }: { searchParams: Promise<Search> }) {
+export default async function CrmLeads({ searchParams }: { searchParams: Promise<Partial<RawSearch>> }) {
   const { supabase, staff } = await requireStaff();
-  const params = await searchParams;
+  const raw = await searchParams;
+  const params: Search = { status: one(raw.status), reason: one(raw.reason), q: one(raw.q), page: one(raw.page) };
 
   const status: LeadStatus | undefined = isLeadStatus(params.status) ? params.status : undefined;
   const reason = (CONTACT.reasons as readonly string[]).includes(params.reason ?? '') ? params.reason : undefined;
@@ -42,6 +52,7 @@ export default async function CrmLeads({ searchParams }: { searchParams: Promise
     .from('leads')
     .select('id, created_at, updated_at, name, email, phone, reason, status, owner_id', { count: 'exact' })
     .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   if (status) query = query.eq('status', status);
   if (reason) query = query.eq('reason', reason);
@@ -53,6 +64,11 @@ export default async function CrmLeads({ searchParams }: { searchParams: Promise
     supabase.from('leads').select('id', { count: 'exact', head: true }),
     ...LEAD_STATUSES.map((s) => supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', s)),
   ]);
+
+  // A failed read must not look like "no leads": throw, and the error page shows.
+  // A page past the end is a PostgREST range error (416), shown as an empty page.
+  const failed = [leadsResult, staffResult, ...counts].find((r) => r.error && r.status !== 416);
+  if (failed) throw new Error('CRM read failed');
 
   const leads = leadsResult.data ?? [];
   const total = leadsResult.count ?? 0;
@@ -69,6 +85,7 @@ export default async function CrmLeads({ searchParams }: { searchParams: Promise
   return (
     <>
       <CrmHeader staffName={staff.display_name} />
+      <div id="main" tabIndex={-1} className="outline-hidden">
       <Container className="py-10 md:py-14">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -87,7 +104,7 @@ export default async function CrmLeads({ searchParams }: { searchParams: Promise
                 <li key={tab.label}>
                   <Link
                     href={href({ status: tab.value, reason, q: q || undefined })}
-                    aria-current={current ? 'page' : undefined}
+                    aria-current={current ? 'true' : undefined}
                     className={
                       'focus-visible:outline-np-ink inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm focus-visible:outline-2 ' +
                       (current
@@ -108,7 +125,7 @@ export default async function CrmLeads({ searchParams }: { searchParams: Promise
           {status && <input type="hidden" name="status" value={status} />}
           <div className="min-w-[14rem] flex-1">
             <label htmlFor="q" className="sr-only">
-              Search by name, email or phone
+              Search name, email or phone
             </label>
             <input
               id="q"
@@ -198,6 +215,7 @@ export default async function CrmLeads({ searchParams }: { searchParams: Promise
           </nav>
         )}
       </Container>
+      </div>
     </>
   );
 }

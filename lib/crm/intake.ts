@@ -56,6 +56,20 @@ function getPool(env: IntakeEnv): Pool {
   return pool;
 }
 
+/**
+ * The address the per-IP limit counts. IPv6 is cut to its /64: one subscriber
+ * line usually holds a whole /64, so per-address buckets would hand a single
+ * client billions of fresh limits.
+ */
+export function rateLimitAddress(ip: string): string {
+  if (!ip.includes(':')) return ip;
+  const [head = '', tail = ''] = ip.split('::');
+  const left = head ? head.split(':') : [];
+  const right = tail ? tail.split(':') : [];
+  const groups = ip.includes('::') ? [...left, ...Array(Math.max(0, 8 - left.length - right.length)).fill('0'), ...right] : left;
+  return `${groups.slice(0, 4).map((g) => g.toLowerCase().replace(/^0+(?=.)/, '')).join(':')}::/64`;
+}
+
 export function clientKey(ip: string, secret: string): string {
   return createHmac('sha256', secret).update(ip).digest('hex');
 }
@@ -74,7 +88,9 @@ export async function submitLead(env: IntakeEnv, lead: LeadInput, ip: string): P
   } catch (error) {
     const code = (error as Partial<DatabaseError>).code;
     if (code === 'P0001' && (error as Error).message === 'rate_limited') return { ok: false, reason: 'rate_limited' };
-    if (code === '23514' || code === '22023' || code === '22001') return { ok: false, reason: 'invalid' };
+    if (code === '23514' || code === '23502' || code === '22023' || code === '22001') {
+      return { ok: false, reason: 'invalid' };
+    }
     throw error;
   }
 }

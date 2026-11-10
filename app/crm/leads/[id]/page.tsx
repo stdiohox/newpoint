@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Container } from '@/components/ui/Container';
@@ -5,6 +6,9 @@ import { CRM_CARD, CrmHeader, StatusChip } from '@/components/crm/CrmChrome';
 import { LeadUpdateForm, NoteForm } from '@/components/crm/forms';
 import { formatWhen, STATUS_LABEL, UUID, type Lead, type LeadActivity } from '@/lib/crm/model';
 import { requireStaff } from '@/lib/crm/supabase';
+
+/** Generic on purpose: tab titles end up in browser history, so no name here. */
+export const metadata: Metadata = { title: 'Lead' };
 
 export default async function CrmLead({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,6 +34,7 @@ export default async function CrmLead({ params }: { params: Promise<{ id: string
       .returns<{ user_id: string; display_name: string; active: boolean }[]>(),
   ]);
 
+  if (leadResult.error || activityResult.error || staffResult.error) throw new Error('CRM read failed');
   const lead = leadResult.data;
   if (!lead) notFound();
   const people = staffResult.data ?? [];
@@ -52,6 +57,7 @@ export default async function CrmLead({ params }: { params: Promise<{ id: string
   return (
     <>
       <CrmHeader staffName={staff.display_name} />
+      <div id="main" tabIndex={-1} className="outline-hidden">
       <Container className="py-10 md:py-14">
         <Link href="/crm" className="text-np-neutral-700 hover:text-np-ink text-sm underline underline-offset-4">
           All leads
@@ -140,6 +146,7 @@ export default async function CrmLead({ params }: { params: Promise<{ id: string
           </aside>
         </div>
       </Container>
+      </div>
     </>
   );
 }

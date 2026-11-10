@@ -2679,6 +2679,12 @@ export const CONTACT = {
     body: 'We have your details and will reach out about an appointment. If you need us sooner, please call the practice.',
   },
   /**
+   * Under the contact form's success and failure messages: focus lands there,
+   * and the footer's crisis strip is far below. "Call 988", never "call or
+   * text" (client instruction, 2026-11-02).
+   */
+  crisisNote: 'If you’re in a crisis, call 988, or 911 in an emergency.',
+  /**
    * Used ONLY when NEXT_PUBLIC_INTAKE_URL is set, i.e. when the form posts to the
    * BAA-covered intake handler (automation/edge/intake). With the flag off (the
    * default) the site renders OnboardingForm, which posts to /api/leads.

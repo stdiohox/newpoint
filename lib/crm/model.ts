@@ -62,4 +62,7 @@ export function formatWhen(iso: string): string {
   return WHEN.format(new Date(iso));
 }
 
-export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** Contact notes are short by design (the hint keeps clinical detail out). The DB allows 2,000. */
+export const NOTE_MAX = 1000;
+
+export const UUID =/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

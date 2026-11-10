@@ -38,23 +38,36 @@ export interface LeadAlertResult {
 }
 
 export async function sendLeadAlerts(deps: LeadAlertDeps): Promise<LeadAlertResult> {
+  const stuck = (await deps.db.query<{ n: number }>("select crm.stuck_lead_alerts() as n")).rows[0]?.n ?? 0;
+  if (stuck > 0) deps.logger.error("crm.lead_alert.gave_up", null, { leads: stuck });
+
   const { rows } = await deps.db.query<{ id: string; reason: string; created_at: Date }>(
     "select id, reason, created_at from crm.claim_lead_alerts(50)",
   );
   if (rows.length === 0) return { claimed: 0, sent: 0, recipients: 0 };
+  const ids = rows.map((row) => row.id);
+  const release = () => deps.db.query("select crm.release_lead_alerts($1::uuid[])", [ids]);
 
   const recipients = (await deps.db.query<{ email: string }>("select email from crm.alert_recipients()")).rows.map(
     (row) => row.email,
   );
   if (recipients.length === 0) {
-    // Nobody to tell. Leave the claim to expire so the alert goes out once someone
-    // turns alerts on, and say so in the run log.
+    // Nobody to tell. Give the claim back without spending an attempt, so the
+    // alert goes out once someone turns alerts on.
+    await release();
     deps.logger.warn("crm.lead_alert.no_recipients", { claimed: rows.length });
     return { claimed: rows.length, sent: 0, recipients: 0 };
   }
 
   const leads: ClaimedLead[] = rows.map((row) => ({ id: row.id, reason: row.reason, createdAt: row.created_at }));
-  await deps.email.send(alertEmail(leads, recipients, deps.crmBaseUrl));
+  try {
+    await deps.email.send(alertEmail(leads, recipients, deps.crmBaseUrl));
+  } catch (error) {
+    // Released so the task's own retry (seconds later) can send it, rather than
+    // waiting out the claim. The attempt counter still caps a permanent failure.
+    await release().catch(() => undefined);
+    throw error;
+  }
 
   const marked = await deps.db.query<{ marked: number }>("select crm.mark_leads_alerted($1::uuid[]) as marked", [
     leads.map((lead) => lead.id),

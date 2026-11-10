@@ -1,7 +1,10 @@
+import type { Metadata } from 'next';
 import { Container } from '@/components/ui/Container';
 import { CRM_CARD, CrmHeader } from '@/components/crm/CrmChrome';
 import { PasswordForm } from '@/components/crm/forms';
 import { requireStaff } from '@/lib/crm/supabase';
+
+export const metadata: Metadata = { title: 'Account' };
 
 export default async function CrmAccount({ searchParams }: { searchParams: Promise<{ first?: string }> }) {
   const { staff } = await requireStaff({ allowPasswordChange: true });
@@ -11,6 +14,7 @@ export default async function CrmAccount({ searchParams }: { searchParams: Promi
   return (
     <>
       <CrmHeader staffName={staff.display_name} />
+      <div id="main" tabIndex={-1} className="outline-hidden">
       <Container className="py-10 md:py-14">
         <h1 className="text-np-ink text-3xl font-semibold tracking-tight">Account</h1>
         <p className="text-np-neutral-600 mt-1 text-sm">{staff.email}</p>
@@ -29,6 +33,7 @@ export default async function CrmAccount({ searchParams }: { searchParams: Promi
           </div>
         </section>
       </Container>
+      </div>
     </>
   );
 }

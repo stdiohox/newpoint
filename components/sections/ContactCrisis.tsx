@@ -75,6 +75,7 @@ export function ContactCrisis() {
               reasons={CONTACT.reasons}
               privacyNote={CONTACT.privacyNote}
               success={CONTACT.success}
+              crisisNote={CONTACT.crisisNote}
               /* The href stays derived from BUSINESS, the single source for
                  the practice's NAP data. */
               phone={{ label: BUSINESS.phonePrimary, href: `tel:${BUSINESS.phonePrimaryHref}` }}

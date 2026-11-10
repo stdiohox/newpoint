@@ -7,10 +7,11 @@ import type { ReactNode } from 'react';
  * the production domain even while it holds (middleware.ts).
  *
  * A direct <main> child of <body> carrying data-crm, which is what hides the
- * public navbar here (globals.css).
+ * public navbar here (globals.css). The skip link's #main target is on each
+ * page's content, AFTER the CRM header, so it skips the header and nav.
  */
 export const metadata: Metadata = {
-  title: { absolute: 'Newpoint CRM' },
+  title: { default: 'Newpoint CRM', template: '%s | Newpoint CRM' },
   robots: { index: false, follow: false },
   openGraph: null,
   twitter: null,
@@ -20,7 +21,7 @@ export const dynamic = 'force-dynamic';
 
 export default function CrmLayout({ children }: { children: ReactNode }) {
   return (
-    <main id="main" data-crm className="bg-np-neutral-50 text-np-ink min-h-dvh">
+    <main data-crm className="bg-np-neutral-50 text-np-ink min-h-dvh">
       {children}
     </main>
   );

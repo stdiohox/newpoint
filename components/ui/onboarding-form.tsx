@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useHydrated } from '@/lib/useHydrated';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
+import { EMAIL_PATTERN, HONEYPOT_FIELD, LEAD_LIMITS, PHONE_PATTERN } from '@/lib/crm/form-contract';
 
 /**
  * The supplied OnboardingForm card, carrying this site's HIPAA-aware intake.
@@ -72,7 +73,7 @@ const fadeUpVariants = (reduce: boolean) => ({
  * rather than the control swapped for a scripted listbox.
  */
 const SELECT_CLASS =
-  'border-np-neutral-300 focus-visible:ring-np-blue-600 flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none';
+  'border-np-neutral-300 focus-visible:ring-np-blue-600 flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden';
 
 const LABEL_CLASS = 'text-np-ink block text-small font-medium';
 const ERROR_CLASS = 'text-np-error mt-1.5 text-small';
@@ -104,6 +105,8 @@ interface OnboardingFormProps extends Omit<
   privacyNote: string;
   /** What a stored submission shows (CONTACT.success). */
   success: { heading: string; body: string };
+  /** Crisis line shown with the success and failure messages ("call 988", never "text"). */
+  crisisNote: string;
   /** The practice's phone, offered whenever a submission does not go through. */
   phone: { label: string; href: string };
 }
@@ -111,7 +114,7 @@ interface OnboardingFormProps extends Omit<
 /**
  * Where the form posts: app/api/leads/route.ts, which stores the lead in the
  * staff CRM (docs/lead-crm.md) and alerts staff. Same origin, JSON, the four
- * fields only. `website` is a honeypot people never see.
+ * fields only, plus a honeypot (HONEYPOT_FIELD) people never see.
  */
 const LEADS_ENDPOINT = '/api/leads';
 
@@ -129,6 +132,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       privacyNote,
       success,
       phone,
+      crisisNote,
       ...props
     },
     ref
@@ -180,11 +184,14 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       const phone = String(data.get('phone') ?? '').trim();
 
       const next: Errors = {};
+      // Same rules as /api/leads (lib/crm/form-contract.ts), so a value the
+      // server would refuse is caught here with a message about that field.
       if (!name) next.name = 'Please enter your name.';
+      else if (name.length > LEAD_LIMITS.name) next.name = 'Please shorten your name.';
       if (!email) next.email = 'Please enter an email address.';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      else if (email.length > LEAD_LIMITS.email || !EMAIL_PATTERN.test(email))
         next.email = 'Please check this email address.';
-      if (phone && !/^[\d\s().+-]{7,}$/.test(phone)) next.phone = 'Please check this phone number.';
+      if (phone && !PHONE_PATTERN.test(phone)) next.phone = 'Please check this phone number.';
 
       setErrors(next);
       /*
@@ -214,16 +221,32 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
         const response = await fetch(LEADS_ENDPOINT, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
+          // A hung request falls through to the catch below and its phone fallback.
+          signal: AbortSignal.timeout(15_000),
           body: JSON.stringify({
             name,
             email,
             phone,
             reason: String(data.get('reason') ?? ''),
-            website: String(data.get('website') ?? ''),
+            [HONEYPOT_FIELD]: String(data.get(HONEYPOT_FIELD) ?? ''),
           }),
         });
-        if (response.status === 201) setSubmitted(true);
-        else setSubmitError(response.status === 429 ? 'rate_limited' : 'failed');
+        if (response.status === 201) {
+          setSubmitted(true);
+        } else if (response.status === 400) {
+          // The server names the fields it refused; show them like local errors.
+          const refused = ((await response.json().catch(() => ({}))) as { fields?: string[] }).fields ?? [];
+          const fieldErrors: Errors = {};
+          if (refused.includes('name')) fieldErrors.name = 'Please check your name.';
+          if (refused.includes('email')) fieldErrors.email = 'Please check this email address.';
+          if (refused.includes('phone')) fieldErrors.phone = 'Please check this phone number.';
+          setErrors(fieldErrors);
+          const first = (['name', 'email', 'phone'] as const).find((k) => fieldErrors[k]);
+          if (first) fieldRefs[first].current?.focus();
+          else setSubmitError('failed');
+        } else {
+          setSubmitError(response.status === 429 ? 'rate_limited' : 'failed');
+        }
       } catch {
         /* Not swallowed. try/finally with no catch would leave a rejected
            submission looking exactly like a misclick: spinner stops, form
@@ -346,6 +369,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                     {phone.label}
                   </a>
                 </p>
+                <p className="text-small text-np-neutral-600 mt-4">{crisisNote}</p>
               </div>
             ) : (
               // method="post" matters even though onSubmit always preventDefaults
@@ -374,6 +398,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                     ref={fieldRefs.name}
                     id="name"
                     name="name"
+                    maxLength={LEAD_LIMITS.name}
                     type="text"
                     autoComplete="name"
                     required
@@ -396,6 +421,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                     ref={fieldRefs.email}
                     id="email"
                     name="email"
+                    maxLength={LEAD_LIMITS.email}
                     type="email"
                     autoComplete="email"
                     required
@@ -418,6 +444,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                     ref={fieldRefs.phone}
                     id="phone"
                     name="phone"
+                    maxLength={LEAD_LIMITS.phoneMax}
                     type="tel"
                     autoComplete="tel"
                     aria-invalid={Boolean(errors.phone)}
@@ -435,8 +462,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                   assistive technology, so only a bot fills it in; the API
                   then discards the submission. */}
                 <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-                  <label htmlFor="website">Website</label>
-                  <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+                  <input name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
                 </div>
 
                 <motion.div {...item}>
@@ -474,9 +500,13 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                       <a href={phone.href} className="underline underline-offset-2">
                         {phone.label}
                       </a>
-                      .
+                      . {crisisNote}
                     </p>
                   )}
+                  {/* Persistent, so "Sending" is announced: the spinner is aria-hidden. */}
+                  <p role="status" className="sr-only">
+                    {isSubmitting ? 'Sending…' : ''}
+                  </p>
                   <Button type="submit" size="lg" className="w-full">
                     {isSubmitting && (
                       <Loader2 aria-hidden="true" className="mr-2 h-4 w-4 animate-spin" />

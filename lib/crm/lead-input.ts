@@ -1,4 +1,5 @@
 import { CONTACT } from '@/lib/content';
+import { EMAIL_PATTERN, LEAD_LIMITS, PHONE_PATTERN } from './form-contract';
 
 /**
  * What /api/leads accepts: the contact form's four fields and nothing else
@@ -15,8 +16,9 @@ export interface LeadInput {
 
 export type LeadField = 'name' | 'email' | 'phone' | 'reason';
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE = /^[0-9 ().+-]{7,32}$/;
+export { HONEYPOT_FIELD } from './form-contract';
+const EMAIL = EMAIL_PATTERN;
+const PHONE = PHONE_PATTERN;
 
 function text(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
@@ -32,8 +34,8 @@ export function parseLeadInput(
   const reason = text(body.reason);
 
   const fields: LeadField[] = [];
-  if (name.length < 1 || name.length > 120) fields.push('name');
-  if (email.length > 254 || !EMAIL.test(email)) fields.push('email');
+  if (name.length < 1 || name.length > LEAD_LIMITS.name) fields.push('name');
+  if (email.length > LEAD_LIMITS.email || !EMAIL.test(email)) fields.push('email');
   if (phone && !PHONE.test(phone)) fields.push('phone');
   if (!(CONTACT.reasons as readonly string[]).includes(reason)) fields.push('reason');
   if (fields.length > 0) return { ok: false, fields };

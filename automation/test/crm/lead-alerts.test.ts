@@ -88,17 +88,36 @@ describe("crm.new-lead-alert", () => {
     expect(JSON.stringify(records)).not.toMatch(/grace/i);
   });
 
-  it("a failed send is retried after the claim expires, not lost", async () => {
+  it("a failed send is released, so the task's own retry sends it, without spending the attempt", async () => {
     await submit("Alan", "b");
     const deps = { db: client(), crmBaseUrl: CRM, logger: createLogger(() => undefined) };
 
     await expect(sendLeadAlerts({ ...deps, email: recordingSender(true) })).rejects.toThrow("resend down");
-    // Still claimed: an immediate re-run does not double-send.
     const again = recordingSender();
-    expect((await sendLeadAlerts({ ...deps, email: again })).claimed).toBe(0);
-
-    await asOwner(() => client().query("update crm.leads set alert_claimed_at = now() - interval '11 minutes'"));
     expect(await sendLeadAlerts({ ...deps, email: again })).toEqual({ claimed: 1, sent: 1, recipients: 1 });
+    const { rows } = await asOwner(() =>
+      client().query<{ n: number }>("select alert_attempts as n from crm.leads where name = 'Alan'"),
+    );
+    expect(rows[0]?.n).toBe(1);
+  });
+
+  it("a claim that was never released expires after 5 minutes", async () => {
+    await submit("Ruth", "f");
+    await asOwner(() => client().query("update crm.leads set alert_claimed_at = now() - interval '4 minutes', alert_attempts = 1"));
+    const deps = { db: client(), email: recordingSender(), crmBaseUrl: CRM, logger: createLogger(() => undefined) };
+    expect((await sendLeadAlerts(deps)).claimed).toBe(0);
+    await asOwner(() => client().query("update crm.leads set alert_claimed_at = now() - interval '6 minutes'"));
+    expect((await sendLeadAlerts(deps)).claimed).toBe(1);
+  });
+
+  it("logs an error for leads whose alert gave up, without their details", async () => {
+    await submit("Edith", "9");
+    await asOwner(() => client().query("update crm.leads set alert_attempts = 5"));
+    const records: LogRecord[] = [];
+    const deps = { db: client(), email: recordingSender(), crmBaseUrl: CRM, logger: createLogger((r) => records.push(r)) };
+    await sendLeadAlerts(deps);
+    expect(records.some((r) => r.event === "crm.lead_alert.gave_up")).toBe(true);
+    expect(JSON.stringify(records)).not.toMatch(/edith/i);
   });
 
   it("with nobody to alert, it leaves the lead to be sent later", async () => {
@@ -107,10 +126,15 @@ describe("crm.new-lead-alert", () => {
     const email = recordingSender();
     const deps = { db: client(), email, crmBaseUrl: CRM, logger: createLogger(() => undefined) };
     try {
-      expect(await sendLeadAlerts(deps)).toEqual({ claimed: 1, sent: 0, recipients: 0 });
+      // Every sweep in this state gives the claim back without spending an attempt.
+      for (let i = 0; i < 7; i++) {
+        expect(await sendLeadAlerts(deps)).toEqual({ claimed: 1, sent: 0, recipients: 0 });
+      }
       expect(email.sent).toHaveLength(0);
       const { rows } = await asOwner(() =>
-        client().query<{ n: number }>("select count(*)::int as n from crm.leads where alerted_at is null"),
+        client().query<{ n: number }>(
+          "select count(*)::int as n from crm.leads where alerted_at is null and alert_attempts = 0 and alert_claimed_at is null",
+        ),
       );
       expect(rows[0]?.n).toBe(1);
     } finally {

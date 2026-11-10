@@ -1,28 +1,37 @@
 'use client';
 
-import { useActionState, useEffect, useId, useRef } from 'react';
+import { useActionState, useId } from 'react';
 import { addNote, changePassword, signIn, updateLead, type FormState } from '@/app/crm/actions';
-import { LEAD_STATUSES, STATUS_LABEL, type LeadStatus } from '@/lib/crm/model';
-import { CRM_BUTTON, CRM_FIELD, CRM_LABEL } from './CrmChrome';
+import { CRM_BUTTON, CRM_FIELD, CRM_LABEL } from '@/lib/crm/classes';
+import { LEAD_STATUSES, NOTE_MAX, STATUS_LABEL, type LeadStatus } from '@/lib/crm/model';
+
+/*
+ * React 19 resets a form after its action finishes, success or not. So a
+ * failed action returns what was submitted in `state.values`, and the fields
+ * use it as their defaultValue: the reset restores the user's input instead of
+ * wiping it. A successful note returns no values, so that form comes back empty.
+ */
 
 const INITIAL: FormState = {};
 
+/**
+ * Errors are role="alert" and mount with the text. Confirmations go into a
+ * status region that is ALWAYS in the tree: a live region inserted at the
+ * moment of the update is not reliably announced.
+ */
 function FormMessage({ state, okText }: { state: FormState; okText?: string }) {
-  if (state.error) {
-    return (
-      <p role="alert" className="text-np-error text-sm">
-        {state.error}
+  return (
+    <>
+      {state.error && (
+        <p role="alert" className="text-np-error text-sm">
+          {state.error}
+        </p>
+      )}
+      <p role="status" className="text-np-neutral-600 text-sm empty:hidden">
+        {state.ok && okText ? okText : ''}
       </p>
-    );
-  }
-  if (state.ok && okText) {
-    return (
-      <p role="status" className="text-np-neutral-600 text-sm">
-        {okText}
-      </p>
-    );
-  }
-  return null;
+    </>
+  );
 }
 
 export function LoginForm() {
@@ -33,7 +42,15 @@ export function LoginForm() {
         <label htmlFor="email" className={CRM_LABEL}>
           Email
         </label>
-        <input id="email" name="email" type="email" autoComplete="username" required className={`${CRM_FIELD} mt-2`} />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="username"
+          required
+          defaultValue={state.values?.email ?? ''}
+          className={`${CRM_FIELD} mt-2`}
+        />
       </div>
       <div>
         <label htmlFor="password" className={CRM_LABEL}>
@@ -75,7 +92,12 @@ export function LeadUpdateForm({
         <label htmlFor="status" className={CRM_LABEL}>
           Status
         </label>
-        <select id="status" name="status" defaultValue={status} className={`${CRM_FIELD} mt-2`}>
+        <select
+          id="status"
+          name="status"
+          defaultValue={state.values?.status ?? status}
+          className={`${CRM_FIELD} mt-2`}
+        >
           {LEAD_STATUSES.map((s) => (
             <option key={s} value={s}>
               {STATUS_LABEL[s]}
@@ -87,7 +109,12 @@ export function LeadUpdateForm({
         <label htmlFor="owner" className={CRM_LABEL}>
           Owner
         </label>
-        <select id="owner" name="owner" defaultValue={ownerId ?? ''} className={`${CRM_FIELD} mt-2`}>
+        <select
+          id="owner"
+          name="owner"
+          defaultValue={state.values?.owner ?? ownerId ?? ''}
+          className={`${CRM_FIELD} mt-2`}
+        >
           <option value="">Unassigned</option>
           {staff.map((s) => (
             <option key={s.user_id} value={s.user_id}>
@@ -106,13 +133,9 @@ export function LeadUpdateForm({
 
 export function NoteForm({ id }: { id: string }) {
   const [state, action, pending] = useActionState(addNote, INITIAL);
-  const formRef = useRef<HTMLFormElement>(null);
   const hintId = useId();
-  useEffect(() => {
-    if (state.ok) formRef.current?.reset();
-  }, [state]);
   return (
-    <form ref={formRef} action={action} aria-busy={pending} className="space-y-3">
+    <form action={action} aria-busy={pending} className="space-y-3">
       <input type="hidden" name="id" value={id} />
       <label htmlFor="note" className={CRM_LABEL}>
         Add a note
@@ -121,13 +144,15 @@ export function NoteForm({ id }: { id: string }) {
         id="note"
         name="body"
         rows={3}
-        maxLength={2000}
+        maxLength={NOTE_MAX}
         required
+        defaultValue={state.values?.body ?? ''}
         aria-describedby={hintId}
         className={CRM_FIELD}
       />
       <p id={hintId} className="text-np-neutral-600 text-xs">
-        Contact outcomes and next steps, for example “Left a voicemail, try again Thursday.”
+        Contact outcomes only, for example “Left a voicemail, try again Thursday.” No symptoms,
+        diagnoses, medications or insurance numbers: clinical detail belongs in the patient record.
       </p>
       <FormMessage state={state} okText="Note added." />
       <button type="submit" className={CRM_BUTTON}>

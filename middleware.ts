@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { CRM_COOKIE_OPTIONS } from '@/lib/crm/cookies';
+import { CRM_COOKIE_OPTIONS, withSessionMaxAge } from '@/lib/crm/cookies';
 
 /**
  * HOLDING-PAGE MODE.
@@ -43,7 +43,7 @@ async function crm(request: NextRequest) {
         setAll: (list) => {
           for (const { name, value } of list) request.cookies.set(name, value);
           response = NextResponse.next({ request });
-          for (const { name, value, options } of list) response.cookies.set(name, value, options);
+          for (const { name, value, options } of list) response.cookies.set(name, value, withSessionMaxAge(options));
         },
       },
     });
