@@ -14,6 +14,8 @@ export interface Email {
   readonly to: readonly string[];
   readonly subject: string;
   readonly text: string;
+  /** Optional HTML body; `text` is always sent too, as the plain-text alternative. */
+  readonly html?: string;
 }
 
 export interface EmailSender {
@@ -33,7 +35,13 @@ export function createResendSender(options: ResendOptions): EmailSender {
       const response = await options.fetch(ENDPOINT, {
         method: "POST",
         headers: { authorization: `Bearer ${options.apiKey}`, "content-type": "application/json" },
-        body: JSON.stringify({ from: options.from, to: email.to, subject: email.subject, text: email.text }),
+        body: JSON.stringify({
+          from: options.from,
+          to: email.to,
+          subject: email.subject,
+          text: email.text,
+          ...(email.html ? { html: email.html } : {}),
+        }),
       });
       if (!response.ok) throw new VendorHttpError("resend", response.status);
     },

@@ -160,6 +160,31 @@ describe("alertEmail", () => {
   it("refuses an empty batch", () => {
     expect(() => alertEmail([], ["a@example.com"], CRM)).toThrow();
   });
+
+  const lead = { id: "11111111-1111-4111-8111-111111111111", reason: "New patient inquiry", createdAt: new Date("2026-11-09T19:14:00Z") };
+
+  it("sends a branded HTML body alongside the text", () => {
+    const { html, text } = alertEmail([lead], ["a@example.com"], CRM);
+    expect(text).toContain(`${CRM}/leads/${lead.id}`);
+    expect(html).toContain(`href="${CRM}/leads/${lead.id}"`);
+    expect(html).toContain("Open lead in CRM");
+    expect(html).toContain("Mon, Nov 9, 2:14 PM ET");
+    expect(html).toContain(`src="${new URL(CRM).origin}/brand/newpoint-mark-color.png"`);
+  });
+
+  it("lists every lead with its own link in a batch, and links the button to the list", () => {
+    const second = { ...lead, id: "22222222-2222-4222-8222-222222222222", reason: "Existing patient" };
+    const { html } = alertEmail([lead, second], ["a@example.com"], CRM);
+    expect(html).toContain("2 new leads");
+    expect(html).toContain(`href="${CRM}/leads/${second.id}"`);
+    expect(html).toContain(`href="${CRM}"`);
+  });
+
+  it("escapes what it interpolates", () => {
+    const { html } = alertEmail([{ ...lead, reason: `<b>"x"</b>` }], ["a@example.com"], CRM);
+    expect(html).not.toContain("<b>");
+    expect(html).toContain("&lt;b&gt;&quot;x&quot;&lt;/b&gt;");
+  });
 });
 
 describe("loadCrmEnv", () => {
