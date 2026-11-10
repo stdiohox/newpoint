@@ -8,12 +8,12 @@ import { defineConfig } from "@trigger.dev/sdk";
  * never hold a PHI-zone credential; `loadMarketingEnv()` refuses to start if
  * one is present in the environment.
  */
-const project = process.env["TRIGGER_PROJECT_REF_MARKETING"];
-if (!project) {
-  throw new Error(
-    "TRIGGER_PROJECT_REF_MARKETING is not set. It is the newpoint-marketing project ref (proj_…) from the Trigger.dev dashboard.",
-  );
-}
+/**
+ * The project ref is an identifier, not a secret. It is written here because
+ * Trigger's cloud indexer imports this file without the local env; the env var
+ * still overrides it for a local `trigger dev` against another project.
+ */
+const project = process.env["TRIGGER_PROJECT_REF_MARKETING"] ?? "proj_xueejjzxufoytsmtozfo";
 
 /**
  * Tasks NOT deployed yet. Going live with one = delete its line here and redeploy.
