@@ -209,6 +209,14 @@ describe("lead confirmation", () => {
     expect(email.sent).toHaveLength(0);
   });
 
+  it("one run of a fresh lead sends both the confirmation and the staff alert", async () => {
+    await submit("Grace", "9");
+    const email = recordingSender();
+    const result = await processNewLeads({ db: client(), email, crmBaseUrl: CRM, confirm, logger: quiet() });
+    expect(result).toEqual({ confirmations: { claimed: 1, sent: 1 }, alerts: { claimed: 1, sent: 1, recipients: 1 } });
+    expect(email.sent.map((e) => e.to)).toEqual([["grace@example.com"], ["desk@example.com"]]);
+  });
+
   it("releases a failed send so the retry sends it, and still sends the staff alert", async () => {
     await submit("Grace", "e");
     const failing = recordingSender(true);

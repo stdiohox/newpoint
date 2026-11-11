@@ -133,12 +133,27 @@ export async function sendLeadConfirmations(deps: LeadAlertDeps): Promise<Confir
   return { claimed: rows.length, sent };
 }
 
-/** Both jobs, each attempted even if the other fails; the first failure is rethrown so the task retries. */
+/**
+ * Both jobs, one after the other: both claims take `for update skip locked` on
+ * the same crm.leads row, so run in parallel the second one skips the lead the
+ * first is holding and leaves it to the sweep (seen in production 2026-11-11).
+ * Each is attempted even if the other fails; the first failure is rethrown so
+ * the task retries.
+ */
 export async function processNewLeads(deps: LeadAlertDeps) {
-  const [confirmations, alerts] = await Promise.allSettled([sendLeadConfirmations(deps), sendLeadAlerts(deps)]);
+  const confirmations = await settle(() => sendLeadConfirmations(deps));
+  const alerts = await settle(() => sendLeadAlerts(deps));
   if (confirmations.status === "rejected") throw confirmations.reason;
   if (alerts.status === "rejected") throw alerts.reason;
   return { confirmations: confirmations.value, alerts: alerts.value };
+}
+
+async function settle<T>(fn: () => Promise<T>): Promise<PromiseSettledResult<T>> {
+  try {
+    return { status: "fulfilled", value: await fn() };
+  } catch (reason: unknown) {
+    return { status: "rejected", reason };
+  }
 }
 
 function deps(): LeadAlertDeps {
