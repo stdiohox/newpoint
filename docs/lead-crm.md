@@ -128,7 +128,7 @@ gets the intake form: a link to `/forms/new-patient-intake.pdf`, to complete and
 bring to the first appointment, never to email back. The crisis line is in the
 body; replies are flagged as not monitored around the clock.
 
-- Off until `CRM_CONFIRM_REPLY_TO` is set in Trigger prod (the inbox replies go to).
+- `CRM_CONFIRM_REPLY_TO` = `frontdesk@newpointnp.com` (IONOS forward → omanager167@gmail.com, set 2026-11-11); replies land there. Unset = confirmations off.
 - Database: `20261110000001_crm_lead_confirmation.sql` (claim / mark / release /
   stuck, 5 attempts, last 2 days only; leads stored before it count as done).
 - A 4xx from Resend spends the attempt; anything else is released for retry. Each
