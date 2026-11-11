@@ -40,7 +40,8 @@ export function firstName(name: string): string | null {
   return /^[\p{L}][\p{L}'’-]{0,39}$/u.test(first) ? first : null;
 }
 
-const CRISIS_TEXT = "If you’re in a crisis, call or text 988 now. In an emergency, call 911.";
+/** The site's wording (lib/content.ts CONTACT.crisisNote), kept identical. */
+const CRISIS_TEXT = "If you’re in a crisis, call 988, or 911 in an emergency.";
 const REPLY_TEXT =
   "This inbox isn’t monitored around the clock, so please don’t include medical details or anything urgent in a reply.";
 
@@ -99,7 +100,7 @@ ${formBlock}
 ${paragraph(`Questions? Call us at ${link(PRACTICE_PHONE_HREF, PRACTICE_PHONE)}, or reply to this email.`, "margin-bottom:8px;")}
 <p style="margin:0 0 20px;font-family:${FONT};font-size:13px;line-height:20px;color:${C.muted};">${esc(REPLY_TEXT)}</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:12px 14px;background:${C.page};border-radius:8px;font-family:${FONT};font-size:15px;line-height:22px;color:${C.ink};">
-If you’re in a crisis, call or text ${link("tel:988", "988", C.ink)} now. In an emergency, call ${link("tel:911", "911", C.ink)}.
+If you’re in a crisis, call ${link("tel:988", "988", C.ink)}, or ${link("tel:911", "911", C.ink)} in an emergency.
 </td></tr></table>`,
     footer: "Newpoint Healthcare · You received this because you asked us to contact you through newpointnp.com.",
   });

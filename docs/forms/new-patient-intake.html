@@ -16,7 +16,7 @@
   .brand span { color: #7c776d; font-weight: 400; font-size: 9.5pt; margin-left: 4px; }
   .doc { font-size: 9pt; color: #7c776d; text-align: right; line-height: 1.35; }
   h1 { font-size: 20pt; letter-spacing: -0.01em; margin: 0 0 4px; color: #131c2e; }
-  h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.06em; color: #435ba8; margin: 18px 0 8px; }
+  h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.06em; color: #435ba8; margin: 18px 0 6px; }
   .lede { color: #5c584f; margin: 0 0 6px; font-size: 10pt; }
   .note { background: #f4f2ed; border-left: 3px solid #435ba8; padding: 8px 12px; font-size: 9.5pt; color: #403d36; margin: 10px 0 4px; }
   .row { display: flex; gap: 18px; margin: 0 0 9px; }
@@ -33,13 +33,15 @@
   .lines div { border-bottom: 1px solid #d3cfc6; height: 22px; }
   .page { break-before: page; }
   table.scale { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-top: 6px; }
-  table.scale th { font-weight: 600; font-size: 8.5pt; color: #403d36; text-align: center; padding: 6px 4px; border-bottom: 1.5px solid #131c2e; vertical-align: bottom; width: 12%; }
+  table.scale th { font-weight: 600; font-size: 8.5pt; color: #403d36; text-align: center; padding: 4px 4px; border-bottom: 1.5px solid #131c2e; vertical-align: bottom; width: 12%; }
   table.scale th:first-child { text-align: left; width: auto; }
-  table.scale td { padding: 5px 4px; border-bottom: 1px solid #e7e4dd; vertical-align: middle; }
+  table.scale td { padding: 3px 4px; border-bottom: 1px solid #e7e4dd; vertical-align: middle; }
   table.scale td.c { text-align: center; }
   table.scale td.c .box { margin: 0; }
   table.scale tr { break-inside: avoid; }
-  .crisis { margin-top: 12px; break-inside: avoid; padding: 9px 12px; border: 1px solid #b3261e; border-radius: 6px; color: #2a2822; font-size: 9.5pt; }
+  .diff { margin: 8px 0 0; font-size: 9pt; line-height: 1.35; color: #131c2e; break-inside: avoid; }
+  .diff .yn { margin: 5px 0 0; flex-wrap: wrap; row-gap: 4px; }
+  .crisis { margin-top: 10px; break-inside: avoid; padding: 9px 12px; border: 1px solid #b3261e; border-radius: 6px; color: #2a2822; font-size: 9.5pt; }
   .crisis b { color: #b3261e; }
   footer { position: fixed; bottom: -0.45in; left: 0; right: 0; font-size: 8pt; color: #a8a399; display: flex; justify-content: space-between; }
   .namebar { display: flex; gap: 18px; margin: 4px 0 6px; }
@@ -73,7 +75,7 @@
 <div class="row"><div class="f"><label>Email address:</label><div class="line"></div></div></div>
 <div class="row">
   <div class="f"><label>Date of Birth:</label><div class="line"></div></div>
-  <div class="f"><label>Social Security Number:</label><div class="line"></div></div>
+  <div class="f"><label>Social Security Number (optional):</label><div class="line"></div></div>
 </div>
 <div class="row"><div class="f"><label>Insurance Name:</label><div class="line"></div></div></div>
 <div class="row">
@@ -133,8 +135,10 @@
   <tr><td>6. Becoming easily annoyed or irritable</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
   <tr><td>7. Feeling afraid as if something awful might happen</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
 </table>
+<div class="diff">If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?
+<div class="yn"><span><span class="box"></span>Not difficult at all</span><span><span class="box"></span>Somewhat difficult</span><span><span class="box"></span>Very difficult</span><span><span class="box"></span>Extremely difficult</span></div></div>
 
-<h2 style="margin-top:18px">Depression Assessment Form</h2>
+<h2 style="margin-top:12px">Depression Assessment Form</h2>
 <p class="lede">Over the last 2 weeks, how often have you been bothered by any of the following problems?</p>
 <table class="scale">
   <tr><th></th><th>Not at all</th><th>Several days</th><th>More than half the days</th><th>Nearly every day</th></tr>
@@ -148,8 +152,10 @@
   <tr><td>8. Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
   <tr><td>9. Thoughts that you would be better off dead or of hurting yourself in some way</td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td><td class="c"><span class="box"></span></td></tr>
 </table>
+<div class="diff">If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?
+<div class="yn"><span><span class="box"></span>Not difficult at all</span><span><span class="box"></span>Somewhat difficult</span><span><span class="box"></span>Very difficult</span><span><span class="box"></span>Extremely difficult</span></div></div>
 
-<div class="crisis"><b>If you are having thoughts of hurting yourself, don’t wait for your appointment.</b> Call or text 988 (Suicide &amp; Crisis Lifeline) now, any time. In an emergency, call 911.</div>
+<div class="crisis"><b>If you are having thoughts of hurting yourself, don’t wait for your appointment.</b> Call 988 (Suicide &amp; Crisis Lifeline) now, any time, or 911 in an emergency.</div>
 
 </body>
 </html>

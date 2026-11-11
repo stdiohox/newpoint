@@ -138,6 +138,8 @@ body; replies are flagged as not monitored around the clock.
   the HTML and print it to PDF with Chrome to change it. `/forms/*` is noindex.
 - Instant delivery needs `TRIGGER_SECRET_KEY` on the production Vercel project;
   without it the 10-minute sweep sends it.
-- Reviewed by healthcare-reviewer and database-reviewer (findings fixed). Open for
-  the practice: the form asks for a Social Security number (consider optional),
-  and the PHQ-9's closing "how difficult" question is not on the form.
+- Reviewed by healthcare-reviewer and database-reviewer (findings fixed). Owner
+  decisions 2026-11-11: the Social Security number is marked optional; the
+  closing "how difficult" question is on both the GAD-7 and the PHQ-9. The crisis
+  line in the email and on the form is the site's wording (`CONTACT.crisisNote`):
+  call 988, or 911 in an emergency — never "text".
