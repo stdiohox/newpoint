@@ -24,7 +24,7 @@ interface Workflow {
 const load = (name: string): Workflow => JSON.parse(readFileSync(join(DIR, name), "utf8")) as Workflow;
 
 describe("n8n workflow exports", () => {
-  it.each(["social-approval.json", "gbp-reply-approval.json"])("%s asks on a confirm page, never with one-click links", (file) => {
+  it.each(["gbp-reply-approval.json"])("%s asks on a confirm page, never with one-click links", (file) => {
     const ask = load(file).nodes.find((n) => n.parameters["operation"] === "sendAndWait");
     expect(ask?.parameters["responseType"]).toBe("customForm");
     expect(ask?.parameters).not.toHaveProperty("approvalOptions");
@@ -32,7 +32,7 @@ describe("n8n workflow exports", () => {
     expect(fields.find((f) => f.fieldLabel === "Decision")?.requiredField).toBe(true);
   });
 
-  it.each(["social-approval.json", "gbp-reply-approval.json", "ops-alert.json", "action-required.json"])("%s has no Code node, no secrets, and stores no executions", (file) => {
+  it.each(["gbp-reply-approval.json", "action-required.json"])("%s has no Code node, no secrets, and stores no executions", (file) => {
     const text = readFileSync(join(DIR, file), "utf8");
     const workflow = load(file);
     expect(workflow.nodes.filter((n) => /code|function|executeCommand/i.test(n.type))).toEqual([]);
@@ -42,7 +42,7 @@ describe("n8n workflow exports", () => {
   });
 
   it("matches what generate.py writes (no hand edits)", () => {
-    const files = ["social-approval.json", "gbp-reply-approval.json", "ops-alert.json", "action-required.json"];
+    const files = ["gbp-reply-approval.json", "action-required.json"];
     const out = mkdtempSync(join(tmpdir(), "newpoint-n8n-"));
     try {
       execFileSync("python3", [join(DIR, "generate.py"), out], { timeout: 30_000 });
@@ -52,7 +52,7 @@ describe("n8n workflow exports", () => {
     }
   });
 
-  it.each(["social-approval.json", "gbp-reply-approval.json"])("%s completes the token only with a submitted decision", (file) => {
+  it.each(["gbp-reply-approval.json"])("%s completes the token only with a submitted decision", (file) => {
     const workflow = load(file);
     const complete = workflow.nodes.find((n) => n.name === "Complete the Trigger.dev token");
     expect(String(complete?.parameters["jsonBody"])).toContain("$json.data['Decision'] === 'Approve'");

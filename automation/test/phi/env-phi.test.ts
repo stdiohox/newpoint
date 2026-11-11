@@ -143,10 +143,6 @@ describe("Phase 9 env", () => {
 
 describe("Phase 10 env", () => {
   it("storage is all-or-none and must be newpoint-phi's own; referrer updates default OFF", () => {
-    const storage = { PHI_STORAGE_URL: `https://${REF}.supabase.co`, PHI_STORAGE_BUCKET: "referrals", PHI_STORAGE_JWT: "j".repeat(60) };
-    expect(loadPhiEnv({ ...valid, ...storage }).PHI_STORAGE_BUCKET).toBe("referrals");
-    expect(configError(() => loadPhiEnv({ ...valid, PHI_STORAGE_URL: storage.PHI_STORAGE_URL })).code).toBe("storage_partial");
-    expect(configError(() => loadPhiEnv({ ...valid, ...storage, PHI_STORAGE_URL: "https://zyxwvutsrqponmlkjihg.supabase.co" })).code).toBe("storage_host_mismatch");
     expect(loadPhiEnv(valid).PHI_REFERRER_UPDATE_ENABLED).toBe(false);
   });
 });

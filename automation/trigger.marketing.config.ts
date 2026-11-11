@@ -23,10 +23,8 @@ const project = process.env["TRIGGER_PROJECT_REF_MARKETING"] ?? "proj_xueejjzxuf
 const NOT_YET_LIVE = [
   "**/seo/rank-tracker.ts", // nothing to rank while the site holds
   "**/geo/recommendations.ts", // would audit the holding page's schema; enable at launch
-  "**/social/**", // Meta app review + n8n approval webhook
   "**/gbp/**", // GBP API access + n8n webhooks
-  "**/ops/heartbeat.ts", // n8n ops alert webhook; only watches social/GBP posts
-  "**/approval-gate.ts", // used only by social and GBP
+  "**/approval-gate.ts", // used only by gbp.reply-drafter
 ];
 
 export default defineConfig({

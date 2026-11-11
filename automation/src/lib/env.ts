@@ -56,25 +56,10 @@ export const marketingEnvSchema = z.object({
     .default("https://www.newpointnp.com/"),
   // --- Phase 3, social (§5.7). Optional here so SEO and GEO run before Meta is set up;
   // each social task demands what it needs through socialEnv() / approvalEnv().
-  /** Graph API version, pinned (for example v24.0). Never defaulted: Meta retires versions. */
-  META_GRAPH_VERSION: z.string().regex(/^v\d+\.\d+$/).optional(),
-  /** The Facebook Page that posts. */
-  META_PAGE_ID: z.string().regex(/^\d{5,25}$/).optional(),
-  /** A long-lived Page access token for that Page, from the Meta app after app review. */
-  META_PAGE_ACCESS_TOKEN: z.string().min(20).optional(),
-  /** The Instagram professional account linked to the Page. */
-  META_IG_USER_ID: z.string().regex(/^\d{5,25}$/).optional(),
-  /** n8n webhook that sends a draft to the owners for approval (§5.7). */
-  N8N_SOCIAL_APPROVAL_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
-  /** That webhook's Header Auth secret (n8n/README.md §5). */
-  N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET: z.string().min(32).optional(),
   // --- Phase 4, GBP (§5.2). Optional at load, demanded by the GBP tasks.
   /** n8n webhook for review-reply approvals (raw review beside the draft). */
   N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
   N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET: z.string().min(32).optional(),
-  /** n8n webhook that alerts Koret ops (ops.heartbeat). */
-  N8N_OPS_ALERT_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
-  N8N_OPS_ALERT_WEBHOOK_SECRET: z.string().min(32).optional(),
   /** OAuth client and a refresh token of a user who manages the listing (GBP has no service accounts). */
   GBP_OAUTH_CLIENT_ID: z.string().regex(/\.apps\.googleusercontent\.com$/).optional(),
   GBP_OAUTH_CLIENT_SECRET: z.string().min(10).optional(),
@@ -223,32 +208,9 @@ export function supabaseProjectRef(databaseUrl: string): string | undefined {
   return undefined;
 }
 
-export interface MetaEnv {
-  readonly graphVersion: string;
-  readonly pageId: string;
-  readonly pageAccessToken: string;
-  /** Absent until the Instagram account is linked; Instagram posts are then not planned. */
-  readonly igUserId: string | undefined;
-}
-
-/** The Meta credentials social.publisher needs, or a ConfigError naming what is missing. */
-export function metaEnv(env: MarketingEnv): MetaEnv {
-  const missing = (["META_GRAPH_VERSION", "META_PAGE_ID", "META_PAGE_ACCESS_TOKEN"] as const).filter((name) => env[name] === undefined);
-  if (missing.length > 0 || !env.META_GRAPH_VERSION || !env.META_PAGE_ID || !env.META_PAGE_ACCESS_TOKEN) {
-    throw new ConfigError("meta_env_missing", missing);
-  }
-  return {
-    graphVersion: env.META_GRAPH_VERSION,
-    pageId: env.META_PAGE_ID,
-    pageAccessToken: env.META_PAGE_ACCESS_TOKEN,
-    igUserId: env.META_IG_USER_ID,
-  };
-}
 
 const WEBHOOKS = {
-  social_approval: ["N8N_SOCIAL_APPROVAL_WEBHOOK_URL", "N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET"],
   gbp_reply_approval: ["N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL", "N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET"],
-  ops_alert: ["N8N_OPS_ALERT_WEBHOOK_URL", "N8N_OPS_ALERT_WEBHOOK_SECRET"],
 } as const;
 
 /** An n8n webhook and its Header Auth secret, or a ConfigError naming what is missing. */
@@ -260,16 +222,6 @@ export function webhookEnv(env: MarketingEnv, webhook: keyof typeof WEBHOOKS): {
     throw new ConfigError(`${webhook}_webhook_env_missing` as const, [urlName, secretName].filter((name) => env[name] === undefined));
   }
   return { url, secret };
-}
-
-/** The n8n webhook social.approval posts to, or a ConfigError naming what is missing. */
-export function approvalWebhookEnv(env: MarketingEnv): { readonly url: string; readonly secret: string } {
-  try {
-    return webhookEnv(env, "social_approval");
-  } catch (error) {
-    if (error instanceof ConfigError) throw new ConfigError("approval_webhook_env_missing", error.variables);
-    throw error;
-  }
 }
 
 export interface GbpEnv {

@@ -152,23 +152,6 @@ def approval_workflow(wf: str, name: str, path: str, credential: str, kind: str,
     }
 
 
-social = approval_workflow(
-    "social", "Newpoint · social post approval", "newpoint-social-approval", "Newpoint social approval webhook",
-    "social.approval_requested",
-    "=Newpoint {{ $json.body.channel }} post for {{ $json.body.scheduled_for }}: approve?",
-    "=Channel: {{ $json.body.channel }}\nScheduled: {{ $json.body.scheduled_for }}\nExpires: {{ $json.body.expires_at }}\n\n"
-    "POST TEXT\n{{ $json.body.body }}\n\n"
-    "IMAGE\n{{ $json.body.media.length ? $json.body.media[0].url + '\\nAlt text: ' + $json.body.media[0].alt : 'none' }}\n\n"
-    "COMPLIANCE\n{{ $json.body.compliance.passed ? 'Passed automated review' : 'AUTOMATED REVIEW DID NOT PASS after three rounds. Approve only if you have read the notes below and you are sure the post is accurate and appropriate.' }} "
-    "(round {{ $json.body.compliance.rounds }})\nRules flagged: {{ $json.body.compliance.rules.join(', ') || 'none' }}\n"
-    "Notes: {{ $json.body.compliance.review_notes.join(' | ') || 'none' }}\n\n"
-    "Approving publishes exactly this text and image at the scheduled time. Any later edit voids the approval.",
-    "Approve this Newpoint post?",
-    "## Newpoint social approval (automation/n8n/README.md §9)\nTrigger.dev `social.approval` POSTs the draft and a one-time token URL here. "
-    "The owner decides on a **confirm page** (a form POST, so link scanners cannot approve); this workflow then POSTs `{approved, content_hash}` "
-    "to the token URL. No Trigger.dev key lives in n8n. With no decision, n8n posts nothing and Trigger.dev's 72 h timeout expires the post.",
-)
-
 gbp = approval_workflow(
     "gbp-reply", "Newpoint · GBP review reply approval", "newpoint-gbp-reply-approval", "Newpoint GBP reply approval webhook",
     "gbp.reply_approval_requested",
@@ -185,38 +168,10 @@ gbp = approval_workflow(
     "An automated check looked for these, but it cannot catch everything; you are the last check. "
     "Approving posts exactly this reply, publicly, under the practice's name.",
     "Approve this reply to a Google review?",
-    "## Newpoint GBP review reply approval (automation/n8n/README.md §10)\nTrigger.dev `gbp.reply-drafter` POSTs the raw review, the draft and a "
+    "## Newpoint GBP review reply approval (automation/n8n/README.md §9)\nTrigger.dev `gbp.reply-drafter` POSTs the raw review, the draft and a "
     "one-time token URL. The owner decides on a confirm page (form POST). Never auto-posts. With no decision, n8n posts nothing and "
     "Trigger.dev's 72 h timeout sends one reminder, then expires the reply.",
 )
-
-ops = {
-    "name": "Newpoint · Koret ops alert (marketing)",
-    "nodes": [
-        webhook("ops", "newpoint-ops-alert", "Newpoint ops alert webhook"),
-        guard("ops", "ops.alert", []),
-        {"id": nid("ops:send"), "name": "Email Koret ops", "type": "n8n-nodes-base.emailSend", "typeVersion": 2.1,
-         "position": [480, -100],
-         "parameters": {
-             "fromEmail": "SET-BEFORE-ACTIVATING@example.invalid", "toEmail": "SET-BEFORE-ACTIVATING@example.invalid",
-             "subject": "=Newpoint automation: {{ $json.body.code }}",
-             "emailFormat": "text",
-             "text": "=Code: {{ $json.body.code }}\nPost: {{ $json.body.post_id }} ({{ $json.body.channel }})\n"
-                     "In 'publishing' since {{ $json.body.since }} ({{ $json.body.minutes }} minutes).\n\n"
-                     "The platform call failed or the worker died mid-call. Nothing re-posts it automatically. "
-                     "Check the Facebook Page / Instagram / Google listing: if the post is live, set the row to published "
-                     "with its reference; if not, re-run social.publisher or gbp.post-publisher from the Trigger.dev dashboard.",
-             "options": {}},
-         "credentials": {"smtp": {"id": "", "name": "Newpoint approvals SMTP"}}},
-        dropped("ops"),
-    ],
-    "connections": {
-        "Webhook": {"main": [[{"node": "Is a valid request?", "type": "main", "index": 0}]]},
-        "Is a valid request?": {"main": [[{"node": "Email Koret ops", "type": "main", "index": 0}],
-                                         [{"node": "Invalid request: dropped", "type": "main", "index": 0}]]},
-    },
-    "settings": SETTINGS, "active": False, "pinData": {}, "tags": [],
-}
 
 # PHI zone → n8n (§1, §6): the body is { kind: "action_required", at } and nothing else.
 # The email says only that something is waiting and links to the staff console; it
@@ -249,7 +204,6 @@ action = {
     "settings": SETTINGS, "active": False, "pinData": {}, "tags": [],
 }
 
-for filename, workflow in [("social-approval.json", social), ("gbp-reply-approval.json", gbp), ("ops-alert.json", ops),
-                           ("action-required.json", action)]:
+for filename, workflow in [("gbp-reply-approval.json", gbp), ("action-required.json", action)]:
     (OUT / filename).write_text(json.dumps(workflow, indent=2) + "\n")
     print("wrote", filename)

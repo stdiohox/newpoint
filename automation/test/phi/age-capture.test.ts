@@ -5,22 +5,18 @@
  * ever fills an UNKNOWN age. Against the embedded newpoint-phi database; synthetic data only.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createIntake } from "../../edge/intake/handler.js";
-import type { Enqueue } from "../../edge/shared/deps.js";
 import { createVapiTools, REPLIES } from "../../edge/vapi-tools/handler.js";
 import { buildAssistant, FIRST_MESSAGE, SYSTEM_PROMPT, type VapiClient } from "../../src/adapters/voice/vapi.js";
-import { CONSENT_WORDING } from "../../src/domain/consent/wording.js";
 import { parseAgeAnswer } from "../../src/domain/messaging/age.js";
 import { TEMPLATES } from "../../src/domain/messaging/templates.js";
 import { clientDb } from "../../src/lib/db-phi.js";
 import { createLogger } from "../../src/lib/logger.js";
 import { phi } from "../../src/lib/phi.js";
 import { runInboundSms, type InboundDeps } from "../../src/trigger/phi/messaging/inbound-sms.js";
-import { AGE_CHECK_PER_HOUR, runSendSms, type SendSmsPayload } from "../../src/trigger/phi/messaging/send-sms.js";
+import { AGE_CHECK_PER_HOUR, runSendSms } from "../../src/trigger/phi/messaging/send-sms.js";
 import { startProjectDb, type MarketingDb } from "../db/marketing-db.js";
 import { ENV, fakeTwilio, seedContact } from "./fixtures.js";
 
-const SITE = "https://newpointnp.example";
 const DAY = new Date("2026-10-20T15:00:00Z");
 
 let db: MarketingDb | undefined;
@@ -60,119 +56,6 @@ describe("reading an age answer", () => {
   });
   it("the question is neutral: Newpoint, the question, how to answer, how to stop", () => {
     expect(TEMPLATES.age_check.text).toBe("Newpoint: before we continue, are you 18 or older? Reply YES or NO. Reply STOP to opt out.");
-  });
-});
-
-// --- Web intake --------------------------------------------------------------------------
-
-function intake() {
-  const calls: { taskId: string; payload: Record<string, unknown> }[] = [];
-  const enqueue: Enqueue = (taskId, payload) => {
-    calls.push({ taskId, payload });
-    return Promise.resolve();
-  };
-  const handler = createIntake(
-    { siteOrigin: SITE, turnstile: () => Promise.resolve(true), hmacSecret: "h".repeat(40), ipHeader: "cf-connecting-ip" },
-    { db: clientDb(client()), enqueue, now: () => DAY },
-  );
-  return { calls, handler };
-}
-const form = (extra: Record<string, unknown> = {}) => ({
-  name: "Test Person",
-  email: "test@example.test",
-  phone: "(609) 555-0190",
-  reason: "New patient inquiry",
-  smsConsent: true,
-  consentVersion: CONSENT_WORDING.version,
-  turnstileToken: "tok",
-  ...extra,
-});
-const post = (handler: (r: Request) => Promise<Response>, path: string, body: unknown, ip = "198.51.100.7") =>
-  handler(
-    new Request(`https://edge.example.test${path}`, {
-      method: "POST",
-      headers: { origin: SITE, "content-type": "application/json", "cf-connecting-ip": ip },
-      body: JSON.stringify(body),
-    }),
-  );
-
-describe("web form: Are you 18 or older?", () => {
-  it.each([
-    // A typed-in number is not proof: "yes" waits for the code even for a new contact.
-    ["yes", "unknown", null],
-    ["no", "minor", "web_form"],
-    [undefined, "unknown", null],
-  ])("a new phone contact answering %s is %s until proven", async (answer, status, source) => {
-    await as("phi_edge");
-    const { handler } = intake();
-    expect((await post(handler, "/intake", form(answer === undefined ? {} : { adult: answer }))).status).toBe(200);
-    await client().query("reset role");
-    expect(await ageOf("+16095550190")).toEqual({ minor_status: status, minor_status_source: source });
-  });
-
-  it("no means no code and no texts, even with the consent box ticked (a minor gets a staff callback)", async () => {
-    await as("phi_edge");
-    const { handler, calls } = intake();
-    const response = await post(handler, "/intake", form({ adult: "no" }));
-    expect(await response.json()).toEqual({ ok: true, verificationId: null });
-    expect(calls.map((c) => c.taskId)).toEqual(["referrals.lead-follow-up"]);
-  });
-
-  it("an existing unknown contact's yes waits for the code; once confirmed they are an adult", async () => {
-    await seedContact(client(), { phone: "+16095550190", minor: "unknown", consent: "none" });
-    await as("phi_edge");
-    const { handler, calls } = intake();
-    const { verificationId } = (await (await post(handler, "/intake", form({ adult: "yes" }))).json()) as { verificationId: string };
-    await client().query("reset role");
-    expect((await ageOf("+16095550190"))?.minor_status).toBe("unknown");
-    // The code may go to them on the strength of the pending yes (D18 exception for the code only).
-    const send = calls.find((c) => c.taskId === "messaging.send-sms")?.payload as SendSmsPayload;
-    await as("phi_tasks");
-    const twilio = fakeTwilio();
-    expect((await runSendSms({ db: clientDb(client()), twilio, env: ENV, now: () => DAY, actor: "messaging.send-sms" }, send)).status).toBe("sent");
-    await client().query("reset role");
-    const code = (await client().query<{ code: string }>(`select code from phi.phone_verifications`)).rows[0]?.code ?? "";
-    await as("phi_edge");
-    expect((await post(handler, "/intake/verify", { verificationId, code })).status).toBe(200);
-    await client().query("reset role");
-    expect(await ageOf("+16095550190")).toEqual({ minor_status: "adult", minor_status_source: "web_form" });
-  });
-
-  it("a typed-in number never overrides an age staff already set", async () => {
-    await seedContact(client(), { phone: "+16095550190", minor: "adult" });
-    await client().query(`update phi.contacts set minor_status_source = 'staff'`);
-    await as("phi_edge");
-    expect((await post(intake().handler, "/intake", form({ adult: "no" }))).status).toBe(200);
-    await client().query("reset role");
-    expect(await ageOf("+16095550190")).toEqual({ minor_status: "adult", minor_status_source: "staff" });
-  });
-
-  it("an existing contact is never flipped by the form: a no is kept on the inquiry for staff", async () => {
-    await seedContact(client(), { phone: "+16095550190", minor: "unknown" });
-    await as("phi_edge");
-    expect((await post(intake().handler, "/intake", form({ adult: "no" }))).status).toBe(200);
-    await client().query("reset role");
-    expect(await ageOf("+16095550190")).toEqual({ minor_status: "unknown", minor_status_source: null });
-    expect((await client().query(`select age_answer from phi.inquiries`)).rows).toEqual([{ age_answer: "no" }]);
-  });
-
-  it("a new contact's yes becomes adult once the code is confirmed; an email-only contact takes it at once", async () => {
-    await as("phi_edge");
-    const { handler } = intake();
-    const { verificationId } = (await (await post(handler, "/intake", form({ adult: "yes" }))).json()) as { verificationId: string };
-    await client().query("reset role");
-    const code = (await client().query<{ code: string }>(`select code from phi.phone_verifications`)).rows[0]?.code ?? "";
-    await as("phi_edge");
-    expect((await post(handler, "/intake/verify", { verificationId, code })).status).toBe(200);
-    expect((await post(handler, "/intake", form({ adult: "yes", phone: undefined, smsConsent: false, email: "e@example.test" }), "198.51.100.8")).status).toBe(200);
-    await client().query("reset role");
-    expect(await ageOf("+16095550190")).toEqual({ minor_status: "adult", minor_status_source: "web_form" });
-    expect((await client().query(`select minor_status::text from phi.contacts where email = 'e@example.test'`)).rows).toEqual([{ minor_status: "adult" }]);
-  });
-
-  it("refuses anything but yes or no", async () => {
-    await as("phi_edge");
-    expect((await post(intake().handler, "/intake", form({ adult: "maybe" }))).status).toBe(400);
   });
 });
 

@@ -1,8 +1,7 @@
 /**
  * Phase 4 end to end against the embedded Postgres shaped like newpoint-marketing,
  * AS marketing_rw: gbp.sync → gbp.reply-drafter (confirm-page approval, reminder,
- * never auto-posts), gbp.post-publisher, gbp.nap-audit's two locks, and the
- * ops.heartbeat stuck-publishing alert. Google, Claude, n8n and the gate are fakes.
+ * never auto-posts) and gbp.nap-audit's two locks. Google, Claude, n8n and the gate are fakes.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { BusinessProfile, GbpLocation, GbpReview } from "../../src/adapters/google/business-profile.js";
@@ -10,13 +9,10 @@ import type { ParseResult, PublicClaude } from "../../src/adapters/llm/anthropic
 import type { GbpReplyApprovalRequested, N8nEvent } from "../../src/adapters/n8n/emit.js";
 import { createLogger } from "../../src/lib/logger.js";
 import type { PublicText } from "../../src/lib/phi.js";
-import { contentHash } from "../../src/domain/social/plan.js";
 import type { ApprovalGate } from "../../src/trigger/marketing/approval-gate.js";
 import { runGbpNapAudit } from "../../src/trigger/marketing/gbp/nap-audit.js";
-import { runGbpPostPublisher } from "../../src/trigger/marketing/gbp/post-publisher.js";
 import { runGbpReplyDrafter } from "../../src/trigger/marketing/gbp/reply-drafter.js";
 import { runGbpSync } from "../../src/trigger/marketing/gbp/sync.js";
-import { runHeartbeat } from "../../src/trigger/marketing/ops/heartbeat.js";
 import { startMarketingDb, type MarketingDb } from "../db/marketing-db.js";
 
 const NOW = new Date("2026-10-19T15:00:00Z");
@@ -249,58 +245,6 @@ describe("gbp.reply-drafter", () => {
     expect(h.events).toHaveLength(1);
     expect(replies).toEqual([]);
     expect(await reviewRow("r1")).toMatchObject({ reply_status: "rejected", status_reason: "replied_elsewhere" });
-  });
-});
-
-describe("gbp.post-publisher", () => {
-  async function approvedGbpPost(body: string, slot = new Date("2026-10-19T14:00:00Z")) {
-    await client().query("reset role");
-    const hash = contentHash({ channel: "gbp", body, media: [], scheduledFor: slot });
-    const { rows } = await client().query<{ id: string }>(
-      `insert into marketing.social_posts (channel, topic, body, scheduled_for, approval_status, approved_content_hash)
-       values ('gbp', 't', $1, $2, 'approved', $3) returning id`,
-      [body, slot.toISOString(), hash],
-    );
-    await client().query("set role marketing_rw");
-    return rows[0]?.id ?? "";
-  }
-  const status = async (id: string) =>
-    (await client().query<{ approval_status: string; status_reason: string | null; published_ref: string | null }>(
-      "select approval_status::text, status_reason, published_ref from marketing.social_posts where id = $1",
-      [id],
-    )).rows[0];
-
-  it("publishes the Phase 3 GBP posts whose slot has come, once", async () => {
-    const due = await approvedGbpPost("How a telehealth visit works. Learn more at newpointnp.com.");
-    const later = await approvedGbpPost("Next week's post.", new Date("2026-10-26T14:00:00Z"));
-    const { gbp, posts } = fakeGbp([]);
-    const deps = { db: client(), gbp: () => gbp, logger, now: () => NOW };
-    expect(await runGbpPostPublisher(deps)).toEqual({ published: 1 });
-    expect(await runGbpPostPublisher(deps)).toEqual({});
-    expect(posts).toEqual([{ summary: "How a telehealth visit works. Learn more at newpointnp.com.", ctaUrl: "https://www.newpointnp.com/", imageUrl: null }]);
-    expect(await status(due)).toMatchObject({ approval_status: "published", published_ref: "localPosts/1" });
-    expect(await status(later)).toMatchObject({ approval_status: "approved" });
-  });
-
-  it("refuses a phone number in a GBP post, and leaves a failed call in publishing for the heartbeat", async () => {
-    const phone = await approvedGbpPost("Call (609) 527-9438 to learn more.");
-    const failing = await approvedGbpPost("Telehealth across New Jersey and Pennsylvania.", new Date("2026-10-19T14:15:00Z"));
-    const { gbp, failNextPosts } = fakeGbp([]);
-    failNextPosts();
-    expect(await runGbpPostPublisher({ db: client(), gbp: () => gbp, logger, now: () => NOW })).toEqual({ gbp_no_phone_in_post: 1, failed: 1 });
-    expect(await status(phone)).toMatchObject({ approval_status: "rejected", status_reason: "gbp_no_phone_in_post" });
-    expect(await status(failing)).toMatchObject({ approval_status: "publishing", status_reason: "publish_failed_check_listing" });
-
-    // ops.heartbeat: nothing at once, one alert after 30 minutes, never a second.
-    const alerts: N8nEvent[] = [];
-    const heartbeat = { db: client(), logger, now: () => NOW, alerts: { emit: (e: N8nEvent) => Promise.resolve(void alerts.push(e)) } };
-    expect(await runHeartbeat(heartbeat)).toEqual({ stuckAlerted: 0 });
-    await client().query("reset role");
-    await client().query("update marketing.social_posts set publishing_started_at = now() - interval '31 minutes' where id = $1", [failing]);
-    await client().query("set role marketing_rw");
-    expect(await runHeartbeat(heartbeat)).toEqual({ stuckAlerted: 1 });
-    expect(await runHeartbeat(heartbeat)).toEqual({ stuckAlerted: 0 });
-    expect(alerts[0]).toMatchObject({ kind: "ops.alert", code: "post_stuck_publishing", post_id: failing, channel: "gbp" });
   });
 });
 

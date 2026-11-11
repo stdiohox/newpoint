@@ -89,28 +89,16 @@ The files follow Supabase's pgTAP convention, so they should also run with
 
 ---
 
-## Phase 3: the social engine (§5.7)
+## Removed on 2026-11-11 (owner decision)
 
-```
-social.planner ─▶ social.drafter ─▶ social.compliance ─┬─▶ social.approval ─▶ social.publisher
- (Mon 07:00 ET)          ▲                              │    (72 h, n8n email)    (at the slot)
-                         └── feedback, at most 3 rounds ┘
-```
-
-| Task | Does |
-|---|---|
-| `social.planner` | Plans the following week: topics × channels from the keyword clusters, confirmed facts and the awareness calendar. |
-| `social.drafter` | Body, plus an image from the confirmed media library and its alt text. A draft that does not fit its channel is rejected, never trimmed. |
-| `social.compliance` | `postViolations` (the brief as code) first, then `claude-opus-5-5` review for tone and implied claims. Back to the drafter at most three times, then to the owner **with the report**. |
-| `social.approval` | Hashes the post, creates a 72 h wait token, sends n8n the draft and the token's one-time URL, waits. |
-| `social.publisher` | Re-hashes and re-runs the rules; refuses on any change or rule break. Facebook and Instagram now (D10); GBP posts stay `approved` for Phase 4. Runs once, retries only Meta 429s, so a post can never go out twice. |
-
-- **Media library:** `public.practice_facts` key `social.media_library`, `confirmed = true`, value
-  `[{ "url": "https://…", "description": "…" }]`. Images the practice owns, on a public https URL.
-  Without it, Instagram is not planned (it cannot post without an image).
-- **Statuses:** `planned → drafted → in_compliance → awaiting_approval → approved → published`, or
-  `rejected` / `expired` with `status_reason` (a code, never vendor text).
-- **Not sent to Meta yet:** alt text (parameter to confirm against the pinned Graph version).
+Deleted from the repo, with their tests, n8n workflows and settings (git history keeps them):
+the **social engine** (Phase 3, `social.*`, Meta adapter) and with it `gbp.post-publisher`
+and `ops.heartbeat`; the **old web intake** (`edge/intake`, replaced by the site's
+`/api/leads` and the lead CRM, docs/lead-crm.md); **SMS lead follow-up**
+(`referrals.lead-follow-up`, replaced by the CRM's staff nudges); and **referral intake**
+(Phase 10: `edge/intake` referral route, `referrals.intake`, `referrals.referrer-update`,
+the referral bucket and the console's referral queue). The `marketing.social_posts` and
+`phi.referrals` tables remain in the schemas; nothing writes to them.
 
 ## Phase 4: Google Business Profile (§5.2)
 
@@ -118,9 +106,7 @@ social.planner ─▶ social.drafter ─▶ social.compliance ─┬─▶ socia
 |---|---|
 | `gbp.sync` (hourly) | Reviews → `marketing.gbp_reviews`; each unanswered review to the drafter. A reply someone posted in the GBP UI stops the pipeline for that review. |
 | `gbp.reply-drafter` | Sonnet 5.5 draft (no tools, review fenced as untrusted) → `replyViolations` (§5.2: never implies a patient, names no one, no clinical word, never repeats the review) → confirm-page approval with the raw review beside the draft (72 h) → one reminder (72 h) → posted only if approved. **Never auto-posts.** |
-| `gbp.post-publisher` (every 15 min) | Publishes the GBP posts approved through the Phase 3 pipeline at their slot. Hash and rules re-checked; no phone number in a GBP post; claimed before the API call. |
 | `gbp.nap-audit` (monthly) | **Blocked until D11.** Runs only with `GBP_NAP_AUDIT_ENABLED=true` AND `legal_name`, `street_address`, `phone` confirmed in `public.practice_facts`. Mismatches → `content_backlog` (`nap`). |
-| `ops.heartbeat` (every 15 min) | Phase 3 fix: alerts Koret ops once for any post stuck in `publishing` > 30 min. |
 
 - **Facts the GBP tasks read** (`public.practice_facts`, `confirmed = true`, string values):
   `phone` (the practice line replies may give), and for the NAP audit `legal_name` and
@@ -170,14 +156,12 @@ against the embedded Postgres and fakes only.
   callback; clinicians see the patient's name and number, admins don't.
 
 
-## Phase 6: SMS concierge, lead follow-up, web intake (§5.1, §5.5) — built, NOT deployable yet
+## Phase 6: SMS concierge (§5.1) — built, NOT deployable yet
 
 | Piece | Does |
 |---|---|
 | `edge/twilio-inbound` | Signature checked against the exact public URL first; duplicate `MessageSid` dropped (and re-enqueued with the same key, so a lost enqueue still runs once); unknown numbers become unknown-age contacts; empty TwiML reply. |
-| `edge/intake` | The site form posts here directly. Exact Origin, strict schema (name, email, optional US phone, the site's four reasons, nothing else), Turnstile, rate limits per IP (5/h) and per phone (3/day) keyed by HMAC. Consent recorded only when ticked, against the server's wording version, stored verbatim. 6-digit code, 10 min, 5 tries. |
 | `messaging.inbound-sms` | Crisis (keyword) → event, page, fixed reply awaited before any opt-out in the same message is recorded → STOP/HELP → Haiku 4.5 (HIPAA org, enum only) → a staff ticket and a neutral template. The model is a second crisis detector; a model failure is a ticket, never a default category. |
-| `referrals.lead-follow-up` | Every web inquiry opens a callback ticket. Web **new-patient** inquiries get SMS at +5 min, +24 h, +72 h; each step re-checks open / adult / consent / verified / no crisis. Referral-sourced, existing-patient, billing and other inquiries are never enrolled. |
 | Site form | `components/ui/intake-form.tsx`, rendered by `ContactCrisis` only when `NEXT_PUBLIC_INTAKE_URL` and `NEXT_PUBLIC_TURNSTILE_SITE_KEY` are both set at build. **Unset (the default) the site is unchanged:** same markup, and the intake code is not in the bundle (build-time dead branch via `next.config.ts` `env`). |
 
 - **D5 open:** the edge handlers are host-agnostic fetch handlers (`edge/README.md`); nothing
@@ -261,25 +245,6 @@ in `src/adapters/scheduling`). No EHR adapter until D1 picks a system with an AP
   the review window shows to every clinician.
 - The marketing `ops.heartbeat` stale-agent digest that reads `metrics.agent_health` is not
   built here (§5.9 marketing side); the rows are now pushed for it.
-
-## Phase 10: referral intake (§5.5) — built, NOT deployable yet
-
-D17: the clinician web form is the only path (fax waits for a BAA-covered e-fax vendor).
-D12: `referrals.referrer-update` is built but OFF.
-
-| Piece | Does |
-|---|---|
-| `edge/intake/referral.ts` (`POST /intake/referral`) | Exact Origin, a declared size and a per-IP attempt limit BEFORE the body is read, Turnstile, rate limits (per IP, global daily), referrer fields only, a PDF (must start with `%PDF-`) of at most 10 MB stored in the private bucket under a server-chosen UUID. No patient fields on the form. |
-| `referrals.intake` | The PDF goes only to the Anthropic HIPAA org (Opus 5.5, effort high, no tools), as untrusted data, into a fixed schema. EVERY referral opens a clinician review ticket: the model's urgency is shown as model-stated and unverified, never trusted to route a referral away from a clinician. Never creates a contact or sends anything. A referral whose intake keeps failing opens a clinician review after 30 minutes (`ops.reconcile`). |
-| Console | Referral queue: extracted values shown escaped and pre-filled for staff to check against the document (an audited download, never rendered inline). Confirm creates the contact with NO consent and opens a staff callback (a clinician review for an urgent one); reject. Either closes the review ticket. Urgent, high-risk or unread referrals are clinician-only (admins cannot decide them or see the patient's name). A number already on file is never linked silently: staff resolve it by hand. |
-| `referrals.referrer-update` | Would send only "received and the patient has been scheduled", once per referral. OFF (`PHI_REFERRER_UPDATE_ENABLED=false`) and no channel to referrers is wired, so it sends nothing until counsel (D12) and a BAA-covered channel are decided. |
-| Retention | `ops.retention-sweep` removes documents past `purge_after` (D16 open: nothing sets it yet). |
-
-- **Not built:** the clinician-facing form page itself (where it is hosted is an owner
-  decision, like D7); the edge route is ready for it.
-- **Go-live setup:** a PRIVATE Supabase Storage bucket on newpoint-phi and storage-scoped JWTs
-  (never service_role): a PUT-only one for the internet-facing edge, and one with get/delete for
-  tasks and the console, each limited to that bucket by `storage.objects` policies.
 
 ## Age at first contact (D18 follow-up)
 
@@ -398,14 +363,7 @@ loads, so deploy with `TRIGGER_PROJECT_REF_MARKETING=proj_… npm run deploy:mar
 3. The request uses the `server-side-fallback-2026-07-01` beta (`fallbacks: "default"`):
    a policy decline is re-run on Anthropic's recommended model for that category.
 
-### 5. Meta (Phase 3; full checklist in the deploy notes)
-
-Set, in the Trigger.dev dashboard only: `META_GRAPH_VERSION`, `META_PAGE_ID`,
-`META_PAGE_ACCESS_TOKEN`, and `META_IG_USER_ID` once Instagram is linked. Never in n8n.
-Then `N8N_SOCIAL_APPROVAL_WEBHOOK_URL` and `N8N_SOCIAL_APPROVAL_WEBHOOK_SECRET` from
-[`n8n/README.md` §9](n8n/README.md).
-
-### 6. Google Business Profile (Phase 4; access steps in the deploy notes)
+### 5. Google Business Profile (Phase 4; access steps in the deploy notes)
 
 Set, in the Trigger.dev dashboard only: `GBP_OAUTH_CLIENT_ID`, `GBP_OAUTH_CLIENT_SECRET`,
 `GBP_OAUTH_REFRESH_TOKEN`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`. Leave
@@ -430,6 +388,6 @@ Set, in the Trigger.dev dashboard only: `GBP_OAUTH_CLIENT_ID`, `GBP_OAUTH_CLIENT
 5. Approve and commit the crisis script (D15) and consent wording (D20) with
    `approved: true`, approver and date. Production will not start before that.
 
-### 7. n8n
+### 6. n8n
 
 Work through [`n8n/README.md`](n8n/README.md) before activating any workflow.

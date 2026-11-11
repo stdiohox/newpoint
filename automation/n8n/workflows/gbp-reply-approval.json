@@ -230,7 +230,7 @@
         "color": 5,
         "width": 780,
         "height": 240,
-        "content": "## Newpoint GBP review reply approval (automation/n8n/README.md \u00a710)\nTrigger.dev `gbp.reply-drafter` POSTs the raw review, the draft and a one-time token URL. The owner decides on a confirm page (form POST). Never auto-posts. With no decision, n8n posts nothing and Trigger.dev's 72 h timeout sends one reminder, then expires the reply."
+        "content": "## Newpoint GBP review reply approval (automation/n8n/README.md \u00a79)\nTrigger.dev `gbp.reply-drafter` POSTs the raw review, the draft and a one-time token URL. The owner decides on a confirm page (form POST). Never auto-posts. With no decision, n8n posts nothing and Trigger.dev's 72 h timeout sends one reminder, then expires the reply."
       }
     }
   ],
