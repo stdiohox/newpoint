@@ -102,18 +102,19 @@ the referral bucket and the console's referral queue). The `marketing.social_pos
 
 ## Phase 4: Google Business Profile (§5.2)
 
+Reviews only (GBP posts went with the social engine). Approval happens in the lead CRM
+(docs/lead-crm.md, "Google reviews"); access steps for the owner are in docs/gbp-access.md.
+
 | Task | Does |
 |---|---|
 | `gbp.sync` (hourly) | Reviews → `marketing.gbp_reviews`; each unanswered review to the drafter. A reply someone posted in the GBP UI stops the pipeline for that review. |
-| `gbp.reply-drafter` | Sonnet 5.5 draft (no tools, review fenced as untrusted) → `replyViolations` (§5.2: never implies a patient, names no one, no clinical word, never repeats the review) → confirm-page approval with the raw review beside the draft (72 h) → one reminder (72 h) → posted only if approved. **Never auto-posts.** |
+| `gbp.reply-drafter` | Sonnet 5.5 draft (no tools, review fenced as untrusted) → `replyViolations` (§5.2: never implies a patient, names no one, no clinical word, never repeats the review) → one email to staff; the review and draft wait at `/crm/reviews`. A draft that fails the rules twice is handed to a person (email, shown in the CRM). **Never posts.** |
+| `gbp.reply-poster` (every 15 min) | Posts replies staff approved in the CRM (`crm.decide_review`), after checking Google live (never overwrites a reply that appeared meanwhile) and the rules again (staff can edit). A refusal is recorded and emailed. |
 | `gbp.nap-audit` (monthly) | **Blocked until D11.** Runs only with `GBP_NAP_AUDIT_ENABLED=true` AND `legal_name`, `street_address`, `phone` confirmed in `public.practice_facts`. Mismatches → `content_backlog` (`nap`). |
 
 - **Facts the GBP tasks read** (`public.practice_facts`, `confirmed = true`, string values):
   `phone` (the practice line replies may give), and for the NAP audit `legal_name` and
   `street_address`. Unconfirmed facts are never used.
-- `marketing.gbp_posts` (§4) is unused: GBP posts go through `social_posts` (channel `gbp`)
-  so they share the Phase 3 drafting, compliance and approval.
-- GBP performance metrics (§5.2 inputs) are not fetched: §4 has no table for them.
 
 ## Phase 5: PHI foundations (§4, §5.0, §5.8, §6) — built, NOT deployable yet
 
@@ -367,8 +368,7 @@ loads, so deploy with `TRIGGER_PROJECT_REF_MARKETING=proj_… npm run deploy:mar
 
 Set, in the Trigger.dev dashboard only: `GBP_OAUTH_CLIENT_ID`, `GBP_OAUTH_CLIENT_SECRET`,
 `GBP_OAUTH_REFRESH_TOKEN`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`. Leave
-`GBP_NAP_AUDIT_ENABLED` unset until D11 is confirmed. Then the two webhooks from
-[`n8n/README.md` §10 and §11](n8n/README.md).
+`GBP_NAP_AUDIT_ENABLED` unset until D11 is confirmed. No n8n: approvals happen in the CRM.
 
 ### PHI zone (Phase 5) — only after every §2 BAA is signed
 

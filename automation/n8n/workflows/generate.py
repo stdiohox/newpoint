@@ -152,27 +152,6 @@ def approval_workflow(wf: str, name: str, path: str, credential: str, kind: str,
     }
 
 
-gbp = approval_workflow(
-    "gbp-reply", "Newpoint · GBP review reply approval", "newpoint-gbp-reply-approval", "Newpoint GBP reply approval webhook",
-    "gbp.reply_approval_requested",
-    "={{ $json.body.reminder ? 'REMINDER: ' : '' }}Reply to a {{ $json.body.rating }}-star Google review: approve?",
-    "={{ $json.body.reminder ? 'This is the reminder: the first request ran out after 72 hours. If this one runs out too, nothing is posted.\\n\\n' : '' }}"
-    "THE REVIEW, AS GOOGLE SHOWS IT ({{ $json.body.rating }} stars, by {{ $json.body.reviewer || 'a Google user' }})\n"
-    "{{ $json.body.review_text || '(rating only, no text)' }}\n\n"
-    "THE DRAFT REPLY\n{{ $json.body.draft }}\n\n"
-    "BEFORE YOU APPROVE, CHECK EACH LINE OF THE REPLY:\n"
-    "- It does not say or hint that this person is or was a patient (no visit, wait, appointment, treatment, care or feeling better).\n"
-    "- It names no one: not the reviewer, not a provider.\n"
-    "- It repeats nothing from the review and mentions no detail of it.\n"
-    "- It uses no clinical or health word.\n"
-    "An automated check looked for these, but it cannot catch everything; you are the last check. "
-    "Approving posts exactly this reply, publicly, under the practice's name.",
-    "Approve this reply to a Google review?",
-    "## Newpoint GBP review reply approval (automation/n8n/README.md §9)\nTrigger.dev `gbp.reply-drafter` POSTs the raw review, the draft and a "
-    "one-time token URL. The owner decides on a confirm page (form POST). Never auto-posts. With no decision, n8n posts nothing and "
-    "Trigger.dev's 72 h timeout sends one reminder, then expires the reply.",
-)
-
 # PHI zone → n8n (§1, §6): the body is { kind: "action_required", at } and nothing else.
 # The email says only that something is waiting and links to the staff console; it
 # carries no id, count or kind of work, and must not be edited to add any.
@@ -204,6 +183,6 @@ action = {
     "settings": SETTINGS, "active": False, "pinData": {}, "tags": [],
 }
 
-for filename, workflow in [("gbp-reply-approval.json", gbp), ("action-required.json", action)]:
+for filename, workflow in [("action-required.json", action)]:
     (OUT / filename).write_text(json.dumps(workflow, indent=2) + "\n")
     print("wrote", filename)

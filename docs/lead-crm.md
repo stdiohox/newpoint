@@ -172,3 +172,16 @@ Two more `crm.*` Trigger tasks, same runtime and email layout as the alerts:
   24 h as nudged, so the first run sends no backlog); pgTAP `013`; vitest
   `test/crm/follow-up.test.ts`. Reviewed by database-reviewer and healthcare-reviewer;
   findings applied.
+
+## Google reviews (2026-11-11)
+
+Review replies are approved in the CRM, not through n8n (which is gone from the
+marketing side). `gbp.sync` (hourly) → `gbp.reply-drafter` drafts, runs the reply rules,
+emails staff once (`gbp_reviews.alerted_at`) → staff approve, edit or skip at
+`/crm/reviews` (`crm.review_queue()`, `crm.decide_review()`; SECURITY DEFINER, gated by
+`crm.is_staff()`) → `gbp.reply-poster` (every 15 min) re-checks Google and the rules and
+posts `approved_reply`. Refusals (`rule_at_post`, `replied_elsewhere`) and drafts that
+failed the rules (`reply_failed_validator`) are emailed to staff and shown with a reason.
+Migration `20261111000002_gbp_review_approval.sql`; pgTAP `014`; vitest `test/gbp`.
+Held back (`**/gbp/**` in NOT_YET_LIVE) until the access steps in `docs/gbp-access.md`
+are done.

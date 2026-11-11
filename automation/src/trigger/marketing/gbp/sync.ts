@@ -7,13 +7,15 @@
  * and §5.2's only output is gbp_reviews, so they are not fetched here.
  */
 import { idempotencyKeys, queue, tasks } from "@trigger.dev/sdk";
-import { createBusinessProfile, gbpAccessToken, type BusinessProfile, type GbpReview } from "../../../adapters/google/business-profile.js";
+import type { BusinessProfile, GbpReview } from "../../../adapters/google/business-profile.js";
 import { listReviewsAwaitingDraft, upsertReviews, type Queryable } from "../../../lib/db-marketing.js";
-import { gbpEnv } from "../../../lib/env.js";
 import type { Logger } from "../../../lib/logger.js";
 import { marketingSchedule } from "../../../lib/task.js";
-import { marketingRuntime, vendorFetch } from "../runtime.js";
+import { marketingRuntime } from "../runtime.js";
 import type { gbpReplyDrafter } from "./reply-drafter.js";
+import { businessProfileFrom } from "./runtime.js";
+
+export { businessProfileFrom } from "./runtime.js";
 
 export const gbpQueue = queue({ name: "gbp", concurrencyLimit: 1 });
 
@@ -39,11 +41,6 @@ export async function runGbpSync(deps: GbpSyncDeps): Promise<{ readonly reviews:
   for (const id of waiting) await deps.draftReply(id);
   deps.logger.info("gbp.sync.completed", { reviews: rated.length, handed_to_drafter: waiting.length });
   return { reviews: rated.length, handedToDrafter: waiting.length };
-}
-
-export function businessProfileFrom(env: Parameters<typeof gbpEnv>[0]): BusinessProfile {
-  const gbp = gbpEnv(env);
-  return createBusinessProfile({ env: gbp, fetch: vendorFetch, accessToken: gbpAccessToken(gbp) });
 }
 
 export const gbpSync = marketingSchedule({

@@ -251,7 +251,7 @@ const SAFE_YOU = [
 
 /** Words that place the reviewer at the practice, whoever the sentence is about. */
 const IMPLIES_PATIENT =
-  /\b(visits?|visited|visiting|appointments?|waits?|waited|waiting|wait time|came in|come in|coming in|stays?|experiences?|feel|feels|feeling|felt|better|recover\w*|progress|journey|session\w*|intake|refills?|follow[- ]?ups?|records?|bills?|billing|office|front desk|check[- ]?in|seen|treated|patients?|clients?|choosing us|trusting us|helped|help you|(could|were able to|are able to) help)\b/i;
+  /\b(visits?|visited|visiting|appointments?|waits?|waited|waiting|wait time|came in|come in|coming in|never came|stays?|experiences?|feel|feels|feeling|felt|better|recover\w*|progress|journey|session\w*|intake|refills?|follow[- ]?ups?|records?|bills?|billing|office|front desk|check[- ]?in|seen|treated|patients?|clients?|choosing us|trusting us|helped|help you|(could|were able to|are able to) help|he|she|they|his|hers?|their|them|staff|team|care|cared|caring|delays?|delayed|mix[- ]?ups?|protocols?|false|untrue|improv\w*|regret\w*)\b/i;
 
 const CLINICAL =
   /\b(anxiety|anxious|depress\w*|adhd|add|bipolar|ptsd|trauma\w*|ocd|schizo\w*|psychos\w*|panic|insomnia|sleep|mood|stress\w*|addict\w*|substance|alcohol|mental|behaviou?ral|medical|clinical|health|wellness|diagnos\w*|therap\w*|counsel\w*|medication\w*|meds|prescri\w*|dose|dosage|symptoms?|disorders?|conditions?|treatment|psychiatric|psychiatry|assessment|weight|injections?|crisis|suicid\w*|telehealth|care plan)\b/i;

@@ -153,7 +153,7 @@ describe("findPhiZoneVariables", () => {
 });
 
 describe("GBP and webhook env (Phase 4)", async () => {
-  const { gbpEnv, webhookEnv } = await import("../../src/lib/env.js");
+  const { gbpEnv } = await import("../../src/lib/env.js");
 
   it("names exactly what each GBP task is missing", () => {
     const env = loadMarketingEnv(valid);
@@ -163,10 +163,6 @@ describe("GBP and webhook env (Phase 4)", async () => {
       "GBP_OAUTH_REFRESH_TOKEN",
       "GBP_ACCOUNT_ID",
       "GBP_LOCATION_ID",
-    ]);
-    expect(configError(() => webhookEnv(env, "gbp_reply_approval")).variables).toEqual([
-      "N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL",
-      "N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET",
     ]);
   });
 

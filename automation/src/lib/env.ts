@@ -57,9 +57,6 @@ export const marketingEnvSchema = z.object({
   // --- Phase 3, social (§5.7). Optional here so SEO and GEO run before Meta is set up;
   // each social task demands what it needs through socialEnv() / approvalEnv().
   // --- Phase 4, GBP (§5.2). Optional at load, demanded by the GBP tasks.
-  /** n8n webhook for review-reply approvals (raw review beside the draft). */
-  N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL: z.string().regex(/^https:\/\/[^\s]+$/).optional(),
-  N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET: z.string().min(32).optional(),
   /** OAuth client and a refresh token of a user who manages the listing (GBP has no service accounts). */
   GBP_OAUTH_CLIENT_ID: z.string().regex(/\.apps\.googleusercontent\.com$/).optional(),
   GBP_OAUTH_CLIENT_SECRET: z.string().min(10).optional(),
@@ -208,21 +205,6 @@ export function supabaseProjectRef(databaseUrl: string): string | undefined {
   return undefined;
 }
 
-
-const WEBHOOKS = {
-  gbp_reply_approval: ["N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL", "N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET"],
-} as const;
-
-/** An n8n webhook and its Header Auth secret, or a ConfigError naming what is missing. */
-export function webhookEnv(env: MarketingEnv, webhook: keyof typeof WEBHOOKS): { readonly url: string; readonly secret: string } {
-  const [urlName, secretName] = WEBHOOKS[webhook];
-  const url = env[urlName];
-  const secret = env[secretName];
-  if (!url || !secret) {
-    throw new ConfigError(`${webhook}_webhook_env_missing` as const, [urlName, secretName].filter((name) => env[name] === undefined));
-  }
-  return { url, secret };
-}
 
 export interface GbpEnv {
   readonly clientId: string;

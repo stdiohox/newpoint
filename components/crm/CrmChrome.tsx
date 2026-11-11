@@ -23,6 +23,7 @@ export function CrmHeader({ staffName }: { staffName: string }) {
           </Link>
           <nav aria-label="CRM" className="text-small flex gap-4">
             <CrmNavLink href="/crm">Leads</CrmNavLink>
+            <CrmNavLink href="/crm/reviews">Reviews</CrmNavLink>
             <CrmNavLink href="/crm/account">Account</CrmNavLink>
           </nav>
         </div>

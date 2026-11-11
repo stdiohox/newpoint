@@ -114,25 +114,7 @@ Run on suspected compromise of the VPS or n8n, and when anyone with editor acces
 - [ ] Apply the pinned n8n upgrade if one is due; re-run §3 checks after.
 - [ ] Rotate webhook secrets and the `n8n_reader` password (90-day maximum, §6 layer 7).
 
-## 9. GBP review reply approval (`workflows/gbp-reply-approval.json`, Phase 4)
-
-Same confirm-page pattern as §9. `gbp.reply-drafter` sends the **raw review beside the
-draft**; a second request marked REMINDER follows if the first 72 h run out, and nothing
-is ever posted without an approval.
-
-- [ ] Import, check every node, bind a **Header Auth** credential "Newpoint GBP reply approval
-      webhook" (its own 32+ character secret) and the SMTP credential.
-- [ ] Set From/To; set the error workflow; activate.
-- [ ] Put the webhook URL and secret in Trigger.dev as `N8N_GBP_REPLY_APPROVAL_WEBHOOK_URL` /
-      `N8N_GBP_REPLY_APPROVAL_WEBHOOK_SECRET`.
-- [ ] Run the §9 tests (bad payload dropped, approve, reject, timeout, scanner GET) here too.
-- [ ] Post a test review payload whose text contains `<a href="https://example.com">x</a>`: the
-      owner's email must show it as plain text, not a link. Reviews are written by the public.
-- [ ] Submit the confirm page once and open the execution: the form's output must be
-      `$json.data['Decision']`. If n8n names it differently, fix `generate.py`, or every
-      decision silently becomes a rejection.
-
-## 10. Staff action required (`workflows/action-required.json`, Phase 5, PHI zone notice)
+## 9. Staff action required (`workflows/action-required.json`, Phase 5, PHI zone notice)
 
 The PHI zone posts `{ kind: "action_required", at }` (minute precision) and nothing
 else. The guard drops any body with other keys. The email says that something is waiting

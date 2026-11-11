@@ -1,9 +1,9 @@
 'use client';
 
-import { useActionState, useId } from 'react';
-import { addNote, changePassword, signIn, updateLead, type FormState } from '@/app/crm/actions';
+import { useActionState, useId, useState } from 'react';
+import { addNote, changePassword, decideReview, signIn, updateLead, type FormState } from '@/app/crm/actions';
 import { CRM_BUTTON, CRM_FIELD, CRM_LABEL } from '@/lib/crm/classes';
-import { LEAD_STATUSES, NOTE_MAX, STATUS_LABEL, type LeadStatus } from '@/lib/crm/model';
+import { LEAD_STATUSES, NOTE_MAX, REPLY_MAX, REPLY_RULES, STATUS_LABEL, type LeadStatus } from '@/lib/crm/model';
 
 /*
  * React 19 resets a form after its action finishes, success or not. So a
@@ -204,6 +204,90 @@ export function PasswordForm() {
       <button type="submit" className={CRM_BUTTON}>
         {pending ? 'Saving…' : 'Save password'}
       </button>
+    </form>
+  );
+}
+
+/**
+ * Approve (with the reply as edited) or skip a drafted Google review reply, or
+ * cancel one that is approved but not yet posted. The two decisions are equal
+ * choices: same styling, and the page says skipping is always fine. The person
+ * approving is the last check before the reply is public, so the enforced rules
+ * sit beside the text. Success is a redirect, so no "saved" message lives here.
+ */
+export function ReviewDecisionForm({
+  id,
+  draft,
+  mode,
+  describedBy,
+}: {
+  id: string;
+  draft: string;
+  mode: 'decide' | 'cancel';
+  /** The id of the review's heading, so each button says which review it acts on. */
+  describedBy: string;
+}) {
+  const [state, action, pending] = useActionState(decideReview, INITIAL);
+  const [clicked, setClicked] = useState<'approve' | 'skip' | null>(null);
+  const replyId = useId();
+  const rulesId = useId();
+  const busy = pending ? clicked : null;
+  const button = (decision: 'approve' | 'skip', label: string, busyLabel: string) => (
+    <button
+      type="submit"
+      name="decision"
+      value={decision}
+      formNoValidate={decision === 'skip'}
+      aria-disabled={pending}
+      aria-describedby={describedBy}
+      onClick={(event) => {
+        if (pending) event.preventDefault();
+        else setClicked(decision);
+      }}
+      className={CRM_BUTTON}
+    >
+      {busy === decision ? busyLabel : label}
+    </button>
+  );
+  if (mode === 'cancel') {
+    return (
+      <form action={action} aria-busy={pending} className="space-y-3">
+        <input type="hidden" name="id" value={id} />
+        <FormMessage state={state} />
+        {button('skip', 'Cancel, don’t post', 'Cancelling…')}
+      </form>
+    );
+  }
+  return (
+    <form action={action} aria-busy={pending} className="space-y-4">
+      <input type="hidden" name="id" value={id} />
+      <div>
+        <label htmlFor={replyId} className={CRM_LABEL}>
+          Reply (edit if you like)
+        </label>
+        <textarea
+          id={replyId}
+          name="reply"
+          rows={4}
+          maxLength={REPLY_MAX}
+          defaultValue={state.values?.reply ?? draft}
+          aria-describedby={rulesId}
+          className={`${CRM_FIELD} mt-2`}
+        />
+      </div>
+      <div id={rulesId} className="text-np-neutral-700 text-sm">
+        <p className="text-np-ink font-medium">Before approving, check the reply against every rule. Skipping is always fine.</p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          {REPLY_RULES.map((rule) => (
+            <li key={rule}>{rule}</li>
+          ))}
+        </ul>
+      </div>
+      <FormMessage state={state} />
+      <div className="flex flex-wrap gap-3">
+        {button('approve', 'Approve and post', 'Saving…')}
+        {button('skip', 'Skip, don’t reply', 'Saving…')}
+      </div>
     </form>
   );
 }

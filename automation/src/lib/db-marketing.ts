@@ -279,8 +279,14 @@ export interface StoredReview {
   readonly reviewer: PublicText | null;
   readonly replyDraft: PublicText | null;
   readonly replyStatus: ReplyStatus;
-  readonly approvalTokenId: string | null;
-  readonly approvedReplyHash: string | null;
+  readonly statusReason: string | null;
+  /** The text staff approved in the CRM (crm.decide_review); what gbp.reply-poster posts. */
+  readonly approvedReply: PublicText | null;
+  /** When staff were emailed about this review; one email per review. */
+  readonly alertedAt: Date | null;
+  /** md5 of the review text at approval; the poster refuses to post against a changed review. */
+  readonly approvedReviewHash: string | null;
+  readonly postAttempts: number;
   /** A reply already shows on Google that this pipeline did not post. */
   readonly existingReply: boolean;
 }
@@ -342,12 +348,15 @@ export async function getReview(db: Queryable, id: string): Promise<StoredReview
     author_display: string | null;
     reply_draft: string | null;
     reply_status: ReplyStatus;
-    approval_token_id: string | null;
-    approved_reply_hash: string | null;
+    status_reason: string | null;
+    approved_reply: string | null;
+    alerted_at: Date | null;
+    approved_review_hash: string | null;
+    post_attempts: number;
     existing_reply: boolean;
   }>(
     `select google_review_id, rating, text, author_display, reply_draft, reply_status::text as reply_status,
-            approval_token_id, approved_reply_hash, existing_reply
+            status_reason, approved_reply, alerted_at, approved_review_hash, post_attempts, existing_reply
        from marketing.gbp_reviews where google_review_id = $1`,
     [id],
   );
@@ -360,13 +369,39 @@ export async function getReview(db: Queryable, id: string): Promise<StoredReview
     reviewer: row.author_display === null ? null : pub(row.author_display),
     replyDraft: row.reply_draft === null ? null : pub(row.reply_draft),
     replyStatus: row.reply_status,
-    approvalTokenId: row.approval_token_id,
-    approvedReplyHash: row.approved_reply_hash,
+    statusReason: row.status_reason,
+    approvedReply: row.approved_reply === null ? null : pub(row.approved_reply),
+    alertedAt: row.alerted_at,
+    approvedReviewHash: row.approved_review_hash,
+    postAttempts: row.post_attempts,
     existingReply: row.existing_reply,
   };
 }
 
-/** Moves a review's reply only from the state the caller expects (see transitionSocialPost). */
+/** Records the one staff email for a review, whatever its status has become meanwhile. */
+export async function markReviewAlerted(db: Queryable, id: string, at: Date): Promise<void> {
+  await db.query(`update marketing.gbp_reviews set alerted_at = coalesce(alerted_at, $2) where google_review_id = $1`, [id, at.toISOString()]);
+}
+
+/** Counts a posting attempt before the call to Google; returns the new count. */
+export async function bumpPostAttempt(db: Queryable, id: string): Promise<number> {
+  const result = await db.query<{ post_attempts: number }>(
+    `update marketing.gbp_reviews set post_attempts = post_attempts + 1 where google_review_id = $1 and reply_status = 'approved' returning post_attempts`,
+    [id],
+  );
+  return result.rows[0]?.post_attempts ?? 0;
+}
+
+/** Reviews staff approved in the CRM and nobody has posted yet, oldest decision first. */
+export async function listApprovedReviews(db: Queryable): Promise<string[]> {
+  const result = await db.query<{ google_review_id: string }>(
+    `select google_review_id from marketing.gbp_reviews
+      where reply_status = 'approved' and approved_reply is not null order by decided_at nulls last, created_at`,
+  );
+  return result.rows.map((row) => row.google_review_id);
+}
+
+/** Moves a review's reply only from the state the caller expects. */
 export async function transitionReview(
   db: Queryable,
   id: string,
@@ -374,28 +409,25 @@ export async function transitionReview(
   to: ReplyStatus,
   fields: {
     readonly replyDraft?: string;
-    readonly approvalTokenId?: string;
-    readonly approvedReplyHash?: string;
+    readonly alertedAt?: Date;
     readonly repliedAt?: Date;
     readonly statusReason?: string | null;
   } = {},
 ): Promise<boolean> {
   const result = await db.query(
     `update marketing.gbp_reviews set
-        reply_status        = $3,
-        reply_draft         = coalesce($4, reply_draft),
-        approval_token_id   = coalesce($5, approval_token_id),
-        approved_reply_hash = coalesce($6, approved_reply_hash),
-        replied_at          = coalesce($7, replied_at),
-        status_reason       = case when $8::boolean then $9 else status_reason end
+        reply_status  = $3,
+        reply_draft   = coalesce($4, reply_draft),
+        alerted_at    = coalesce($5, alerted_at),
+        replied_at    = coalesce($6, replied_at),
+        status_reason = case when $7::boolean then $8 else status_reason end
       where google_review_id = $1 and reply_status = any($2::marketing.review_reply_status[])`,
     [
       id,
       from,
       to,
       fields.replyDraft ?? null,
-      fields.approvalTokenId ?? null,
-      fields.approvedReplyHash ?? null,
+      fields.alertedAt?.toISOString() ?? null,
       fields.repliedAt?.toISOString() ?? null,
       fields.statusReason !== undefined,
       fields.statusReason ?? null,

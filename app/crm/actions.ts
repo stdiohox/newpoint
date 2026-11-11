@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { crmAuthEnv, crmSupabase, requireStaff } from '@/lib/crm/supabase';
-import { isLeadStatus, NOTE_MAX, UUID } from '@/lib/crm/model';
+import { isLeadStatus, NOTE_MAX, REPLY_MAX, REVIEW_ID, UUID } from '@/lib/crm/model';
 
 export interface FormState {
   error?: string;
@@ -93,4 +93,35 @@ export async function changePassword(_prev: FormState, form: FormData): Promise<
     return { error: 'Your password was changed, but setup didn’t finish. Sign in with the new password and try again.' };
   }
   redirect('/crm');
+}
+
+/**
+ * Approve (with the reply as edited) or skip a drafted Google review reply.
+ * crm.decide_review checks that the caller is staff and that the review is
+ * still waiting; the reply rules are re-checked by the automation before
+ * anything reaches Google.
+ */
+export async function decideReview(_prev: FormState, form: FormData): Promise<FormState> {
+  const { supabase } = await requireStaff();
+  const id = field(form, 'id');
+  const decision = field(form, 'decision');
+  const reply = field(form, 'reply').replace(/\s+/g, ' ');
+  const values = { reply };
+  if (!REVIEW_ID.test(id) || (decision !== 'approve' && decision !== 'skip')) {
+    return { error: 'Reload the page and try again.', values };
+  }
+  if (decision === 'approve' && reply.length === 0) return { error: 'Write the reply first, or skip this review.', values };
+  if (reply.length > REPLY_MAX) {
+    return { error: `Replies can be up to ${REPLY_MAX.toLocaleString('en-US')} characters.`, values };
+  }
+  const { data, error } = await supabase.rpc('decide_review', {
+    p_id: id,
+    p_decision: decision,
+    p_reply: decision === 'approve' ? reply : null,
+  });
+  if (error || data !== true) {
+    return { error: 'That review has changed since the page loaded. Reload it to see its status.', values };
+  }
+  revalidatePath('/crm/reviews');
+  redirect(`/crm/reviews?done=${decision}`);
 }
