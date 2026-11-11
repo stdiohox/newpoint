@@ -143,3 +143,32 @@ body; replies are flagged as not monitored around the clock.
   closing "how difficult" question is on both the GAD-7 and the PHQ-9. The crisis
   line in the email and on the form is the site's wording (`CONTACT.crisisNote`):
   call 988, or 911 in an emergency — never "text".
+
+## Follow-up nudges and the weekly summary (2026-11-11)
+
+Two more `crm.*` Trigger tasks, same runtime and email layout as the alerts:
+
+- **`crm.stale-lead-nudge`** (hourly, sends only 08:00–19:59 ET). A lead still **New**
+  past its first threshold → one email to the front desk (`crm.staff.role =
+  'front_desk'`; if nobody there has alerts on, everyone who does). Past its second
+  threshold → one email to everyone with alerts on, providers included. Thresholds:
+  **Existing patient 4 h / 24 h** (healthcare review: a current patient's message may
+  be about medication or a decline), **everything else 24 h / 72 h**. Each nudge goes
+  once per lead (`leads.first_nudge_at` / `second_nudge_at`); any other status ends
+  them, and moving a lead back to New does not restart them. At most 50 leads per
+  email; reason, time, age and link only; the button lands on `/crm?status=new`.
+  The wording tells staff a voicemail is not contact and to mark Not a fit only after
+  speaking with the person.
+- **`crm.weekly-summary`** (Monday 08:00 ET) to everyone with alerts on: last week's
+  (Mon–Sun, Eastern, DST-safe) new leads by reason, how many reached Contacted /
+  Scheduled / Became a patient / Not a fit, what is open now, still New after 24 h,
+  and Contacted-but-not-scheduled after 7 days. Counts only, computed by
+  `crm.weekly_summary()`. Idempotency key `weekly-summary/<monday>`; nudges carry
+  `lead-nudge/<level>/<hash of ids>`.
+- Roles: `crm.staff.role` is `front_desk` (default) or `provider`. Dr. Whitaker and
+  Dr. Ofoegbu are `provider`; the front desk account is `front_desk`. Change with
+  `update crm.staff set role = … where email = …` (no UI for it).
+- Migration `20261111000001_crm_follow_up.sql` (backfills leads already older than
+  24 h as nudged, so the first run sends no backlog); pgTAP `013`; vitest
+  `test/crm/follow-up.test.ts`. Reviewed by database-reviewer and healthcare-reviewer;
+  findings applied.
