@@ -103,6 +103,8 @@ interface OnboardingFormProps extends Omit<
   reasons: readonly string[];
   /** The "do not include health information" notice, rendered above the button. */
   privacyNote: string;
+  /** Under the phone field: a number means Joyce will call (CONTACT.phoneNote). */
+  phoneNote: string;
   /** What a stored submission shows (CONTACT.success). */
   success: { heading: string; body: string };
   /** Crisis line shown with the success and failure messages ("call 988", never "text"). */
@@ -130,6 +132,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       buttonText,
       reasons,
       privacyNote,
+      phoneNote,
       success,
       phone,
       crisisNote,
@@ -144,6 +147,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
     const reduce = useReducedMotion();
     const hydrated = useHydrated();
     const noteId = useId();
+    const phoneNoteId = useId();
     const fieldRefs = {
       name: useRef<HTMLInputElement>(null),
       email: useRef<HTMLInputElement>(null),
@@ -448,7 +452,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                     type="tel"
                     autoComplete="tel"
                     aria-invalid={Boolean(errors.phone)}
-                    aria-describedby={errors.phone ? 'phone-error' : undefined}
+                    aria-describedby={errors.phone ? `phone-error ${phoneNoteId}` : phoneNoteId}
                     className="mt-2"
                   />
                   {errors.phone && (
@@ -456,6 +460,10 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                       {errors.phone}
                     </p>
                   )}
+                  {/* Said before submitting: leaving a number is consent to Joyce's call. */}
+                  <p id={phoneNoteId} className="text-small text-np-neutral-600 mt-1.5">
+                    {phoneNote}
+                  </p>
                 </motion.div>
 
                 {/* Honeypot. Off-screen, out of the tab order and hidden from

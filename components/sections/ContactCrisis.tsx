@@ -74,6 +74,7 @@ export function ContactCrisis() {
               buttonText="Send"
               reasons={CONTACT.reasons}
               privacyNote={CONTACT.privacyNote}
+              phoneNote={CONTACT.phoneNote}
               success={CONTACT.success}
               crisisNote={CONTACT.crisisNote}
               /* The href stays derived from BUSINESS, the single source for

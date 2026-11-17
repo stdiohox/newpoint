@@ -18,7 +18,6 @@
  * The alert functions return a lead's id, reason and time only; the
  * confirmation claim also returns name and email, to address the email.
  */
-import { queue } from "@trigger.dev/sdk";
 import { z } from "zod";
 import type { EmailSender } from "../../../adapters/email/resend.js";
 import { VendorHttpError } from "../../../lib/errors.js";
@@ -27,9 +26,11 @@ import { confirmationEmail, type ConfirmationOptions } from "../../../domain/crm
 import type { Queryable } from "../../../lib/db-marketing.js";
 import type { Logger } from "../../../lib/logger.js";
 import { marketingSchedule, marketingTask } from "../../../lib/task.js";
+import { leadCallDeps, placeLeadCalls, type LeadCallDeps } from "./lead-calls.js";
+import { crmQueue } from "./queue.js";
 import { crmRuntime } from "./runtime.js";
 
-export const crmQueue = queue({ name: "crm", concurrencyLimit: 1 });
+export { crmQueue };
 
 export interface LeadAlertDeps {
   readonly db: Queryable;
@@ -140,12 +141,19 @@ export async function sendLeadConfirmations(deps: LeadAlertDeps): Promise<Confir
  * Each is attempted even if the other fails; the first failure is rethrown so
  * the task retries.
  */
-export async function processNewLeads(deps: LeadAlertDeps) {
+export async function processNewLeads(deps: LeadAlertDeps, callDeps?: LeadCallDeps) {
   const confirmations = await settle(() => sendLeadConfirmations(deps));
   const alerts = await settle(() => sendLeadAlerts(deps));
+  // Joyce's call goes out after the email (docs/lead-crm.md "Lead calls"). Off while CRM_VOICE_* are unset.
+  const calls = callDeps ? await settle(() => placeLeadCalls(callDeps)) : undefined;
   if (confirmations.status === "rejected") throw confirmations.reason;
   if (alerts.status === "rejected") throw alerts.reason;
-  return { confirmations: confirmations.value, alerts: alerts.value };
+  if (calls?.status === "rejected") throw calls.reason;
+  return {
+    confirmations: confirmations.value,
+    alerts: alerts.value,
+    ...(calls?.status === "fulfilled" ? { calls: calls.value } : {}),
+  };
 }
 
 async function settle<T>(fn: () => Promise<T>): Promise<PromiseSettledResult<T>> {
@@ -177,7 +185,7 @@ export const newLeadAlert = marketingTask({
   queue: crmQueue,
   maxDuration: 120,
   retry: { maxAttempts: 3, factor: 2, minTimeoutInMs: 5_000, maxTimeoutInMs: 60_000 },
-  run: () => processNewLeads(deps()),
+  run: () => processNewLeads(deps(), leadCallDeps()),
 });
 
 export const newLeadAlertSweep = marketingSchedule({

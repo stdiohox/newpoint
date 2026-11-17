@@ -66,6 +66,8 @@ Supabase newpoint-marketing, schema crm
 | Trigger.dev prod | `RESEND_API_KEY` | Resend key, sending access only |
 | | `CRM_ALERT_FROM` | e.g. `Newpoint CRM <crm@newpointnp.com>` (domain verified in Resend) |
 | | `CRM_BASE_URL` | optional, default `https://www.newpointnp.com/crm` |
+| | `CRM_VOICE_API_KEY`, `CRM_VOICE_AGENT_ID`, `CRM_VOICE_FROM_NUMBER_ID` | optional, all three or none: Joyce's lead calls (see "Lead calls") |
+| Vercel (site) | `CRM_VOICE_TOOL_SECRET` | 32+ random characters, same as the header on Joyce's `record_outcome` tool |
 
 The alert tasks also use `MARKETING_DATABASE_URL`, `MARKETING_DATABASE_CA_CERT` and
 `SUPABASE_MARKETING_PROJECT_REF`, already set. They load `loadCrmEnv()`, not the full
@@ -172,6 +174,52 @@ Two more `crm.*` Trigger tasks, same runtime and email layout as the alerts:
   24 h as nudged, so the first run sends no backlog); pgTAP `013`; vitest
   `test/crm/follow-up.test.ts`. Reviewed by database-reviewer and healthcare-reviewer;
   findings applied.
+
+## Lead calls (2026-11-17)
+
+Owner request: a lead who leaves a phone number gets a call from Joyce, the automated
+assistant, as well as the confirmation email, and the call is logged on the lead.
+
+- **Who is called.** A lead with a phone, still **New**, less than 24 hours old, once.
+  Only 09:00–19:59 Eastern, and only NJ, PA, NY, DE, MD and DC area codes
+  (`CALLABLE_AREA_CODES`): always inside the callee's own hours, and never a premium,
+  toll-free or international-rate number. One number at most once in 30 days; at most 50
+  calls a day (`crm.lead_call_daily_cap()`). A new-patient inquiry gets the four appointment
+  questions; any other reason gets "the team will call you back" only. The form says, under
+  the phone field, that Joyce will call, that the call is recorded and that she may leave a
+  voicemail (`CONTACT.phoneNote`).
+- **How.** `processNewLeads` places the call right after the confirmation and alert
+  (`crm.new-lead-alert`). **`crm.lead-calls`** (every 5 minutes) places morning calls and
+  retries, and reads each finished call back from Cartesia. One request per call, never
+  repeated: a timeout, a 5xx other than 503, or an unreadable answer is final
+  ("ambiguous"); only 429 and 503 are retried, 3 attempts in all. Each lead's bookkeeping is
+  isolated, so one bad row never stops the rest or the crisis alerts.
+- **During the call.** Joyce's `record_outcome` tool posts to the site's
+  `/api/voice/outcome` (shared secret), which triggers **`crm.lead-call-outcome`**: the
+  answers are noted on the open call and, on a crisis, staff are emailed while the call is
+  still on. After the call, the sweep merges Cartesia's copy; a noted crisis is never
+  overwritten, and noted answers survive a call Cartesia never reports (2 hours → failed).
+- **What is logged** (`crm.lead_calls`, "Call from Joyce" on the lead page): times,
+  Cartesia's end reason, an outcome, and the enum answers: state, in person or telehealth,
+  seen before, times that suit. **No transcript and no summary are copied into the CRM**;
+  they stay in Cartesia. The one health fact kept is the outcome `crisis`, so staff call
+  back; every active staff account sees it, like the lead itself.
+- **Crisis email.** "Urgent: call this lead back now", a link and a time only, to everyone
+  with alerts on. If nobody has alerts on it is logged as an error and goes out as soon as
+  someone does.
+- **Off until configured.** With any `CRM_VOICE_*` unset (blank counts as unset) nothing is
+  dialled. Set-up, the agent's script and the four open decisions (recording disclosure,
+  crisis transfer number, crisis wording, voicemail) are in `docs/voice-agent-outbound.md`.
+- **Zone.** Cartesia is called from `adapters/calls/cartesia.ts`, on the CRM side, not
+  from `adapters/voice/` (the PHI receptionist): the CRM is in the marketing Supabase by
+  owner decision, and this only dials a lead the CRM already holds.
+- **Not done, by choice:** the number is not verified before the call (no SMS code), so
+  someone could enter another person's number. The greeting asks for the person by first
+  name and says nothing about the request until they confirm; the 30-day and daily limits
+  cap the harm. Add verification if it is ever abused.
+- Migration `20261117000001_crm_lead_calls.sql`; vitest `test/crm/lead-calls.test.ts`.
+  Reviewed 2026-11-17 by typescript-, database-, security-, healthcare- and react-reviewer
+  (a11y included); findings applied.
 
 ## Google reviews (2026-11-11)
 

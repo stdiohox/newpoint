@@ -4,7 +4,16 @@ import { notFound } from 'next/navigation';
 import { Container } from '@/components/ui/Container';
 import { CRM_CARD, CrmHeader, StatusChip } from '@/components/crm/CrmChrome';
 import { LeadUpdateForm, NoteForm } from '@/components/crm/forms';
-import { formatWhen, STATUS_LABEL, UUID, type Lead, type LeadActivity } from '@/lib/crm/model';
+import {
+  CALL_DETAIL_LABEL,
+  callStatusLabel,
+  formatWhen,
+  STATUS_LABEL,
+  UUID,
+  type Lead,
+  type LeadActivity,
+  type LeadCall,
+} from '@/lib/crm/model';
 import { requireStaff } from '@/lib/crm/supabase';
 
 /** Generic on purpose: tab titles end up in browser history, so no name here. */
@@ -15,7 +24,7 @@ export default async function CrmLead({ params }: { params: Promise<{ id: string
   if (!UUID.test(id)) notFound();
   const { supabase, staff } = await requireStaff();
 
-  const [leadResult, activityResult, staffResult] = await Promise.all([
+  const [leadResult, activityResult, staffResult, callResult] = await Promise.all([
     supabase
       .from('leads')
       .select('id, created_at, updated_at, name, email, phone, reason, status, owner_id')
@@ -32,11 +41,37 @@ export default async function CrmLead({ params }: { params: Promise<{ id: string
       .select('user_id, display_name, active')
       .order('display_name')
       .returns<{ user_id: string; display_name: string; active: boolean }[]>(),
+    supabase
+      .from('lead_calls')
+      .select(
+        'lead_id, status, attempts, placed_at, started_at, ended_at, end_reason, outcome, state, modality, seen_before, preferred_windows, error'
+      )
+      .eq('lead_id', id)
+      .maybeSingle<LeadCall>(),
   ]);
 
   if (leadResult.error || activityResult.error || staffResult.error) throw new Error('CRM read failed');
   const lead = leadResult.data;
   if (!lead) notFound();
+  // A failed read of the call log must not take the lead page down with it.
+  const call = callResult.error ? null : callResult.data;
+  const minutes = (c: LeadCall) =>
+    c.started_at && c.ended_at
+      ? Math.max(1, Math.round((Date.parse(c.ended_at) - Date.parse(c.started_at)) / 60_000))
+      : null;
+  const callDetails = call
+    ? ([
+        ['State', call.state],
+        ['How they want to be seen', call.modality],
+        ['Seen here before', call.seen_before],
+        [
+          'Times that suit',
+          call.preferred_windows?.length
+            ? call.preferred_windows.map((w) => CALL_DETAIL_LABEL[w] ?? w).join(', ')
+            : null,
+        ],
+      ] as const)
+    : [];
   const people = staffResult.data ?? [];
   const name = (userId: string | null) =>
     userId ? (people.find((p) => p.user_id === userId)?.display_name ?? 'Former staff') : 'Website';
@@ -107,6 +142,58 @@ export default async function CrmLead({ params }: { params: Promise<{ id: string
                 </div>
               </dl>
             </section>
+
+            {lead.phone && (
+              <section aria-labelledby="call-heading" className={`${CRM_CARD} p-6`}>
+                <h2 id="call-heading" className="text-np-ink text-base font-semibold">
+                  Call from Joyce
+                </h2>
+                {call ? (
+                  <>
+                    <p
+                      className={
+                        call.outcome === 'crisis'
+                          ? 'text-np-error mt-4 text-sm font-semibold'
+                          : 'text-np-ink mt-4 text-sm font-medium'
+                      }
+                    >
+                      {call.outcome === 'crisis' && 'Urgent: '}
+                      {callStatusLabel(call)}
+                    </p>
+                    {(call.started_at ?? call.placed_at) && (
+                      <p className="text-np-neutral-600 mt-1 text-sm">
+                        <time dateTime={call.started_at ?? call.placed_at ?? undefined}>
+                          {formatWhen(call.started_at ?? call.placed_at ?? '')}
+                        </time>{' '}
+                        ET
+                        {minutes(call) !== null && ` · ${String(minutes(call))} min`}
+                      </p>
+                    )}
+                    {callDetails.some(([, value]) => value) && (
+                      <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                        {callDetails.map(([label, value]) =>
+                          value ? (
+                            <div key={label}>
+                              <dt className="text-np-neutral-600">{label}</dt>
+                              <dd className="text-np-ink mt-1">{CALL_DETAIL_LABEL[value] ?? value}</dd>
+                            </div>
+                          ) : null
+                        )}
+                      </dl>
+                    )}
+                    <p className="text-np-neutral-600 mt-4 text-xs">
+                      Only these answers are kept here. Joyce does not ask for health details; the
+                      recording and transcript stay with the call provider.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-np-neutral-600 mt-4 text-sm">
+                    No call yet. Joyce calls new leads between 9 AM and 8 PM ET, within a day of
+                    their request, while they are still New.
+                  </p>
+                )}
+              </section>
+            )}
 
             <section aria-labelledby="history-heading" className={`${CRM_CARD} p-6`}>
               <h2 id="history-heading" className="text-np-ink text-base font-semibold">

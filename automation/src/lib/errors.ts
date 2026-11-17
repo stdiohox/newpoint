@@ -56,7 +56,9 @@ export type Vendor =
   /** The practice's own public website, read for schema.org coverage (§5.6). */
   | "newpoint_site"
   /** Email for the lead CRM's new-lead alerts (docs/lead-crm.md). */
-  | "resend";
+  | "resend"
+  /** Joyce's outbound calls to website leads (docs/lead-crm.md, "Lead calls"). */
+  | "cartesia";
 
 export class VendorHttpError extends AppError {
   readonly failureClass: FailureClass;

@@ -49,6 +49,80 @@ export interface LeadActivity {
   body: string | null;
 }
 
+/* --------------------------------------------------------------- lead calls -- */
+
+/** One row of crm.lead_calls (automation/.../20261117000001_crm_lead_calls.sql): Joyce's call. */
+export interface LeadCall {
+  lead_id: string;
+  status: 'dialing' | 'retry' | 'placed' | 'ended' | 'not_placed';
+  attempts: number;
+  placed_at: string | null;
+  started_at: string | null;
+  ended_at: string | null;
+  end_reason: string | null;
+  outcome: string | null;
+  state: string | null;
+  modality: string | null;
+  seen_before: string | null;
+  preferred_windows: string[] | null;
+  error: string | null;
+}
+
+export const CALL_OUTCOME_LABEL: Record<string, string> = {
+  appointment_requested: 'Asked for an appointment',
+  callback_requested: 'Asked the team to call back',
+  not_interested: 'No longer interested',
+  wrong_person: 'Wrong person or number',
+  language_help: 'Needs help in another language',
+  under_18: 'Under 18: a staff member should call back',
+  crisis: 'Possible crisis: call them back now',
+  voicemail: 'Voicemail, message left',
+  no_answer: 'No answer',
+  no_outcome: 'Answered, nothing recorded',
+  failed: 'The call did not go through',
+};
+
+export const CALL_DETAIL_LABEL: Record<string, string> = {
+  NJ: 'New Jersey',
+  PA: 'Pennsylvania',
+  other: 'Another state',
+  unknown: 'Not sure',
+  in_person: 'In person',
+  telehealth: 'Telehealth',
+  either: 'Either',
+  yes: 'Yes',
+  no: 'No',
+  weekday_morning: 'Weekday mornings',
+  weekday_afternoon: 'Weekday afternoons',
+  weekday_evening: 'Weekday evenings',
+  weekend: 'Weekends',
+};
+
+/** What staff see for a call that is not finished, or never went out. */
+export function callStatusLabel(call: LeadCall): string {
+  switch (call.status) {
+    case 'dialing':
+      return 'Calling now';
+    case 'retry':
+      return 'Call could not start; trying again shortly';
+    case 'placed':
+      return 'Call in progress';
+    case 'not_placed':
+      switch (call.error) {
+        case 'invalid_number':
+          return 'Not called: the number is not a valid US number';
+        case 'outside_area':
+          return 'Not called: Joyce only calls NJ, PA, NY, DE, MD and DC area codes';
+        case 'expired':
+          return 'Not called: the lead was already contacted, or more than a day old';
+        default:
+          return 'Not called: the call could not be placed';
+      }
+    case 'ended':
+      return CALL_OUTCOME_LABEL[call.outcome ?? ''] ?? 'Ended';
+  }
+}
+
 const WHEN = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/New_York',
   month: 'short',

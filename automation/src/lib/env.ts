@@ -127,6 +127,10 @@ export function loadMarketingEnv(
   return Object.freeze(result.data);
 }
 
+function blankIsUnset<T extends z.ZodType>(schema: T) {
+  return z.preprocess((value) => (typeof value === "string" && value.trim() === "" ? undefined : value), schema.optional());
+}
+
 /**
  * The lead CRM's alert tasks (`crm.*`, docs/lead-crm.md) need only the database
  * and an email sender, so they load this instead of the whole marketing schema:
@@ -155,7 +159,22 @@ export const crmEnvSchema = z.object({
     .string()
     .regex(/^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\/crm$/, "must be https://…newpointnp.com/crm")
     .default("https://www.newpointnp.com/crm"),
-});
+  /**
+   * Joyce's outbound call to new leads with a phone (docs/lead-crm.md "Lead calls").
+   * All three or none: unset = no calls (everything else still runs). Cartesia, not
+   * Vapi/Twilio, so the PHI-zone name guard does not apply; see adapters/calls/cartesia.ts.
+   */
+  // A variable that exists but is blank counts as unset: it must not stop the alerts.
+  CRM_VOICE_API_KEY: blankIsUnset(z.string().regex(/^sk_car_[A-Za-z0-9_-]{10,}$/, "must be a Cartesia API key (sk_car_…)")),
+  CRM_VOICE_AGENT_ID: blankIsUnset(z.string().regex(/^agent_[A-Za-z0-9]{6,64}$/, "must be a Cartesia agent id (agent_…)")),
+  CRM_VOICE_FROM_NUMBER_ID: blankIsUnset(z.string().regex(/^[A-Za-z0-9_-]{6,80}$/, "must be a Cartesia phone number id")),
+}).refine(
+  (env) => {
+    const set = [env.CRM_VOICE_API_KEY, env.CRM_VOICE_AGENT_ID, env.CRM_VOICE_FROM_NUMBER_ID].filter(Boolean).length;
+    return set === 0 || set === 3;
+  },
+  { path: ["CRM_VOICE_API_KEY"], message: "set CRM_VOICE_API_KEY, CRM_VOICE_AGENT_ID and CRM_VOICE_FROM_NUMBER_ID together" },
+);
 
 export type CrmEnv = Readonly<z.output<typeof crmEnvSchema>>;
 
