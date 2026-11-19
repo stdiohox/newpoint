@@ -1,5 +1,8 @@
 # Joyce, the Newpoint voice agent: Cartesia system prompt
 
+**Not in use (owner, 2026-11-19): outbound only for now.** The live agent is
+`docs/voice-agent-outbound.md`. Kept for when an inbound line is wanted.
+
 Written for: Samuel (to paste into the Cartesia agent builder) and the practice (to fill the
 bracketed facts and approve the crisis wording). The prompt is everything between the two
 `----` lines. The notes after it say what to configure around it.
@@ -189,7 +192,7 @@ You: "I can only help in English. I will ask the team to call you back." (take_m
 ## Configuring the agent around the prompt (Cartesia)
 
 1. **First message:** set the greeting as the agent's opening line exactly as written in the prompt, so the disclosure and the age question are never skipped.
-2. **Recording:** Cartesia records every agent call and has no setting to stop it. Pennsylvania requires all-party consent, so the greeting says the call is recorded, and a caller who objects is given the practice line. **Paste the new greeting into the live agent now**: the old one said "not recorded".
+2. **Recording:** Cartesia records every agent call and has no setting to stop it. Pennsylvania requires all-party consent, so the greeting says the call is recorded, and a caller who objects is given the practice line.
 3. **Tools:** define the six tools with the names and enum values above. Keep every parameter an enum or a short string; never free text for the reason. `transfer_call` points at **+18002738255** (the Lifeline's 10-digit number, which reaches 988; D15), set as a fixed destination with no parameter the model fills. Test one live transfer from a real phone before relying on it: Playground calls cannot transfer.
 4. **Where tool calls go:** the Newpoint automation has a tool server design for these calls (`automation/edge/vapi-tools`), built for Vapi. Pointing Cartesia at it needs a small adapter for Cartesia's request shape; say when you are ready and that gets built. Until then, `request_booking` and `take_message` can post to a simple webhook that emails the front desk.
 5. **Language:** English only in speech-to-text and the voice. Pick a calm, unhurried voice; set speaking rate slightly slower than default for phone audio.

@@ -12,14 +12,10 @@ four appointment questions as the inbound Joyce, records the answers with one to
 the team will call to arrange a time. The answers appear on the lead in the CRM
 (docs/lead-crm.md, "Lead calls").
 
-**Why a second agent, and not a second number.** One Cartesia agent has one prompt and one
-opening line, which plays before the model can decide anything. Inbound Joyce opens "Thank
-you for calling Newpoint"; this one must open by asking for `{{first_name}}` and say nothing
-else until the right person answers. Cartesia's docs do not say what an inbound call does
-when `{{first_name}}` is missing, so merging the two would risk the live inbound greeting.
-Duplicating Joyce in Cartesia and pasting this prompt is the safer ten minutes. **No new
-number:** any number on the account can place outbound calls, so this agent calls from
-inbound Joyce's number. A lead who calls that number back reaches inbound Joyce.
+**Outbound only (owner, 2026-11-19).** This is the only Joyce agent: there is no inbound
+agent for now. She calls leads; she does not answer calls. Her number is not assigned to any
+agent, so a lead who calls it back is not answered. The voicemail and her closing line both
+give the practice line (609) 527-9438 instead.
 
 ## Decided 2026-11-19 (Koret, at the owner's request)
 
@@ -31,7 +27,7 @@ inbound Joyce's number. A lead who calls that number back reaches inbound Joyce.
    call record stays, marked redacted). A failed delete is retried on every sweep. **A
    crisis call's recording is kept 30 days**, then deleted the same way. The clinicians
    review it in Cartesia (Agents → Calls), so whoever holds the Cartesia login plays it
-   for them. The inbound prompt now says "recorded" too.
+   for them. (The inbound prompt, not in use, says "recorded" too.)
 2. **Crisis transfer (D15): +1 800 273 8255**, the Lifeline's 10-digit number, which routes
    to 988. A 3-digit code cannot be a transfer destination. The destination is fixed in
    the tool, never filled by the model. Test one live transfer from a real phone
@@ -144,8 +140,8 @@ If a tool fails, do not mention it. Carry on and close as normal.
    website. Please call us back on six zero nine, five two seven, nine four three eight.
    Thank you." It must not say the person's name or what the practice does.
    `transfer_to_number` on, to **+18002738255**, used only as the safety rule says.
-5. **Phone number:** none to buy. Use inbound Joyce's number and note its id (Phone numbers
-   page). Leave it assigned to inbound Joyce, so callbacks reach her.
+5. **Phone number:** buy one US number in Cartesia and note its id (Phone numbers page).
+   Leave it unassigned: Joyce only calls out.
 6. **Publish** the agent and note its id (`agent_…`).
 7. **Trigger.dev prod** (project newpoint-marketing), set all three, then redeploy:
    `CRM_VOICE_API_KEY` (an `sk_car_…` key), `CRM_VOICE_AGENT_ID`, `CRM_VOICE_FROM_NUMBER_ID`.
