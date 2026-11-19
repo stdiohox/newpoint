@@ -192,35 +192,51 @@ export async function recordLeadCallResults(deps: LeadCallDeps, now: Date = new 
               ]
             : [row.lead_id, null, null, "no_result", "failed", null, null, null, null];
         if (!finished) deps.logger.warn("crm.lead_call.no_result", { lead: entityId(row.lead_id) });
-        const marked = await deps.db.query<{ outcome: string | null }>(
-          "select crm.record_lead_call($1::uuid, $2, $3, $4, $5, $6, $7, $8, $9::text[]) as outcome",
+        const marked = await deps.db.query<{ n: number }>(
+          "select crm.record_lead_call($1::uuid, $2, $3, $4, $5, $6, $7, $8, $9::text[]) as n",
           params,
         );
-        const stored = marked.rows[0]?.outcome ?? null;
-        if (stored === null) continue;
-        recorded += 1;
-        // The answers are in the CRM now, so the recording and transcript go.
-        // A crisis call's are kept for the clinicians to review.
-        if (finished && stored !== "crisis") {
-          try {
-            await calls.deleteRecording(row.provider_call_id);
-          } catch (error) {
-            deps.logger.warn("crm.lead_call.recording_not_deleted", {
-              lead: entityId(row.lead_id),
-              status: error instanceof VendorHttpError ? error.status : null,
-            });
-          }
-        }
+        recorded += marked.rows[0]?.n ?? 0;
       } catch (error) {
         deps.logger.error("crm.lead_call.record_failed", error, { lead: entityId(row.lead_id) });
       }
     }
   }
 
+  if (calls) await deleteLeadCallRecordings(deps, calls);
+
   // Runs even with calls off, so a crisis recorded before they were turned off still goes out.
   const crisisAlerts = await sendCrisisCallAlerts(deps);
   if (recorded > 0 || crisisAlerts > 0) deps.logger.info("crm.lead_call.recorded", { recorded, pending, crisis_alerts: crisisAlerts });
   return { recorded, pending, crisisAlerts };
+}
+
+/**
+ * Once a call is recorded here, its recording and transcript are deleted at
+ * Cartesia (agent calls cannot be set not to record). A crisis call's are kept
+ * 30 days for the clinicians. A failed delete is retried on the next sweep.
+ */
+export async function deleteLeadCallRecordings(
+  deps: Pick<LeadCallDeps, "db" | "logger">,
+  calls: CallsClient,
+): Promise<number> {
+  const { rows } = await deps.db.query<{ lead_id: string; provider_call_id: string }>(
+    "select lead_id, provider_call_id from crm.lead_call_recordings_to_delete(20)",
+  );
+  let deleted = 0;
+  for (const row of rows) {
+    try {
+      await calls.deleteRecording(row.provider_call_id);
+      await deps.db.query("select crm.mark_lead_call_recording_deleted($1::uuid)", [row.lead_id]);
+      deleted += 1;
+    } catch (error) {
+      deps.logger.warn("crm.lead_call.recording_not_deleted", {
+        lead: entityId(row.lead_id),
+        status: error instanceof VendorHttpError ? error.status : null,
+      });
+    }
+  }
+  return deleted;
 }
 
 export async function sendCrisisCallAlerts(deps: Pick<LeadCallDeps, "db" | "email" | "crmBaseUrl" | "logger">): Promise<number> {

@@ -28,11 +28,17 @@ inbound Joyce's number. A lead who calls that number back reaches inbound Joyce.
    party's consent, so the greeting and the note under the form's phone field say the call
    is recorded, and anyone who objects is not kept on the call. Once the call has ended and
    the CRM has the answers, the CRM deletes the recording and transcript at Cartesia (the
-   call record stays, marked redacted). **A crisis call's recording is kept** for the
-   clinicians to review. The inbound prompt now says "recorded" too.
+   call record stays, marked redacted). A failed delete is retried on every sweep. **A
+   crisis call's recording is kept 30 days**, then deleted the same way. The clinicians
+   review it in Cartesia (Agents → Calls), so whoever holds the Cartesia login plays it
+   for them. The inbound prompt now says "recorded" too.
 2. **Crisis transfer (D15): +1 800 273 8255**, the Lifeline's 10-digit number, which routes
-   to 988. A 3-digit code cannot be a transfer destination. Test one live transfer from a
-   real phone: Playground calls cannot transfer.
+   to 988. A 3-digit code cannot be a transfer destination. The destination is fixed in
+   the tool, never filled by the model. Test one live transfer from a real phone
+   (Playground calls cannot transfer) and check two things: that it reaches a Lifeline
+   counselor (the 800 number routes by caller ID, so a PA caller may reach an NJ center),
+   and whether Cartesia keeps recording after the transfer. If it does, the call with the
+   counselor is captured too; note that here.
 3. **Crisis sentence: the site's, word for word** ("If you’re in a crisis, call 988, or 911
    in an emergency."), then the transfer offer. Same in both prompts and in
    `automation/src/domain/crisis/response.ts`.
@@ -69,7 +75,7 @@ A false alarm costs nothing. Treat anything borderline as a crisis.
 - Never say what kind of practice Newpoint is, and never mention their request, until you know you are speaking to {{first_name}}. Someone else may have answered.
 - Never book, confirm or promise a time, a day or a provider. Never quote prices.
 - Never leave details on a voicemail beyond the message configured for voicemail.
-- If they do not want to be recorded: "No problem. The team will call you back instead. Goodbye." Record outcome "callback_requested". End the call.
+- If they do not want to be recorded (and nothing sounds like a crisis; the safety rule always comes first): "No problem. The team will call you back instead. Goodbye." Record outcome "callback_requested". End the call.
 - English only. If they need another language: "I can only help in English. I'll ask the team to call you back." Record outcome "language_help" and end the call.
 
 # Call flow

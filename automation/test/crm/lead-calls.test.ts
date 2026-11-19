@@ -88,11 +88,12 @@ function fakeCalls(
       const result = results[id];
       return result instanceof Error ? Promise.reject(result) : Promise.resolve(result ?? null);
     },
-    deleteRecording: (id) => (deleted.push(id), Promise.resolve()),
+    deleteRecording: (id) => (id === failDelete ? Promise.reject(new VendorHttpError("cartesia", 500)) : (deleted.push(id), Promise.resolve())),
   };
 }
 
 let n = 0;
+let failDelete: string | null = null;
 const accepts = () => fakeCalls(() => Promise.resolve({ ok: true, callId: `ac_${String((n += 1))}` }));
 
 const deps = (calls: CallsClient | null, email = recordingSender()) => ({
@@ -249,6 +250,19 @@ describe("recording results", () => {
     expect(await callRow(live)).toMatchObject({ status: "placed" });
     // The answers are kept; the recording of the ended call is deleted, the live one is not.
     expect(calls.deleted).toEqual(["ac_done"]);
+  });
+
+  it("retries a failed recording delete on the next sweep", async () => {
+    await submit("Ada Lane", "9", "6095550119");
+    const calls = fakeCalls(() => Promise.resolve({ ok: true, callId: "ac_retry" }), { ac_retry: ended({}) });
+    await placeLeadCalls(deps(calls), DAYTIME);
+    failDelete = "ac_retry";
+    await recordLeadCallResults(deps(calls), new Date());
+    expect(calls.deleted).toEqual([]);
+    failDelete = null;
+    await recordLeadCallResults(deps(calls), new Date());
+    await recordLeadCallResults(deps(calls), new Date());
+    expect(calls.deleted).toEqual(["ac_retry"]);
   });
 
   it("one unreadable call does not stop the others or the crisis alerts", async () => {

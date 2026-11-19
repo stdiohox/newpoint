@@ -49,6 +49,8 @@ create table crm.lead_calls (
   -- Why a call was not placed: a code, never a vendor message.
   error             text check (error ~ '^[a-z0-9_]{1,40}$'),
   crisis_alerted_at timestamptz,
+  -- When the CRM deleted the recording and transcript at Cartesia.
+  recording_deleted_at timestamptz,
   check ((status = 'placed') <= (provider_call_id is not null)),
   check ((status = 'ended') <= (outcome is not null))
 );
@@ -212,12 +214,11 @@ $$;
 -- The call's result, after it ended. Answers Joyce already sent during the call
 -- (crm.note_lead_call_outcome) are kept: a crisis is never overwritten, and an
 -- outcome Cartesia could not tell us (no_outcome, failed, ...) does not replace
--- one Joyce recorded. A call already ended is left alone. Returns the outcome
--- stored when recorded (the task keeps the recording of a crisis call), else null.
+-- one Joyce recorded. A call already ended is left alone. Returns 1 when recorded.
 create function crm.record_lead_call(
   p_lead_id uuid, p_started_at timestamptz, p_ended_at timestamptz, p_end_reason text,
   p_outcome text, p_state text, p_modality text, p_seen_before text, p_preferred_windows text[])
-returns text
+returns integer
 language sql
 security definer
 set search_path = ''
@@ -236,8 +237,8 @@ as $$
            seen_before = coalesce(p_seen_before, c.seen_before),
            preferred_windows = coalesce(p_preferred_windows, c.preferred_windows), updated_at = now()
      where c.lead_id = p_lead_id and c.status = 'placed'
-    returning c.outcome)
-  select (select outcome from marked);
+    returning 1)
+  select count(*)::int from marked;
 $$;
 
 -- Joyce's record_outcome, sent during the call, by Cartesia's call id. Only
@@ -286,6 +287,41 @@ as $$
     returning 1)
   select count(*)::int from marked;
 $$;
+
+-- Ended calls whose recording and transcript are still at Cartesia: every one
+-- except a crisis call, which is kept 30 days for the clinicians, then goes too.
+-- Retried every sweep until Cartesia confirms (or says the call is gone).
+create function crm.lead_call_recordings_to_delete(p_limit integer)
+returns table (lead_id uuid, provider_call_id text)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select c.lead_id, c.provider_call_id from crm.lead_calls c
+   where c.status = 'ended' and c.provider_call_id is not null and c.recording_deleted_at is null
+     and (c.outcome <> 'crisis' or coalesce(c.ended_at, c.updated_at) < now() - interval '30 days')
+   order by c.updated_at
+   limit greatest(1, least(p_limit, 50));
+$$;
+
+create function crm.mark_lead_call_recording_deleted(p_lead_id uuid)
+returns integer
+language sql
+security definer
+set search_path = ''
+as $$
+  with marked as (
+    update crm.lead_calls c set recording_deleted_at = now()
+     where c.lead_id = p_lead_id and c.recording_deleted_at is null
+    returning 1)
+  select count(*)::int from marked;
+$$;
+
+revoke all on function crm.lead_call_recordings_to_delete(integer) from public, anon, authenticated, service_role;
+revoke all on function crm.mark_lead_call_recording_deleted(uuid) from public, anon, authenticated, service_role;
+grant execute on function crm.lead_call_recordings_to_delete(integer) to crm_alerts;
+grant execute on function crm.mark_lead_call_recording_deleted(uuid) to crm_alerts;
 
 revoke all on function crm.phone_key(text) from public, anon, authenticated, service_role;
 revoke all on function crm.lead_call_daily_cap() from public, anon, authenticated, service_role;

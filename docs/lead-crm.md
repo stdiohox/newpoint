@@ -203,8 +203,8 @@ assistant, as well as the confirmation email, and the call is logged on the lead
   Cartesia's end reason, an outcome, and the enum answers: state, in person or telehealth,
   seen before, times that suit. **No transcript and no summary are copied into the CRM.**
   Once a call is recorded here, the sweep deletes its recording and transcript at Cartesia
-  (`crm.lead_call.recording_not_deleted` is logged if that fails); a crisis call's are kept
-  for the clinicians. The one health fact kept is the outcome `crisis`, so staff call
+  and stamps `recording_deleted_at`; a failure logs `crm.lead_call.recording_not_deleted`
+  and is retried every sweep. A crisis call's are kept 30 days for the clinicians, then go. The one health fact kept is the outcome `crisis`, so staff call
   back; every active staff account sees it, like the lead itself.
 - **Crisis email.** "Urgent: call this lead back now", a link and a time only, to everyone
   with alerts on. If nobody has alerts on it is logged as an error and goes out as soon as

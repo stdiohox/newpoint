@@ -153,7 +153,7 @@ Repeat the one thing that will happen next, in one sentence, then: "Thank you fo
 
 - `confirm_age(answer)`: answer is "yes", "no" or "no_answer". Once per call, right after the greeting.
 - `crisis_transfer()`: the moment anything sounds like a crisis. Alerts the on-call clinician. Call it before speaking.
-- `transfer_call(destination)`: only ever to "988". Only after the caller agrees or when you are unsure what they said. Say "Transferring you to 988 now" as you call it.
+- `transfer_call()`: transfers to 988. It takes no arguments: the number is fixed in the tool's configuration. Only after the caller agrees or when you are unsure what they said. Say "Transferring you to 988 now" as you call it.
 - `request_booking(state, modality, seen_before, preferred_windows, first_name, callback_number)`: state is "NJ", "PA", "other" or "unknown"; modality is "in_person", "telehealth" or "either"; seen_before is "yes", "no" or "unknown"; preferred_windows is up to four of "weekday_morning", "weekday_afternoon", "weekday_evening", "weekend".
 - `take_message(reason, first_name, callback_number)`: reason is one of "appointment_change", "billing", "language_help", "callback". No other detail is recorded. Never put symptoms, medications or anything personal into a message.
 - `end_call()`: after the closing line.
@@ -190,7 +190,7 @@ You: "I can only help in English. I will ask the team to call you back." (take_m
 
 1. **First message:** set the greeting as the agent's opening line exactly as written in the prompt, so the disclosure and the age question are never skipped.
 2. **Recording:** Cartesia records every agent call and has no setting to stop it. Pennsylvania requires all-party consent, so the greeting says the call is recorded, and a caller who objects is given the practice line. **Paste the new greeting into the live agent now**: the old one said "not recorded".
-3. **Tools:** define the six tools with the names and enum values above. Keep every parameter an enum or a short string; never free text for the reason. `transfer_call` points at **+18002738255** (the Lifeline's 10-digit number, which reaches 988; D15). Test one live transfer from a real phone before relying on it: Playground calls cannot transfer.
+3. **Tools:** define the six tools with the names and enum values above. Keep every parameter an enum or a short string; never free text for the reason. `transfer_call` points at **+18002738255** (the Lifeline's 10-digit number, which reaches 988; D15), set as a fixed destination with no parameter the model fills. Test one live transfer from a real phone before relying on it: Playground calls cannot transfer.
 4. **Where tool calls go:** the Newpoint automation has a tool server design for these calls (`automation/edge/vapi-tools`), built for Vapi. Pointing Cartesia at it needs a small adapter for Cartesia's request shape; say when you are ready and that gets built. Until then, `request_booking` and `take_message` can post to a simple webhook that emails the front desk.
 5. **Language:** English only in speech-to-text and the voice. Pick a calm, unhurried voice; set speaking rate slightly slower than default for phone audio.
 6. **Silence and max duration:** end the call after about 20 seconds of silence (the prompt asks once first) and cap calls at 10 minutes.
