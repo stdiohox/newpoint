@@ -95,6 +95,12 @@ export interface CallsClient {
   placeCall(request: PlaceCallRequest): Promise<PlaceCallResult>;
   /** null = not found or unreadable (the task treats it as not finished yet). */
   getCall(callId: string): Promise<CallResult | null>;
+  /**
+   * Deletes the call's recording and transcript at Cartesia (the call record
+   * stays, marked redacted). Agent calls cannot be set not to record, so the
+   * CRM removes them once it has the answers. A call already gone is fine.
+   */
+  deleteRecording(callId: string): Promise<void>;
 }
 
 export interface CartesiaOptions {
@@ -202,6 +208,13 @@ export function createCartesiaCalls(options: CartesiaOptions): CallsClient {
       if (response.status === 404) return null;
       if (!response.ok) throw new VendorHttpError("cartesia", response.status);
       return readCall(await response.json().catch(() => null));
+    },
+
+    async deleteRecording(callId) {
+      if (!CALL_ID.test(callId)) return;
+      const response = await options.readFetch(`${API}/agents/calls/${callId}`, { method: "DELETE", headers });
+      if (response.status === 404) return;
+      if (!response.ok) throw new VendorHttpError("cartesia", response.status);
     },
   };
 }

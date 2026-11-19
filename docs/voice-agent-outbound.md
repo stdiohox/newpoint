@@ -12,25 +12,32 @@ four appointment questions as the inbound Joyce, records the answers with one to
 the team will call to arrange a time. The answers appear on the lead in the CRM
 (docs/lead-crm.md, "Lead calls").
 
-**It is a separate Cartesia agent from the inbound Joyce** (docs/voice-agent-cartesia.md): an
-outbound call starts differently, and the CRM reads this agent's `record_outcome` tool.
+**Why a second agent, and not a second number.** One Cartesia agent has one prompt and one
+opening line, which plays before the model can decide anything. Inbound Joyce opens "Thank
+you for calling Newpoint"; this one must open by asking for `{{first_name}}` and say nothing
+else until the right person answers. Cartesia's docs do not say what an inbound call does
+when `{{first_name}}` is missing, so merging the two would risk the live inbound greeting.
+Duplicating Joyce in Cartesia and pasting this prompt is the safer ten minutes. **No new
+number:** any number on the account can place outbound calls, so this agent calls from
+inbound Joyce's number. A lead who calls that number back reaches inbound Joyce.
 
-## Before go-live: four things to decide
+## Decided 2026-11-19 (Koret, at the owner's request)
 
-1. **Recording.** Cartesia records the audio and transcript of every call by default. The
-   inbound prompt says "this call is not recorded", which is untrue on Cartesia unless
-   recording is turned off (Zero Data Retention, an Enterprise feature). Pennsylvania requires
-   every party's consent to record. **This script therefore says the call is recorded**, and
-   so does the note under the form's phone field. If recording is ever turned off, change both
-   back. The CRM does not depend on the recording: Joyce's answers reach it through her
-   `record_outcome` tool during the call. **The inbound Joyce has the same problem today.**
-2. **Crisis transfer number (D15).** `transfer_to_number` needs a real number that reaches
-   988, chosen by the clinicians. Until it is set, leave `transfer_to_number` off: Joyce still
-   gives 988 and 911, records `crisis`, and the CRM emails every staff member at once.
-3. **Approve the crisis sentences**, which are the same draft as the inbound prompt.
-4. **The voicemail.** Inbound Joyce leaves none. This one leaves a short message with no name
-   and no service (step 4 of the configuration). The practice should approve it, or turn
-   voicemail detection's message off.
+1. **Recording: said, then deleted.** Cartesia saves every agent call and has no setting to
+   stop it (Zero Data Retention covers only its speech APIs). Pennsylvania requires every
+   party's consent, so the greeting and the note under the form's phone field say the call
+   is recorded, and anyone who objects is not kept on the call. Once the call has ended and
+   the CRM has the answers, the CRM deletes the recording and transcript at Cartesia (the
+   call record stays, marked redacted). **A crisis call's recording is kept** for the
+   clinicians to review. The inbound prompt now says "recorded" too.
+2. **Crisis transfer (D15): +1 800 273 8255**, the Lifeline's 10-digit number, which routes
+   to 988. A 3-digit code cannot be a transfer destination. Test one live transfer from a
+   real phone: Playground calls cannot transfer.
+3. **Crisis sentence: the site's, word for word** ("If you’re in a crisis, call 988, or 911
+   in an emergency."), then the transfer offer. Same in both prompts and in
+   `automation/src/domain/crisis/response.ts`.
+4. **Voicemail: the short message in step 4 below**, with no name and no service. Leaving a
+   message means a lead who missed the call knows who rang and can call back.
 
 ----
 
@@ -49,9 +56,9 @@ Short sentences. One question at a time, then listen. Warm, calm and plain. Neve
 If, at any point, the person says anything about harming themselves, harming someone else, wanting to die, not wanting to be alive, being in danger, being hurt by someone, an overdose, or an emergency, or anything that sounds like a crisis even if indirect, stop and do this, in this order:
 
 1. Call `record_outcome` with outcome "crisis" immediately, before you say anything else. It alerts the team.
-2. Say, calmly and without adding anything: "If you are thinking about harming yourself or are in crisis, please call 988, the Suicide and Crisis Lifeline. If this is an emergency, hang up and call 911."
-3. If transferring is available to you, add "I can transfer you to 988 now." If they say yes, or you are unsure, use `transfer_to_number`. Never say you are transferring unless you use it.
-4. If they say no, or you cannot transfer: "Okay. 988 is there any time, day or night. Someone from the team will call you back." Then end the call gently. Do not ask what happened, do not advise.
+2. Say, calmly and without adding anything: "If you’re in a crisis, call 988, or 911 in an emergency. I can transfer you to 988 now."
+3. If they say yes, or you are unsure what they said, use `transfer_to_number`. Never say you are transferring unless you use it.
+4. If they clearly say no: "Okay. Someone from the team will call you back." Then end the call gently. Do not ask what happened, do not advise.
 
 A false alarm costs nothing. Treat anything borderline as a crisis.
 
@@ -62,6 +69,7 @@ A false alarm costs nothing. Treat anything borderline as a crisis.
 - Never say what kind of practice Newpoint is, and never mention their request, until you know you are speaking to {{first_name}}. Someone else may have answered.
 - Never book, confirm or promise a time, a day or a provider. Never quote prices.
 - Never leave details on a voicemail beyond the message configured for voicemail.
+- If they do not want to be recorded: "No problem. The team will call you back instead. Goodbye." Record outcome "callback_requested". End the call.
 - English only. If they need another language: "I can only help in English. I'll ask the team to call you back." Record outcome "language_help" and end the call.
 
 # Call flow
@@ -129,8 +137,9 @@ If a tool fails, do not mention it. Carry on and close as normal.
    "Hello, this is Joyce, an automated assistant from Newpoint, returning a request from our
    website. Please call us back on six zero nine, five two seven, nine four three eight.
    Thank you." It must not say the person's name or what the practice does.
-   `transfer_to_number` only once the clinicians choose the number (D15).
-5. **Phone number:** buy or connect one in Cartesia, US. Note its id (Phone numbers page).
+   `transfer_to_number` on, to **+18002738255**, used only as the safety rule says.
+5. **Phone number:** none to buy. Use inbound Joyce's number and note its id (Phone numbers
+   page). Leave it assigned to inbound Joyce, so callbacks reach her.
 6. **Publish** the agent and note its id (`agent_…`).
 7. **Trigger.dev prod** (project newpoint-marketing), set all three, then redeploy:
    `CRM_VOICE_API_KEY` (an `sk_car_…` key), `CRM_VOICE_AGENT_ID`, `CRM_VOICE_FROM_NUMBER_ID`.

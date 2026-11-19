@@ -21,7 +21,10 @@ export const CRISIS_SCRIPT = {
   // notified or how soon anyone replies. The page has no response-time guarantee, so the reply
   // must not read as a promise that someone will answer: "do not wait for us" carries that.
   sms: "Newpoint here. If you are thinking about harming yourself or are in crisis, do not wait for us: call 988 now, or 911 in an emergency.",
-  /** What the voice assistant says before offering the 988 transfer (Phase 8). */
-  voice:
-    "If you are thinking about harming yourself or are in crisis, please call 988, the Suicide and Crisis Lifeline. If this is an emergency, hang up and call 911. I can transfer you to 988 now.",
+  /**
+   * What the voice assistant says, then the 988 transfer offer. Koret, 2026-11-19: the
+   * site's one crisis sentence word for word (lib/content.ts CONTACT.crisisNote), the same in
+   * both Joyce prompts (docs/voice-agent-cartesia.md, docs/voice-agent-outbound.md).
+   */
+  voice: "If you’re in a crisis, call 988, or 911 in an emergency. I can transfer you to 988 now.",
 } as const;

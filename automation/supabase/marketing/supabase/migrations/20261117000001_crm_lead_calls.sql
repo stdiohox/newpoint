@@ -212,11 +212,12 @@ $$;
 -- The call's result, after it ended. Answers Joyce already sent during the call
 -- (crm.note_lead_call_outcome) are kept: a crisis is never overwritten, and an
 -- outcome Cartesia could not tell us (no_outcome, failed, ...) does not replace
--- one Joyce recorded. A call already ended is left alone. Returns 1 when recorded.
+-- one Joyce recorded. A call already ended is left alone. Returns the outcome
+-- stored when recorded (the task keeps the recording of a crisis call), else null.
 create function crm.record_lead_call(
   p_lead_id uuid, p_started_at timestamptz, p_ended_at timestamptz, p_end_reason text,
   p_outcome text, p_state text, p_modality text, p_seen_before text, p_preferred_windows text[])
-returns integer
+returns text
 language sql
 security definer
 set search_path = ''
@@ -235,8 +236,8 @@ as $$
            seen_before = coalesce(p_seen_before, c.seen_before),
            preferred_windows = coalesce(p_preferred_windows, c.preferred_windows), updated_at = now()
      where c.lead_id = p_lead_id and c.status = 'placed'
-    returning 1)
-  select count(*)::int from marked;
+    returning c.outcome)
+  select (select outcome from marked);
 $$;
 
 -- Joyce's record_outcome, sent during the call, by Cartesia's call id. Only

@@ -201,15 +201,18 @@ assistant, as well as the confirmation email, and the call is logged on the lead
   overwritten, and noted answers survive a call Cartesia never reports (2 hours → failed).
 - **What is logged** (`crm.lead_calls`, "Call from Joyce" on the lead page): times,
   Cartesia's end reason, an outcome, and the enum answers: state, in person or telehealth,
-  seen before, times that suit. **No transcript and no summary are copied into the CRM**;
-  they stay in Cartesia. The one health fact kept is the outcome `crisis`, so staff call
+  seen before, times that suit. **No transcript and no summary are copied into the CRM.**
+  Once a call is recorded here, the sweep deletes its recording and transcript at Cartesia
+  (`crm.lead_call.recording_not_deleted` is logged if that fails); a crisis call's are kept
+  for the clinicians. The one health fact kept is the outcome `crisis`, so staff call
   back; every active staff account sees it, like the lead itself.
 - **Crisis email.** "Urgent: call this lead back now", a link and a time only, to everyone
   with alerts on. If nobody has alerts on it is logged as an error and goes out as soon as
   someone does.
 - **Off until configured.** With any `CRM_VOICE_*` unset (blank counts as unset) nothing is
-  dialled. Set-up, the agent's script and the four open decisions (recording disclosure,
-  crisis transfer number, crisis wording, voicemail) are in `docs/voice-agent-outbound.md`.
+  dialled. Set-up, the agent's script and the decisions taken on 2026-11-19 (recording
+  said then deleted, transfer to +1 800 273 8255, the site's crisis sentence, the
+  voicemail) are in `docs/voice-agent-outbound.md`.
 - **Zone.** Cartesia is called from `adapters/calls/cartesia.ts`, on the CRM side, not
   from `adapters/voice/` (the PHI receptionist): the CRM is in the marketing Supabase by
   owner decision, and this only dials a lead the CRM already holds.

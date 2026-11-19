@@ -77,15 +77,18 @@ function recordingSender(): EmailSender & { sent: Email[] } {
 function fakeCalls(
   place: (request: PlaceCallRequest) => Promise<PlaceCallResult>,
   results: Record<string, CallResult | null | Error> = {},
-): CallsClient & { placed: PlaceCallRequest[] } {
+): CallsClient & { placed: PlaceCallRequest[]; deleted: string[] } {
   const placed: PlaceCallRequest[] = [];
+  const deleted: string[] = [];
   return {
     placed,
+    deleted,
     placeCall: (request) => (placed.push(request), place(request)),
     getCall: (id) => {
       const result = results[id];
       return result instanceof Error ? Promise.reject(result) : Promise.resolve(result ?? null);
     },
+    deleteRecording: (id) => (deleted.push(id), Promise.resolve()),
   };
 }
 
@@ -244,6 +247,8 @@ describe("recording results", () => {
       preferred_windows: ["weekday_morning"],
     });
     expect(await callRow(live)).toMatchObject({ status: "placed" });
+    // The answers are kept; the recording of the ended call is deleted, the live one is not.
+    expect(calls.deleted).toEqual(["ac_done"]);
   });
 
   it("one unreadable call does not stop the others or the crisis alerts", async () => {
@@ -295,6 +300,8 @@ describe("during the call (record_outcome via the site)", () => {
     await recordLeadCallResults(deps(calls, email), new Date());
     expect(await callRow(id)).toMatchObject({ status: "ended", outcome: "crisis" });
     expect(email.sent).toHaveLength(1);
+    // A crisis call's recording stays for the clinicians.
+    expect(calls.deleted).toEqual([]);
   });
 
   it("throws (so the task retries) when no open call has that id", async () => {
