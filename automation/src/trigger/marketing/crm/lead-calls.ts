@@ -316,7 +316,8 @@ export function leadCallDeps(): LeadCallDeps {
 /** Morning calls for evening leads, retries, and every call's result. */
 export const leadCallsSweep = marketingSchedule({
   id: "crm.lead-calls",
-  cron: { pattern: "*/5 * * * *", timezone: "America/New_York" },
+  // window: without it Trigger gives a new schedule a stable delay of up to 60 minutes.
+  cron: { pattern: "*/5 * * * *", timezone: "America/New_York", window: "1m" },
   queue: crmQueue,
   maxDuration: 120,
   retry: { maxAttempts: 2, factor: 2, minTimeoutInMs: 5_000, maxTimeoutInMs: 60_000 },
