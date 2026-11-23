@@ -66,7 +66,7 @@ Supabase newpoint-marketing, schema crm
 | Trigger.dev prod | `RESEND_API_KEY` | Resend key, sending access only |
 | | `CRM_ALERT_FROM` | e.g. `Newpoint CRM <crm@newpointnp.com>` (domain verified in Resend) |
 | | `CRM_BASE_URL` | optional, default `https://www.newpointnp.com/crm` |
-| | `CRM_VOICE_API_KEY`, `CRM_VOICE_AGENT_ID`, `CRM_VOICE_FROM_NUMBER_ID` | optional, all three or none: Joyce's lead calls (see "Lead calls") |
+| | `CRM_VOICE_API_KEY`, `CRM_VOICE_AGENT_ID`, `CRM_VOICE_FROM_NUMBER_ID` | optional, all three or none: Joyce's lead calls (see "Lead calls"). Spaces and tabs are trimmed; a wrong or partial set only turns calls off (error `crm.lead_call.config_invalid` names which one), alerts and confirmations keep running |
 | Vercel (site) | `CRM_VOICE_TOOL_SECRET` | 32+ random characters, same as the header on Joyce's `record_outcome` tool |
 
 The alert tasks also use `MARKETING_DATABASE_URL`, `MARKETING_DATABASE_CA_CERT` and

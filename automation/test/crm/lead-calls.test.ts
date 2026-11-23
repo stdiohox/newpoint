@@ -362,7 +362,7 @@ describe("pure helpers", () => {
     expect(outcomeOf({ ...base, endReason: "client_hangup" })).toBe("no_outcome");
   });
 
-  it("treats a blank CRM_VOICE_* as unset, and refuses a partial set", () => {
+  it("treats a blank CRM_VOICE_* as unset; a wrong or partial set turns calls off, never the alerts", () => {
     const base = {
       MARKETING_DATABASE_URL: "postgresql://trigger_marketing.utxaczptucbqrnnzmziz:pw@aws-0-eu-west-1.pooler.supabase.com:5432/postgres",
       MARKETING_DATABASE_CA_CERT: "-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----",
@@ -370,7 +370,37 @@ describe("pure helpers", () => {
       RESEND_API_KEY: "re_abcdefghijkl",
       CRM_ALERT_FROM: "Newpoint CRM <crm@newpointnp.com>",
     };
-    expect(loadCrmEnv({ ...base, CRM_VOICE_API_KEY: "", CRM_VOICE_AGENT_ID: " " }).CRM_VOICE_API_KEY).toBeUndefined();
-    expect(() => loadCrmEnv({ ...base, CRM_VOICE_API_KEY: "sk_car_abcdefghijkl" })).toThrow();
+    const blank = loadCrmEnv({ ...base, CRM_VOICE_API_KEY: "", CRM_VOICE_AGENT_ID: " " });
+    expect(blank.CRM_VOICE_API_KEY).toBeUndefined();
+    expect(blank.crmVoiceProblem).toBeUndefined();
+
+    // Partial set (the 2026-11-23 outage: key saved under another name): calls off, env loads.
+    const partial = loadCrmEnv({ ...base, CRM_VOICE_AGENT_ID: "agent_abcdefgh", CRM_VOICE_FROM_NUMBER_ID: "ap_abcdefgh" });
+    expect(partial.CRM_VOICE_AGENT_ID).toBeUndefined();
+    expect(partial.RESEND_API_KEY).toBe(base.RESEND_API_KEY);
+    expect(partial.crmVoiceProblem).toEqual({ apiKeyOk: false, agentIdOk: true, fromNumberIdOk: true });
+
+    // Malformed value: calls off, the bad one named.
+    const bad = loadCrmEnv({
+      ...base,
+      CRM_VOICE_API_KEY: "sk_car_abcdefghijkl",
+      CRM_VOICE_AGENT_ID: "not-an-agent",
+      CRM_VOICE_FROM_NUMBER_ID: "ap_abcdefgh",
+    });
+    expect(bad.CRM_VOICE_API_KEY).toBeUndefined();
+    expect(bad.crmVoiceProblem).toEqual({ apiKeyOk: true, agentIdOk: false, fromNumberIdOk: true });
+
+    // A pasted tab or newline is trimmed, not an error.
+    const pasted = loadCrmEnv({
+      ...base,
+      CRM_VOICE_API_KEY: "sk_car_abcdefghijkl\n",
+      CRM_VOICE_AGENT_ID: "\tagent_abcdefgh",
+      CRM_VOICE_FROM_NUMBER_ID: " ap_abcdefgh ",
+    });
+    expect(pasted.crmVoiceProblem).toBeUndefined();
+    expect(pasted.CRM_VOICE_AGENT_ID).toBe("agent_abcdefgh");
+
+    // The alerts' own settings stay strict.
+    expect(() => loadCrmEnv({ ...base, RESEND_API_KEY: "nope" })).toThrow("invalid_crm_env");
   });
 });

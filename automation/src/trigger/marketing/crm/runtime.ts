@@ -27,11 +27,14 @@ let runtime: CrmRuntime | undefined;
 export function crmRuntime(): CrmRuntime {
   if (runtime) return runtime;
   const env = loadCrmEnv();
+  const logger = createLogger();
+  // Calls off, alerts on: say so in every worker's log until it is fixed in Trigger.dev.
+  if (env.crmVoiceProblem) logger.error("crm.lead_call.config_invalid", null, env.crmVoiceProblem);
   runtime = Object.freeze({
     env,
     db: createMarketingPool(env.MARKETING_DATABASE_URL, env.MARKETING_DATABASE_CA_CERT),
     email: createResendSender({ apiKey: env.RESEND_API_KEY, from: env.CRM_ALERT_FROM, fetch: vendorFetch }),
-    logger: createLogger(),
+    logger,
     calls:
       env.CRM_VOICE_API_KEY && env.CRM_VOICE_AGENT_ID && env.CRM_VOICE_FROM_NUMBER_ID
         ? createCartesiaCalls({

@@ -127,8 +127,12 @@ export function loadMarketingEnv(
   return Object.freeze(result.data);
 }
 
+/** Trims (a pasted tab or newline is not an error) and treats blank as unset. */
 function blankIsUnset<T extends z.ZodType>(schema: T) {
-  return z.preprocess((value) => (typeof value === "string" && value.trim() === "" ? undefined : value), schema.optional());
+  return z.preprocess(
+    (value) => (typeof value === "string" ? (value.trim() === "" ? undefined : value.trim()) : value),
+    schema.optional(),
+  );
 }
 
 /**
@@ -159,24 +163,42 @@ export const crmEnvSchema = z.object({
     .string()
     .regex(/^https:\/\/([a-z0-9-]+\.)*newpointnp\.com\/crm$/, "must be https://…newpointnp.com/crm")
     .default("https://www.newpointnp.com/crm"),
-  /**
-   * Joyce's outbound call to new leads with a phone (docs/lead-crm.md "Lead calls").
-   * All three or none: unset = no calls (everything else still runs). Cartesia, not
-   * Vapi/Twilio, so the PHI-zone name guard does not apply; see adapters/calls/cartesia.ts.
-   */
-  // A variable that exists but is blank counts as unset: it must not stop the alerts.
-  CRM_VOICE_API_KEY: blankIsUnset(z.string().regex(/^sk_car_[A-Za-z0-9_-]{10,}$/, "must be a Cartesia API key (sk_car_…)")),
-  CRM_VOICE_AGENT_ID: blankIsUnset(z.string().regex(/^agent_[A-Za-z0-9]{6,64}$/, "must be a Cartesia agent id (agent_…)")),
-  CRM_VOICE_FROM_NUMBER_ID: blankIsUnset(z.string().regex(/^[A-Za-z0-9_-]{6,80}$/, "must be a Cartesia phone number id")),
-}).refine(
-  (env) => {
-    const set = [env.CRM_VOICE_API_KEY, env.CRM_VOICE_AGENT_ID, env.CRM_VOICE_FROM_NUMBER_ID].filter(Boolean).length;
-    return set === 0 || set === 3;
-  },
-  { path: ["CRM_VOICE_API_KEY"], message: "set CRM_VOICE_API_KEY, CRM_VOICE_AGENT_ID and CRM_VOICE_FROM_NUMBER_ID together" },
-);
+});
 
-export type CrmEnv = Readonly<z.output<typeof crmEnvSchema>>;
+/**
+ * Joyce's outbound call to new leads with a phone (docs/lead-crm.md "Lead calls").
+ * All three or none: unset = no calls. Cartesia, not Vapi/Twilio, so the PHI-zone
+ * name guard does not apply; see adapters/calls/cartesia.ts.
+ *
+ * Checked apart from crmEnvSchema on purpose: a wrong or partial CRM_VOICE_* turns
+ * calls off (crmVoiceProblem says which) and never stops the alerts and
+ * confirmations (outage 2026-11-23: a mistyped name and a pasted tab stopped every crm.* task).
+ */
+export const crmVoiceEnvSchema = z
+  .object({
+    CRM_VOICE_API_KEY: blankIsUnset(z.string().regex(/^sk_car_[A-Za-z0-9_-]{10,}$/, "must be a Cartesia API key (sk_car_…)")),
+    CRM_VOICE_AGENT_ID: blankIsUnset(z.string().regex(/^agent_[A-Za-z0-9]{6,64}$/, "must be a Cartesia agent id (agent_…)")),
+    CRM_VOICE_FROM_NUMBER_ID: blankIsUnset(z.string().regex(/^[A-Za-z0-9_-]{6,80}$/, "must be a Cartesia phone number id")),
+  })
+  .refine(
+    (env) => {
+      const set = [env.CRM_VOICE_API_KEY, env.CRM_VOICE_AGENT_ID, env.CRM_VOICE_FROM_NUMBER_ID].filter(Boolean).length;
+      return set === 0 || set === 3;
+    },
+    { path: ["CRM_VOICE_API_KEY"], message: "set CRM_VOICE_API_KEY, CRM_VOICE_AGENT_ID and CRM_VOICE_FROM_NUMBER_ID together" },
+  );
+
+export type CrmEnv = Readonly<
+  z.output<typeof crmEnvSchema> &
+    Partial<z.output<typeof crmVoiceEnvSchema>> & {
+      /** Set when CRM_VOICE_* is wrong or partial: calls are off, everything else runs. */
+      readonly crmVoiceProblem?: {
+        readonly apiKeyOk: boolean;
+        readonly agentIdOk: boolean;
+        readonly fromNumberIdOk: boolean;
+      };
+    }
+>;
 
 export function loadCrmEnv(source: Readonly<Record<string, string | undefined>> = process.env): CrmEnv {
   const forbidden = findPhiZoneVariables(source);
@@ -191,7 +213,19 @@ export function loadCrmEnv(source: Readonly<Record<string, string | undefined>> 
   if (supabaseProjectRef(result.data.MARKETING_DATABASE_URL) !== result.data.SUPABASE_MARKETING_PROJECT_REF) {
     throw new ConfigError("marketing_db_host_mismatch", ["MARKETING_DATABASE_URL", "SUPABASE_MARKETING_PROJECT_REF"]);
   }
-  return Object.freeze(result.data);
+  const voice = crmVoiceEnvSchema.safeParse(source);
+  if (voice.success) return Object.freeze({ ...result.data, ...voice.data });
+  // Which variable is wrong, by name only (never a value). A missing one in a partial set counts as wrong.
+  const ok = (name: keyof typeof crmVoiceEnvSchema.shape) =>
+    crmVoiceEnvSchema.shape[name].safeParse(source[name]).data !== undefined;
+  return Object.freeze({
+    ...result.data,
+    crmVoiceProblem: {
+      apiKeyOk: ok("CRM_VOICE_API_KEY"),
+      agentIdOk: ok("CRM_VOICE_AGENT_ID"),
+      fromNumberIdOk: ok("CRM_VOICE_FROM_NUMBER_ID"),
+    },
+  });
 }
 
 /**
