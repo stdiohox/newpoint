@@ -10,7 +10,7 @@ import { EMAIL_PATTERN, LEAD_LIMITS, PHONE_PATTERN } from './form-contract';
 export interface LeadInput {
   name: string;
   email: string;
-  phone: string | null;
+  phone: string;
   reason: (typeof CONTACT.reasons)[number];
 }
 
@@ -36,12 +36,13 @@ export function parseLeadInput(
   const fields: LeadField[] = [];
   if (name.length < 1 || name.length > LEAD_LIMITS.name) fields.push('name');
   if (email.length > LEAD_LIMITS.email || !EMAIL.test(email)) fields.push('email');
-  if (phone && !PHONE.test(phone)) fields.push('phone');
+  // Required since 2026-11-24 (client instruction): an empty phone fails the pattern.
+  if (!PHONE.test(phone)) fields.push('phone');
   if (!(CONTACT.reasons as readonly string[]).includes(reason)) fields.push('reason');
   if (fields.length > 0) return { ok: false, fields };
 
   return {
     ok: true,
-    lead: { name, email, phone: phone || null, reason: reason as LeadInput['reason'] },
+    lead: { name, email, phone, reason: reason as LeadInput['reason'] },
   };
 }

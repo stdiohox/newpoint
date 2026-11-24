@@ -8,7 +8,7 @@
  * Posts straight from the browser to the BAA-covered intake handler
  * (automation/edge/intake): no Next.js route, server action or middleware in between,
  * and no analytics on the fields (automation spec §5.5). Same fields as the
- * OnboardingForm (name, email, optional phone, the constrained reason) per the
+ * OnboardingForm (name, email, phone (required), the constrained reason) per the
  * CLAUDE.md HIPAA rule, plus an UNTICKED SMS consent box and a Turnstile check. With
  * consent and a phone, a 6-digit code is texted and entered here.
  *
@@ -180,10 +180,10 @@ export function IntakeForm({
     if (!email) next.email = 'Please enter an email address.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       next.email = 'Please check this email address.';
-    if (phoneValue && !/^[\d\s().+-]{7,}$/.test(phoneValue))
+    // Required since 2026-11-24 (client instruction).
+    if (!phoneValue) next.phone = 'Please enter a phone number.';
+    else if (!/^[\d\s().+-]{7,}$/.test(phoneValue))
       next.phone = 'Please check this phone number.';
-    if (smsConsent && !phoneValue)
-      next.phone = 'Add a phone number to get texts, or untick the box below.';
     if (Object.keys(next).length > 0) return fail(next);
     setErrors({});
     if (token === null) {
@@ -379,7 +379,7 @@ export function IntakeForm({
             </div>
             <div>
               <label htmlFor="phone" className={LABEL_CLASS}>
-                Phone <span className="text-np-neutral-600 font-normal">(optional)</span>
+                Phone
               </label>
               <Input
                 ref={fieldRefs.phone}
@@ -387,6 +387,7 @@ export function IntakeForm({
                 name="phone"
                 type="tel"
                 autoComplete="tel"
+                required
                 aria-invalid={Boolean(errors.phone)}
                 aria-describedby={errors.phone ? 'phone-error' : undefined}
                 className="mt-2"

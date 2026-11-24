@@ -195,7 +195,9 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
       if (!email) next.email = 'Please enter an email address.';
       else if (email.length > LEAD_LIMITS.email || !EMAIL_PATTERN.test(email))
         next.email = 'Please check this email address.';
-      if (phone && !PHONE_PATTERN.test(phone)) next.phone = 'Please check this phone number.';
+      // Required since 2026-11-24 (client instruction): every lead gets a number.
+      if (!phone) next.phone = 'Please enter a phone number.';
+      else if (!PHONE_PATTERN.test(phone)) next.phone = 'Please check this phone number.';
 
       setErrors(next);
       /*
@@ -442,7 +444,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
 
                 <motion.div {...item}>
                   <label htmlFor="phone" className={LABEL_CLASS}>
-                    Phone <span className="text-np-neutral-600 font-normal">(optional)</span>
+                    Phone
                   </label>
                   <Input
                     ref={fieldRefs.phone}
@@ -451,6 +453,7 @@ const OnboardingForm = React.forwardRef<HTMLDivElement, OnboardingFormProps>(
                     maxLength={LEAD_LIMITS.phoneMax}
                     type="tel"
                     autoComplete="tel"
+                    required
                     aria-invalid={Boolean(errors.phone)}
                     aria-describedby={errors.phone ? `phone-error ${phoneNoteId}` : phoneNoteId}
                     className="mt-2"

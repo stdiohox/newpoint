@@ -2663,13 +2663,15 @@ export const CONTACT = {
   privacyNote:
     'Please don’t include health information, medical history, or insurance ID numbers in this form.',
   /**
-   * Under the optional phone field. Owner request 2026-11-17: a lead who gives a
-   * number gets a call from Joyce, the automated assistant (docs/lead-crm.md
-   * "Lead calls"). Said before they submit, so leaving a number is consent to
-   * that call (TCPA: automated and AI-voice calls need prior express consent).
+   * Under the phone field, which is REQUIRED since 2026-11-24 (client
+   * instruction: "the phone number is a must"). Owner request 2026-11-17: a lead
+   * who gives a number gets a call from Joyce, the automated assistant
+   * (docs/lead-crm.md "Lead calls"). Said before they submit, so leaving a number
+   * is consent to that call (TCPA: automated and AI-voice calls need prior
+   * express consent). No "If you add a number": every lead now gives one.
    */
   phoneNote:
-    'If you add a number, Joyce, our automated assistant, will call you about your request. The call is recorded, and she may leave a voicemail. You can tell her on the call if you’d rather not be called.',
+    'Joyce, our automated assistant, will call you about your request. The call is recorded, and she may leave a voicemail. You can tell her on the call if you’d rather not be called.',
   reasons: [
     'New patient inquiry',
     'Existing patient',
